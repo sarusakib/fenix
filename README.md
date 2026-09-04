@@ -1,2 +1,2 @@
-# fenix-app
+# fenix
 FeniX — Feni Business Ecosystem
