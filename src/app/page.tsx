@@ -65,9 +65,9 @@ href: '/guide'
 <Navbar />
 ​{/* Hero Section /}
 <section className="bg-[#0B1736] text-white pt-12 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-{/ Subtle Background Elements */}
-<div className="absolute -top-24 -right-24 w-96 h-96 bg-[#008080]/20 rounded-full blur-3xl pointer-events-none"></div>
-<div className="absolute top-1/2 -left-24 w-72 h-72 bg-[#FFD700]/10 rounded-full blur-2xl pointer-events-none"></div>
+{/ Background Glows */}
+<div className="absolute -top-24 -right-24 w-96 h-96 bg-[#008080]/20 rounded-full blur-3xl pointer-events-none" />
+<div className="absolute top-1/2 -left-24 w-72 h-72 bg-[#FFD700]/10 rounded-full blur-2xl pointer-events-none" />
 ​<div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
 <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium border border-white/10 text-[#FFD700]">
 <Sparkle weight="fill" className="text-[#FFD700] w-4 h-4" />
@@ -82,7 +82,7 @@ href: '/guide'
 ​<p className="max-w-2xl mx-auto text-sm sm:text-base text-gray-300 font-normal">
 ফেনীর উদ্যোক্তা, বিনিয়োগকারী এবং ব্যবসার জন্য তৈরি সমন্বিত প্ল্যাটফর্ম। সঠিক তথ্য, বিশ্বস্ত পার্টনার ও আধুনিক প্রযুক্তিতে গড়ে তুলুন আপনার বিজনেস।
 </p>
-​{/* Feni Brain AI Smart Search Bar */}
+​{/* Search Bar */}
 <div className="max-w-3xl mx-auto mt-8">
 <div className="relative flex items-center bg-white rounded-2xl shadow-xl border-2 border-teal-500/30 p-2 focus-within:border-[#008080] transition-all duration-300">
 <div className="p-3 text-gray-400">
@@ -199,4 +199,4 @@ className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all dur
 </footer>
 </div>
 )
-}
+  }
