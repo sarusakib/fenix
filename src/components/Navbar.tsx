@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useAuthStore } from '@/store/useAuthStore'
+import { useAuthStore } from '../store/useAuthStore'
 
 export default function Navbar() {
   const { user, role, logout } = useAuthStore()
@@ -55,4 +55,4 @@ export default function Navbar() {
       </div>
     </nav>
   )
-      }
+}
