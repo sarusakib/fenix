@@ -2,7 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  box-sizing: border-box;
+}
+
+html,
 body {
-  background-color: #F6F8FC;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f3f4f6;
   color: #0B1736;
 }
