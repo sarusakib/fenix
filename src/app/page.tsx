@@ -1,6 +1,6 @@
 'use client'
 ​import { useState } from 'react'
-import Navbar from '@/components/Navbar'
+import Link from 'next/link'
 import {
 Rocket,
 TrendUp,
@@ -61,11 +61,34 @@ href: '/guide'
 ]
 ​return (
 <div className="min-h-screen bg-[#f3f4f6] text-gray-800 flex flex-col font-sans">
-{/* Top Navigation Bar with Login Button */}
-<Navbar />
-​{/* Hero Section /}
+{/* Top Navigation Bar */}
+<nav className="bg-[#0B1736] border-b border-gray-800 text-white sticky top-0 z-50">
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div className="flex items-center justify-between h-16">
+<div className="flex items-center space-x-3">
+<Link href="/" className="flex items-center space-x-2">
+<span className="text-2xl font-extrabold text-[#FFD700] tracking-wider">FeniX</span>
+<span className="text-xs bg-[#008080] text-white px-2 py-0.5 rounded-full font-medium">Ecosystem</span>
+</Link>
+</div>
+<div className="hidden md:flex items-center space-x-6 text-sm font-medium">
+<Link href="/" className="hover:text-[#FFD700] transition-colors">হোম</Link>
+<Link href="/directory" className="hover:text-[#FFD700] transition-colors">বিজনেস ডিরেক্টরি</Link>
+<Link href="/invest" className="hover:text-[#FFD700] transition-colors">ইনভেস্টমেন্ট</Link>
+</div>
+<div className="flex items-center space-x-4">
+<Link
+href="/login"
+className="bg-[#008080] hover:bg-[#006666] text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+>
+লগইন করুন
+</Link>
+</div>
+</div>
+</div>
+</nav>
+​{/* Hero Section */}
 <section className="bg-[#0B1736] text-white pt-12 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-{/ Background Glows */}
 <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#008080]/20 rounded-full blur-3xl pointer-events-none" />
 <div className="absolute top-1/2 -left-24 w-72 h-72 bg-[#FFD700]/10 rounded-full blur-2xl pointer-events-none" />
 ​<div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
@@ -122,8 +145,9 @@ className="bg-white/10 hover:bg-white/20 text-gray-200 px-3 py-1 rounded-lg bord
 {actionCards.map((card) => {
 const IconComponent = card.icon
 return (
-<div
+<a
 key={card.id}
+href={card.href}
 className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col justify-between group cursor-pointer hover:-translate-y-1"
 >
 <div>
@@ -146,7 +170,7 @@ className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all dur
 <span>বিস্তারিত দেখুন</span>
 <ArrowRight size={14} className="ml-1" weight="bold" />
 </div>
-</div>
+</a>
 )
 })}
 </div>
