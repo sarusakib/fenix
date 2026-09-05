@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "fenix",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.48.1",
     "next": "latest",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@types/node": "^20",
