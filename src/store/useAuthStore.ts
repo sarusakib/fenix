@@ -15,11 +15,14 @@ interface AuthState {
   role: UserRole
   isLocked: boolean
   failedAttempts: number
+
   setAuth: (session: Session | null) => void
   setUser: (user: User | null) => void
   setRole: (role: UserRole) => void
+
   recordFailedAttempt: () => void
   resetFailedAttempts: () => void
+
   logout: () => Promise<void>
   clearAuth: () => void
 }
@@ -37,9 +40,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       user: session?.user ?? null,
     }),
 
-  setUser: (user) => set({ user }),
+  setUser: (user) =>
+    set({
+      user,
+    }),
 
-  setRole: (role) => set({ role }),
+  setRole: (role) =>
+    set({
+      role,
+    }),
 
   recordFailedAttempt: () =>
     set((state) => {
