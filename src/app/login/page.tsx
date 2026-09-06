@@ -1,187 +1,204 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '../../utils/supabase/client';
-import { useAuthStore } from '../../store/useAuthStore';
+import { FormEvent, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import {
+  ArrowRight,
+  CheckCircle,
+  Eye,
+  EyeSlash,
+  FacebookLogo,
+  GoogleLogo,
+  LockKey,
+  ShieldCheck,
+  SpinnerGap,
+  User,
+  XCircle,
+} from '@phosphor-icons/react'
+
+import { createClient } from '../../utils/supabase/client'
+import { useAuthStore } from '../../store/useAuthStore'
+
+type AuthMode = 'login' | 'signup'
 
 export default function AuthPage() {
-  const router = useRouter();
-  const supabase = createClient();
+  const router = useRouter()
+  const supabase = createClient()
 
-  const setAuth = useAuthStore((state) => state.setAuth);
+  const setAuth = useAuthStore((state) => state.setAuth)
   const resetFailedAttempts = useAuthStore(
     (state) => state.resetFailedAttempts
-  );
+  )
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<AuthMode>('login')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const [loading, setLoading] = useState(false)
+  const [oauthLoading, setOauthLoading] = useState<
+    'google' | 'facebook' | null
+  >(null)
+
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [showSplash, setShowSplash] = useState(true)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setShowSplash(false)
+    }, 1200)
+
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  const clearMessages = () => {
+    setError('')
+    setSuccess('')
+  }
+
+  const getSafeMessage = (message: string) => {
+    const normalized = message.toLowerCase()
+
+    if (normalized.includes('invalid login credentials')) {
+      return 'ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।'
+    }
+
+    if (normalized.includes('email not confirmed')) {
+      return 'আপনার ইমেইলটি আগে confirm করুন।'
+    }
+
+    if (normalized.includes('user already registered')) {
+      return 'এই ইমেইল দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট আছে।'
+    }
+
+    if (normalized.includes('password')) {
+      return 'পাসওয়ার্ডটি সঠিক নয় অথবা প্রয়োজনীয় শর্ত পূরণ করছে না।'
+    }
+
+    if (normalized.includes('rate limit')) {
+      return 'অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।'
+    }
+
+    return 'এই মুহূর্তে অনুরোধটি সম্পন্ন করা যাচ্ছে না। আবার চেষ্টা করুন।'
+  }
+
+  const handleAuth = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    clearMessages()
+
+    const cleanEmail = email.trim()
+    const cleanName = fullName.trim()
+
+    if (!cleanEmail || !password) {
+      setError('ইমেইল এবং পাসওয়ার্ড দিন।')
+      return
+    }
+
+    if (mode === 'signup' && !cleanName) {
+      setError('আপনার পুরো নাম দিন।')
+      return
+    }
+
+    if (mode === 'signup' && password.length < 6) {
+      setError('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।')
+      return
+    }
+
+    setLoading(true)
 
     try {
-      if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            data: {
-              full_name: fullName.trim(),
-              role: 'user',
+      if (mode === 'signup') {
+        const { data, error: signUpError } =
+          await supabase.auth.signUp({
+            email: cleanEmail,
+            password,
+            options: {
+              data: {
+                full_name: cleanName,
+                role: 'user',
+              },
             },
-          },
-        });
+          })
 
-        if (error) throw error;
+        if (signUpError) {
+          throw signUpError
+        }
 
         if (data.session) {
-          setAuth(data.session);
-          resetFailedAttempts();
+          setAuth(data.session)
+          resetFailedAttempts()
 
-          alert('রেজিস্ট্রেশন সফল হয়েছে!');
-          router.push('/guide');
-          router.refresh();
-        } else {
-          alert(
-            'অ্যাকাউন্ট তৈরি হয়েছে। আগে ইমেইল confirm করতে হবে, তারপর login করুন।'
-          );
+          router.push('/guide')
+          router.refresh()
+
+          return
         }
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
+
+        setSuccess(
+          'অ্যাকাউন্ট তৈরি হয়েছে। আপনার ইমেইল confirm করে তারপর login করুন।'
+        )
+
+        setMode('login')
+        setPassword('')
+
+        return
+      }
+
+      const { data, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email: cleanEmail,
           password,
-        });
+        })
 
-        if (error) throw error;
+      if (signInError) {
+        throw signInError
+      }
 
-        if (!data.session) {
-          throw new Error('Login session তৈরি হয়নি।');
-        }
+      if (!data.session) {
+        throw new Error('Login session তৈরি হয়নি।')
+      }
 
-        setAuth(data.session);
-        resetFailedAttempts();
+      setAuth(data.session)
+      resetFailedAttempts()
 
-        alert('সফলভাবে লগইন হয়েছে!');
-        router.push('/guide');
-        router.refresh();
+      router.push('/guide')
+      router.refresh()
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? getSafeMessage(error.message)
+          : 'একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+
+      setError(message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleOAuth = async (
+    provider: 'google' | 'facebook'
+  ) => {
+    clearMessages()
+
+    setOauthLoading(provider)
+
+    try {
+      const { error: oauthError } =
+        await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: `${window.location.origin}/auth/callback`,
+          },
+        })
+
+      if (oauthError) {
+        throw oauthError
       }
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : 'একটি সমস্যা হয়েছে';
-
-      alert(message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div
-      style={{
-        maxWidth: '400px',
-        margin: '50px auto',
-        padding: '20px',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        color: '#000',
-      }}
-    >
-      <h2 style={{ marginBottom: '15px' }}>
-        {isSignUp ? 'নতুন অ্যাকাউন্ট খুলুন' : 'লগইন করুন'}
-      </h2>
-
-      <form onSubmit={handleAuth}>
-        {isSignUp && (
-          <div style={{ marginBottom: '10px' }}>
-            <input
-              type="text"
-              placeholder="আপনার পুরো নাম"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-              }}
-            />
-          </div>
-        )}
-
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="email"
-            placeholder="ইমেইল অ্যাড্রেস"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
-          />
-        </div>
-
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="password"
-            placeholder="পাসওয়ার্ড"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '10px',
-            background: '#0070f3',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {loading
-            ? 'প্রসেসিং...'
-            : isSignUp
-              ? 'সাইন-আপ করুন'
-              : 'লগইন করুন'}
-        </button>
-      </form>
-
-      <button
-        onClick={() => setIsSignUp(!isSignUp)}
-        style={{
-          marginTop: '15px',
-          background: 'none',
-          border: 'none',
-          color: 'blue',
-          cursor: 'pointer',
-          textDecoration: 'underline',
-        }}
-      >
-        {isSignUp
-          ? 'আগে থেকেই অ্যাকাউন্ট আছে? লগইন করুন'
-          : 'নতুন অ্যাকাউন্ট তৈরি করতে চান? সাইন-আপ করুন'}
-      </button>
-    </div>
-  );
-}
+        error instanceof Error
+          ? getSafeMessage(error.message)
+          : 'Social login চালু করা যাচ্ছে না।'
