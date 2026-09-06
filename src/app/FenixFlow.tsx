@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import FenixIntro from "./FenixIntro";
 
+const INTRO_KEY = "fenix-intro-seen";
+
 export default function FenixFlow({
   children,
 }: {
@@ -12,43 +14,77 @@ export default function FenixFlow({
   const pathname = usePathname();
   const router = useRouter();
 
-  const [introDone, setIntroDone] = useState(false);
-  const [transitioning, setTransitioning] = useState(false);
+  const [showIntro, setShowIntro] = useState(false);
+  const [ready, setReady] = useState(false);
 
   const handleIntroComplete = useCallback(() => {
-    setTransitioning(true);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(INTRO_KEY, "true");
+    }
+
+    setShowIntro(false);
 
     window.setTimeout(() => {
-      setIntroDone(true);
       router.replace("/login");
-    }, 450);
+    }, 50);
   }, [router]);
 
   useEffect(() => {
     if (pathname !== "/") {
-      setIntroDone(true);
-      setTransitioning(false);
+      setShowIntro(false);
+      setReady(true);
+      return;
     }
+
+    const introAlreadySeen =
+      typeof window !== "undefined" &&
+      sessionStorage.getItem(INTRO_KEY) === "true";
+
+    if (introAlreadySeen) {
+      setShowIntro(false);
+      setReady(true);
+      return;
+    }
+
+    setShowIntro(true);
+    setReady(true);
   }, [pathname]);
 
-  // Website root: ONLY Intro.
-  // Homepage must NOT render here.
-  if (pathname === "/") {
+  /*
+   * Initial render protection.
+   * This prevents Homepage from flashing before the intro decision is made.
+   */
+  if (!ready) {
     return (
-      <div className="fixed inset-0 overflow-hidden bg-[#030506]">
-        <div
-          className={`absolute inset-0 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            transitioning
-              ? "scale-[1.04] opacity-0"
-              : "scale-100 opacity-100"
-          }`}
-        >
-          <FenixIntro onComplete={handleIntroComplete} />
-        </div>
+      <div className="fixed inset-0 z-[99999] bg-[#030506]" />
+    );
+  }
+
+  /*
+   * First visit:
+   * / → Intro only
+   *
+   * IMPORTANT:
+   * Homepage is NOT rendered underneath the intro.
+   * So there will be no Homepage flash.
+   */
+  if (pathname === "/" && showIntro) {
+    return (
+      <div className="fixed inset-0 z-[99999] bg-[#030506]">
+        <FenixIntro onComplete={handleIntroComplete} />
       </div>
     );
   }
 
-  // Login and other pages
+  /*
+   * After intro:
+   * /login → Login page
+   *
+   * After successful login:
+   * / → Homepage
+   *
+   * Since sessionStorage remembers the intro,
+   * Homepage will NOT trigger the intro again.
+   */
   return <>{children}</>;
 }
