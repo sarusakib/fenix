@@ -44,6 +44,24 @@ export default function FenixFlow({
     void checkAuth();
   }, [pathname, router]);
 
+  useEffect(() => {
+    if (pathname === "/" && introDone && !checkingAuth) {
+      const redirectToLogin = async () => {
+        const supabase = createClient();
+
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session) {
+          router.replace("/login");
+        }
+      };
+
+      void redirectToLogin();
+    }
+  }, [pathname, introDone, checkingAuth, router]);
+
   if (pathname === "/" && !introDone) {
     return (
       <>
@@ -53,7 +71,7 @@ export default function FenixFlow({
     );
   }
 
-  if (pathname === "/" && checkingAuth) {
+  if (pathname === "/" && (checkingAuth || !introDone)) {
     return <div className="min-h-screen bg-surface" />;
   }
 
