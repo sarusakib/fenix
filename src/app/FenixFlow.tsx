@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "../utils/supabase/client";
 import FenixIntro from "./FenixIntro";
 
 export default function FenixFlow({
@@ -14,66 +13,26 @@ export default function FenixFlow({
   const router = useRouter();
 
   const [introDone, setIntroDone] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
 
   const handleIntroComplete = useCallback(() => {
     setIntroDone(true);
   }, []);
 
   useEffect(() => {
-    if (pathname !== "/") {
-      setCheckingAuth(false);
-      return;
+    if (pathname === "/" && introDone) {
+      router.replace("/login");
+    }
+  }, [pathname, introDone, router]);
+
+  // Homepage (/)
+  if (pathname === "/") {
+    if (!introDone) {
+      return <FenixIntro onComplete={handleIntroComplete} />;
     }
 
-    const checkAuth = async () => {
-      const supabase = createClient();
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        router.replace("/login");
-        return;
-      }
-
-      setCheckingAuth(false);
-    };
-
-    void checkAuth();
-  }, [pathname, router]);
-
-  useEffect(() => {
-    if (pathname === "/" && introDone && !checkingAuth) {
-      const redirectToLogin = async () => {
-        const supabase = createClient();
-
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
-          router.replace("/login");
-        }
-      };
-
-      void redirectToLogin();
-    }
-  }, [pathname, introDone, checkingAuth, router]);
-
-  if (pathname === "/" && !introDone) {
-    return (
-      <>
-        <FenixIntro onComplete={handleIntroComplete} />
-        <div className="min-h-screen opacity-0" />
-      </>
-    );
-  }
-
-  if (pathname === "/" && (checkingAuth || !introDone)) {
     return <div className="min-h-screen bg-surface" />;
   }
 
+  // Login এবং অন্যান্য page
   return <>{children}</>;
 }
