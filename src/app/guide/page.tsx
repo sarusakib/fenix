@@ -9,10 +9,17 @@ const BUSINESS_ID = "69abbbe2-f9f1-48a3-a6b3-ccdfa3caca64";
 const BUSINESS_TEXT =
   "ফেনী শহরে সাশ্রয়ী দামে পোশাক, শাড়ি ও ফ্যাশন পণ্য বিক্রির ব্যবসা।";
 
+type BusinessResult = {
+  id: string;
+  name: string;
+  description: string;
+  similarity: number;
+};
+
 export default function GuidePage() {
   const [status, setStatus] = useState("");
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<BusinessResult[]>([]);
 
   const handleGenerate = async () => {
     setStatus("Embedding তৈরি হচ্ছে...");
@@ -42,7 +49,9 @@ export default function GuidePage() {
 
     if (result.success) {
       setResults(result.results);
-      setStatus(`✅ ${result.results.length}টি result পাওয়া গেছে।`);
+      setStatus(
+        `✅ ${result.results.length}টি result পাওয়া গেছে।`
+      );
     } else {
       setStatus(`❌ ${result.error}`);
     }
@@ -116,4 +125,4 @@ export default function GuidePage() {
       </div>
     </main>
   );
-          }
+}
