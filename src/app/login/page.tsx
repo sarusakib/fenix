@@ -2,10 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabase';
+import { createClient } from '../../utils/supabase/client';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export default function AuthPage() {
   const router = useRouter();
+  const supabase = createClient();
+
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const resetFailedAttempts = useAuthStore(
+    (state) => state.resetFailedAttempts
+  );
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +32,7 @@ export default function AuthPage() {
           options: {
             data: {
               full_name: fullName.trim(),
-              role: 'customer',
+              role: 'user',
             },
           },
         });
@@ -33,6 +40,9 @@ export default function AuthPage() {
         if (error) throw error;
 
         if (data.session) {
+          setAuth(data.session);
+          resetFailedAttempts();
+
           alert('রেজিস্ট্রেশন সফল হয়েছে!');
           router.push('/guide');
           router.refresh();
@@ -53,12 +63,18 @@ export default function AuthPage() {
           throw new Error('Login session তৈরি হয়নি।');
         }
 
+        setAuth(data.session);
+        resetFailedAttempts();
+
         alert('সফলভাবে লগইন হয়েছে!');
         router.push('/guide');
         router.refresh();
       }
-    } catch (error: any) {
-      alert(error.message || 'একটি সমস্যা হয়েছে');
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : 'একটি সমস্যা হয়েছে';
+
+      alert(message);
     } finally {
       setLoading(false);
     }
@@ -140,7 +156,7 @@ export default function AuthPage() {
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'pointer',
+            cursor: loading ? 'not-allowed' : 'pointer',
           }}
         >
           {loading
