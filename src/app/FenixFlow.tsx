@@ -13,26 +13,47 @@ export default function FenixFlow({
   const router = useRouter();
 
   const [introDone, setIntroDone] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
 
   const handleIntroComplete = useCallback(() => {
-    setIntroDone(true);
-  }, []);
+    setTransitioning(true);
+
+    const timer = window.setTimeout(() => {
+      setIntroDone(true);
+      router.replace("/login");
+    }, 180);
+
+    return () => window.clearTimeout(timer);
+  }, [router]);
 
   useEffect(() => {
-    if (pathname === "/" && introDone) {
-      router.replace("/login");
+    if (pathname !== "/") {
+      setIntroDone(true);
+      setTransitioning(false);
     }
-  }, [pathname, introDone, router]);
+  }, [pathname]);
 
-  // Homepage (/)
+  // Initial website entry
   if (pathname === "/") {
     if (!introDone) {
-      return <FenixIntro onComplete={handleIntroComplete} />;
+      return (
+        <div
+          className={`fixed inset-0 z-[99999] transition-all duration-500 ease-out ${
+            transitioning
+              ? "scale-[1.02] opacity-0"
+              : "scale-100 opacity-100"
+          }`}
+        >
+          <FenixIntro onComplete={handleIntroComplete} />
+        </div>
+      );
     }
 
-    return <div className="min-h-screen bg-surface" />;
+    return (
+      <div className="min-h-screen bg-[#030506]" />
+    );
   }
 
-  // Login এবং অন্যান্য page
+  // Login and all other pages
   return <>{children}</>;
 }
