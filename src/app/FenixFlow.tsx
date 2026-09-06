@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "../utils/supabase/client";
 import FenixIntro from "./FenixIntro";
@@ -15,6 +15,10 @@ export default function FenixFlow({
 
   const [introDone, setIntroDone] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+
+  const handleIntroComplete = useCallback(() => {
+    setIntroDone(true);
+  }, []);
 
   useEffect(() => {
     if (pathname !== "/") {
@@ -31,6 +35,7 @@ export default function FenixFlow({
 
       if (!session) {
         router.replace("/login");
+        return;
       }
 
       setCheckingAuth(false);
@@ -42,7 +47,7 @@ export default function FenixFlow({
   if (pathname === "/" && !introDone) {
     return (
       <>
-        <FenixIntro />
+        <FenixIntro onComplete={handleIntroComplete} />
         <div className="min-h-screen opacity-0" />
       </>
     );
