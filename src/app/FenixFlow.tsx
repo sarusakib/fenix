@@ -13,47 +13,51 @@ export default function FenixFlow({
   const router = useRouter();
 
   const [introDone, setIntroDone] = useState(false);
-  const [transitioning, setTransitioning] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
 
   const handleIntroComplete = useCallback(() => {
-    setTransitioning(true);
+    setIsLeaving(true);
 
-    const timer = window.setTimeout(() => {
+    window.setTimeout(() => {
       setIntroDone(true);
       router.replace("/login");
-    }, 180);
-
-    return () => window.clearTimeout(timer);
+    }, 450);
   }, [router]);
 
   useEffect(() => {
     if (pathname !== "/") {
       setIntroDone(true);
-      setTransitioning(false);
+      setIsLeaving(false);
     }
   }, [pathname]);
 
-  // Initial website entry
   if (pathname === "/") {
-    if (!introDone) {
-      return (
+    return (
+      <div className="relative min-h-screen overflow-hidden bg-[#030506]">
+        {!introDone && (
+          <div
+            className={`fixed inset-0 z-[99999] transition-all duration-450 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              isLeaving
+                ? "scale-[1.04] opacity-0"
+                : "scale-100 opacity-100"
+            }`}
+          >
+            <FenixIntro onComplete={handleIntroComplete} />
+          </div>
+        )}
+
         <div
-          className={`fixed inset-0 z-[99999] transition-all duration-500 ease-out ${
-            transitioning
-              ? "scale-[1.02] opacity-0"
-              : "scale-100 opacity-100"
+          className={`min-h-screen transition-all duration-500 ease-out ${
+            isLeaving
+              ? "scale-100 opacity-100"
+              : "scale-[0.985] opacity-0"
           }`}
         >
-          <FenixIntro onComplete={handleIntroComplete} />
+          {children}
         </div>
-      );
-    }
-
-    return (
-      <div className="min-h-screen bg-[#030506]" />
+      </div>
     );
   }
 
-  // Login and all other pages
   return <>{children}</>;
 }
