@@ -14,6 +14,8 @@ export async function generateEmbedding(text) {
   }
 
   try {
+    console.log("Feni Brain: Starting embedding request...");
+
     const hf = new HfInference(hfToken);
 
     const result = await hf.featureExtraction({
@@ -22,26 +24,42 @@ export async function generateEmbedding(text) {
       provider: "hf-inference",
     });
 
+    console.log("Feni Brain: Hugging Face response received.");
+
     const embedding = Array.isArray(result[0])
       ? result[0]
       : result;
 
     if (!Array.isArray(embedding)) {
-      throw new Error("Invalid embedding response.");
+      throw new Error(
+        "DIAGNOSTIC: Hugging Face response array নয়।"
+      );
     }
+
+    console.log(
+      `Feni Brain: Embedding dimension = ${embedding.length}`
+    );
 
     if (embedding.length !== 384) {
       throw new Error(
-        `ভুল embedding dimension: ${embedding.length}. Expected: 384.`
+        `DIAGNOSTIC: Embedding dimension ${embedding.length}, expected 384.`
       );
     }
 
     return embedding;
   } catch (error) {
-    console.error("Feni Brain embedding error:", error);
+    console.error("========== FENI BRAIN ERROR ==========");
+    console.error("Error name:", error?.name);
+    console.error("Error message:", error?.message);
+    console.error("Error status:", error?.status);
+    console.error("Error cause:", error?.cause);
+    console.error("Full error:", error);
+    console.error("======================================");
+
+    const message = error?.message || "Unknown Hugging Face error.";
 
     throw new Error(
-      error?.message || "Embedding তৈরি করা যায়নি।"
+      `Feni Brain diagnostic: ${message}`
     );
   }
-}
+    }
