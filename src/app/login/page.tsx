@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
@@ -43,15 +43,6 @@ export default function AuthPage() {
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [showSplash, setShowSplash] = useState(true)
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setShowSplash(false)
-    }, 1200)
-
-    return () => window.clearTimeout(timer)
-  }, [])
 
   const clearMessages = () => {
     setError('')
@@ -253,36 +244,6 @@ export default function AuthPage() {
     setPassword('')
   }
 
-  if (showSplash) {
-    return (
-      <main className="fixed inset-0 z-[9999] flex min-h-screen items-center justify-center overflow-hidden bg-[#05070b] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,128,128,0.16),transparent_45%)]" />
-
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="flex h-24 w-24 items-center justify-center rounded-[28px] border border-white/10 bg-white/[0.04] shadow-[0_0_80px_rgba(0,128,128,0.16)] backdrop-blur-xl sm:h-28 sm:w-28">
-            <span className="text-4xl font-black tracking-[-0.06em] text-white sm:text-5xl">
-              F<span className="text-[#008080]">X</span>
-            </span>
-          </div>
-
-          <div className="mt-7 text-center">
-            <h1 className="text-2xl font-black tracking-tight sm:text-3xl">
-              Feni<span className="text-[#008080]">X</span>
-            </h1>
-
-            <p className="mt-2 text-[10px] font-medium uppercase tracking-[0.35em] text-white/40 sm:text-xs">
-              Feni Business Ecosystem
-            </p>
-          </div>
-
-          <div className="mt-8 h-1 w-24 overflow-hidden rounded-full bg-white/10">
-            <div className="h-full w-full origin-left animate-[pulse_1.2s_ease-in-out]" />
-          </div>
-        </div>
-      </main>
-    )
-  }
-
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-[#05070b] text-white">
       <div className="absolute inset-0">
@@ -290,7 +251,6 @@ export default function AuthPage() {
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[2560px] flex-col lg:flex-row">
-        {/* Visual Panel */}
         <section className="relative hidden min-h-screen overflow-hidden lg:flex lg:w-[52%] xl:w-[55%]">
           <div
             className="absolute inset-0 bg-cover bg-center"
@@ -369,10 +329,8 @@ export default function AuthPage() {
           </div>
         </section>
 
-        {/* Authentication Panel */}
         <section className="flex min-h-screen w-full items-center justify-center px-4 py-8 sm:px-6 lg:w-[48%] lg:px-10 xl:w-[45%] xl:px-16 2xl:px-24">
           <div className="w-full max-w-[560px]">
-            {/* Mobile Brand */}
             <div className="mb-8 flex items-center justify-center lg:hidden">
               <div className="flex items-center">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05]">
@@ -414,7 +372,6 @@ export default function AuthPage() {
                 </p>
               </div>
 
-              {/* OAuth */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <button
                   type="button"
@@ -459,7 +416,6 @@ export default function AuthPage() {
                 </button>
               </div>
 
-              {/* Divider */}
               <div className="my-7 flex items-center gap-4">
                 <div className="h-px flex-1 bg-white/[0.08]" />
 
@@ -470,7 +426,6 @@ export default function AuthPage() {
                 <div className="h-px flex-1 bg-white/[0.08]" />
               </div>
 
-              {/* Messages */}
               {error && (
                 <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-400/20 bg-red-400/[0.06] p-3.5 text-sm text-red-200">
                   <XCircle
@@ -493,7 +448,6 @@ export default function AuthPage() {
                 </div>
               )}
 
-              {/* Form */}
               <form
                 onSubmit={handleAuth}
                 className="space-y-4"
@@ -649,7 +603,6 @@ export default function AuthPage() {
                 </button>
               </form>
 
-              {/* Switch Auth Mode */}
               <div className="mt-7 text-center">
                 <p className="text-sm text-white/40">
                   {mode === 'login'
@@ -668,7 +621,6 @@ export default function AuthPage() {
                 </p>
               </div>
 
-              {/* Security */}
               <div className="mt-8 flex items-center justify-center gap-2 text-[10px] text-white/25">
                 <ShieldCheck size={15} />
 
@@ -677,7 +629,6 @@ export default function AuthPage() {
                 </span>
               </div>
 
-              {/* Mobile footer */}
               <p className="mt-6 text-center text-[9px] uppercase tracking-[0.2em] text-white/15 lg:hidden">
                 FeniX — Feni Business Ecosystem
               </p>
