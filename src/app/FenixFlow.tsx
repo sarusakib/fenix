@@ -13,64 +13,63 @@ export default function FenixFlow({
   const router = useRouter();
 
   const [mounted, setMounted] = useState(false);
-  const [showIntro, setShowIntro] = useState(false);
-
-  const handleIntroComplete = useCallback(() => {
-    /*
-     * IMPORTANT:
-     * Intro শেষ হওয়ার সাথে সাথে Homepage render করা হবে না।
-     * সরাসরি Login page-এ যাবে।
-     */
-    setShowIntro(false);
-
-    router.replace("/login");
-  }, [router]);
+  const [introActive, setIntroActive] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    /*
-     * শুধুমাত্র Homepage route-এর জন্য Intro চালু হবে।
-     */
     if (!mounted) return;
 
+    /*
+     * Intro শুধুমাত্র root "/" route-এ শুরু হবে।
+     */
     if (pathname === "/") {
-      setShowIntro(true);
+      setIntroActive(true);
     } else {
-      setShowIntro(false);
+      setIntroActive(false);
     }
   }, [pathname, mounted]);
 
+  const handleIntroComplete = useCallback(() => {
+    /*
+     * Intro শেষ হওয়ার পর Homepage render করার আগে
+     * সরাসরি Login route-এ যাওয়া হবে।
+     */
+    setIntroActive(false);
+
+    router.replace("/login");
+  }, [router]);
+
   /*
-   * Browser প্রথম load করার সময় কোনো page flash হতে দেওয়া হবে না।
+   * React mount হওয়ার আগ পর্যন্ত সম্পূর্ণ কালো screen।
+   *
+   * এতে Homepage-এর initial flash বন্ধ হবে।
    */
   if (!mounted) {
     return (
-      <div className="fixed inset-0 z-[999999] bg-[#030506]" />
+      <div className="fixed inset-0 z-[999999] min-h-screen bg-[#030506]" />
     );
   }
 
   /*
-   * "/" route-এ Intro চলাকালীন Homepage-এর children
-   * একদম render করা হচ্ছে না।
+   * ROOT ROUTE
    *
-   * তাই:
-   * Intro → Login
+   * Intro চলাকালীন children render করা হবে না।
    *
-   * Homepage flash করার কোনো সুযোগ নেই।
+   * তাই Homepage DOM-এই থাকবে না।
    */
-  if (pathname === "/" && showIntro) {
+  if (pathname === "/" && introActive) {
     return (
-      <div className="fixed inset-0 z-[999999] overflow-hidden bg-[#030506]">
+      <div className="fixed inset-0 z-[999999] min-h-screen overflow-hidden bg-[#030506]">
         <FenixIntro onComplete={handleIntroComplete} />
       </div>
     );
   }
 
   /*
-   * Login এবং অন্যান্য route স্বাভাবিকভাবে render হবে।
+   * Login বা অন্য route হলে normal children render হবে।
    */
   return <>{children}</>;
 }
