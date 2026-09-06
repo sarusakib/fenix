@@ -19,6 +19,7 @@ export async function generateEmbedding(text) {
     const result = await hf.featureExtraction({
       model: "sentence-transformers/all-MiniLM-L6-v2",
       inputs: text.trim(),
+      provider: "hf-inference",
     });
 
     const embedding = Array.isArray(result[0])
