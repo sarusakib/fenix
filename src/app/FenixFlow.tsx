@@ -4,8 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import FenixIntro from "./FenixIntro";
 
-const INTRO_KEY = "fenix-intro-seen";
-
 export default function FenixFlow({
   children,
 }: {
@@ -14,77 +12,65 @@ export default function FenixFlow({
   const pathname = usePathname();
   const router = useRouter();
 
+  const [mounted, setMounted] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
-  const [ready, setReady] = useState(false);
 
   const handleIntroComplete = useCallback(() => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem(INTRO_KEY, "true");
-    }
-
+    /*
+     * IMPORTANT:
+     * Intro শেষ হওয়ার সাথে সাথে Homepage render করা হবে না।
+     * সরাসরি Login page-এ যাবে।
+     */
     setShowIntro(false);
 
-    window.setTimeout(() => {
-      router.replace("/login");
-    }, 50);
+    router.replace("/login");
   }, [router]);
 
   useEffect(() => {
-    if (pathname !== "/") {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    /*
+     * শুধুমাত্র Homepage route-এর জন্য Intro চালু হবে।
+     */
+    if (!mounted) return;
+
+    if (pathname === "/") {
+      setShowIntro(true);
+    } else {
       setShowIntro(false);
-      setReady(true);
-      return;
     }
-
-    const introAlreadySeen =
-      typeof window !== "undefined" &&
-      sessionStorage.getItem(INTRO_KEY) === "true";
-
-    if (introAlreadySeen) {
-      setShowIntro(false);
-      setReady(true);
-      return;
-    }
-
-    setShowIntro(true);
-    setReady(true);
-  }, [pathname]);
+  }, [pathname, mounted]);
 
   /*
-   * Initial render protection.
-   * This prevents Homepage from flashing before the intro decision is made.
+   * Browser প্রথম load করার সময় কোনো page flash হতে দেওয়া হবে না।
    */
-  if (!ready) {
+  if (!mounted) {
     return (
-      <div className="fixed inset-0 z-[99999] bg-[#030506]" />
+      <div className="fixed inset-0 z-[999999] bg-[#030506]" />
     );
   }
 
   /*
-   * First visit:
-   * / → Intro only
+   * "/" route-এ Intro চলাকালীন Homepage-এর children
+   * একদম render করা হচ্ছে না।
    *
-   * IMPORTANT:
-   * Homepage is NOT rendered underneath the intro.
-   * So there will be no Homepage flash.
+   * তাই:
+   * Intro → Login
+   *
+   * Homepage flash করার কোনো সুযোগ নেই।
    */
   if (pathname === "/" && showIntro) {
     return (
-      <div className="fixed inset-0 z-[99999] bg-[#030506]">
+      <div className="fixed inset-0 z-[999999] overflow-hidden bg-[#030506]">
         <FenixIntro onComplete={handleIntroComplete} />
       </div>
     );
   }
 
   /*
-   * After intro:
-   * /login → Login page
-   *
-   * After successful login:
-   * / → Homepage
-   *
-   * Since sessionStorage remembers the intro,
-   * Homepage will NOT trigger the intro again.
+   * Login এবং অন্যান্য route স্বাভাবিকভাবে render হবে।
    */
   return <>{children}</>;
 }
