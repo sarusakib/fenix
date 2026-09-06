@@ -1,6 +1,6 @@
 import "./globals.css";
 import AuthSync from "../components/AuthSync";
-import FenixIntro from "./FenixIntro";
+import FenixFlow from "./FenixFlow";
 
 export const metadata = {
   title: "FeniX | Business Ecosystem",
@@ -18,9 +18,7 @@ export default function RootLayout({
       <body className="bg-surface text-navy">
         <AuthSync />
 
-        <FenixIntro />
-
-        {children}
+        <FenixFlow>{children}</FenixFlow>
       </body>
     </html>
   );
