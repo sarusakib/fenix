@@ -12,53 +12,45 @@ export default function FenixFlow({
   const pathname = usePathname();
   const router = useRouter();
 
-  const [mounted, setMounted] = useState(false);
-  const [introActive, setIntroActive] = useState(false);
+  /*
+   * IMPORTANT:
+   * Initial state pathname থেকেই নির্ধারণ করা হচ্ছে।
+   *
+   * তাই "/" হলে প্রথম render থেকেই Intro active থাকবে।
+   * Homepage একবারও render হবে না।
+   */
+  const [introActive, setIntroActive] = useState(
+    pathname === "/"
+  );
 
+  /*
+   * Route পরিবর্তন হলে Intro state synchronize করা।
+   */
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    /*
-     * Intro শুধুমাত্র root "/" route-এ শুরু হবে।
-     */
     if (pathname === "/") {
       setIntroActive(true);
     } else {
       setIntroActive(false);
     }
-  }, [pathname, mounted]);
+  }, [pathname]);
 
+  /*
+   * Intro শেষ হলে সরাসরি Login page।
+   *
+   * Homepage render করার কোনো intermediate state নেই।
+   */
   const handleIntroComplete = useCallback(() => {
-    /*
-     * Intro শেষ হওয়ার পর Homepage render করার আগে
-     * সরাসরি Login route-এ যাওয়া হবে।
-     */
     setIntroActive(false);
-
     router.replace("/login");
   }, [router]);
 
   /*
-   * React mount হওয়ার আগ পর্যন্ত সম্পূর্ণ কালো screen।
+   * ROOT "/" ROUTE
    *
-   * এতে Homepage-এর initial flash বন্ধ হবে।
-   */
-  if (!mounted) {
-    return (
-      <div className="fixed inset-0 z-[999999] min-h-screen bg-[#030506]" />
-    );
-  }
-
-  /*
-   * ROOT ROUTE
+   * Intro active থাকলে শুধু Intro render হবে।
    *
-   * Intro চলাকালীন children render করা হবে না।
-   *
-   * তাই Homepage DOM-এই থাকবে না।
+   * children = Homepage
+   * কিন্তু এখানে children render করা হচ্ছে না।
    */
   if (pathname === "/" && introActive) {
     return (
@@ -69,7 +61,7 @@ export default function FenixFlow({
   }
 
   /*
-   * Login বা অন্য route হলে normal children render হবে।
+   * Login / অন্যান্য route
    */
   return <>{children}</>;
-}
+    }
