@@ -1,13 +1,9 @@
 "use server";
 
+import { HfInference } from "@huggingface/inference";
+
 export async function generateEmbedding(text) {
   const hfToken = process.env.HUGGINGFACE_API_KEY;
-
-  const model =
-    "sentence-transformers/all-MiniLM-L6-v2";
-
-  const url =
-    `https://router.huggingface.co/hf-inference/models/${model}/pipeline/feature-extraction`;
 
   if (!hfToken) {
     throw new Error("HUGGINGFACE_API_KEY পাওয়া যায়নি।");
@@ -18,40 +14,16 @@ export async function generateEmbedding(text) {
   }
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
+    const hf = new HfInference(hfToken);
 
-      headers: {
-        Authorization: `Bearer ${hfToken}`,
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify({
-        inputs: text.trim(),
-      }),
-
-      cache: "no-store",
+    const result = await hf.featureExtraction({
+      model: "sentence-transformers/all-MiniLM-L6-v2",
+      inputs: text.trim(),
     });
 
-    const responseText = await response.text();
-
-    if (!response.ok) {
-      console.error(
-        "Hugging Face API Error:",
-        response.status,
-        responseText
-      );
-
-      throw new Error(
-        `Hugging Face API error (${response.status})`
-      );
-    }
-
-    const data = JSON.parse(responseText);
-
-    const embedding = Array.isArray(data[0])
-      ? data[0]
-      : data;
+    const embedding = Array.isArray(result[0])
+      ? result[0]
+      : result;
 
     if (!Array.isArray(embedding)) {
       throw new Error("Invalid embedding response.");
@@ -65,7 +37,7 @@ export async function generateEmbedding(text) {
 
     return embedding;
   } catch (error) {
-    console.error("Embedding generation failed:", error);
+    console.error("Feni Brain embedding error:", error);
 
     throw new Error(
       error?.message || "Embedding তৈরি করা যায়নি।"
