@@ -35,7 +35,6 @@ export default function AuthPage() {
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<
     'google' | 'facebook' | null
@@ -122,7 +121,9 @@ export default function AuthPage() {
           setAuth(data.session)
           resetFailedAttempts()
 
-          router.push('/guide')
+          // Master correction:
+          // Successful signup → Homepage
+          router.replace('/')
           router.refresh()
 
           return
@@ -155,7 +156,9 @@ export default function AuthPage() {
       setAuth(data.session)
       resetFailedAttempts()
 
-      router.push('/guide')
+      // Master correction:
+      // Successful login → Homepage
+      router.replace('/')
       router.refresh()
     } catch (error: unknown) {
       const message =
@@ -213,9 +216,12 @@ export default function AuthPage() {
 
     try {
       const { error: resetError } =
-        await supabase.auth.resetPasswordForEmail(cleanEmail, {
-          redirectTo: `${window.location.origin}/auth/reset-password`,
-        })
+        await supabase.auth.resetPasswordForEmail(
+          cleanEmail,
+          {
+            redirectTo: `${window.location.origin}/auth/reset-password`,
+          }
+        )
 
       if (resetError) {
         throw resetError
@@ -238,9 +244,11 @@ export default function AuthPage() {
 
   const switchMode = () => {
     clearMessages()
+
     setMode((current) =>
       current === 'login' ? 'signup' : 'login'
     )
+
     setPassword('')
   }
 
@@ -251,6 +259,7 @@ export default function AuthPage() {
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[2560px] flex-col lg:flex-row">
+
         <section className="relative hidden min-h-screen overflow-hidden lg:flex lg:w-[52%] xl:w-[55%]">
           <div
             className="absolute inset-0 bg-cover bg-center"
@@ -265,6 +274,7 @@ export default function AuthPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#05070b]/90 via-[#05070b]/45 to-[#008080]/20" />
 
           <div className="relative z-10 flex w-full flex-col justify-between p-8 xl:p-12 2xl:p-16">
+
             <div className="flex items-center">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/10 backdrop-blur-xl">
                 <span className="text-lg font-black">
@@ -307,6 +317,7 @@ export default function AuthPage() {
                   <p className="text-[10px] uppercase tracking-wider text-white/35">
                     Ecosystem
                   </p>
+
                   <p className="mt-1 text-sm font-bold">
                     Local Business
                   </p>
@@ -316,6 +327,7 @@ export default function AuthPage() {
                   <p className="text-[10px] uppercase tracking-wider text-white/35">
                     Powered by
                   </p>
+
                   <p className="mt-1 text-sm font-bold">
                     FeniX Brain
                   </p>
@@ -331,6 +343,7 @@ export default function AuthPage() {
 
         <section className="flex min-h-screen w-full items-center justify-center px-4 py-8 sm:px-6 lg:w-[48%] lg:px-10 xl:w-[45%] xl:px-16 2xl:px-24">
           <div className="w-full max-w-[560px]">
+
             <div className="mb-8 flex items-center justify-center lg:hidden">
               <div className="flex items-center">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05]">
@@ -352,6 +365,7 @@ export default function AuthPage() {
             </div>
 
             <div className="rounded-[28px] border border-white/[0.08] bg-white/[0.035] p-5 shadow-2xl backdrop-blur-2xl sm:p-8 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none xl:p-2">
+
               <div className="mb-8">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#008080]">
                   {mode === 'login'
@@ -535,7 +549,11 @@ export default function AuthPage() {
 
                     <input
                       id="password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={
+                        showPassword
+                          ? 'text'
+                          : 'password'
+                      }
                       value={password}
                       onChange={(event) =>
                         setPassword(event.target.value)
@@ -553,7 +571,9 @@ export default function AuthPage() {
                     <button
                       type="button"
                       onClick={() =>
-                        setShowPassword((current) => !current)
+                        setShowPassword(
+                          (current) => !current
+                        )
                       }
                       aria-label={
                         showPassword
@@ -573,7 +593,10 @@ export default function AuthPage() {
 
                 <button
                   type="submit"
-                  disabled={loading || oauthLoading !== null}
+                  disabled={
+                    loading ||
+                    oauthLoading !== null
+                  }
                   className="group mt-2 flex h-13 w-full items-center justify-center gap-2 rounded-xl bg-[#008080] px-5 text-sm font-bold text-white shadow-[0_12px_35px_rgba(0,128,128,0.18)] transition-all duration-200 hover:bg-[#009999] hover:shadow-[0_15px_40px_rgba(0,128,128,0.25)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? (
@@ -608,10 +631,14 @@ export default function AuthPage() {
                   {mode === 'login'
                     ? 'নতুন এখানে?'
                     : 'ইতিমধ্যে অ্যাকাউন্ট আছে?'}{' '}
+
                   <button
                     type="button"
                     onClick={switchMode}
-                    disabled={loading || oauthLoading !== null}
+                    disabled={
+                      loading ||
+                      oauthLoading !== null
+                    }
                     className="font-bold text-[#008080] transition-colors hover:text-teal-300 disabled:opacity-50"
                   >
                     {mode === 'login'
@@ -638,4 +665,4 @@ export default function AuthPage() {
       </div>
     </main>
   )
-}
+    }
