@@ -12,34 +12,30 @@ export default function FenixFlow({
   const pathname = usePathname();
   const router = useRouter();
 
-  const [introFinished, setIntroFinished] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
 
   const handleIntroComplete = useCallback(() => {
     setTransitioning(true);
 
     window.setTimeout(() => {
-      setIntroFinished(true);
+      setIntroDone(true);
       router.replace("/login");
     }, 450);
   }, [router]);
 
   useEffect(() => {
     if (pathname !== "/") {
-      setIntroFinished(true);
+      setIntroDone(true);
       setTransitioning(false);
     }
   }, [pathname]);
 
-  /*
-   * ROOT ENTRY
-   *
-   * "/" কখনো Homepage render করবে না।
-   * প্রথমে শুধু Intro থাকবে।
-   */
+  // Website root: ONLY Intro.
+  // Homepage must NOT render here.
   if (pathname === "/") {
     return (
-      <main className="fixed inset-0 overflow-hidden bg-[#030506]">
+      <div className="fixed inset-0 overflow-hidden bg-[#030506]">
         <div
           className={`absolute inset-0 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             transitioning
@@ -49,16 +45,10 @@ export default function FenixFlow({
         >
           <FenixIntro onComplete={handleIntroComplete} />
         </div>
-
-        {!introFinished && (
-          <div className="absolute inset-0 bg-[#030506]" />
-        )}
-      </main>
+      </div>
     );
   }
 
-  /*
-   * LOGIN + OTHER ROUTES
-   */
+  // Login and other pages
   return <>{children}</>;
 }
