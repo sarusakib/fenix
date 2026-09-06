@@ -1,7 +1,7 @@
 "use server";
 
 import { generateEmbedding } from "./generateEmbedding";
-import { createClient } from "../../lib/supabaseServer";
+import { createClient } from "../../utils/supabase/server";
 
 export async function saveBusinessEmbedding(businessId, text) {
   try {
@@ -14,7 +14,6 @@ export async function saveBusinessEmbedding(businessId, text) {
 
     const supabase = await createClient();
 
-    // বর্তমান logged-in user
     const {
       data: { user },
       error: userError,
@@ -27,7 +26,6 @@ export async function saveBusinessEmbedding(businessId, text) {
       };
     }
 
-    // Business ownership verify
     const { data: business, error: businessError } = await supabase
       .from("businesses")
       .select("id, name, owner_id")
@@ -44,11 +42,10 @@ export async function saveBusinessEmbedding(businessId, text) {
     if (business.owner_id !== user.id) {
       return {
         success: false,
-        error: "এই business-এর embedding update করার অনুমতি নেই।",
+        error: "এই business update করার অনুমতি নেই।",
       };
     }
 
-    // Generate 384-dimensional embedding
     const embedding = await generateEmbedding(text);
 
     if (!embedding || embedding.length !== 384) {
@@ -58,7 +55,6 @@ export async function saveBusinessEmbedding(businessId, text) {
       };
     }
 
-    // Save embedding
     const { error: updateError } = await supabase
       .from("businesses")
       .update({
@@ -77,7 +73,7 @@ export async function saveBusinessEmbedding(businessId, text) {
 
     return {
       success: true,
-      message: `${business.name} এর Feni Brain embedding successfully saved.`,
+      message: "Feni Brain embedding successfully saved.",
     };
   } catch (error) {
     console.error("saveBusinessEmbedding error:", error);
@@ -87,4 +83,4 @@ export async function saveBusinessEmbedding(businessId, text) {
       error: error.message || "Unknown error.",
     };
   }
-  }
+      }
