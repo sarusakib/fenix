@@ -13,6 +13,7 @@ interface AuthState {
   user: User | null
   session: Session | null
   role: UserRole
+
   isLocked: boolean
   failedAttempts: number
 
@@ -27,12 +28,16 @@ interface AuthState {
   clearAuth: () => void
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+const initialAuthState = {
   user: null,
   session: null,
-  role: 'user',
+  role: 'user' as UserRole,
   isLocked: false,
   failedAttempts: 0,
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  ...initialAuthState,
 
   setAuth: (session) =>
     set({
@@ -69,21 +74,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     const supabase = createClient()
 
-    await supabase.auth.signOut()
-
-    set({
-      user: null,
-      session: null,
-      role: 'user',
-      isLocked: false,
-      failedAttempts: 0,
-    })
+    try {
+      await supabase.auth.signOut()
+    } finally {
+      set({
+        ...initialAuthState,
+      })
+    }
   },
 
   clearAuth: () =>
     set({
-      user: null,
-      session: null,
-      role: 'user',
+      ...initialAuthState,
     }),
 }))
