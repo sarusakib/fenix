@@ -57,7 +57,10 @@ const QUALITY_ORDER: QualityName[] = [
   "ultra",
 ];
 
-const QUALITY_CONFIG: Record<QualityName, QualityConfig> = {
+const QUALITY_CONFIG: Record<
+  QualityName,
+  QualityConfig
+> = {
   safe: {
     featherCount: 58,
     sparkCount: 8,
@@ -95,41 +98,31 @@ const QUALITY_CONFIG: Record<QualityName, QualityConfig> = {
   },
 };
 
-/*
-|--------------------------------------------------------------------------
-| TIMING
-|--------------------------------------------------------------------------
-|
-| 0ms       → intro begins
-| 0–900ms   → feather vortex establishes
-| 900–3200  → main cinematic hold
-| 3200–3900 → logo / scene exits
-| 3900ms    → Login navigation
-|
-*/
-
 const INTRO_HOLD = 900;
 const INTRO_EXIT_START = 3200;
 const INTRO_COMPLETE = 3900;
 
 const TAU = Math.PI * 2;
 
-function clamp(value: number, min: number, max: number) {
+function clamp(
+  value: number,
+  min: number,
+  max: number,
+) {
   return Math.max(min, Math.min(max, value));
 }
 
-function lerp(a: number, b: number, t: number) {
+function lerp(
+  a: number,
+  b: number,
+  t: number,
+) {
   return a + (b - a) * t;
 }
 
 function easeOutCubic(t: number) {
   t = clamp(t, 0, 1);
   return 1 - Math.pow(1 - t, 3);
-}
-
-function easeInCubic(t: number) {
-  t = clamp(t, 0, 1);
-  return t * t * t;
 }
 
 function easeInOutCubic(t: number) {
@@ -192,7 +185,6 @@ function detectQuality(): QualityName {
 
   const width = window.innerWidth;
   const height = window.innerHeight;
-
   const area = width * height;
 
   const nav = navigator as Navigator & {
@@ -200,13 +192,11 @@ function detectQuality(): QualityName {
     hardwareConcurrency?: number;
     connection?: {
       saveData?: boolean;
-      effectiveType?: string;
     };
   };
 
   const cores = nav.hardwareConcurrency ?? 4;
   const memory = nav.deviceMemory ?? 4;
-
   const network = getNetworkScore();
 
   const isTouch =
@@ -215,7 +205,8 @@ function detectQuality(): QualityName {
 
   const smallestSide = Math.min(width, height);
 
-  const isSmallScreen = smallestSide <= 600;
+  const isSmallScreen =
+    smallestSide <= 600;
 
   const isTablet =
     smallestSide > 600 &&
@@ -273,12 +264,6 @@ function detectQuality(): QualityName {
   return "balanced";
 }
 
-/*
-|--------------------------------------------------------------------------
-| Feather creation
-|--------------------------------------------------------------------------
-*/
-
 function createFeather(
   index: number,
   count: number,
@@ -291,10 +276,6 @@ function createFeather(
   const normalized =
     index / Math.max(1, count - 1);
 
-  /*
-   * Multiple spiral bands create the
-   * dense vortex appearance.
-   */
   const band = index % 7;
 
   const layer =
@@ -310,10 +291,6 @@ function createFeather(
     0.18 +
     Math.pow(Math.random(), 0.7) * 0.82;
 
-  /*
-   * Large radius spread creates the
-   * circular feather field.
-   */
   const radiusBase =
     sceneRadius *
     (
@@ -322,9 +299,6 @@ function createFeather(
       (Math.random() - 0.5) * 0.18
     );
 
-  /*
-   * Long spiral progression.
-   */
   const angle =
     normalized *
       TAU *
@@ -344,9 +318,7 @@ function createFeather(
 
   return {
     angle,
-
     radiusBase,
-
     size,
 
     speed:
@@ -361,16 +333,12 @@ function createFeather(
       (layer % 2 === 0 ? 1 : -1),
 
     twist:
-      (
-        Math.random() - 0.5
-      ) *
-      0.58,
+      (Math.random() - 0.5) * 0.58,
 
     phase:
       Math.random() * TAU,
 
     depth,
-
     layer,
 
     alpha:
@@ -382,23 +350,12 @@ function createFeather(
       Math.random() * 1.1,
 
     spriteIndex:
-      Math.floor(
-        Math.random() * 8,
-      ),
+      Math.floor(Math.random() * 8),
 
     drift:
-      (
-        Math.random() - 0.5
-      ) *
-      0.0012,
+      (Math.random() - 0.5) * 0.0012,
   };
 }
-
-/*
-|--------------------------------------------------------------------------
-| Spark creation
-|--------------------------------------------------------------------------
-*/
 
 function createSpark(
   width: number,
@@ -435,16 +392,6 @@ function createSpark(
   };
 }
 
-/*
-|--------------------------------------------------------------------------
-| Feather sprite renderer
-|--------------------------------------------------------------------------
-|
-| The detailed feather is rendered once into an offscreen canvas.
-| The main animation then uses drawImage().
-|
-*/
-
 function drawFeatherSprite(
   canvas: HTMLCanvasElement,
   color: string,
@@ -457,7 +404,8 @@ function drawFeatherSprite(
   canvas.width = size;
   canvas.height = size;
 
-  const ctx = canvas.getContext("2d");
+  const ctx =
+    canvas.getContext("2d");
 
   if (!ctx) {
     return;
@@ -480,12 +428,8 @@ function drawFeatherSprite(
     size * 0.22;
 
   ctx.save();
-
   ctx.translate(cx, cy);
 
-  /*
-   * Soft atmospheric body.
-   */
   const bodyGradient =
     ctx.createLinearGradient(
       -length * 0.5,
@@ -529,9 +473,6 @@ function drawFeatherSprite(
 
   ctx.globalAlpha = 0.72;
 
-  /*
-   * Curved feather body.
-   */
   ctx.beginPath();
 
   ctx.moveTo(
@@ -558,14 +499,10 @@ function drawFeatherSprite(
   );
 
   ctx.closePath();
-
   ctx.fill();
 
   ctx.globalAlpha = 1;
 
-  /*
-   * Dark underside.
-   */
   const underside =
     ctx.createLinearGradient(
       -length * 0.2,
@@ -618,12 +555,8 @@ function drawFeatherSprite(
   );
 
   ctx.closePath();
-
   ctx.fill();
 
-  /*
-   * Central rachis.
-   */
   const rachis =
     ctx.createLinearGradient(
       -length * 0.48,
@@ -682,9 +615,6 @@ function drawFeatherSprite(
 
   ctx.stroke();
 
-  /*
-   * Individual barbs.
-   */
   const barbCount =
     Math.floor(
       8 + detail * 18,
@@ -762,9 +692,6 @@ function drawFeatherSprite(
     ctx.stroke();
   }
 
-  /*
-   * Fine highlight along the upper edge.
-   */
   const highlight =
     ctx.createLinearGradient(
       -length * 0.32,
@@ -821,12 +748,6 @@ function drawFeatherSprite(
   ctx.restore();
 }
 
-/*
-|--------------------------------------------------------------------------
-| Sprite cache
-|--------------------------------------------------------------------------
-*/
-
 function buildSprites(
   detail: number,
   scale: number,
@@ -871,12 +792,6 @@ function buildSprites(
   return sprites;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Component
-|--------------------------------------------------------------------------
-*/
-
 export default function FenixIntro({
   onComplete,
 }: FenixIntroProps) {
@@ -893,10 +808,8 @@ export default function FenixIntro({
 
   /*
    * IMPORTANT:
-   *
-   * stageRef is intentionally NOT React state.
-   * Changing animation stage must never restart
-   * the canvas effect.
+   * Animation stage is a ref.
+   * It must NOT be an effect dependency.
    */
   const stageRef =
     useRef<Stage>("enter");
@@ -916,19 +829,20 @@ export default function FenixIntro({
     }
 
     /*
-     * Stable non-null alias.
-     *
-     * This fixes:
-     * "canvas is possibly null"
+     * Stable non-null canvas reference.
+     * Prevents TS "possibly null".
      */
     const canvas =
       canvasElement;
 
     const ctx =
-      canvas.getContext("2d", {
-        alpha: true,
-        desynchronized: true,
-      });
+      canvas.getContext(
+        "2d",
+        {
+          alpha: true,
+          desynchronized: true,
+        },
+      );
 
     if (!ctx) {
       return;
@@ -969,11 +883,57 @@ export default function FenixIntro({
 
     let lastQualityChange = 0;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Resize
-    |--------------------------------------------------------------------------
-    */
+    const rebuildScene = () => {
+      if (destroyed) {
+        return;
+      }
+
+      config =
+        QUALITY_CONFIG[quality];
+
+      sprites =
+        buildSprites(
+          config.barbDetail,
+          config.spriteScale,
+        );
+
+      feathers = [];
+
+      for (
+        let i = 0;
+        i < config.featherCount;
+        i++
+      ) {
+        feathers.push(
+          createFeather(
+            i,
+            config.featherCount,
+            width,
+            height,
+          ),
+        );
+      }
+
+      feathers.sort(
+        (a, b) =>
+          a.depth - b.depth,
+      );
+
+      sparks = [];
+
+      for (
+        let i = 0;
+        i < config.sparkCount;
+        i++
+      ) {
+        sparks.push(
+          createSpark(
+            width,
+            height,
+          ),
+        );
+      }
+    };
 
     const resize = () => {
       if (destroyed) {
@@ -1019,10 +979,6 @@ export default function FenixIntro({
           config.dpr,
         );
 
-      /*
-       * Prevent giant 4K/mobile canvas
-       * memory allocations.
-       */
       if (
         pixelArea >
         config.maxPixelArea
@@ -1030,9 +986,6 @@ export default function FenixIntro({
         targetDpr *= 0.9;
       }
 
-      /*
-       * Conservative mobile ceiling.
-       */
       if (
         width <= 600 ||
         height <= 600
@@ -1085,74 +1038,6 @@ export default function FenixIntro({
       rebuildScene();
     };
 
-    /*
-    |--------------------------------------------------------------------------
-    | Scene creation
-    |--------------------------------------------------------------------------
-    */
-
-    const rebuildScene = () => {
-      if (destroyed) {
-        return;
-      }
-
-      config =
-        QUALITY_CONFIG[quality];
-
-      sprites =
-        buildSprites(
-          config.barbDetail,
-          config.spriteScale,
-        );
-
-      feathers = [];
-
-      for (
-        let i = 0;
-        i < config.featherCount;
-        i++
-      ) {
-        feathers.push(
-          createFeather(
-            i,
-            config.featherCount,
-            width,
-            height,
-          ),
-        );
-      }
-
-      /*
-       * Stable depth order.
-       * No sorting every frame.
-       */
-      feathers.sort(
-        (a, b) =>
-          a.depth - b.depth,
-      );
-
-      sparks = [];
-
-      for (
-        let i = 0;
-        i < config.sparkCount;
-        i++
-      ) {
-        sparks.push(
-          createSpark(
-            width,
-            height,
-          ),
-        );
-      }
-    };
-
-    /*
-    |--------------------------------------------------------------------------
-    | Adaptive quality
-    |--------------------------------------------------------------------------
-    */
-
     const setQuality = (
       next: QualityName,
     ) => {
@@ -1177,9 +1062,6 @@ export default function FenixIntro({
     const adaptQuality = (
       frameTime: number,
     ) => {
-      /*
-       * Don't constantly rebuild.
-       */
       if (
         elapsed -
           lastQualityChange <
@@ -1206,9 +1088,6 @@ export default function FenixIntro({
           quality,
         );
 
-      /*
-       * Drop quality quickly if device struggles.
-       */
       if (
         slowFrames >= 3 &&
         index > 0
@@ -1222,9 +1101,6 @@ export default function FenixIntro({
         return;
       }
 
-      /*
-       * Increase quality slowly.
-       */
       if (
         fastFrames >= 12 &&
         index <
@@ -1238,12 +1114,6 @@ export default function FenixIntro({
       }
     };
 
-    /*
-    |--------------------------------------------------------------------------
-    | Background
-    |--------------------------------------------------------------------------
-    */
-
     const drawBackground = (
       time: number,
       opacity: number,
@@ -1255,9 +1125,6 @@ export default function FenixIntro({
         height,
       );
 
-      /*
-       * Deep black base.
-       */
       const base =
         ctx.createRadialGradient(
           centerX,
@@ -1302,9 +1169,6 @@ export default function FenixIntro({
         height,
       );
 
-      /*
-       * Teal atmospheric core.
-       */
       const pulse =
         0.5 +
         Math.sin(
@@ -1325,14 +1189,17 @@ export default function FenixIntro({
       tealGlow.addColorStop(
         0,
         `rgba(0,160,160,${
-          0.12 * pulse * opacity
+          0.12 *
+          pulse *
+          opacity
         })`,
       );
 
       tealGlow.addColorStop(
         0.22,
         `rgba(0,128,128,${
-          0.075 * opacity
+          0.075 *
+          opacity
         })`,
       );
 
@@ -1356,9 +1223,6 @@ export default function FenixIntro({
         height,
       );
 
-      /*
-       * Very subtle moving gold atmosphere.
-       */
       const goldX =
         centerX +
         Math.cos(
@@ -1388,14 +1252,16 @@ export default function FenixIntro({
       gold.addColorStop(
         0,
         `rgba(170,125,64,${
-          0.032 * opacity
+          0.032 *
+          opacity
         })`,
       );
 
       gold.addColorStop(
         0.48,
         `rgba(120,90,48,${
-          0.012 * opacity
+          0.012 *
+          opacity
         })`,
       );
 
@@ -1404,8 +1270,7 @@ export default function FenixIntro({
         "rgba(0,0,0,0)",
       );
 
-      ctx.fillStyle =
-        gold;
+      ctx.fillStyle = gold;
 
       ctx.fillRect(
         0,
@@ -1414,12 +1279,6 @@ export default function FenixIntro({
         height,
       );
     };
-
-    /*
-    |--------------------------------------------------------------------------
-    | Vortex core
-    |--------------------------------------------------------------------------
-    */
 
     const drawCore = (
       time: number,
@@ -1437,9 +1296,6 @@ export default function FenixIntro({
         0.14 *
         breathe;
 
-      /*
-       * Inner black optical center.
-       */
       const darkCore =
         ctx.createRadialGradient(
           centerX,
@@ -1453,14 +1309,16 @@ export default function FenixIntro({
       darkCore.addColorStop(
         0,
         `rgba(0,0,0,${
-          0.95 * opacity
+          0.95 *
+          opacity
         })`,
       );
 
       darkCore.addColorStop(
         0.34,
         `rgba(0,6,7,${
-          0.88 * opacity
+          0.88 *
+          opacity
         })`,
       );
 
@@ -1489,9 +1347,6 @@ export default function FenixIntro({
 
       ctx.fill();
 
-      /*
-       * Teal optical ring.
-       */
       const ring =
         ctx.createRadialGradient(
           centerX,
@@ -1505,21 +1360,24 @@ export default function FenixIntro({
       ring.addColorStop(
         0,
         `rgba(220,245,242,${
-          0.10 * opacity
+          0.10 *
+          opacity
         })`,
       );
 
       ring.addColorStop(
         0.15,
         `rgba(0,170,170,${
-          0.14 * opacity
+          0.14 *
+          opacity
         })`,
       );
 
       ring.addColorStop(
         0.38,
         `rgba(0,128,128,${
-          0.07 * opacity
+          0.07 *
+          opacity
         })`,
       );
 
@@ -1528,8 +1386,7 @@ export default function FenixIntro({
         "rgba(0,0,0,0)",
       );
 
-      ctx.fillStyle =
-        ring;
+      ctx.fillStyle = ring;
 
       ctx.beginPath();
 
@@ -1543,12 +1400,10 @@ export default function FenixIntro({
 
       ctx.fill();
 
-      /*
-       * Thin inner optical line.
-       */
       ctx.strokeStyle =
         `rgba(180,225,223,${
-          0.07 * opacity
+          0.07 *
+          opacity
         })`;
 
       ctx.lineWidth = 0.7;
@@ -1565,12 +1420,6 @@ export default function FenixIntro({
 
       ctx.stroke();
     };
-
-    /*
-    |--------------------------------------------------------------------------
-    | Feather rendering
-    |--------------------------------------------------------------------------
-    */
 
     const drawFeather = (
       feather: Feather,
@@ -1593,17 +1442,11 @@ export default function FenixIntro({
         return;
       }
 
-      /*
-       * Orbital movement.
-       */
       const orbitAngle =
         feather.angle +
         time *
           feather.orbit;
 
-      /*
-       * Natural feather flutter.
-       */
       const flutter =
         Math.sin(
           time *
@@ -1612,9 +1455,6 @@ export default function FenixIntro({
             feather.phase,
         );
 
-      /*
-       * Slow radial breathing.
-       */
       const breathing =
         Math.sin(
           time *
@@ -1624,9 +1464,6 @@ export default function FenixIntro({
         sceneRadius *
         0.014;
 
-      /*
-       * Slight drift.
-       */
       const drift =
         Math.sin(
           time *
@@ -1644,9 +1481,6 @@ export default function FenixIntro({
           0.006 +
         drift;
 
-      /*
-       * Elliptical vortex.
-       */
       const x =
         centerX +
         Math.cos(
@@ -1662,27 +1496,17 @@ export default function FenixIntro({
           radius *
           0.78;
 
-      /*
-       * Tangent orientation.
-       */
       const tangent =
         orbitAngle +
         Math.PI * 0.5 +
         feather.twist +
         flutter * 0.08;
 
-      /*
-       * Perspective.
-       */
       const perspective =
         0.52 +
         feather.depth *
           0.70;
 
-      /*
-       * More distant feathers are
-       * slightly dimmer.
-       */
       const distanceFade =
         clamp(
           1 -
@@ -1699,9 +1523,6 @@ export default function FenixIntro({
           1,
         );
 
-      /*
-       * Depth scale.
-       */
       const finalScale =
         feather.size *
         perspective *
@@ -1716,11 +1537,6 @@ export default function FenixIntro({
           0.94,
         );
 
-      /*
-       * Exit motion:
-       * feathers subtly collapse
-       * into the center as logo exits.
-       */
       let exitScale = 1;
 
       if (
@@ -1770,9 +1586,6 @@ export default function FenixIntro({
         finalScale *
         exitScale;
 
-      /*
-       * Cached sprite.
-       */
       const drawWidth =
         sprite.width *
         drawScale /
@@ -1793,12 +1606,6 @@ export default function FenixIntro({
 
       ctx.restore();
     };
-
-    /*
-    |--------------------------------------------------------------------------
-    | Sparks
-    |--------------------------------------------------------------------------
-    */
 
     const drawSparks = (
       time: number,
@@ -1831,7 +1638,8 @@ export default function FenixIntro({
         const pulse =
           0.62 +
           Math.sin(
-            time * 0.0027 +
+            time *
+              0.0027 +
               spark.phase,
           ) *
             0.38;
@@ -1889,12 +1697,6 @@ export default function FenixIntro({
       ctx.restore();
     };
 
-    /*
-    |--------------------------------------------------------------------------
-    | Vignette
-    |--------------------------------------------------------------------------
-    */
-
     const drawVignette = (
       opacity: number,
     ) => {
@@ -1921,14 +1723,16 @@ export default function FenixIntro({
       vignette.addColorStop(
         0.76,
         `rgba(0,0,0,${
-          0.34 * opacity
+          0.34 *
+          opacity
         })`,
       );
 
       vignette.addColorStop(
         1,
         `rgba(0,0,0,${
-          0.92 * opacity
+          0.92 *
+          opacity
         })`,
       );
 
@@ -1942,12 +1746,6 @@ export default function FenixIntro({
         height,
       );
     };
-
-    /*
-    |--------------------------------------------------------------------------
-    | Grain
-    |--------------------------------------------------------------------------
-    */
 
     const drawGrain = (
       time: number,
@@ -1969,7 +1767,8 @@ export default function FenixIntro({
       ctx.save();
 
       ctx.globalAlpha =
-        0.014 * opacity;
+        0.014 *
+        opacity;
 
       ctx.fillStyle =
         "#ffffff";
@@ -2010,12 +1809,6 @@ export default function FenixIntro({
       ctx.restore();
     };
 
-    /*
-    |--------------------------------------------------------------------------
-    | Render loop
-    |--------------------------------------------------------------------------
-    */
-
     const render = (
       now: number,
     ) => {
@@ -2023,11 +1816,6 @@ export default function FenixIntro({
         return;
       }
 
-      /*
-       * Delta-time based animation.
-       * Prevents high refresh-rate devices
-       * from running the scene faster.
-       */
       const frameTime =
         Math.min(
           50,
@@ -2045,9 +1833,6 @@ export default function FenixIntro({
         frameTime,
       );
 
-      /*
-       * Initial fade-in.
-       */
       let introOpacity = 1;
 
       if (
@@ -2061,9 +1846,6 @@ export default function FenixIntro({
           );
       }
 
-      /*
-       * Exit fade.
-       */
       let exitOpacity = 1;
 
       if (
@@ -2085,8 +1867,8 @@ export default function FenixIntro({
       }
 
       /*
-       * Stage changes are refs,
-       * NOT effect dependencies.
+       * IMPORTANT:
+       * No React state for animation stage.
        */
       if (
         elapsed >=
@@ -2099,12 +1881,9 @@ export default function FenixIntro({
           stageRef.current =
             "exit";
 
-          /*
-           * React state is used only
-           * for the one-time visual logo
-           * transition.
-           */
-          setLogoVisible(false);
+          setLogoVisible(
+            false,
+          );
         }
       } else if (
         elapsed >=
@@ -2127,9 +1906,6 @@ export default function FenixIntro({
         visualOpacity,
       );
 
-      /*
-       * Feather vortex.
-       */
       for (
         let i = 0;
         i < feathers.length;
@@ -2142,17 +1918,11 @@ export default function FenixIntro({
         );
       }
 
-      /*
-       * Optical center.
-       */
       drawCore(
         elapsed,
         visualOpacity,
       );
 
-      /*
-       * Tiny atmospheric particles.
-       */
       drawSparks(
         elapsed,
         visualOpacity,
@@ -2167,9 +1937,6 @@ export default function FenixIntro({
         visualOpacity,
       );
 
-      /*
-       * Complete intro.
-       */
       if (
         elapsed >=
         INTRO_COMPLETE
@@ -2192,10 +1959,6 @@ export default function FenixIntro({
               null;
           }
 
-          /*
-           * Clear expensive canvas
-           * before navigation.
-           */
           ctx.clearRect(
             0,
             0,
@@ -2216,12 +1979,6 @@ export default function FenixIntro({
           render,
         );
     };
-
-    /*
-    |--------------------------------------------------------------------------
-    | Visibility handling
-    |--------------------------------------------------------------------------
-    */
 
     const handleVisibility =
       () => {
@@ -2260,21 +2017,10 @@ export default function FenixIntro({
         }
       };
 
-    /*
-    |--------------------------------------------------------------------------
-    | Resize handling
-    |--------------------------------------------------------------------------
-    */
-
-    const handleResize = () => {
-      resize();
-    };
-
-    /*
-    |--------------------------------------------------------------------------
-    | Initial setup
-    |--------------------------------------------------------------------------
-    */
+    const handleResize =
+      () => {
+        resize();
+      };
 
     resize();
 
@@ -2303,12 +2049,6 @@ export default function FenixIntro({
       requestAnimationFrame(
         render,
       );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Cleanup
-    |--------------------------------------------------------------------------
-    */
 
     return () => {
       destroyed = true;
@@ -2340,9 +2080,6 @@ export default function FenixIntro({
         handleResize,
       );
 
-      /*
-       * Release canvas memory.
-       */
       canvas.width = 1;
       canvas.height = 1;
 
@@ -2350,22 +2087,7 @@ export default function FenixIntro({
       sparks = [];
       sprites = [];
     };
-
-    /*
-     * VERY IMPORTANT:
-     *
-     * Do NOT add stage or logoVisible here.
-     *
-     * Otherwise React would restart the entire
-     * canvas animation when the logo fades.
-     */
   }, [onComplete]);
-
-  /*
-  |--------------------------------------------------------------------------
-  | JSX
-  |--------------------------------------------------------------------------
-  */
 
   const isExiting =
     stageRef.current ===
@@ -2381,22 +2103,12 @@ export default function FenixIntro({
         WebkitUserSelect: "none",
       }}
     >
-      {/*
-      ------------------------------------------------------------------------
-      CANVAS
-      ------------------------------------------------------------------------
-      */}
       <canvas
         ref={canvasRef}
         aria-hidden="true"
         className="absolute inset-0 block h-full w-full"
       />
 
-      {/*
-      ------------------------------------------------------------------------
-      ATMOSPHERIC OVERLAY
-      ------------------------------------------------------------------------
-      */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
@@ -2406,11 +2118,6 @@ export default function FenixIntro({
         }}
       />
 
-      {/*
-      ------------------------------------------------------------------------
-      OUTER OPTICAL RING
-      ------------------------------------------------------------------------
-      */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-1/2"
@@ -2435,11 +2142,6 @@ export default function FenixIntro({
         }}
       />
 
-      {/*
-      ------------------------------------------------------------------------
-      INNER FX RING
-      ------------------------------------------------------------------------
-      */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-1/2"
@@ -2464,11 +2166,6 @@ export default function FenixIntro({
         }}
       />
 
-      {/*
-      ------------------------------------------------------------------------
-      LOGO
-      ------------------------------------------------------------------------
-      */}
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center"
         style={{
@@ -2477,50 +2174,37 @@ export default function FenixIntro({
 
           transform:
             `translate(-50%, -50%) scale(${
-              logoVisible ? 1 : 0.80
+              logoVisible
+                ? 1
+                : 0.80
             })`,
 
           transition:
             "opacity 650ms cubic-bezier(.22,.61,.36,1), transform 800ms cubic-bezier(.22,.61,.36,1)",
         }}
       >
-        {/*
-        ----------------------------------------------------------------------
-        FX SYMBOL
-        ----------------------------------------------------------------------
-        */}
         <div
           aria-hidden="true"
           style={{
             width:
               "clamp(76px, 11vw, 142px)",
-
             height:
               "clamp(76px, 11vw, 142px)",
-
             borderRadius:
               "50%",
-
             display: "flex",
-
             alignItems:
               "center",
-
             justifyContent:
               "center",
-
             border:
               "1px solid rgba(214,225,223,0.30)",
-
             background:
               "radial-gradient(circle at 35% 28%, rgba(255,255,255,0.12), rgba(0,0,0,0.38) 56%, rgba(0,128,128,0.09))",
-
             boxShadow:
               "0 0 38px rgba(0,128,128,0.13), inset 0 0 25px rgba(255,255,255,0.035)",
-
             backdropFilter:
               "blur(3px)",
-
             WebkitBackdropFilter:
               "blur(3px)",
           }}
@@ -2529,21 +2213,15 @@ export default function FenixIntro({
             style={{
               fontFamily:
                 "Arial, Helvetica, sans-serif",
-
               fontSize:
                 "clamp(28px, 4vw, 52px)",
-
               fontWeight: 800,
-
               letterSpacing:
                 "-0.09em",
-
               color:
                 "#eef4f3",
-
               textShadow:
                 "0 0 18px rgba(190,240,235,0.20)",
-
               transform:
                 "translateX(-2px)",
             }}
@@ -2552,35 +2230,22 @@ export default function FenixIntro({
           </span>
         </div>
 
-        {/*
-        ----------------------------------------------------------------------
-        FeniX WORDMARK
-        ----------------------------------------------------------------------
-        */}
         <div
           style={{
             marginTop:
               "clamp(14px, 2vw, 24px)",
-
             fontFamily:
               "Arial, Helvetica, sans-serif",
-
             fontSize:
               "clamp(27px, 4.5vw, 58px)",
-
             lineHeight: 1,
-
             fontWeight: 700,
-
             letterSpacing:
               "0.18em",
-
             color:
               "#f1f4f3",
-
             textShadow:
               "0 0 24px rgba(255,255,255,0.10)",
-
             whiteSpace:
               "nowrap",
           }}
@@ -2588,31 +2253,20 @@ export default function FenixIntro({
           FeniX
         </div>
 
-        {/*
-        ----------------------------------------------------------------------
-        TAGLINE
-        ----------------------------------------------------------------------
-        */}
         <div
           style={{
             marginTop:
               "clamp(9px, 1.2vw, 15px)",
-
             fontFamily:
               "Arial, Helvetica, sans-serif",
-
             fontSize:
               "clamp(8px, 1.15vw, 13px)",
-
             letterSpacing:
               "0.24em",
-
             color:
               "rgba(196,211,210,0.72)",
-
             textAlign:
               "center",
-
             whiteSpace:
               "nowrap",
           }}
@@ -2621,23 +2275,16 @@ export default function FenixIntro({
         </div>
       </div>
 
-      {/*
-      ------------------------------------------------------------------------
-      INITIALIZATION BAR
-      ------------------------------------------------------------------------
-      */}
       <div
         className="pointer-events-none absolute left-1/2 bottom-[9vh] -translate-x-1/2"
         style={{
           width:
             "min(220px, 58vw)",
-
           opacity:
             loading &&
             !isExiting
               ? 1
               : 0,
-
           transition:
             "opacity 500ms ease",
         }}
@@ -2645,30 +2292,21 @@ export default function FenixIntro({
         <div
           style={{
             height: 1,
-
             width: "100%",
-
             background:
               "rgba(255,255,255,0.08)",
-
             overflow:
               "hidden",
           }}
         >
           <div
             style={{
-              height:
-                "100%",
-
-              width:
-                "42%",
-
+              height: "100%",
+              width: "42%",
               background:
                 "linear-gradient(90deg, transparent, #008080, #d4b879, transparent)",
-
               animation:
                 "fenixIntroLoading 1.45s ease-in-out infinite",
-
               willChange:
                 "transform",
             }}
@@ -2678,18 +2316,12 @@ export default function FenixIntro({
         <div
           style={{
             marginTop: 9,
-
-            textAlign:
-              "center",
-
+            textAlign: "center",
             fontFamily:
               "Arial, Helvetica, sans-serif",
-
             fontSize: 9,
-
             letterSpacing:
               "0.30em",
-
             color:
               "rgba(194,207,206,0.50)",
           }}
@@ -2698,34 +2330,20 @@ export default function FenixIntro({
         </div>
       </div>
 
-      {/*
-      ------------------------------------------------------------------------
-      FINAL BLACK FADE
-      ------------------------------------------------------------------------
-      */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
-          background:
-            "#000",
-
+          background: "#000",
           opacity:
             isExiting ? 1 : 0,
-
           transition:
             "opacity 700ms cubic-bezier(.22,.61,.36,1)",
-
           willChange:
             "opacity",
         }}
       />
 
-      {/*
-      ------------------------------------------------------------------------
-      LOCAL ANIMATION
-      ------------------------------------------------------------------------
-      */}
       <style jsx>{`
         @keyframes fenixIntroLoading {
           0% {
