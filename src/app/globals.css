@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================================
+   GLOBAL RESET
+   ========================================================= */
+
 * {
   box-sizing: border-box;
 }
@@ -10,367 +14,38 @@ html,
 body {
   margin: 0;
   padding: 0;
+  min-height: 100%;
+}
+
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 body {
   background: #f3f4f6;
   color: #0B1736;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent accidental horizontal overflow */
+#__next {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Canvas rendering */
+canvas {
+  display: block;
+  max-width: 100%;
 }
 
 /* =========================================================
-   FENIX — LIVING FEATHER SPIRAL
-   Pure CSS — no image required
+   FENIX INTRO — LOADING BAR
    ========================================================= */
-
-.fenix-feather-bg {
-  position: absolute;
-  inset: -18%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-
-  background:
-    radial-gradient(
-      circle at 50% 48%,
-      #d8d0c2 0%,
-      #8c8b86 14%,
-      #505456 30%,
-      #24282a 57%,
-      #080909 100%
-    );
-
-  transform: translateZ(0) scale(1.04);
-}
-
-.fenix-feather-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 20;
-
-  background:
-    radial-gradient(
-      circle at 50% 50%,
-      transparent 0%,
-      transparent 18%,
-      rgba(0, 0, 0, 0.16) 32%,
-      rgba(0, 0, 0, 0.55) 70%,
-      #000 100%
-    );
-}
-
-.fenix-feather-bg::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 21;
-
-  background:
-    radial-gradient(
-      circle at 72% 35%,
-      rgba(235, 175, 100, 0.2),
-      transparent 22%
-    ),
-    radial-gradient(
-      circle at 25% 70%,
-      rgba(150, 180, 190, 0.15),
-      transparent 28%
-    );
-
-  mix-blend-mode: screen;
-}
-
-/* =========================================================
-   MAIN FEATHERS
-   ========================================================= */
-
-.fenix-feather {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-
-  width: clamp(90px, 15vw, 260px);
-  height: clamp(28px, 5vw, 82px);
-
-  transform-origin: 0 50%;
-
-  border-radius: 100% 8% 8% 100%;
-
-  background:
-    linear-gradient(
-      90deg,
-      #24282a 0%,
-      #69716f 34%,
-      #d3ccc0 73%,
-      #eee8dc 100%
-    );
-
-  box-shadow:
-    inset 0 2px 4px rgba(255,255,255,.22),
-    inset 0 -7px 11px rgba(0,0,0,.28),
-    8px 12px 20px rgba(0,0,0,.42);
-
-  opacity: .88;
-
-  animation:
-    fenixFeatherBreath
-    8s
-    ease-in-out
-    infinite;
-}
-
-.fenix-feather::before {
-  content: "";
-  position: absolute;
-
-  left: 8%;
-  top: 48%;
-
-  width: 88%;
-  height: 2px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(255,255,255,.58),
-      transparent
-    );
-
-  transform: rotate(-7deg);
-
-  opacity: .55;
-}
-
-.fenix-feather::after {
-  content: "";
-  position: absolute;
-
-  right: 8%;
-  top: 18%;
-
-  width: 45%;
-  height: 62%;
-
-  border-radius: 100% 0 100% 0;
-
-  border-top: 1px solid rgba(255,255,255,.3);
-
-  transform: rotate(-18deg);
-}
-
-/* =========================================================
-   BLUE / SILVER FEATHERS
-   ========================================================= */
-
-.fenix-feather-blue {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-
-  width: clamp(65px, 11vw, 190px);
-  height: clamp(22px, 3.5vw, 58px);
-
-  transform-origin: 0 50%;
-
-  border-radius: 100% 8% 8% 100%;
-
-  background:
-    linear-gradient(
-      90deg,
-      #151b1e,
-      #4e6069 42%,
-      #aeb9bc 78%,
-      #d9d5cc
-    );
-
-  box-shadow:
-    inset 0 1px 3px rgba(255,255,255,.2),
-    7px 9px 17px rgba(0,0,0,.4);
-
-  opacity: .68;
-
-  animation:
-    fenixFeatherBlue
-    9s
-    ease-in-out
-    infinite;
-}
-
-/* =========================================================
-   GOLD ACCENT
-   ========================================================= */
-
-.fenix-feather-gold {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-
-  width: clamp(55px, 9vw, 150px);
-  height: clamp(20px, 3vw, 50px);
-
-  transform-origin: 0 50%;
-
-  border-radius: 100% 8% 8% 100%;
-
-  background:
-    linear-gradient(
-      90deg,
-      #5e4030,
-      #a56b38 38%,
-      #e3ad64 72%,
-      #f4d28c
-    );
-
-  box-shadow:
-    inset 0 1px 3px rgba(255,255,255,.24),
-    5px 8px 15px rgba(0,0,0,.42);
-
-  opacity: .7;
-
-  animation:
-    fenixFeatherGold
-    7s
-    ease-in-out
-    infinite;
-}
-
-/* =========================================================
-   CENTER
-   ========================================================= */
-
-.fenix-feather-core {
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  width: clamp(90px, 16vw, 250px);
-  height: clamp(90px, 16vw, 250px);
-
-  transform: translate(-50%, -50%);
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      #121516 0%,
-      #343938 22%,
-      #817c71 45%,
-      transparent 71%
-    );
-
-  box-shadow:
-    0 0 90px rgba(0,0,0,.8),
-    inset 0 0 45px rgba(255,255,255,.08);
-
-  z-index: 12;
-}
-
-.fenix-feather-core::after {
-  content: "";
-
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  width: 34%;
-  height: 34%;
-
-  transform: translate(-50%, -50%);
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      #050606 0%,
-      #151819 55%,
-      transparent 75%
-    );
-
-  box-shadow:
-    0 0 35px rgba(0,0,0,.95);
-}
-
-/* =========================================================
-   ANIMATION
-   ========================================================= */
-
-@keyframes fenixFeatherBreath {
-  0%,
-  100% {
-    filter:
-      brightness(.82)
-      saturate(.78);
-
-    transform:
-      rotate(calc(var(--i) * 8.57deg))
-      translateX(calc(78px + var(--i) * 3.25px))
-      rotate(-16deg)
-      scale(1);
-  }
-
-  50% {
-    filter:
-      brightness(1)
-      saturate(.96);
-
-    transform:
-      rotate(calc(var(--i) * 8.57deg))
-      translateX(calc(83px + var(--i) * 3.25px))
-      rotate(-16deg)
-      scale(1.025);
-  }
-}
-
-@keyframes fenixFeatherBlue {
-  0%,
-  100% {
-    filter: brightness(.75);
-
-    transform:
-      rotate(calc(var(--i) * 12.85deg))
-      translateX(calc(48px + var(--i) * 4px))
-      rotate(17deg)
-      scale(1);
-  }
-
-  50% {
-    filter: brightness(1);
-
-    transform:
-      rotate(calc(var(--i) * 12.85deg))
-      translateX(calc(53px + var(--i) * 4px))
-      rotate(17deg)
-      scale(1.03);
-  }
-}
-
-@keyframes fenixFeatherGold {
-  0%,
-  100% {
-    filter: brightness(.72);
-
-    transform:
-      rotate(calc(var(--i) * 18deg))
-      translateX(calc(35px + var(--i) * 3.5px))
-      rotate(-12deg)
-      scale(1);
-  }
-
-  50% {
-    filter: brightness(1.08);
-
-    transform:
-      rotate(calc(var(--i) * 18deg))
-      translateX(calc(39px + var(--i) * 3.5px))
-      rotate(-12deg)
-      scale(1.035);
-  }
-}
 
 @keyframes fenixLoad {
   0% {
@@ -378,7 +53,17 @@ body {
     opacity: 0;
   }
 
-  20% {
+  12% {
+    opacity: 1;
+  }
+
+  35% {
+    transform: scaleX(0.35);
+    opacity: 1;
+  }
+
+  68% {
+    transform: scaleX(0.72);
     opacity: 1;
   }
 
@@ -389,27 +74,77 @@ body {
 }
 
 /* =========================================================
-   MOBILE
+   FENIX INTRO — OPTIONAL CINEMATIC MOTION
+   ========================================================= */
+
+@keyframes fenixAmbientPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.035);
+  }
+}
+
+@keyframes fenixSoftPulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 0.65;
+  }
+}
+
+/* =========================================================
+   MOBILE PERFORMANCE
    ========================================================= */
 
 @media (max-width: 600px) {
-  .fenix-feather-bg {
-    inset: -28%;
+  html,
+  body {
+    overflow-x: hidden;
   }
 
-  .fenix-feather {
-    width: 145px;
-    height: 43px;
+  canvas {
+    image-rendering: auto;
   }
+}
 
-  .fenix-feather-blue {
-    width: 105px;
-    height: 31px;
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  html,
+  body {
+    overflow-x: hidden;
   }
+}
 
-  .fenix-feather-gold {
-    width: 82px;
-    height: 27px;
+/* =========================================================
+   LARGE SCREENS / 4K
+   ========================================================= */
+
+@media (min-width: 1920px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+   ========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -418,9 +153,58 @@ body {
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .fenix-feather,
-  .fenix-feather-blue,
-  .fenix-feather-gold {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
-  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+:focus-visible {
+  outline: 2px solid #008080;
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   SELECTION
+   ========================================================= */
+
+::selection {
+  background: rgba(0, 128, 128, 0.28);
+  color: #ffffff;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #05070b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 128, 128, 0.45);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 128, 128, 0.7);
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 128, 128, 0.55) #05070b;
+}
