@@ -1486,4 +1486,4 @@ export default function FenixIntro({
       />
     </div>
   );
-      }
+}
