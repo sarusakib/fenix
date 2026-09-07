@@ -8,23 +8,35 @@ type FenixIntroProps = {
 
 type Stage = "enter" | "hold" | "exit";
 
-type QualityTier = "safe" | "balanced" | "high" | "ultra";
+type QualityName = "safe" | "balanced" | "high" | "ultra";
 
-type FeatherColor = "silver" | "teal" | "gold" | "dark";
+type QualityConfig = {
+  featherCount: number;
+  sparkCount: number;
+  dpr: number;
+  barbDetail: number;
+  spriteScale: number;
+  maxPixelArea: number;
+};
 
 type Feather = {
   angle: number;
   radius: number;
+  radiusBase: number;
+  size: number;
   length: number;
   width: number;
+  speed: number;
   orbit: number;
   twist: number;
   phase: number;
   depth: number;
+  layer: number;
+  color: string;
   alpha: number;
-  scale: number;
-  color: FeatherColor;
+  curve: number;
   flutter: number;
+  spriteIndex: number;
 };
 
 type Spark = {
@@ -36,31 +48,90 @@ type Spark = {
   phase: number;
 };
 
-type QualityConfig = {
-  feathers: number;
-  sparks: number;
-  dpr: number;
-  barbDetail: number;
-  spriteScale: number;
-  backgroundQuality: number;
+type Sprite = {
+  canvas: HTMLCanvasElement;
+  width: number;
+  height: number;
+};
+
+const QUALITY_ORDER: QualityName[] = [
+  "safe",
+  "balanced",
+  "high",
+  "ultra",
+];
+
+const QUALITY_CONFIG: Record<QualityName, QualityConfig> = {
+  safe: {
+    featherCount: 58,
+    sparkCount: 10,
+    dpr: 1,
+    barbDetail: 0.42,
+    spriteScale: 0.9,
+    maxPixelArea: 2_800_000,
+  },
+
+  balanced: {
+    featherCount: 92,
+    sparkCount: 16,
+    dpr: 1.15,
+    barbDetail: 0.58,
+    spriteScale: 1,
+    maxPixelArea: 4_500_000,
+  },
+
+  high: {
+    featherCount: 135,
+    sparkCount: 24,
+    dpr: 1.35,
+    barbDetail: 0.76,
+    spriteScale: 1.08,
+    maxPixelArea: 7_500_000,
+  },
+
+  ultra: {
+    featherCount: 175,
+    sparkCount: 32,
+    dpr: 1.55,
+    barbDetail: 0.92,
+    spriteScale: 1.15,
+    maxPixelArea: 11_000_000,
+  },
 };
 
 const INTRO_HOLD = 900;
 const INTRO_EXIT_START = 3200;
 const INTRO_COMPLETE = 3900;
 
-const TAU = Math.PI * 2;
-
-function rand(min: number, max: number) {
-  return min + Math.random() * (max - min);
-}
-
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-function getNetworkScore(): number {
-  if (typeof navigator === "undefined") return 2;
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+function easeOutCubic(t: number) {
+  return 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+}
+
+function easeInOutCubic(t: number) {
+  t = clamp(t, 0, 1);
+
+  return t < 0.5
+    ? 4 * t * t * t
+    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function smoothStep(t: number) {
+  t = clamp(t, 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function getNetworkScore() {
+  if (typeof navigator === "undefined") {
+    return 1;
+  }
 
   const connection = (
     navigator as Navigator & {
@@ -72,35 +143,39 @@ function getNetworkScore(): number {
     }
   ).connection;
 
-  if (!connection) return 2;
+  if (!connection) {
+    return 1;
+  }
 
-  if (connection.saveData) return 0;
+  if (connection.saveData) {
+    return 0;
+  }
 
   const effectiveType = connection.effectiveType;
 
-  if (effectiveType === "slow-2g") return 0;
-  if (effectiveType === "2g") return 0;
-  if (effectiveType === "3g") return 1;
-  if (effectiveType === "4g") return 3;
+  if (effectiveType === "slow-2g") {
+    return 0;
+  }
 
-  if (
-    typeof connection.downlink === "number" &&
-    connection.downlink >= 8
-  ) {
-    return 3;
+  if (effectiveType === "2g") {
+    return 0.25;
+  }
+
+  if (effectiveType === "3g") {
+    return 0.65;
   }
 
   if (
     typeof connection.downlink === "number" &&
-    connection.downlink >= 2
+    connection.downlink < 1
   ) {
-    return 2;
+    return 0.45;
   }
 
   return 1;
 }
 
-function detectQuality(): QualityTier {
+function detectQuality(): QualityName {
   if (typeof window === "undefined") {
     return "balanced";
   }
@@ -109,798 +184,564 @@ function detectQuality(): QualityTier {
   const height = window.innerHeight;
   const area = width * height;
 
-  const cores = navigator.hardwareConcurrency || 4;
+  const nav = navigator as Navigator & {
+    deviceMemory?: number;
+    hardwareConcurrency?: number;
+    connection?: {
+      saveData?: boolean;
+      effectiveType?: string;
+    };
+  };
 
-  const memory =
-    "deviceMemory" in navigator
-      ? Number(
-          (
-            navigator as Navigator & {
-              deviceMemory?: number;
-            }
-          ).deviceMemory || 4,
-        )
-      : 4;
+  const cores = nav.hardwareConcurrency ?? 4;
+  const memory = nav.deviceMemory ?? 4;
+  const network = getNetworkScore();
 
-  const touch =
+  const isTouch =
+    "ontouchstart" in window ||
     navigator.maxTouchPoints > 0;
 
-  const networkScore = getNetworkScore();
+  const isSmallScreen =
+    Math.min(width, height) <= 600;
 
-  const reducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
+  const isTablet =
+    Math.min(width, height) > 600 &&
+    Math.min(width, height) <= 1024;
 
-  if (reducedMotion) {
+  if (
+    nav.connection?.saveData ||
+    network <= 0.25 ||
+    cores <= 2 ||
+    memory <= 2
+  ) {
     return "safe";
   }
 
-  if (cores <= 2 || memory <= 2) {
+  if (isSmallScreen) {
+    if (cores >= 8 && memory >= 8 && network >= 0.65) {
+      return "balanced";
+    }
+
     return "safe";
   }
 
-  if (networkScore === 0) {
-    return cores <= 4 ? "safe" : "balanced";
+  if (isTablet || isTouch) {
+    if (cores >= 8 && memory >= 8 && network >= 0.65) {
+      return "high";
+    }
+
+    return "balanced";
   }
 
-  if (touch && area < 450000) {
-    return cores >= 6 && memory >= 4
-      ? "balanced"
-      : "safe";
-  }
-
-  if (cores >= 10 && memory >= 8 && area >= 1800000) {
+  if (
+    area >= 2_000_000 &&
+    cores >= 8 &&
+    memory >= 8 &&
+    network >= 0.65
+  ) {
     return "ultra";
   }
 
   if (cores >= 6 && memory >= 4) {
-    return networkScore >= 2
-      ? "high"
-      : "balanced";
+    return "high";
   }
 
   return "balanced";
 }
 
-function getConfig(
-  tier: QualityTier,
-): QualityConfig {
-  switch (tier) {
-    case "safe":
-      return {
-        feathers: 58,
-        sparks: 10,
-        dpr: 1,
-        barbDetail: 0.42,
-        spriteScale: 0.82,
-        backgroundQuality: 0.7,
-      };
-
-    case "balanced":
-      return {
-        feathers: 92,
-        sparks: 16,
-        dpr: 1.15,
-        barbDetail: 0.58,
-        spriteScale: 0.92,
-        backgroundQuality: 0.82,
-      };
-
-    case "high":
-      return {
-        feathers: 135,
-        sparks: 24,
-        dpr: 1.35,
-        barbDetail: 0.76,
-        spriteScale: 1,
-        backgroundQuality: 0.94,
-      };
-
-    case "ultra":
-      return {
-        feathers: 175,
-        sparks: 32,
-        dpr: 1.55,
-        barbDetail: 0.92,
-        spriteScale: 1.05,
-        backgroundQuality: 1,
-      };
-  }
-}
-
 function createFeather(
+  index: number,
+  count: number,
   width: number,
   height: number,
-  index: number,
-  total: number,
 ): Feather {
-  const maxRadius =
-    Math.max(width, height) * 0.68;
+  const center = Math.min(width, height) * 0.5;
 
-  const distribution =
-    Math.random();
+  const band = index % 5;
 
-  let radius: number;
+  const normalized = index / Math.max(1, count - 1);
 
-  if (distribution < 0.18) {
-    radius = rand(
-      maxRadius * 0.14,
-      maxRadius * 0.32,
-    );
-  } else if (distribution < 0.6) {
-    radius = rand(
-      maxRadius * 0.28,
-      maxRadius * 0.62,
-    );
-  } else {
-    radius = rand(
-      maxRadius * 0.55,
-      maxRadius,
-    );
-  }
+  const layer =
+    band === 0
+      ? 0
+      : band === 1
+        ? 1
+        : band === 2
+          ? 2
+          : band === 3
+            ? 3
+            : 4;
 
-  const layer = radius / maxRadius;
+  const depth =
+    0.35 +
+    Math.random() * 0.65;
 
-  const palette = Math.random();
+  const radiusBase =
+    center *
+    (0.62 + normalized * 0.72) *
+    (0.85 + Math.random() * 0.3);
 
-  let color: FeatherColor;
+  const angle =
+    normalized * Math.PI * 13.5 +
+    band * 0.42 +
+    (Math.random() - 0.5) * 0.5;
 
-  if (palette < 0.075) {
-    color = "gold";
-  } else if (palette < 0.28) {
-    color = "teal";
-  } else if (palette < 0.72) {
-    color = "silver";
-  } else {
-    color = "dark";
-  }
+  const size =
+    (0.58 + depth * 0.8) *
+    (0.78 + Math.random() * 0.42);
+
+  const colors = [
+    "#e8ecec",
+    "#c8ced0",
+    "#9ba3a7",
+    "#6f777b",
+    "#3d4549",
+    "#20272b",
+    "#d6d8d3",
+    "#6e8587",
+    "#3c7779",
+    "#9d8b68",
+  ];
+
+  const color =
+    colors[Math.floor(Math.random() * colors.length)];
 
   return {
-    angle:
-      (index / Math.max(total, 1)) * TAU +
-      rand(-0.14, 0.14),
+    angle,
+    radius: radiusBase,
+    radiusBase,
 
-    radius,
+    size,
 
     length:
-      rand(58, 190) *
-      (1.12 - layer * 0.24),
+      (26 + Math.random() * 48) *
+      size,
 
     width:
-      rand(16, 48) *
-      (1.08 - layer * 0.18),
+      (8 + Math.random() * 13) *
+      size,
 
-    orbit: rand(
-      0.00018,
-      0.00058,
-    ) *
-      (Math.random() > 0.5 ? 1 : -1),
+    speed:
+      (0.045 + Math.random() * 0.055) *
+      (0.7 + depth * 0.6),
 
-    twist: rand(-0.3, 0.3),
+    orbit:
+      (0.00014 + Math.random() * 0.00024) *
+      (layer % 2 === 0 ? 1 : -1),
 
-    phase: rand(0, TAU),
+    twist:
+      (Math.random() - 0.5) * 0.8,
 
-    depth: rand(0.25, 1),
+    phase:
+      Math.random() * Math.PI * 2,
 
-    alpha:
-      color === "dark"
-        ? rand(0.28, 0.62)
-        : color === "gold"
-          ? rand(0.42, 0.76)
-          : rand(0.42, 0.86),
+    depth,
 
-    scale: rand(0.68, 1.14),
+    layer,
 
     color,
 
-    flutter: rand(0.35, 1),
+    alpha:
+      0.28 +
+      depth * 0.58,
+
+    curve:
+      (Math.random() - 0.5) * 0.6,
+
+    flutter:
+      0.4 + Math.random() * 1.1,
+
+    spriteIndex:
+      Math.floor(Math.random() * 8),
   };
 }
 
-function createSpark(): Spark {
+function createSpark(
+  width: number,
+  height: number,
+): Spark {
+  const center = Math.min(width, height) * 0.5;
+
   return {
-    angle: rand(0, TAU),
-    radius: rand(90, 700),
-    speed: rand(
-      0.00015,
-      0.00052,
-    ),
-    size: rand(0.45, 1.45),
-    alpha: rand(0.15, 0.58),
-    phase: rand(0, TAU),
+    angle:
+      Math.random() * Math.PI * 2,
+
+    radius:
+      center *
+      (0.2 + Math.random() * 1.25),
+
+    speed:
+      0.00012 +
+      Math.random() * 0.00028,
+
+    size:
+      0.5 +
+      Math.random() * 1.8,
+
+    alpha:
+      0.25 +
+      Math.random() * 0.65,
+
+    phase:
+      Math.random() * Math.PI * 2,
   };
 }
 
-function createFeatherSprite(
-  color: FeatherColor,
+function drawFeatherSprite(
+  canvas: HTMLCanvasElement,
+  color: string,
+  detail: number,
   scale: number,
-  barbDetail: number,
-): HTMLCanvasElement {
-  const canvas =
-    document.createElement("canvas");
+) {
+  const size = 128 * scale;
 
-  const width =
-    Math.round(220 * scale);
-
-  const height =
-    Math.round(90 * scale);
-
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = Math.ceil(size);
+  canvas.height = Math.ceil(size);
 
   const ctx = canvas.getContext("2d");
 
   if (!ctx) {
-    return canvas;
+    return;
   }
 
-  const cx = 8 * scale;
-  const cy = height / 2;
+  ctx.clearRect(0, 0, size, size);
 
-  const length =
-    190 * scale;
+  const cx = size * 0.5;
+  const cy = size * 0.5;
 
-  const featherWidth =
-    42 * scale;
-
-  let gradient =
-    ctx.createLinearGradient(
-      0,
-      0,
-      length,
-      0,
-    );
-
-  if (color === "silver") {
-    gradient.addColorStop(
-      0,
-      "#111617",
-    );
-
-    gradient.addColorStop(
-      0.24,
-      "#515a59",
-    );
-
-    gradient.addColorStop(
-      0.52,
-      "#aaa9a1",
-    );
-
-    gradient.addColorStop(
-      0.78,
-      "#ece8df",
-    );
-
-    gradient.addColorStop(
-      1,
-      "#7e8583",
-    );
-  }
-
-  if (color === "teal") {
-    gradient.addColorStop(
-      0,
-      "#061719",
-    );
-
-    gradient.addColorStop(
-      0.3,
-      "#155458",
-    );
-
-    gradient.addColorStop(
-      0.58,
-      "#238688",
-    );
-
-    gradient.addColorStop(
-      0.8,
-      "#83b7b4",
-    );
-
-    gradient.addColorStop(
-      1,
-      "#315e60",
-    );
-  }
-
-  if (color === "gold") {
-    gradient.addColorStop(
-      0,
-      "#2b2118",
-    );
-
-    gradient.addColorStop(
-      0.3,
-      "#80532f",
-    );
-
-    gradient.addColorStop(
-      0.62,
-      "#cb9653",
-    );
-
-    gradient.addColorStop(
-      0.82,
-      "#efc887",
-    );
-
-    gradient.addColorStop(
-      1,
-      "#754c29",
-    );
-  }
-
-  if (color === "dark") {
-    gradient.addColorStop(
-      0,
-      "#050707",
-    );
-
-    gradient.addColorStop(
-      0.38,
-      "#151a1a",
-    );
-
-    gradient.addColorStop(
-      0.7,
-      "#3d4544",
-    );
-
-    gradient.addColorStop(
-      1,
-      "#121717",
-    );
-  }
+  const length = size * 0.82;
+  const width = size * 0.19;
 
   ctx.save();
 
-  ctx.translate(
+  ctx.translate(cx, cy);
+
+  const bodyGradient = ctx.createLinearGradient(
+    -length * 0.45,
     0,
+    length * 0.45,
     0,
   );
+
+  bodyGradient.addColorStop(0, "rgba(255,255,255,0)");
+  bodyGradient.addColorStop(0.12, color);
+  bodyGradient.addColorStop(0.55, color);
+  bodyGradient.addColorStop(0.82, "rgba(255,255,255,0.58)");
+  bodyGradient.addColorStop(1, "rgba(255,255,255,0)");
+
+  ctx.fillStyle = bodyGradient;
 
   ctx.beginPath();
 
-  ctx.moveTo(
-    cx,
-    cy,
+  ctx.moveTo(-length * 0.48, 0);
+
+  ctx.bezierCurveTo(
+    -length * 0.16,
+    -width,
+    length * 0.16,
+    -width * 0.86,
+    length * 0.48,
+    0,
   );
 
   ctx.bezierCurveTo(
-    length * 0.22,
-    cy - featherWidth * 0.52,
-    length * 0.58,
-    cy - featherWidth * 0.6,
-    length,
-    cy,
-  );
-
-  ctx.bezierCurveTo(
-    length * 0.62,
-    cy + featherWidth * 0.5,
-    length * 0.2,
-    cy + featherWidth * 0.36,
-    cx,
-    cy,
+    length * 0.17,
+    width * 0.78,
+    -length * 0.18,
+    width,
+    -length * 0.48,
+    0,
   );
 
   ctx.closePath();
 
-  ctx.fillStyle = gradient;
+  ctx.globalAlpha = 0.76;
 
   ctx.fill();
 
-  /*
-   * Central rachis
-   */
-  const shaft =
-    ctx.createLinearGradient(
-      0,
-      cy,
-      length,
-      cy,
-    );
+  ctx.globalAlpha = 1;
 
-  shaft.addColorStop(
+  const rachisGradient = ctx.createLinearGradient(
+    -length * 0.48,
     0,
-    "rgba(15,18,18,0.75)",
+    length * 0.48,
+    0,
   );
 
-  shaft.addColorStop(
-    0.4,
-    "rgba(245,242,232,0.62)",
-  );
+  rachisGradient.addColorStop(0, "rgba(255,255,255,0)");
+  rachisGradient.addColorStop(0.2, "rgba(235,242,241,0.65)");
+  rachisGradient.addColorStop(0.55, "rgba(255,255,255,0.9)");
+  rachisGradient.addColorStop(1, "rgba(255,255,255,0)");
 
-  shaft.addColorStop(
-    0.72,
-    "rgba(255,255,255,0.88)",
-  );
-
-  shaft.addColorStop(
-    1,
-    "rgba(255,255,255,0)",
-  );
+  ctx.strokeStyle = rachisGradient;
+  ctx.lineWidth = Math.max(0.7, size * 0.011);
 
   ctx.beginPath();
 
-  ctx.moveTo(
-    cx,
-    cy,
-  );
-
+  ctx.moveTo(-length * 0.48, 0);
   ctx.quadraticCurveTo(
-    length * 0.5,
-    cy - featherWidth * 0.04,
-    length,
-    cy - featherWidth * 0.025,
+    0,
+    -size * 0.015,
+    length * 0.48,
+    0,
   );
-
-  ctx.strokeStyle = shaft;
-
-  ctx.lineWidth =
-    Math.max(
-      0.7,
-      1.25 * scale,
-    );
 
   ctx.stroke();
 
-  /*
-   * Barb details
-   *
-   * Generated ONCE.
-   * Never regenerated every frame.
-   */
-  const barbCount = Math.max(
-    5,
-    Math.floor(
-      20 * barbDetail,
-    ),
+  const barbCount = Math.floor(
+    7 + detail * 15,
   );
 
-  ctx.globalAlpha = 0.58;
-
-  for (
-    let i = 2;
-    i < barbCount;
-    i++
-  ) {
-    const t =
-      i / barbCount;
+  for (let i = 0; i < barbCount; i++) {
+    const p = i / Math.max(1, barbCount - 1);
 
     const x =
-      length * t;
-
-    const envelope =
-      Math.sin(
-        Math.PI * t,
+      lerp(
+        -length * 0.34,
+        length * 0.38,
+        p,
       );
 
-    const barb =
-      featherWidth *
-      envelope *
-      0.48;
+    const taper =
+      Math.sin(p * Math.PI);
+
+    const barbLength =
+      width *
+      (0.42 + taper * 0.55);
 
     const side =
-      i % 2 === 0
-        ? -1
-        : 1;
+      i % 2 === 0 ? -1 : 1;
 
-    const endX =
-      x -
-      length * 0.09;
+    const curve =
+      barbLength * 0.25;
 
-    const endY =
-      cy +
-      side * barb;
+    ctx.strokeStyle =
+      side < 0
+        ? "rgba(255,255,255,0.22)"
+        : "rgba(0,0,0,0.22)";
+
+    ctx.lineWidth =
+      Math.max(0.45, size * 0.006);
 
     ctx.beginPath();
 
-    ctx.moveTo(
-      x,
-      cy,
-    );
+    ctx.moveTo(x, 0);
 
     ctx.quadraticCurveTo(
-      x - length * 0.035,
-      cy + side * barb * 0.28,
-      endX,
-      endY,
+      x + curve,
+      side * barbLength * 0.65,
+      x + barbLength * 0.18,
+      side * barbLength,
     );
-
-    if (color === "teal") {
-      ctx.strokeStyle =
-        "rgba(210,245,242,0.3)";
-    } else if (color === "gold") {
-      ctx.strokeStyle =
-        "rgba(255,224,170,0.3)";
-    } else {
-      ctx.strokeStyle =
-        "rgba(255,255,255,0.24)";
-    }
-
-    ctx.lineWidth =
-      Math.max(
-        0.4,
-        0.85 * scale,
-      );
 
     ctx.stroke();
   }
 
-  /*
-   * Controlled highlight
-   */
-  ctx.globalAlpha = 0.55;
-
-  const shine =
-    ctx.createLinearGradient(
-      length * 0.15,
-      cy - featherWidth * 0.18,
-      length * 0.85,
-      cy,
-    );
-
-  shine.addColorStop(
-    0,
-    "rgba(255,255,255,0)",
-  );
-
-  shine.addColorStop(
-    0.55,
-    "rgba(255,255,255,0.25)",
-  );
-
-  shine.addColorStop(
-    0.68,
-    "rgba(255,255,255,0.62)",
-  );
-
-  shine.addColorStop(
-    0.74,
-    "rgba(255,255,255,0)",
-  );
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    length * 0.16,
-    cy - featherWidth * 0.13,
-  );
-
-  ctx.quadraticCurveTo(
-    length * 0.5,
-    cy - featherWidth * 0.22,
-    length * 0.82,
-    cy,
-  );
-
-  ctx.strokeStyle = shine;
-
-  ctx.lineWidth =
-    Math.max(
-      0.7,
-      2 * scale,
-    );
-
-  ctx.stroke();
-
   ctx.restore();
+}
 
-  return canvas;
+function buildSprites(
+  detail: number,
+  scale: number,
+): Sprite[] {
+  const sprites: Sprite[] = [];
+
+  const colors = [
+    "#e8ecec",
+    "#c8ced0",
+    "#9ba3a7",
+    "#697276",
+    "#3d4549",
+    "#242b2f",
+    "#6f8889",
+    "#a79672",
+  ];
+
+  for (let i = 0; i < colors.length; i++) {
+    const canvas = document.createElement("canvas");
+
+    drawFeatherSprite(
+      canvas,
+      colors[i],
+      detail,
+      scale,
+    );
+
+    sprites.push({
+      canvas,
+      width: canvas.width,
+      height: canvas.height,
+    });
+  }
+
+  return sprites;
 }
 
 export default function FenixIntro({
   onComplete,
 }: FenixIntroProps) {
   const canvasRef =
-    useRef<HTMLCanvasElement | null>(
-      null,
-    );
+    useRef<HTMLCanvasElement | null>(null);
+
+  const frameRef =
+    useRef<number | null>(null);
+
+  const completeRef =
+    useRef(false);
+
+  const qualityRef =
+    useRef<QualityName>("balanced");
 
   const [stage, setStage] =
     useState<Stage>("enter");
 
-  useEffect(() => {
-    const holdTimer =
-      window.setTimeout(
-        () => setStage("hold"),
-        INTRO_HOLD,
-      );
+  const [logoVisible, setLogoVisible] =
+    useState(true);
 
-    const exitTimer =
-      window.setTimeout(
-        () => setStage("exit"),
-        INTRO_EXIT_START,
-      );
-
-    const completeTimer =
-      window.setTimeout(
-        () => onComplete(),
-        INTRO_COMPLETE,
-      );
-
-    return () => {
-      window.clearTimeout(
-        holdTimer,
-      );
-
-      window.clearTimeout(
-        exitTimer,
-      );
-
-      window.clearTimeout(
-        completeTimer,
-      );
-    };
-  }, [onComplete]);
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
-    const canvas =
-      canvasRef.current;
+    const canvasElement = canvasRef.current;
 
-    if (!canvas) return;
+    if (!canvasElement) {
+      return;
+    }
 
-    const ctx =
-      canvas.getContext("2d", {
-        alpha: true,
-        desynchronized: true,
-      });
+    /*
+     * IMPORTANT:
+     * Keep this stable non-null alias.
+     * This prevents the TypeScript:
+     * "canvas is possibly null"
+     * error inside nested functions.
+     */
+    const canvas = canvasElement;
 
-    if (!ctx) return;
+    const ctx = canvas.getContext("2d", {
+      alpha: true,
+      desynchronized: true,
+    });
+
+    if (!ctx) {
+      return;
+    }
 
     let destroyed = false;
 
-    let animationFrame = 0;
-
-    let width = 0;
-    let height = 0;
+    let width = 1;
+    let height = 1;
 
     let dpr = 1;
 
-    let elapsed = 0;
+    let centerX = 0;
+    let centerY = 0;
 
-    let lastTime =
-      performance.now();
+    let sceneRadius = 0;
 
-    let lastQualityCheck =
-      performance.now();
-
-    let slowFrames = 0;
-    let goodFrames = 0;
-
-    let tier =
+    let quality: QualityName =
       detectQuality();
 
+    qualityRef.current = quality;
+
     let config =
-      getConfig(tier);
+      QUALITY_CONFIG[quality];
 
     let feathers: Feather[] = [];
-
     let sparks: Spark[] = [];
 
-    const reducedMotion =
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
+    let sprites: Sprite[] = [];
 
-    /*
-     * Feather sprites.
-     *
-     * Created once per quality setup.
-     */
-    let sprites:
-      Record<
-        FeatherColor,
-        HTMLCanvasElement
-      > = {} as Record<
-        FeatherColor,
-        HTMLCanvasElement
-      >;
+    let lastTime = performance.now();
 
-    function buildSprites() {
-      sprites = {
-        silver:
-          createFeatherSprite(
-            "silver",
-            config.spriteScale,
-            config.barbDetail,
-          ),
+    let elapsed = 0;
 
-        teal:
-          createFeatherSprite(
-            "teal",
-            config.spriteScale,
-            config.barbDetail,
-          ),
+    let slowFrames = 0;
+    let fastFrames = 0;
 
-        gold:
-          createFeatherSprite(
-            "gold",
-            config.spriteScale,
-            config.barbDetail,
-          ),
+    let lastQualityChange = 0;
 
-        dark:
-          createFeatherSprite(
-            "dark",
-            config.spriteScale,
-            config.barbDetail,
-          ),
-      };
-    }
+    const resize = () => {
+      if (destroyed) {
+        return;
+      }
 
-    function rebuildScene() {
-      feathers = Array.from(
-        {
-          length:
-            config.feathers,
-        },
-        (_, index) =>
-          createFeather(
-            width,
-            height,
-            index,
-            config.feathers,
-          ),
-      );
+      const rect =
+        canvas.getBoundingClientRect();
 
-      sparks = Array.from(
-        {
-          length:
-            config.sparks,
-        },
-        createSpark,
-      );
-
-      buildSprites();
-    }
-
-    function resize() {
       width =
-        window.innerWidth;
+        Math.max(
+          1,
+          Math.floor(rect.width),
+        );
 
       height =
-        window.innerHeight;
+        Math.max(
+          1,
+          Math.floor(rect.height),
+        );
 
-      const screenArea =
+      centerX =
+        width * 0.5;
+
+      centerY =
+        height * 0.5;
+
+      sceneRadius =
+        Math.min(width, height) * 0.5;
+
+      const pixelArea =
         width * height;
 
-      /*
-       * DPR is adaptive.
-       *
-       * Never blindly use native DPR.
-       */
-      const maxDpr =
-        screenArea > 2500000
-          ? 1.65
-          : screenArea > 1200000
-            ? 1.45
-            : 1.25;
+      let targetDpr =
+        config.dpr;
 
-      dpr = Math.min(
-        window.devicePixelRatio ||
+      const nativeDpr =
+        window.devicePixelRatio || 1;
+
+      targetDpr =
+        Math.min(
+          nativeDpr,
+          targetDpr,
+        );
+
+      if (
+        pixelArea >
+        config.maxPixelArea
+      ) {
+        targetDpr *= 0.9;
+      }
+
+      /*
+       * Keep iOS / mobile canvas memory
+       * under control.
+       */
+      if (
+        width <= 600 ||
+        height <= 600
+      ) {
+        targetDpr =
+          Math.min(
+            targetDpr,
+            1.35,
+          );
+      }
+
+      dpr =
+        Math.max(
           1,
-        config.dpr,
-        maxDpr,
-      );
+          targetDpr,
+        );
 
       canvas.width =
         Math.max(
           1,
-          Math.floor(
-            width * dpr,
-          ),
+          Math.floor(width * dpr),
         );
 
       canvas.height =
         Math.max(
           1,
-          Math.floor(
-            height * dpr,
-          ),
+          Math.floor(height * dpr),
         );
 
       canvas.style.width =
@@ -919,86 +760,181 @@ export default function FenixIntro({
       );
 
       rebuildScene();
-    }
-
-    resize();
-
-    let resizeTimer = 0;
-
-    const handleResize = () => {
-      window.clearTimeout(
-        resizeTimer,
-      );
-
-      resizeTimer =
-        window.setTimeout(
-          resize,
-          120,
-        );
     };
 
-    window.addEventListener(
-      "resize",
-      handleResize,
-      {
-        passive: true,
-      },
-    );
+    const rebuildScene = () => {
+      if (destroyed) {
+        return;
+      }
 
-    function drawBackground() {
-      const cx =
-        width * 0.5;
+      config =
+        QUALITY_CONFIG[quality];
 
-      const cy =
-        height * 0.5;
+      sprites = buildSprites(
+        config.barbDetail,
+        config.spriteScale,
+      );
 
-      const radius =
-        Math.max(
-          width,
-          height,
-        ) * 0.72;
+      feathers = [];
 
-      const bg =
+      for (
+        let i = 0;
+        i < config.featherCount;
+        i++
+      ) {
+        feathers.push(
+          createFeather(
+            i,
+            config.featherCount,
+            width,
+            height,
+          ),
+        );
+      }
+
+      /*
+       * Stable depth ordering.
+       * We sort only when scene is rebuilt,
+       * never every animation frame.
+       */
+      feathers.sort(
+        (a, b) =>
+          a.depth - b.depth,
+      );
+
+      sparks = [];
+
+      for (
+        let i = 0;
+        i < config.sparkCount;
+        i++
+      ) {
+        sparks.push(
+          createSpark(
+            width,
+            height,
+          ),
+        );
+      }
+    };
+
+    const setQuality =
+      (next: QualityName) => {
+        if (
+          destroyed ||
+          next === quality
+        ) {
+          return;
+        }
+
+        quality = next;
+
+        qualityRef.current =
+          next;
+
+        slowFrames = 0;
+        fastFrames = 0;
+
+        lastQualityChange =
+          performance.now();
+
+        rebuildScene();
+      };
+
+    const adaptQuality =
+      (frameTime: number) => {
+        if (
+          elapsed -
+            lastQualityChange <
+          900
+        ) {
+          return;
+        }
+
+        if (frameTime > 27) {
+          slowFrames++;
+          fastFrames = 0;
+        } else if (frameTime < 17) {
+          fastFrames++;
+          slowFrames = 0;
+        } else {
+          slowFrames = 0;
+          fastFrames = 0;
+        }
+
+        const index =
+          QUALITY_ORDER.indexOf(
+            quality,
+          );
+
+        if (
+          slowFrames >= 2 &&
+          index > 0
+        ) {
+          setQuality(
+            QUALITY_ORDER[
+              index - 1
+            ],
+          );
+
+          return;
+        }
+
+        if (
+          fastFrames >= 8 &&
+          index <
+            QUALITY_ORDER.length - 1
+        ) {
+          setQuality(
+            QUALITY_ORDER[
+              index + 1
+            ],
+          );
+        }
+      };
+
+    const drawBackground = (
+      time: number,
+      introProgress: number,
+    ) => {
+      ctx.clearRect(
+        0,
+        0,
+        width,
+        height,
+      );
+
+      const base =
         ctx.createRadialGradient(
-          cx,
-          cy,
+          centerX,
+          centerY,
           0,
-          cx,
-          cy,
-          radius,
+          centerX,
+          centerY,
+          sceneRadius * 1.55,
         );
 
-      bg.addColorStop(
+      base.addColorStop(
         0,
-        "#101617",
+        "#101719",
       );
 
-      bg.addColorStop(
-        0.16,
-        "#1b2424",
+      base.addColorStop(
+        0.22,
+        "#081011",
       );
 
-      bg.addColorStop(
-        0.32,
-        "#303637",
+      base.addColorStop(
+        0.58,
+        "#040809",
       );
 
-      bg.addColorStop(
-        0.54,
-        "#141919",
-      );
-
-      bg.addColorStop(
-        0.8,
-        "#07090a",
-      );
-
-      bg.addColorStop(
+      base.addColorStop(
         1,
-        "#010202",
+        "#010203",
       );
 
-      ctx.fillStyle = bg;
+      ctx.fillStyle = base;
 
       ctx.fillRect(
         0,
@@ -1009,30 +945,34 @@ export default function FenixIntro({
 
       const glow =
         ctx.createRadialGradient(
-          cx - width * 0.04,
-          cy - height * 0.04,
+          centerX,
+          centerY,
           0,
-          cx - width * 0.04,
-          cy - height * 0.04,
-          Math.max(
-            width,
-            height,
-          ) * 0.52,
+          centerX,
+          centerY,
+          sceneRadius * 0.7,
         );
+
+      const pulse =
+        0.5 +
+        Math.sin(time * 0.0007) *
+          0.08;
 
       glow.addColorStop(
         0,
-        "rgba(0,128,128,0.16)",
+        `rgba(0,128,128,${
+          0.13 * pulse
+        })`,
       );
 
       glow.addColorStop(
-        0.35,
-        "rgba(0,128,128,0.05)",
+        0.34,
+        "rgba(0,86,88,0.065)",
       );
 
       glow.addColorStop(
-        1,
-        "rgba(0,128,128,0)",
+        0.72,
+        "rgba(0,0,0,0)",
       );
 
       ctx.fillStyle = glow;
@@ -1044,411 +984,42 @@ export default function FenixIntro({
         height,
       );
 
-      const warm =
-        ctx.createRadialGradient(
-          width * 0.72,
-          height * 0.32,
-          0,
-          width * 0.72,
-          height * 0.32,
-          Math.max(
-            width,
-            height,
-          ) * 0.4,
-        );
-
-      warm.addColorStop(
-        0,
-        "rgba(210,155,80,0.065)",
-      );
-
-      warm.addColorStop(
-        1,
-        "rgba(210,155,80,0)",
-      );
-
-      ctx.fillStyle = warm;
-
-      ctx.fillRect(
-        0,
-        0,
-        width,
-        height,
-      );
-    }
-
-    function drawFeather(
-      feather: Feather,
-      time: number,
-    ) {
-      const sprite =
-        sprites[feather.color];
-
-      if (!sprite) return;
-
-      const cx =
-        width * 0.5;
-
-      const cy =
-        height * 0.5;
-
-      const wave =
-        Math.sin(
-          time * 0.001 *
-            feather.flutter +
-            feather.phase,
-        ) * 0.045;
-
-      const radius =
-        feather.radius +
-        Math.sin(
-          time * 0.00042 +
-            feather.phase,
-        ) *
-          (10 +
-            feather.depth * 22);
-
-      const angle =
-        feather.angle +
-        time * feather.orbit +
-        wave;
-
-      const x =
-        cx +
-        Math.cos(angle) *
-          radius;
-
-      const y =
-        cy +
-        Math.sin(angle) *
-          radius *
-          0.78;
-
-      const tangent =
-        angle +
-        Math.PI / 2;
-
-      const flutter =
-        Math.sin(
-          time * 0.0017 +
-            feather.phase,
-        ) *
-        feather.flutter *
-        0.07;
-
-      const rotation =
-        tangent +
-        feather.twist +
-        flutter;
-
-      const perspective =
-        0.72 +
-        feather.depth *
-          0.48;
-
-      const scale =
-        feather.scale *
-        perspective;
-
       /*
-       * Skip extremely tiny distant
-       * feathers on weaker quality tiers.
+       * Very subtle cinematic gold
+       * atmospheric light.
        */
-      if (
-        tier === "safe" &&
-        feather.depth < 0.28
-      ) {
-        return;
-      }
-
-      ctx.save();
-
-      ctx.translate(
-        x,
-        y,
-      );
-
-      ctx.rotate(
-        rotation,
-      );
-
-      ctx.globalAlpha =
-        feather.alpha *
-        (0.5 +
-          feather.depth *
-            0.5);
-
-      ctx.drawImage(
-        sprite,
-        0,
-        -sprite.height / 2,
-        sprite.width * scale,
-        sprite.height * scale,
-      );
-
-      ctx.restore();
-    }
-
-    function drawCore(
-      time: number,
-    ) {
-      const cx =
-        width * 0.5;
-
-      const cy =
-        height * 0.5;
-
-      const coreRadius =
-        Math.min(
-          width,
-          height,
-        ) * 0.115;
-
-      const aura =
+      const gold =
         ctx.createRadialGradient(
-          cx,
-          cy,
+          centerX +
+            Math.cos(time * 0.00016) *
+              sceneRadius *
+              0.35,
+          centerY +
+            Math.sin(time * 0.00019) *
+              sceneRadius *
+              0.22,
           0,
-          cx,
-          cy,
-          coreRadius * 3,
+          centerX,
+          centerY,
+          sceneRadius,
         );
 
-      aura.addColorStop(
+      gold.addColorStop(
         0,
-        "rgba(0,128,128,0.12)",
+        "rgba(170,125,64,0.025)",
       );
 
-      aura.addColorStop(
-        0.35,
-        "rgba(0,128,128,0.045)",
+      gold.addColorStop(
+        0.55,
+        "rgba(120,90,48,0.01)",
       );
 
-      aura.addColorStop(
+      gold.addColorStop(
         1,
-        "rgba(0,128,128,0)",
-      );
-
-      ctx.fillStyle = aura;
-
-      ctx.beginPath();
-
-      ctx.arc(
-        cx,
-        cy,
-        coreRadius * 3,
-        0,
-        TAU,
-      );
-
-      ctx.fill();
-
-      const core =
-        ctx.createRadialGradient(
-          cx,
-          cy,
-          0,
-          cx,
-          cy,
-          coreRadius * 1.9,
-        );
-
-      core.addColorStop(
-        0,
-        "rgba(1,3,3,0.98)",
-      );
-
-      core.addColorStop(
-        0.45,
-        "rgba(5,10,10,0.94)",
-      );
-
-      core.addColorStop(
-        0.7,
-        "rgba(10,21,21,0.7)",
-      );
-
-      core.addColorStop(
-        1,
-        "rgba(10,15,15,0)",
-      );
-
-      ctx.fillStyle = core;
-
-      ctx.beginPath();
-
-      ctx.arc(
-        cx,
-        cy,
-        coreRadius * 1.9,
-        0,
-        TAU,
-      );
-
-      ctx.fill();
-
-      if (tier !== "safe") {
-        ctx.save();
-
-        ctx.translate(
-          cx,
-          cy,
-        );
-
-        ctx.rotate(
-          time * 0.00015,
-        );
-
-        ctx.strokeStyle =
-          "rgba(0,180,180,0.2)";
-
-        ctx.lineWidth = 1;
-
-        ctx.beginPath();
-
-        ctx.arc(
-          0,
-          0,
-          coreRadius * 1.05,
-          -0.7,
-          0.8,
-        );
-
-        ctx.stroke();
-
-        ctx.strokeStyle =
-          "rgba(255,215,0,0.12)";
-
-        ctx.beginPath();
-
-        ctx.arc(
-          0,
-          0,
-          coreRadius * 1.2,
-          2.3,
-          3.5,
-        );
-
-        ctx.stroke();
-
-        ctx.restore();
-      }
-    }
-
-    function drawSparks(
-      time: number,
-    ) {
-      if (
-        tier === "safe"
-      ) {
-        return;
-      }
-
-      const cx =
-        width * 0.5;
-
-      const cy =
-        height * 0.5;
-
-      ctx.save();
-
-      for (const spark of sparks) {
-        const radius =
-          spark.radius +
-          Math.sin(
-            time * 0.001 +
-              spark.phase,
-          ) * 18;
-
-        const angle =
-          spark.angle +
-          time * spark.speed;
-
-        const x =
-          cx +
-          Math.cos(angle) *
-            radius;
-
-        const y =
-          cy +
-          Math.sin(angle) *
-            radius *
-            0.78;
-
-        const pulse =
-          0.55 +
-          Math.sin(
-            time * 0.0025 +
-              spark.phase,
-          ) *
-            0.45;
-
-        ctx.globalAlpha =
-          spark.alpha *
-          pulse;
-
-        ctx.fillStyle =
-          spark.phase % 2 >
-          1
-            ? "#008080"
-            : "#d9d5cc";
-
-        ctx.fillRect(
-          x,
-          y,
-          spark.size,
-          spark.size,
-        );
-      }
-
-      ctx.restore();
-    }
-
-    function drawVignette() {
-      const cx =
-        width * 0.5;
-
-      const cy =
-        height * 0.5;
-
-      const vignette =
-        ctx.createRadialGradient(
-          cx,
-          cy,
-          Math.min(
-            width,
-            height,
-          ) * 0.18,
-          cx,
-          cy,
-          Math.max(
-            width,
-            height,
-          ) * 0.75,
-        );
-
-      vignette.addColorStop(
-        0,
         "rgba(0,0,0,0)",
       );
 
-      vignette.addColorStop(
-        0.58,
-        "rgba(0,0,0,0.08)",
-      );
-
-      vignette.addColorStop(
-        0.82,
-        "rgba(0,0,0,0.46)",
-      );
-
-      vignette.addColorStop(
-        1,
-        "rgba(0,0,0,0.88)",
-      );
-
-      ctx.fillStyle =
-        vignette;
+      ctx.fillStyle = gold;
 
       ctx.fillRect(
         0,
@@ -1456,193 +1027,670 @@ export default function FenixIntro({
         width,
         height,
       );
-    }
 
-    /*
-     * Performance monitor.
-     *
-     * The intro watches actual frame time.
-     * If the device struggles, quality drops.
-     */
-    function adaptQuality(
-      frameTime: number,
-    ) {
-      if (
-        reducedMotion ||
-        performance.now() -
-          lastQualityCheck <
-          500
-      ) {
-        return;
-      }
+      if (introProgress > 0) {
+        ctx.globalAlpha =
+          0.08 *
+          (1 - introProgress);
 
-      lastQualityCheck =
-        performance.now();
+        ctx.fillStyle =
+          "#ffffff";
 
-      if (frameTime > 27) {
-        slowFrames += 1;
-        goodFrames = 0;
-      } else if (
-        frameTime < 17
-      ) {
-        goodFrames += 1;
-        slowFrames = 0;
-      } else {
-        slowFrames = 0;
-        goodFrames = 0;
-      }
-
-      /*
-       * Drop one tier quickly if
-       * the device is struggling.
-       */
-      if (
-        slowFrames >= 2
-      ) {
-        const next =
-          tier === "ultra"
-            ? "high"
-            : tier === "high"
-              ? "balanced"
-              : "safe";
-
-        if (next !== tier) {
-          tier = next;
-          config =
-            getConfig(tier);
-
-          rebuildScene();
-        }
-
-        slowFrames = 0;
-
-        return;
-      }
-
-      /*
-       * Upgrade only after sustained
-       * good performance.
-       */
-      if (
-        goodFrames >= 5
-      ) {
-        const next =
-          tier === "safe"
-            ? "balanced"
-            : tier === "balanced"
-              ? "high"
-              : tier === "high"
-                ? "ultra"
-                : "ultra";
-
-        if (next !== tier) {
-          tier = next;
-          config =
-            getConfig(tier);
-
-          rebuildScene();
-        }
-
-        goodFrames = 0;
-      }
-    }
-
-    function render(
-      now: number,
-    ) {
-      if (destroyed) {
-        return;
-      }
-
-      const delta =
-        Math.min(
-          now - lastTime,
-          34,
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height,
         );
 
-      lastTime = now;
+        ctx.globalAlpha = 1;
+      }
+    };
 
-      if (
-        document.visibilityState !==
-        "visible"
-      ) {
-        animationFrame =
+    const drawCore =
+      (
+        time: number,
+        opacity: number,
+      ) => {
+        const corePulse =
+          1 +
+          Math.sin(
+            time * 0.0021,
+          ) *
+            0.035;
+
+        const radius =
+          sceneRadius *
+          0.145 *
+          corePulse;
+
+        const core =
+          ctx.createRadialGradient(
+            centerX,
+            centerY,
+            0,
+            centerX,
+            centerY,
+            radius * 1.9,
+          );
+
+        core.addColorStop(
+          0,
+          `rgba(240,248,246,${
+            0.13 * opacity
+          })`,
+        );
+
+        core.addColorStop(
+          0.12,
+          `rgba(0,160,160,${
+            0.15 * opacity
+          })`,
+        );
+
+        core.addColorStop(
+          0.35,
+          `rgba(0,128,128,${
+            0.08 * opacity
+          })`,
+        );
+
+        core.addColorStop(
+          0.7,
+          "rgba(0,0,0,0)",
+        );
+
+        ctx.fillStyle = core;
+
+        ctx.beginPath();
+
+        ctx.arc(
+          centerX,
+          centerY,
+          radius * 1.9,
+          0,
+          Math.PI * 2,
+        );
+
+        ctx.fill();
+
+        /*
+         * Fine inner optical ring.
+         */
+        ctx.strokeStyle =
+          `rgba(180,225,223,${
+            0.08 * opacity
+          })`;
+
+        ctx.lineWidth = 0.7;
+
+        ctx.beginPath();
+
+        ctx.arc(
+          centerX,
+          centerY,
+          radius * 0.75,
+          0,
+          Math.PI * 2,
+        );
+
+        ctx.stroke();
+      };
+
+    const drawFeather =
+      (
+        feather: Feather,
+        time: number,
+        opacity: number,
+      ) => {
+        const sprite =
+          sprites[
+            feather.spriteIndex %
+              sprites.length
+          ];
+
+        if (!sprite) {
+          return;
+        }
+
+        const orbitAngle =
+          feather.angle +
+          time *
+            feather.orbit;
+
+        const flutter =
+          Math.sin(
+            time * 0.0017 *
+              feather.flutter +
+              feather.phase,
+          ) *
+          feather.flutter;
+
+        /*
+         * Spiral compression toward center.
+         * This creates the vortex structure.
+         */
+        const breathing =
+          Math.sin(
+            time * 0.00065 +
+              feather.phase,
+          ) *
+          sceneRadius *
+          0.012;
+
+        const radius =
+          feather.radiusBase +
+          breathing +
+          flutter *
+            sceneRadius *
+            0.006;
+
+        const x =
+          centerX +
+          Math.cos(
+            orbitAngle,
+          ) *
+            radius;
+
+        const y =
+          centerY +
+          Math.sin(
+            orbitAngle,
+          ) *
+            radius *
+            0.82;
+
+        const tangent =
+          orbitAngle +
+          Math.PI * 0.5 +
+          feather.twist +
+          Math.sin(
+            time * 0.001 +
+              feather.phase,
+          ) *
+            0.08;
+
+        const perspective =
+          0.58 +
+          feather.depth * 0.62;
+
+        const size =
+          feather.size *
+          perspective;
+
+        const fadeByDistance =
+          clamp(
+            1 -
+              Math.abs(
+                radius -
+                  sceneRadius *
+                    0.66,
+              ) /
+                (sceneRadius *
+                  1.15),
+            0.28,
+            1,
+          );
+
+        const finalAlpha =
+          feather.alpha *
+          fadeByDistance *
+          opacity;
+
+        ctx.save();
+
+        ctx.translate(
+          Math.round(x),
+          Math.round(y),
+        );
+
+        ctx.rotate(tangent);
+
+        const scale =
+          size *
+          0.78;
+
+        ctx.globalAlpha =
+          clamp(
+            finalAlpha,
+            0,
+            0.95,
+          );
+
+        /*
+         * No per-frame shadowBlur/filter.
+         * Feather detail is already baked
+         * into the sprite.
+         */
+        ctx.globalCompositeOperation =
+          feather.layer >= 3
+            ? "screen"
+            : "source-over";
+
+        ctx.drawImage(
+          sprite.canvas,
+          -sprite.width *
+            0.5 *
+            scale /
+            config.spriteScale,
+          -sprite.height *
+            0.5 *
+            scale /
+            config.spriteScale,
+          sprite.width *
+            scale /
+            config.spriteScale,
+          sprite.height *
+            scale /
+            config.spriteScale,
+        );
+
+        ctx.restore();
+      };
+
+    const drawSparks =
+      (
+        time: number,
+        opacity: number,
+      ) => {
+        ctx.save();
+
+        ctx.globalCompositeOperation =
+          "screen";
+
+        for (const spark of sparks) {
+          const angle =
+            spark.angle +
+            time *
+              spark.speed;
+
+          const pulse =
+            0.65 +
+            Math.sin(
+              time * 0.003 +
+                spark.phase,
+            ) *
+              0.35;
+
+          const radius =
+            spark.radius *
+            (0.94 +
+              Math.sin(
+                time * 0.0008 +
+                  spark.phase,
+              ) *
+                0.04);
+
+          const x =
+            centerX +
+            Math.cos(angle) *
+              radius;
+
+          const y =
+            centerY +
+            Math.sin(angle) *
+              radius *
+              0.82;
+
+          ctx.globalAlpha =
+            spark.alpha *
+            pulse *
+            opacity;
+
+          ctx.fillStyle =
+            spark.phase % 2 >
+            1
+              ? "#d9f4f2"
+              : "#d4b879";
+
+          ctx.beginPath();
+
+          ctx.arc(
+            x,
+            y,
+            spark.size,
+            0,
+            Math.PI * 2,
+          );
+
+          ctx.fill();
+        }
+
+        ctx.restore();
+      };
+
+    const drawVignette =
+      (opacity: number) => {
+        const vignette =
+          ctx.createRadialGradient(
+            centerX,
+            centerY,
+            sceneRadius * 0.18,
+            centerX,
+            centerY,
+            sceneRadius * 1.08,
+          );
+
+        vignette.addColorStop(
+          0,
+          "rgba(0,0,0,0)",
+        );
+
+        vignette.addColorStop(
+          0.54,
+          "rgba(0,0,0,0.06)",
+        );
+
+        vignette.addColorStop(
+          0.82,
+          `rgba(0,0,0,${
+            0.4 * opacity
+          })`,
+        );
+
+        vignette.addColorStop(
+          1,
+          `rgba(0,0,0,${
+            0.9 * opacity
+          })`,
+        );
+
+        ctx.fillStyle =
+          vignette;
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height,
+        );
+      };
+
+    const drawGrain =
+      (
+        time: number,
+        opacity: number,
+      ) => {
+        /*
+         * Very cheap procedural grain:
+         * tiny sparse points rather than
+         * expensive image filtering.
+         */
+        if (quality === "safe") {
+          return;
+        }
+
+        const amount =
+          quality === "ultra"
+            ? 95
+            : quality === "high"
+              ? 65
+              : 38;
+
+        ctx.save();
+
+        ctx.globalAlpha =
+          0.018 * opacity;
+
+        ctx.fillStyle =
+          "#ffffff";
+
+        for (
+          let i = 0;
+          i < amount;
+          i++
+        ) {
+          const x =
+            Math.abs(
+              Math.sin(
+                i * 91.17 +
+                  time * 0.00008,
+              ),
+            ) * width;
+
+          const y =
+            Math.abs(
+              Math.sin(
+                i * 47.31 +
+                  time * 0.00006,
+              ),
+            ) * height;
+
+          ctx.fillRect(
+            Math.floor(x),
+            Math.floor(y),
+            1,
+            1,
+          );
+        }
+
+        ctx.restore();
+      };
+
+    const render =
+      (
+        now: number,
+      ) => {
+        if (destroyed) {
+          return;
+        }
+
+        const frameTime =
+          Math.min(
+            50,
+            now - lastTime,
+          );
+
+        lastTime = now;
+
+        elapsed += frameTime;
+
+        adaptQuality(
+          frameTime,
+        );
+
+        let introOpacity = 1;
+
+        if (
+          elapsed <
+          INTRO_HOLD
+        ) {
+          introOpacity =
+            easeOutCubic(
+              elapsed /
+                INTRO_HOLD,
+            );
+        }
+
+        let exitOpacity = 1;
+
+        if (
+          elapsed >=
+          INTRO_EXIT_START
+        ) {
+          exitOpacity =
+            1 -
+            easeInOutCubic(
+              (elapsed -
+                INTRO_EXIT_START) /
+                (INTRO_COMPLETE -
+                  INTRO_EXIT_START),
+            );
+        }
+
+        if (
+          elapsed >=
+          INTRO_EXIT_START
+        ) {
+          if (stage !== "exit") {
+            setStage("exit");
+          }
+
+          setLogoVisible(false);
+        } else if (
+          elapsed >=
+          INTRO_HOLD
+        ) {
+          if (stage !== "hold") {
+            setStage("hold");
+          }
+        }
+
+        const visualOpacity =
+          clamp(
+            introOpacity *
+              exitOpacity,
+            0,
+            1,
+          );
+
+        drawBackground(
+          now,
+          visualOpacity,
+        );
+
+        /*
+         * Depth-layered feather field.
+         */
+        for (
+          let i = 0;
+          i < feathers.length;
+          i++
+        ) {
+          drawFeather(
+            feathers[i],
+            elapsed,
+            visualOpacity,
+          );
+        }
+
+        drawCore(
+          elapsed,
+          visualOpacity,
+        );
+
+        drawSparks(
+          elapsed,
+          visualOpacity,
+        );
+
+        drawVignette(
+          visualOpacity,
+        );
+
+        drawGrain(
+          elapsed,
+          visualOpacity,
+        );
+
+        if (
+          elapsed >=
+          INTRO_COMPLETE
+        ) {
+          if (!completeRef.current) {
+            completeRef.current = true;
+
+            if (
+              frameRef.current !==
+              null
+            ) {
+              cancelAnimationFrame(
+                frameRef.current,
+              );
+
+              frameRef.current = null;
+            }
+
+            /*
+             * Stop all expensive rendering
+             * before navigation.
+             */
+            ctx.clearRect(
+              0,
+              0,
+              width,
+              height,
+            );
+
+            setLoading(false);
+
+            onComplete();
+
+            return;
+          }
+        }
+
+        frameRef.current =
           requestAnimationFrame(
             render,
           );
+      };
 
-        return;
-      }
+    const handleVisibility =
+      () => {
+        if (
+          document.visibilityState ===
+          "hidden"
+        ) {
+          if (
+            frameRef.current !==
+            null
+          ) {
+            cancelAnimationFrame(
+              frameRef.current,
+            );
 
-      elapsed +=
-        reducedMotion
-          ? delta * 0.08
-          : delta;
+            frameRef.current = null;
+          }
 
-      const frameStart =
-        performance.now();
+          return;
+        }
 
-      ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0,
-      );
+        if (
+          !destroyed &&
+          !completeRef.current &&
+          frameRef.current ===
+            null
+        ) {
+          lastTime =
+            performance.now();
 
-      ctx.globalAlpha = 1;
+          frameRef.current =
+            requestAnimationFrame(
+              render,
+            );
+        }
+      };
 
-      ctx.clearRect(
-        0,
-        0,
-        width,
-        height,
-      );
+    const handleResize =
+      () => {
+        resize();
+      };
 
-      drawBackground();
+    resize();
 
-      /*
-       * No per-frame sort.
-       *
-       * Feathers are generated with
-       * random depth and don't need
-       * expensive sorting every frame.
-       */
-      for (
-        const feather of feathers
-      ) {
-        drawFeather(
-          feather,
-          elapsed,
-        );
-      }
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibility,
+    );
 
-      drawCore(
-        elapsed,
-      );
+    window.addEventListener(
+      "resize",
+      handleResize,
+      {
+        passive: true,
+      },
+    );
 
-      drawSparks(
-        elapsed,
-      );
+    window.addEventListener(
+      "orientationchange",
+      handleResize,
+      {
+        passive: true,
+      },
+    );
 
-      drawVignette();
-
-      const frameTime =
-        performance.now() -
-        frameStart;
-
-      adaptQuality(
-        frameTime,
-      );
-
-      animationFrame =
-        requestAnimationFrame(
-          render,
-        );
-    }
-
-    animationFrame =
+    frameRef.current =
       requestAnimationFrame(
         render,
       );
@@ -1650,12 +1698,20 @@ export default function FenixIntro({
     return () => {
       destroyed = true;
 
-      cancelAnimationFrame(
-        animationFrame,
-      );
+      if (
+        frameRef.current !==
+        null
+      ) {
+        cancelAnimationFrame(
+          frameRef.current,
+        );
 
-      window.clearTimeout(
-        resizeTimer,
+        frameRef.current = null;
+      }
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibility,
       );
 
       window.removeEventListener(
@@ -1663,309 +1719,287 @@ export default function FenixIntro({
         handleResize,
       );
 
+      window.removeEventListener(
+        "orientationchange",
+        handleResize,
+      );
+
       /*
-       * Release canvas backing store.
+       * Release canvas memory.
        */
       canvas.width = 1;
       canvas.height = 1;
 
       feathers = [];
       sparks = [];
-      sprites = {} as Record<
-        FeatherColor,
-        HTMLCanvasElement
-      >;
+      sprites = [];
     };
-  }, []);
-
-  const isExit =
-    stage === "exit";
+  }, [onComplete, stage]);
 
   return (
-    <div
-      className={[
-        "fixed inset-0 z-[999999]",
-        "overflow-hidden",
-        "bg-[#030506]",
-        "text-white",
-        "transition-[opacity,transform]",
-        "duration-[700ms]",
-        "ease-[cubic-bezier(0.22,1,0.36,1)]",
-        isExit
-          ? "scale-[1.055] opacity-0"
-          : "scale-100 opacity-100",
-      ].join(" ")}
-      aria-label="FeniX intro"
+    <main
+      aria-label="FeniX introduction"
+      className="fixed inset-0 z-[999999] h-[100dvh] w-full overflow-hidden bg-[#030506]"
+      style={{
+        touchAction: "none",
+        userSelect: "none",
+      }}
     >
       <canvas
         ref={canvasRef}
-        className={[
-          "absolute inset-0",
-          "h-full w-full",
-          "transition-[transform,opacity,filter]",
-          "duration-[900ms]",
-          "ease-[cubic-bezier(0.22,1,0.36,1)]",
-          isExit
-            ? "scale-[1.08] opacity-0 blur-[3px]"
-            : "scale-100 opacity-100 blur-0",
-        ].join(" ")}
         aria-hidden="true"
+        className="absolute inset-0 block h-full w-full"
       />
 
+      {/* Cinematic atmospheric layer */}
       <div
-        className={[
-          "pointer-events-none absolute inset-0 z-10",
-          "transition-opacity duration-[900ms]",
-          isExit
-            ? "opacity-0"
-            : "opacity-100",
-        ].join(" ")}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 50%, rgba(0,128,128,0.055) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.55) 100%)",
+        }}
+      />
+
+      {/* Central focus */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2"
+        style={{
+          width: "min(34vw, 340px)",
+          height: "min(34vw, 340px)",
+          minWidth: 180,
+          minHeight: 180,
+          transform:
+            "translate(-50%, -50%)",
+          borderRadius: "50%",
+          border:
+            "1px solid rgba(0,128,128,0.14)",
+          boxShadow:
+            "0 0 55px rgba(0,128,128,0.08), inset 0 0 45px rgba(0,0,0,0.55)",
+          opacity:
+            stage === "exit"
+              ? 0
+              : 1,
+          transition:
+            "opacity 650ms ease",
+        }}
+      />
+
+      {/* FX rings */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2"
+        style={{
+          width: "min(20vw, 210px)",
+          height: "min(20vw, 210px)",
+          minWidth: 115,
+          minHeight: 115,
+          transform:
+            "translate(-50%, -50%)",
+          borderRadius: "50%",
+          border:
+            "1px solid rgba(0,128,128,0.2)",
+          boxShadow:
+            "0 0 28px rgba(0,128,128,0.07)",
+          opacity:
+            stage === "exit"
+              ? 0
+              : 0.9,
+          transition:
+            "opacity 500ms ease",
+        }}
+      />
+
+      {/* Logo */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center"
+        style={{
+          opacity: logoVisible ? 1 : 0,
+          transform: `translate(-50%, -50%) scale(${
+            logoVisible ? 1 : 0.82
+          })`,
+          transition:
+            "opacity 650ms cubic-bezier(.22,.61,.36,1), transform 800ms cubic-bezier(.22,.61,.36,1)",
+        }}
       >
+        {/* FX symbol */}
         <div
-          className="
-            absolute inset-0
-            bg-[radial-gradient(circle_at_50%_50%,rgba(0,128,128,0.10),transparent_34%)]
-          "
-        />
-
-        <div
-          className="
-            absolute inset-0
-            bg-[linear-gradient(180deg,rgba(3,5,6,0.12),transparent_35%,rgba(0,0,0,0.55))]
-          "
-        />
-      </div>
-
-      <div
-        className={[
-          "pointer-events-none absolute",
-          "left-1/2 top-1/2 z-20",
-          "h-[220px] w-[220px]",
-          "-translate-x-1/2 -translate-y-1/2",
-          "rounded-full",
-          "border border-[#008080]/10",
-          "shadow-[0_0_80px_rgba(0,128,128,0.06)]",
-          "transition-[transform,opacity]",
-          "duration-[1000ms]",
-          isExit
-            ? "scale-[1.5] opacity-0"
-            : "scale-100 opacity-100",
-        ].join(" ")}
-      />
-
-      <div
-        className={[
-          "pointer-events-none absolute",
-          "left-1/2 top-1/2 z-20",
-          "h-[310px] w-[310px]",
-          "-translate-x-1/2 -translate-y-1/2",
-          "rounded-full",
-          "border border-white/[0.035]",
-          "transition-[transform,opacity]",
-          "duration-[1100ms]",
-          isExit
-            ? "scale-[1.35] opacity-0"
-            : "scale-100 opacity-100",
-        ].join(" ")}
-      />
-
-      <div
-        className="
-          pointer-events-none
-          absolute inset-0
-          z-30
-          flex items-center justify-center
-        "
-      >
-        <div
-          className={[
-            "flex flex-col items-center",
-            "transition-[opacity,transform,filter]",
-            "duration-[850ms]",
-            "ease-[cubic-bezier(0.22,1,0.36,1)]",
-            isExit
-              ? "translate-y-[-12px] scale-[1.18] opacity-0 blur-[7px]"
-              : "translate-y-0 scale-100 opacity-100 blur-0",
-          ].join(" ")}
+          aria-hidden="true"
+          style={{
+            width:
+              "clamp(76px, 11vw, 142px)",
+            height:
+              "clamp(76px, 11vw, 142px)",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border:
+              "1px solid rgba(214,225,223,0.28)",
+            background:
+              "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.1), rgba(0,0,0,0.36) 58%, rgba(0,128,128,0.08))",
+            boxShadow:
+              "0 0 35px rgba(0,128,128,0.12), inset 0 0 24px rgba(255,255,255,0.035)",
+            backdropFilter:
+              "blur(3px)",
+          }}
         >
-          <div
-            className={[
-              "relative flex",
-              "h-[88px] w-[88px]",
-              "items-center justify-center",
-              "rounded-[26px]",
-              "border border-white/10",
-              "bg-[#05070b]/45",
-              "shadow-[0_0_100px_rgba(0,128,128,0.22)]",
-              "backdrop-blur-xl",
-              "transition-[transform,opacity]",
-              "duration-[1000ms]",
-              stage === "enter"
-                ? "scale-[0.72] opacity-0"
-                : "scale-100 opacity-100",
-            ].join(" ")}
+          <span
+            style={{
+              fontFamily:
+                "Arial, Helvetica, sans-serif",
+              fontSize:
+                "clamp(28px, 4vw, 52px)",
+              fontWeight: 800,
+              letterSpacing:
+                "-0.09em",
+              color: "#eef4f3",
+              textShadow:
+                "0 0 18px rgba(190,240,235,0.18)",
+              transform:
+                "translateX(-2px)",
+            }}
           >
-            <div
-              className="
-                absolute inset-[7px]
-                rounded-[20px]
-                border border-[#008080]/25
-              "
-            />
+            FX
+          </span>
+        </div>
 
-            <div
-              className="
-                absolute inset-[15px]
-                rounded-[15px]
-                border border-white/[0.045]
-              "
-            />
+        {/* FeniX */}
+        <div
+          style={{
+            marginTop:
+              "clamp(14px, 2vw, 24px)",
+            fontFamily:
+              "Arial, Helvetica, sans-serif",
+            fontSize:
+              "clamp(27px, 4.5vw, 58px)",
+            lineHeight: 1,
+            fontWeight: 700,
+            letterSpacing:
+              "0.18em",
+            color: "#f1f4f3",
+            textTransform:
+              "none",
+            textShadow:
+              "0 0 24px rgba(255,255,255,0.1)",
+          }}
+        >
+          FeniX
+        </div>
 
-            <div
-              className="
-                absolute
-                left-1/2 top-1/2
-                h-[46px] w-[46px]
-                -translate-x-1/2
-                -translate-y-1/2
-                rounded-full
-                border border-[#008080]/15
-                animate-[spin_9s_linear_infinite]
-              "
-            />
-
-            <span
-              className="
-                relative
-                text-[38px]
-                font-black
-                tracking-[-0.1em]
-              "
-            >
-              F
-              <span className="text-[#008080]">
-                X
-              </span>
-            </span>
-
-            <span
-              className="
-                absolute
-                right-[5px]
-                top-[5px]
-                h-[5px]
-                w-[5px]
-                rounded-full
-                bg-[#FFD700]
-                shadow-[0_0_16px_rgba(255,215,0,0.8)]
-              "
-            />
-          </div>
-
-          <div
-            className={[
-              "mt-6 text-center",
-              "transition-[opacity,transform]",
-              "duration-[1000ms]",
-              "delay-[100ms]",
-              "ease-[cubic-bezier(0.22,1,0.36,1)]",
-              stage === "enter"
-                ? "translate-y-3 opacity-0"
-                : "translate-y-0 opacity-100",
-            ].join(" ")}
-          >
-            <h1
-              className="
-                text-[30px]
-                font-black
-                tracking-[-0.065em]
-                sm:text-[38px]
-              "
-            >
-              Feni
-              <span className="text-[#008080]">
-                X
-              </span>
-            </h1>
-
-            <p
-              className="
-                mt-2
-                text-[8px]
-                font-semibold
-                uppercase
-                tracking-[0.38em]
-                text-white/35
-                sm:text-[9px]
-              "
-            >
-              Feni Business Ecosystem
-            </p>
-          </div>
-
-          <div
-            className={[
-              "mt-8",
-              "h-[2px] w-[112px]",
-              "overflow-hidden rounded-full",
-              "bg-white/[0.08]",
-              "transition-opacity duration-700",
-              stage === "enter"
-                ? "opacity-0"
-                : "opacity-100",
-            ].join(" ")}
-          >
-            <div
-              className="
-                h-full w-full
-                origin-left
-                bg-gradient-to-r
-                from-[#008080]/30
-                via-white
-                to-[#FFD700]/60
-                animate-[fenixLoad_2.8s_cubic-bezier(0.22,1,0.36,1)_forwards]
-              "
-            />
-          </div>
-
-          <p
-            className={[
-              "mt-3",
-              "text-[7px]",
-              "font-medium",
-              "uppercase",
-              "tracking-[0.5em]",
-              "text-white/25",
-              "transition-opacity duration-700",
-              stage === "enter"
-                ? "opacity-0"
-                : "opacity-100",
-            ].join(" ")}
-          >
-            Loading
-          </p>
+        {/* Tagline */}
+        <div
+          style={{
+            marginTop:
+              "clamp(9px, 1.2vw, 15px)",
+            fontFamily:
+              "Arial, Helvetica, sans-serif",
+            fontSize:
+              "clamp(8px, 1.15vw, 13px)",
+            letterSpacing:
+              "0.24em",
+            color:
+              "rgba(196,211,210,0.72)",
+            textAlign: "center",
+            whiteSpace: "nowrap",
+          }}
+        >
+          FEARLESS ENERGY NAVIGATES INFINITE X-FACTORS
         </div>
       </div>
 
+      {/* Loading indicator */}
       <div
-        className="
-          pointer-events-none
-          absolute inset-0
-          z-40
-          bg-[radial-gradient(circle_at_center,transparent_18%,rgba(0,0,0,0.08)_42%,rgba(0,0,0,0.78)_100%)]
-        "
+        className="pointer-events-none absolute left-1/2 bottom-[9vh] -translate-x-1/2"
+        style={{
+          width:
+            "min(220px, 58vw)",
+          opacity:
+            loading &&
+            stage !== "exit"
+              ? 1
+              : 0,
+          transition:
+            "opacity 500ms ease",
+        }}
+      >
+        <div
+          style={{
+            height: 1,
+            width: "100%",
+            background:
+              "rgba(255,255,255,0.08)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: "42%",
+              background:
+                "linear-gradient(90deg, transparent, #008080, #d4b879, transparent)",
+              animation:
+                "fenixIntroLoading 1.45s ease-in-out infinite",
+            }}
+          />
+        </div>
+
+        <div
+          style={{
+            marginTop: 9,
+            textAlign: "center",
+            fontFamily:
+              "Arial, Helvetica, sans-serif",
+            fontSize: 9,
+            letterSpacing:
+              "0.3em",
+            color:
+              "rgba(194,207,206,0.5)",
+          }}
+        >
+          INITIALIZING
+        </div>
+      </div>
+
+      {/* Final fade */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "#000",
+          opacity:
+            stage === "exit"
+              ? 1
+              : 0,
+          transition:
+            "opacity 700ms ease",
+        }}
       />
 
-      <div
-        className="
-          pointer-events-none
-          absolute inset-0
-          z-50
-          opacity-[0.018]
-          [background-image:radial-gradient(rgba(255,255,255,0.8)_0.5px,transparent_0.5px)]
-          [background-size:4px_4px]
-        "
-      />
-    </div>
+      <style jsx>{`
+        @keyframes fenixIntroLoading {
+          0% {
+            transform: translateX(-130%);
+          }
+
+          50% {
+            transform: translateX(110%);
+          }
+
+          100% {
+            transform: translateX(280%);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          div {
+            animation-duration: 0.001ms !important;
+            animation-iteration-count: 1 !important;
+          }
+        }
+      `}</style>
+    </main>
   );
 }
