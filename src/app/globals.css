@@ -3,48 +3,127 @@
 @tailwind utilities;
 
 /* =========================================================
-   GLOBAL RESET
+   FENIX — GLOBAL FOUNDATION
    ========================================================= */
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html,
+html {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100%;
+  background: #030506;
+  color-scheme: dark;
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
-  min-height: 100%;
-}
+  min-width: 320px;
+  min-height: 100dvh;
 
-html {
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
+  background: #030506;
+  color: #ffffff;
 
-body {
-  background: #f3f4f6;
-  color: #0B1736;
-  overflow-x: hidden;
+  overflow-x: clip;
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Prevent accidental horizontal overflow */
+/* =========================================================
+   NEXT ROOT
+   ========================================================= */
+
 #__next {
-  min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
-/* Canvas rendering */
+/* =========================================================
+   MEDIA SAFETY
+   ========================================================= */
+
+img,
+svg,
+video,
 canvas {
   display: block;
   max-width: 100%;
 }
 
+img {
+  height: auto;
+}
+
 /* =========================================================
-   FENIX INTRO — LOADING BAR
+   TEXT SAFETY
+   ========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+a {
+  overflow-wrap: break-word;
+}
+
+/* =========================================================
+   FORM SAFETY
+   ========================================================= */
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* =========================================================
+   FOCUS / ACCESSIBILITY
+   ========================================================= */
+
+:focus-visible {
+  outline: 2px solid #56d1ce;
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   SELECTION
+   ========================================================= */
+
+::selection {
+  background: rgba(0, 128, 128, 0.28);
+  color: #ffffff;
+}
+
+/* =========================================================
+   FENIX INTRO — LOADING
    ========================================================= */
 
 @keyframes fenixLoad {
@@ -74,7 +153,7 @@ canvas {
 }
 
 /* =========================================================
-   FENIX INTRO — OPTIONAL CINEMATIC MOTION
+   FENIX AMBIENT MOTION
    ========================================================= */
 
 @keyframes fenixAmbientPulse {
@@ -102,13 +181,13 @@ canvas {
 }
 
 /* =========================================================
-   MOBILE PERFORMANCE
+   MOBILE
    ========================================================= */
 
 @media (max-width: 600px) {
   html,
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   canvas {
@@ -123,18 +202,18 @@ canvas {
 @media (min-width: 601px) and (max-width: 1024px) {
   html,
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }
 
 /* =========================================================
-   LARGE SCREENS / 4K
+   LARGE / 4K
    ========================================================= */
 
 @media (min-width: 1920px) {
   html,
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }
 
@@ -161,24 +240,38 @@ canvas {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }
 
 /* =========================================================
-   ACCESSIBILITY
+   VERY SMALL DEVICES
    ========================================================= */
 
-:focus-visible {
-  outline: 2px solid #008080;
-  outline-offset: 3px;
+@media (max-width: 359px) {
+  html {
+    font-size: 15px;
+  }
 }
 
 /* =========================================================
-   SELECTION
+   SAFE AREA
    ========================================================= */
 
-::selection {
-  background: rgba(0, 128, 128, 0.28);
-  color: #ffffff;
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.min-screen-safe {
+  min-height: 100dvh;
 }
 
 /* =========================================================
@@ -203,7 +296,6 @@ canvas {
   background: rgba(0, 128, 128, 0.7);
 }
 
-/* Firefox */
 html {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 128, 128, 0.55) #05070b;
