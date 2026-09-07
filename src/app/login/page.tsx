@@ -39,7 +39,6 @@ export default function AuthPage() {
   const [oauthLoading, setOauthLoading] = useState<
     'google' | 'facebook' | null
   >(null)
-
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -74,9 +73,8 @@ export default function AuthPage() {
     return 'এই মুহূর্তে অনুরোধটি সম্পন্ন করা যাচ্ছে না। আবার চেষ্টা করুন।'
   }
 
-  const handleAuth = async (event: FormEvent<HTMLFormElement>) => {
+  const handleAuth = async (event: FormEvent) => {
     event.preventDefault()
-
     clearMessages()
 
     const cleanEmail = email.trim()
@@ -172,7 +170,6 @@ export default function AuthPage() {
     provider: 'google' | 'facebook'
   ) => {
     clearMessages()
-
     setOauthLoading(provider)
 
     try {
@@ -259,16 +256,11 @@ export default function AuthPage() {
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
 
-        {/* Light black overlay */}
+        {/* Light overlay */}
         <div className="absolute inset-0 bg-[#05070b]/10" />
 
-        {/* Subtle gradient */}
+        {/* Very light black gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#05070b]/15 via-[#05070b]/5 to-[#05070b]/25" />
-      </div>
-
-      {/* Global subtle atmosphere */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(0,128,128,0.06),transparent_30%),radial-gradient(circle_at_85%_80%,rgba(255,215,0,0.025),transparent_25%)]" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[2560px] flex-col lg:flex-row">
@@ -282,10 +274,10 @@ export default function AuthPage() {
             }}
           />
 
-          {/* Light black overlay */}
+          {/* Light overlay */}
           <div className="absolute inset-0 bg-[#05070b]/10" />
 
-          {/* Subtle gradient */}
+          {/* Light premium gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#05070b]/20 via-[#05070b]/8 to-[#008080]/12" />
 
           <div className="relative z-10 flex w-full flex-col justify-between p-8 xl:p-12 2xl:p-16">
@@ -310,6 +302,7 @@ export default function AuthPage() {
             <div className="max-w-2xl pb-8">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-white/75 backdrop-blur-xl">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#008080] shadow-[0_0_12px_rgba(0,128,128,0.9)]" />
+
                 Feni's digital business ecosystem
               </div>
 
@@ -667,4 +660,21 @@ export default function AuthPage() {
               </div>
 
               {/* Security notice */}
-              <div className="mt-8 flex items-center justify-center gap-2 text
+              <div className="mt-8 flex items-center justify-center gap-2 text-[10px] text-white/25">
+                <ShieldCheck size={15} />
+
+                <span>
+                  Your authentication is securely handled by Supabase
+                </span>
+              </div>
+
+              <p className="mt-6 text-center text-[9px] uppercase tracking-[0.2em] text-white/15 lg:hidden">
+                FeniX — Feni Business Ecosystem
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
