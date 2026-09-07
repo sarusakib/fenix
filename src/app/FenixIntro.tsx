@@ -77,4 +77,4 @@ export default function FenixIntro({ onComplete }: FenixIntroProps) {
       </div>
     </div>
   );
-      }
+}
