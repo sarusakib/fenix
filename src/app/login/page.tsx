@@ -121,7 +121,6 @@ export default function AuthPage() {
           setAuth(data.session)
           resetFailedAttempts()
 
-          // Master correction:
           // Successful signup → Homepage
           router.replace('/')
           router.refresh()
@@ -156,7 +155,6 @@ export default function AuthPage() {
       setAuth(data.session)
       resetFailedAttempts()
 
-      // Master correction:
       // Successful login → Homepage
       router.replace('/')
       router.refresh()
@@ -259,13 +257,13 @@ export default function AuthPage() {
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[2560px] flex-col lg:flex-row">
-
+        {/* Desktop visual panel */}
         <section className="relative hidden min-h-screen overflow-hidden lg:flex lg:w-[52%] xl:w-[55%]">
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage:
-                "url('/images/fenix-login-bg.jpg')",
+                "url('/images/IMG_20260907_032431.png')",
             }}
           />
 
@@ -274,7 +272,6 @@ export default function AuthPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#05070b]/90 via-[#05070b]/45 to-[#008080]/20" />
 
           <div className="relative z-10 flex w-full flex-col justify-between p-8 xl:p-12 2xl:p-16">
-
             <div className="flex items-center">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/10 backdrop-blur-xl">
                 <span className="text-lg font-black">
@@ -341,9 +338,10 @@ export default function AuthPage() {
           </div>
         </section>
 
+        {/* Authentication panel */}
         <section className="flex min-h-screen w-full items-center justify-center px-4 py-8 sm:px-6 lg:w-[48%] lg:px-10 xl:w-[45%] xl:px-16 2xl:px-24">
           <div className="w-full max-w-[560px]">
-
+            {/* Mobile logo */}
             <div className="mb-8 flex items-center justify-center lg:hidden">
               <div className="flex items-center">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05]">
@@ -365,7 +363,6 @@ export default function AuthPage() {
             </div>
 
             <div className="rounded-[28px] border border-white/[0.08] bg-white/[0.035] p-5 shadow-2xl backdrop-blur-2xl sm:p-8 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none xl:p-2">
-
               <div className="mb-8">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#008080]">
                   {mode === 'login'
@@ -386,6 +383,7 @@ export default function AuthPage() {
                 </p>
               </div>
 
+              {/* Social login */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <button
                   type="button"
@@ -440,6 +438,7 @@ export default function AuthPage() {
                 <div className="h-px flex-1 bg-white/[0.08]" />
               </div>
 
+              {/* Messages */}
               {error && (
                 <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-400/20 bg-red-400/[0.06] p-3.5 text-sm text-red-200">
                   <XCircle
@@ -462,6 +461,7 @@ export default function AuthPage() {
                 </div>
               )}
 
+              {/* Auth form */}
               <form
                 onSubmit={handleAuth}
                 className="space-y-4"
@@ -626,6 +626,7 @@ export default function AuthPage() {
                 </button>
               </form>
 
+              {/* Switch login/signup */}
               <div className="mt-7 text-center">
                 <p className="text-sm text-white/40">
                   {mode === 'login'
@@ -648,6 +649,7 @@ export default function AuthPage() {
                 </p>
               </div>
 
+              {/* Security notice */}
               <div className="mt-8 flex items-center justify-center gap-2 text-[10px] text-white/25">
                 <ShieldCheck size={15} />
 
@@ -665,4 +667,4 @@ export default function AuthPage() {
       </div>
     </main>
   )
-    }
+}
