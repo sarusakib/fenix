@@ -6,24 +6,24 @@ type FenixIntroProps = {
   onComplete: () => void;
 };
 
-type IntroStage = "enter" | "hold" | "exit";
+type Stage = "enter" | "hold" | "exit";
+
+type QualityTier = "safe" | "balanced" | "high" | "ultra";
 
 type FeatherColor = "silver" | "teal" | "gold" | "dark";
 
 type Feather = {
   angle: number;
   radius: number;
-  size: number;
   length: number;
   width: number;
-  speed: number;
   orbit: number;
   twist: number;
   phase: number;
   depth: number;
-  color: FeatherColor;
   alpha: number;
-  curve: number;
+  scale: number;
+  color: FeatherColor;
   flutter: number;
 };
 
@@ -36,157 +36,660 @@ type Spark = {
   phase: number;
 };
 
-const INTRO_ENTER = 850;
+type QualityConfig = {
+  feathers: number;
+  sparks: number;
+  dpr: number;
+  barbDetail: number;
+  spriteScale: number;
+  backgroundQuality: number;
+};
+
+const INTRO_HOLD = 900;
 const INTRO_EXIT_START = 3200;
-const INTRO_COMPLETE = 4050;
+const INTRO_COMPLETE = 3900;
 
 const TAU = Math.PI * 2;
 
-function random(min: number, max: number): number {
+function rand(min: number, max: number) {
   return min + Math.random() * (max - min);
 }
 
-function clamp(
-  value: number,
-  min: number,
-  max: number,
-): number {
+function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
+}
+
+function getNetworkScore(): number {
+  if (typeof navigator === "undefined") return 2;
+
+  const connection = (
+    navigator as Navigator & {
+      connection?: {
+        effectiveType?: string;
+        downlink?: number;
+        saveData?: boolean;
+      };
+    }
+  ).connection;
+
+  if (!connection) return 2;
+
+  if (connection.saveData) return 0;
+
+  const effectiveType = connection.effectiveType;
+
+  if (effectiveType === "slow-2g") return 0;
+  if (effectiveType === "2g") return 0;
+  if (effectiveType === "3g") return 1;
+  if (effectiveType === "4g") return 3;
+
+  if (
+    typeof connection.downlink === "number" &&
+    connection.downlink >= 8
+  ) {
+    return 3;
+  }
+
+  if (
+    typeof connection.downlink === "number" &&
+    connection.downlink >= 2
+  ) {
+    return 2;
+  }
+
+  return 1;
+}
+
+function detectQuality(): QualityTier {
+  if (typeof window === "undefined") {
+    return "balanced";
+  }
+
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const area = width * height;
+
+  const cores = navigator.hardwareConcurrency || 4;
+
+  const memory =
+    "deviceMemory" in navigator
+      ? Number(
+          (
+            navigator as Navigator & {
+              deviceMemory?: number;
+            }
+          ).deviceMemory || 4,
+        )
+      : 4;
+
+  const touch =
+    navigator.maxTouchPoints > 0;
+
+  const networkScore = getNetworkScore();
+
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  if (reducedMotion) {
+    return "safe";
+  }
+
+  if (cores <= 2 || memory <= 2) {
+    return "safe";
+  }
+
+  if (networkScore === 0) {
+    return cores <= 4 ? "safe" : "balanced";
+  }
+
+  if (touch && area < 450000) {
+    return cores >= 6 && memory >= 4
+      ? "balanced"
+      : "safe";
+  }
+
+  if (cores >= 10 && memory >= 8 && area >= 1800000) {
+    return "ultra";
+  }
+
+  if (cores >= 6 && memory >= 4) {
+    return networkScore >= 2
+      ? "high"
+      : "balanced";
+  }
+
+  return "balanced";
+}
+
+function getConfig(
+  tier: QualityTier,
+): QualityConfig {
+  switch (tier) {
+    case "safe":
+      return {
+        feathers: 58,
+        sparks: 10,
+        dpr: 1,
+        barbDetail: 0.42,
+        spriteScale: 0.82,
+        backgroundQuality: 0.7,
+      };
+
+    case "balanced":
+      return {
+        feathers: 92,
+        sparks: 16,
+        dpr: 1.15,
+        barbDetail: 0.58,
+        spriteScale: 0.92,
+        backgroundQuality: 0.82,
+      };
+
+    case "high":
+      return {
+        feathers: 135,
+        sparks: 24,
+        dpr: 1.35,
+        barbDetail: 0.76,
+        spriteScale: 1,
+        backgroundQuality: 0.94,
+      };
+
+    case "ultra":
+      return {
+        feathers: 175,
+        sparks: 32,
+        dpr: 1.55,
+        barbDetail: 0.92,
+        spriteScale: 1.05,
+        backgroundQuality: 1,
+      };
+  }
 }
 
 function createFeather(
   width: number,
   height: number,
-  mobile: boolean,
   index: number,
   total: number,
 ): Feather {
   const maxRadius =
-    Math.max(width, height) *
-    (mobile ? 0.64 : 0.76);
+    Math.max(width, height) * 0.68;
 
-  const distribution = Math.random();
+  const distribution =
+    Math.random();
 
   let radius: number;
 
-  if (distribution < 0.2) {
-    radius = random(
-      maxRadius * 0.13,
-      maxRadius * 0.29,
+  if (distribution < 0.18) {
+    radius = rand(
+      maxRadius * 0.14,
+      maxRadius * 0.32,
     );
-  } else if (distribution < 0.62) {
-    radius = random(
-      maxRadius * 0.27,
+  } else if (distribution < 0.6) {
+    radius = rand(
+      maxRadius * 0.28,
       maxRadius * 0.62,
     );
   } else {
-    radius = random(
+    radius = rand(
       maxRadius * 0.55,
       maxRadius,
     );
   }
 
-  const colorRoll = Math.random();
+  const layer = radius / maxRadius;
+
+  const palette = Math.random();
 
   let color: FeatherColor;
 
-  if (colorRoll < 0.075) {
+  if (palette < 0.075) {
     color = "gold";
-  } else if (colorRoll < 0.25) {
+  } else if (palette < 0.28) {
     color = "teal";
-  } else if (colorRoll < 0.72) {
+  } else if (palette < 0.72) {
     color = "silver";
   } else {
     color = "dark";
   }
 
-  const normalizedRadius =
-    radius / maxRadius;
-
-  const baseAngle =
-    (index / Math.max(total, 1)) *
-    TAU *
-    2.4;
-
   return {
     angle:
-      baseAngle +
-      random(-0.17, 0.17),
+      (index / Math.max(total, 1)) * TAU +
+      rand(-0.14, 0.14),
 
     radius,
 
-    size:
-      random(
-        mobile ? 0.62 : 0.7,
-        mobile ? 1.04 : 1.24,
-      ) *
-      (1.08 - normalizedRadius * 0.18),
-
     length:
-      random(
-        mobile ? 55 : 65,
-        mobile ? 122 : 205,
-      ) *
-      (1.08 - normalizedRadius * 0.22),
+      rand(58, 190) *
+      (1.12 - layer * 0.24),
 
     width:
-      random(
-        mobile ? 15 : 18,
-        mobile ? 36 : 52,
-      ) *
-      (1.1 - normalizedRadius * 0.15),
+      rand(16, 48) *
+      (1.08 - layer * 0.18),
 
-    speed:
-      random(0.000018, 0.000055) *
+    orbit: rand(
+      0.00018,
+      0.00058,
+    ) *
       (Math.random() > 0.5 ? 1 : -1),
 
-    orbit: random(
-      0.00022,
-      0.00066,
-    ),
+    twist: rand(-0.3, 0.3),
 
-    twist: random(
-      -0.32,
-      0.32,
-    ),
+    phase: rand(0, TAU),
 
-    phase: random(0, TAU),
-
-    depth: random(
-      0.3,
-      1,
-    ),
-
-    color,
+    depth: rand(0.25, 1),
 
     alpha:
       color === "dark"
-        ? random(0.25, 0.58)
+        ? rand(0.28, 0.62)
         : color === "gold"
-          ? random(0.42, 0.76)
-          : random(0.43, 0.88),
+          ? rand(0.42, 0.76)
+          : rand(0.42, 0.86),
 
-    curve: random(
-      -0.35,
-      0.35,
-    ),
+    scale: rand(0.68, 1.14),
 
-    flutter: random(
-      0.25,
-      1,
-    ),
+    color,
+
+    flutter: rand(0.35, 1),
   };
 }
 
 function createSpark(): Spark {
   return {
-    angle: random(0, TAU),
-    radius: random(70, 760),
-    speed: random(0.00016, 0.00055),
-    size: random(0.35, 1.65),
-    alpha: random(0.12, 0.55),
-    phase: random(0, TAU),
+    angle: rand(0, TAU),
+    radius: rand(90, 700),
+    speed: rand(
+      0.00015,
+      0.00052,
+    ),
+    size: rand(0.45, 1.45),
+    alpha: rand(0.15, 0.58),
+    phase: rand(0, TAU),
   };
+}
+
+function createFeatherSprite(
+  color: FeatherColor,
+  scale: number,
+  barbDetail: number,
+): HTMLCanvasElement {
+  const canvas =
+    document.createElement("canvas");
+
+  const width =
+    Math.round(220 * scale);
+
+  const height =
+    Math.round(90 * scale);
+
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    return canvas;
+  }
+
+  const cx = 8 * scale;
+  const cy = height / 2;
+
+  const length =
+    190 * scale;
+
+  const featherWidth =
+    42 * scale;
+
+  let gradient =
+    ctx.createLinearGradient(
+      0,
+      0,
+      length,
+      0,
+    );
+
+  if (color === "silver") {
+    gradient.addColorStop(
+      0,
+      "#111617",
+    );
+
+    gradient.addColorStop(
+      0.24,
+      "#515a59",
+    );
+
+    gradient.addColorStop(
+      0.52,
+      "#aaa9a1",
+    );
+
+    gradient.addColorStop(
+      0.78,
+      "#ece8df",
+    );
+
+    gradient.addColorStop(
+      1,
+      "#7e8583",
+    );
+  }
+
+  if (color === "teal") {
+    gradient.addColorStop(
+      0,
+      "#061719",
+    );
+
+    gradient.addColorStop(
+      0.3,
+      "#155458",
+    );
+
+    gradient.addColorStop(
+      0.58,
+      "#238688",
+    );
+
+    gradient.addColorStop(
+      0.8,
+      "#83b7b4",
+    );
+
+    gradient.addColorStop(
+      1,
+      "#315e60",
+    );
+  }
+
+  if (color === "gold") {
+    gradient.addColorStop(
+      0,
+      "#2b2118",
+    );
+
+    gradient.addColorStop(
+      0.3,
+      "#80532f",
+    );
+
+    gradient.addColorStop(
+      0.62,
+      "#cb9653",
+    );
+
+    gradient.addColorStop(
+      0.82,
+      "#efc887",
+    );
+
+    gradient.addColorStop(
+      1,
+      "#754c29",
+    );
+  }
+
+  if (color === "dark") {
+    gradient.addColorStop(
+      0,
+      "#050707",
+    );
+
+    gradient.addColorStop(
+      0.38,
+      "#151a1a",
+    );
+
+    gradient.addColorStop(
+      0.7,
+      "#3d4544",
+    );
+
+    gradient.addColorStop(
+      1,
+      "#121717",
+    );
+  }
+
+  ctx.save();
+
+  ctx.translate(
+    0,
+    0,
+  );
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    cx,
+    cy,
+  );
+
+  ctx.bezierCurveTo(
+    length * 0.22,
+    cy - featherWidth * 0.52,
+    length * 0.58,
+    cy - featherWidth * 0.6,
+    length,
+    cy,
+  );
+
+  ctx.bezierCurveTo(
+    length * 0.62,
+    cy + featherWidth * 0.5,
+    length * 0.2,
+    cy + featherWidth * 0.36,
+    cx,
+    cy,
+  );
+
+  ctx.closePath();
+
+  ctx.fillStyle = gradient;
+
+  ctx.fill();
+
+  /*
+   * Central rachis
+   */
+  const shaft =
+    ctx.createLinearGradient(
+      0,
+      cy,
+      length,
+      cy,
+    );
+
+  shaft.addColorStop(
+    0,
+    "rgba(15,18,18,0.75)",
+  );
+
+  shaft.addColorStop(
+    0.4,
+    "rgba(245,242,232,0.62)",
+  );
+
+  shaft.addColorStop(
+    0.72,
+    "rgba(255,255,255,0.88)",
+  );
+
+  shaft.addColorStop(
+    1,
+    "rgba(255,255,255,0)",
+  );
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    cx,
+    cy,
+  );
+
+  ctx.quadraticCurveTo(
+    length * 0.5,
+    cy - featherWidth * 0.04,
+    length,
+    cy - featherWidth * 0.025,
+  );
+
+  ctx.strokeStyle = shaft;
+
+  ctx.lineWidth =
+    Math.max(
+      0.7,
+      1.25 * scale,
+    );
+
+  ctx.stroke();
+
+  /*
+   * Barb details
+   *
+   * Generated ONCE.
+   * Never regenerated every frame.
+   */
+  const barbCount = Math.max(
+    5,
+    Math.floor(
+      20 * barbDetail,
+    ),
+  );
+
+  ctx.globalAlpha = 0.58;
+
+  for (
+    let i = 2;
+    i < barbCount;
+    i++
+  ) {
+    const t =
+      i / barbCount;
+
+    const x =
+      length * t;
+
+    const envelope =
+      Math.sin(
+        Math.PI * t,
+      );
+
+    const barb =
+      featherWidth *
+      envelope *
+      0.48;
+
+    const side =
+      i % 2 === 0
+        ? -1
+        : 1;
+
+    const endX =
+      x -
+      length * 0.09;
+
+    const endY =
+      cy +
+      side * barb;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      x,
+      cy,
+    );
+
+    ctx.quadraticCurveTo(
+      x - length * 0.035,
+      cy + side * barb * 0.28,
+      endX,
+      endY,
+    );
+
+    if (color === "teal") {
+      ctx.strokeStyle =
+        "rgba(210,245,242,0.3)";
+    } else if (color === "gold") {
+      ctx.strokeStyle =
+        "rgba(255,224,170,0.3)";
+    } else {
+      ctx.strokeStyle =
+        "rgba(255,255,255,0.24)";
+    }
+
+    ctx.lineWidth =
+      Math.max(
+        0.4,
+        0.85 * scale,
+      );
+
+    ctx.stroke();
+  }
+
+  /*
+   * Controlled highlight
+   */
+  ctx.globalAlpha = 0.55;
+
+  const shine =
+    ctx.createLinearGradient(
+      length * 0.15,
+      cy - featherWidth * 0.18,
+      length * 0.85,
+      cy,
+    );
+
+  shine.addColorStop(
+    0,
+    "rgba(255,255,255,0)",
+  );
+
+  shine.addColorStop(
+    0.55,
+    "rgba(255,255,255,0.25)",
+  );
+
+  shine.addColorStop(
+    0.68,
+    "rgba(255,255,255,0.62)",
+  );
+
+  shine.addColorStop(
+    0.74,
+    "rgba(255,255,255,0)",
+  );
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    length * 0.16,
+    cy - featherWidth * 0.13,
+  );
+
+  ctx.quadraticCurveTo(
+    length * 0.5,
+    cy - featherWidth * 0.22,
+    length * 0.82,
+    cy,
+  );
+
+  ctx.strokeStyle = shine;
+
+  ctx.lineWidth =
+    Math.max(
+      0.7,
+      2 * scale,
+    );
+
+  ctx.stroke();
+
+  ctx.restore();
+
+  return canvas;
 }
 
 export default function FenixIntro({
@@ -198,23 +701,26 @@ export default function FenixIntro({
     );
 
   const [stage, setStage] =
-    useState<IntroStage>("enter");
+    useState<Stage>("enter");
 
   useEffect(() => {
     const holdTimer =
-      window.setTimeout(() => {
-        setStage("hold");
-      }, INTRO_ENTER);
+      window.setTimeout(
+        () => setStage("hold"),
+        INTRO_HOLD,
+      );
 
     const exitTimer =
-      window.setTimeout(() => {
-        setStage("exit");
-      }, INTRO_EXIT_START);
+      window.setTimeout(
+        () => setStage("exit"),
+        INTRO_EXIT_START,
+      );
 
     const completeTimer =
-      window.setTimeout(() => {
-        onComplete();
-      }, INTRO_COMPLETE);
+      window.setTimeout(
+        () => onComplete(),
+        INTRO_COMPLETE,
+      );
 
     return () => {
       window.clearTimeout(
@@ -232,77 +738,169 @@ export default function FenixIntro({
   }, [onComplete]);
 
   useEffect(() => {
-    const canvasElement =
+    const canvas =
       canvasRef.current;
 
-    if (!canvasElement) {
-      return;
-    }
+    if (!canvas) return;
 
-    const canvas = canvasElement;
-
-    const context =
+    const ctx =
       canvas.getContext("2d", {
         alpha: true,
         desynchronized: true,
       });
 
-    if (!context) {
-      return;
-    }
+    if (!ctx) return;
 
-    const ctx = context;
+    let destroyed = false;
+
+    let animationFrame = 0;
 
     let width = 0;
     let height = 0;
+
     let dpr = 1;
 
-    let animationFrame = 0;
-    let destroyed = false;
-
-    let feathers: Feather[] = [];
-    let sparks: Spark[] = [];
+    let elapsed = 0;
 
     let lastTime =
       performance.now();
 
-    let elapsed = 0;
+    let lastQualityCheck =
+      performance.now();
+
+    let slowFrames = 0;
+    let goodFrames = 0;
+
+    let tier =
+      detectQuality();
+
+    let config =
+      getConfig(tier);
+
+    let feathers: Feather[] = [];
+
+    let sparks: Spark[] = [];
 
     const reducedMotion =
       window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
-    let isMobile =
-      window.innerWidth <= 600 ||
-      navigator.maxTouchPoints > 1;
+    /*
+     * Feather sprites.
+     *
+     * Created once per quality setup.
+     */
+    let sprites:
+      Record<
+        FeatherColor,
+        HTMLCanvasElement
+      > = {} as Record<
+        FeatherColor,
+        HTMLCanvasElement
+      >;
 
-    const resize = () => {
+    function buildSprites() {
+      sprites = {
+        silver:
+          createFeatherSprite(
+            "silver",
+            config.spriteScale,
+            config.barbDetail,
+          ),
+
+        teal:
+          createFeatherSprite(
+            "teal",
+            config.spriteScale,
+            config.barbDetail,
+          ),
+
+        gold:
+          createFeatherSprite(
+            "gold",
+            config.spriteScale,
+            config.barbDetail,
+          ),
+
+        dark:
+          createFeatherSprite(
+            "dark",
+            config.spriteScale,
+            config.barbDetail,
+          ),
+      };
+    }
+
+    function rebuildScene() {
+      feathers = Array.from(
+        {
+          length:
+            config.feathers,
+        },
+        (_, index) =>
+          createFeather(
+            width,
+            height,
+            index,
+            config.feathers,
+          ),
+      );
+
+      sparks = Array.from(
+        {
+          length:
+            config.sparks,
+        },
+        createSpark,
+      );
+
+      buildSprites();
+    }
+
+    function resize() {
       width =
         window.innerWidth;
 
       height =
         window.innerHeight;
 
-      isMobile =
-        width <= 600 ||
-        navigator.maxTouchPoints > 1;
+      const screenArea =
+        width * height;
+
+      /*
+       * DPR is adaptive.
+       *
+       * Never blindly use native DPR.
+       */
+      const maxDpr =
+        screenArea > 2500000
+          ? 1.65
+          : screenArea > 1200000
+            ? 1.45
+            : 1.25;
 
       dpr = Math.min(
-        window.devicePixelRatio || 1,
-        isMobile ? 1.5 : 2,
+        window.devicePixelRatio ||
+          1,
+        config.dpr,
+        maxDpr,
       );
 
       canvas.width =
         Math.max(
           1,
-          Math.floor(width * dpr),
+          Math.floor(
+            width * dpr,
+          ),
         );
 
       canvas.height =
         Math.max(
           1,
-          Math.floor(height * dpr),
+          Math.floor(
+            height * dpr,
+          ),
         );
 
       canvas.style.width =
@@ -320,256 +918,208 @@ export default function FenixIntro({
         0,
       );
 
-      const area =
-        width * height;
-
-      let featherCount = 180;
-
-      if (area < 300000) {
-        featherCount = 105;
-      } else if (area < 600000) {
-        featherCount = 135;
-      } else if (area < 1200000) {
-        featherCount = 185;
-      } else if (
-        area < 2200000
-      ) {
-        featherCount = 245;
-      } else {
-        featherCount = 315;
-      }
-
-      feathers =
-        Array.from(
-          {
-            length:
-              featherCount,
-          },
-          (_, index) =>
-            createFeather(
-              width,
-              height,
-              isMobile,
-              index,
-              featherCount,
-            ),
-        );
-
-      sparks =
-        Array.from(
-          {
-            length: isMobile
-              ? 20
-              : 44,
-          },
-          () => createSpark(),
-        );
-    };
+      rebuildScene();
+    }
 
     resize();
 
+    let resizeTimer = 0;
+
+    const handleResize = () => {
+      window.clearTimeout(
+        resizeTimer,
+      );
+
+      resizeTimer =
+        window.setTimeout(
+          resize,
+          120,
+        );
+    };
+
     window.addEventListener(
       "resize",
-      resize,
-      { passive: true },
+      handleResize,
+      {
+        passive: true,
+      },
     );
 
-    const drawBackground =
-      () => {
-        const centerX =
-          width * 0.5;
+    function drawBackground() {
+      const cx =
+        width * 0.5;
 
-        const centerY =
-          height * 0.5;
+      const cy =
+        height * 0.5;
 
-        const outerRadius =
+      const radius =
+        Math.max(
+          width,
+          height,
+        ) * 0.72;
+
+      const bg =
+        ctx.createRadialGradient(
+          cx,
+          cy,
+          0,
+          cx,
+          cy,
+          radius,
+        );
+
+      bg.addColorStop(
+        0,
+        "#101617",
+      );
+
+      bg.addColorStop(
+        0.16,
+        "#1b2424",
+      );
+
+      bg.addColorStop(
+        0.32,
+        "#303637",
+      );
+
+      bg.addColorStop(
+        0.54,
+        "#141919",
+      );
+
+      bg.addColorStop(
+        0.8,
+        "#07090a",
+      );
+
+      bg.addColorStop(
+        1,
+        "#010202",
+      );
+
+      ctx.fillStyle = bg;
+
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        height,
+      );
+
+      const glow =
+        ctx.createRadialGradient(
+          cx - width * 0.04,
+          cy - height * 0.04,
+          0,
+          cx - width * 0.04,
+          cy - height * 0.04,
           Math.max(
             width,
             height,
-          ) * 0.76;
+          ) * 0.52,
+        );
 
-        const backgroundGradient =
-          ctx.createRadialGradient(
-            centerX,
-            centerY,
-            0,
-            centerX,
-            centerY,
-            outerRadius,
-          );
+      glow.addColorStop(
+        0,
+        "rgba(0,128,128,0.16)",
+      );
 
-        backgroundGradient.addColorStop(
+      glow.addColorStop(
+        0.35,
+        "rgba(0,128,128,0.05)",
+      );
+
+      glow.addColorStop(
+        1,
+        "rgba(0,128,128,0)",
+      );
+
+      ctx.fillStyle = glow;
+
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        height,
+      );
+
+      const warm =
+        ctx.createRadialGradient(
+          width * 0.72,
+          height * 0.32,
           0,
-          "#111617",
+          width * 0.72,
+          height * 0.32,
+          Math.max(
+            width,
+            height,
+          ) * 0.4,
         );
 
-        backgroundGradient.addColorStop(
-          0.13,
-          "#202625",
-        );
+      warm.addColorStop(
+        0,
+        "rgba(210,155,80,0.065)",
+      );
 
-        backgroundGradient.addColorStop(
-          0.28,
-          "#474b48",
-        );
+      warm.addColorStop(
+        1,
+        "rgba(210,155,80,0)",
+      );
 
-        backgroundGradient.addColorStop(
-          0.48,
-          "#222728",
-        );
+      ctx.fillStyle = warm;
 
-        backgroundGradient.addColorStop(
-          0.72,
-          "#0a0c0d",
-        );
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        height,
+      );
+    }
 
-        backgroundGradient.addColorStop(
-          1,
-          "#010202",
-        );
-
-        ctx.fillStyle =
-          backgroundGradient;
-
-        ctx.fillRect(
-          0,
-          0,
-          width,
-          height,
-        );
-
-        const tealGlow =
-          ctx.createRadialGradient(
-            centerX -
-              width * 0.055,
-            centerY -
-              height * 0.03,
-            0,
-            centerX -
-              width * 0.055,
-            centerY -
-              height * 0.03,
-            Math.max(
-              width,
-              height,
-            ) * 0.48,
-          );
-
-        tealGlow.addColorStop(
-          0,
-          "rgba(0,128,128,0.17)",
-        );
-
-        tealGlow.addColorStop(
-          0.36,
-          "rgba(0,128,128,0.045)",
-        );
-
-        tealGlow.addColorStop(
-          1,
-          "rgba(0,128,128,0)",
-        );
-
-        ctx.fillStyle =
-          tealGlow;
-
-        ctx.fillRect(
-          0,
-          0,
-          width,
-          height,
-        );
-
-        const warmGlow =
-          ctx.createRadialGradient(
-            width * 0.76,
-            height * 0.3,
-            0,
-            width * 0.76,
-            height * 0.3,
-            Math.max(
-              width,
-              height,
-            ) * 0.4,
-          );
-
-        warmGlow.addColorStop(
-          0,
-          "rgba(214,158,83,0.075)",
-        );
-
-        warmGlow.addColorStop(
-          1,
-          "rgba(214,158,83,0)",
-        );
-
-        ctx.fillStyle =
-          warmGlow;
-
-        ctx.fillRect(
-          0,
-          0,
-          width,
-          height,
-        );
-      };
-
-    const drawFeather = (
+    function drawFeather(
       feather: Feather,
       time: number,
-    ) => {
-      const centerX =
+    ) {
+      const sprite =
+        sprites[feather.color];
+
+      if (!sprite) return;
+
+      const cx =
         width * 0.5;
 
-      const centerY =
+      const cy =
         height * 0.5;
 
-      const flutterWave =
+      const wave =
         Math.sin(
-          time *
-            0.0011 *
+          time * 0.001 *
             feather.flutter +
             feather.phase,
-        ) * 0.07;
-
-      const breathing =
-        Math.sin(
-          time * 0.00045 +
-            feather.phase,
-        ) *
-        (10 +
-          feather.depth * 17);
+        ) * 0.045;
 
       const radius =
         feather.radius +
-        breathing;
+        Math.sin(
+          time * 0.00042 +
+            feather.phase,
+        ) *
+          (10 +
+            feather.depth * 22);
 
       const angle =
         feather.angle +
         time * feather.orbit +
-        flutterWave;
-
-      const depthWave =
-        Math.sin(
-          time * 0.00034 +
-            feather.phase,
-        );
-
-      const depth =
-        clamp(
-          0.56 +
-            depthWave * 0.35,
-          0.18,
-          1,
-        );
+        wave;
 
       const x =
-        centerX +
+        cx +
         Math.cos(angle) *
           radius;
 
       const y =
-        centerY +
+        cy +
         Math.sin(angle) *
           radius *
           0.78;
@@ -578,30 +1128,38 @@ export default function FenixIntro({
         angle +
         Math.PI / 2;
 
-      const inwardMovement =
+      const flutter =
         Math.sin(
-          time * 0.00029 +
+          time * 0.0017 +
             feather.phase,
-        ) * 0.1;
+        ) *
+        feather.flutter *
+        0.07;
 
       const rotation =
         tangent +
         feather.twist +
-        inwardMovement;
+        flutter;
 
       const perspective =
-        0.68 +
-        depth * 0.5;
+        0.72 +
+        feather.depth *
+          0.48;
 
-      const length =
-        feather.length *
-        feather.size *
+      const scale =
+        feather.scale *
         perspective;
 
-      const featherWidth =
-        feather.width *
-        feather.size *
-        perspective;
+      /*
+       * Skip extremely tiny distant
+       * feathers on weaker quality tiers.
+       */
+      if (
+        tier === "safe" &&
+        feather.depth < 0.28
+      ) {
+        return;
+      }
 
       ctx.save();
 
@@ -614,483 +1172,46 @@ export default function FenixIntro({
         rotation,
       );
 
-      const shear =
-        Math.sin(
-          time * 0.0013 +
-            feather.phase,
-        ) *
-        feather.flutter *
-        0.1;
-
-      ctx.transform(
-        1,
-        shear,
-        0,
-        1,
-        0,
-        0,
-      );
-
       ctx.globalAlpha =
         feather.alpha *
-        (0.48 + depth * 0.52);
+        (0.5 +
+          feather.depth *
+            0.5);
 
-      if (depth < 0.3) {
-        ctx.filter =
-          "blur(2px)";
-      } else if (
-        depth < 0.56
-      ) {
-        ctx.filter =
-          "blur(1px)";
-      } else if (
-        depth > 0.84
-      ) {
-        ctx.filter =
-          "blur(0.2px)";
-      } else {
-        ctx.filter = "none";
-      }
-
-      const bodyGradient =
-        ctx.createLinearGradient(
-          0,
-          0,
-          length,
-          0,
-        );
-
-      if (
-        feather.color ===
-        "silver"
-      ) {
-        bodyGradient.addColorStop(
-          0,
-          "#111515",
-        );
-
-        bodyGradient.addColorStop(
-          0.18,
-          "#424949",
-        );
-
-        bodyGradient.addColorStop(
-          0.42,
-          "#858986",
-        );
-
-        bodyGradient.addColorStop(
-          0.67,
-          "#d2cec4",
-        );
-
-        bodyGradient.addColorStop(
-          0.85,
-          "#eee9df",
-        );
-
-        bodyGradient.addColorStop(
-          1,
-          "#858b88",
-        );
-      } else if (
-        feather.color ===
-        "teal"
-      ) {
-        bodyGradient.addColorStop(
-          0,
-          "#051011",
-        );
-
-        bodyGradient.addColorStop(
-          0.25,
-          "#12484b",
-        );
-
-        bodyGradient.addColorStop(
-          0.5,
-          "#147779",
-        );
-
-        bodyGradient.addColorStop(
-          0.74,
-          "#75aaa8",
-        );
-
-        bodyGradient.addColorStop(
-          0.9,
-          "#9cc0bd",
-        );
-
-        bodyGradient.addColorStop(
-          1,
-          "#31595b",
-        );
-      } else if (
-        feather.color ===
-        "gold"
-      ) {
-        bodyGradient.addColorStop(
-          0,
-          "#2f2117",
-        );
-
-        bodyGradient.addColorStop(
-          0.26,
-          "#744a2a",
-        );
-
-        bodyGradient.addColorStop(
-          0.55,
-          "#aa7038",
-        );
-
-        bodyGradient.addColorStop(
-          0.76,
-          "#e2ae69",
-        );
-
-        bodyGradient.addColorStop(
-          0.9,
-          "#f3cd8d",
-        );
-
-        bodyGradient.addColorStop(
-          1,
-          "#83572e",
-        );
-      } else {
-        bodyGradient.addColorStop(
-          0,
-          "#050707",
-        );
-
-        bodyGradient.addColorStop(
-          0.3,
-          "#121718",
-        );
-
-        bodyGradient.addColorStop(
-          0.68,
-          "#303737",
-        );
-
-        bodyGradient.addColorStop(
-          1,
-          "#181d1d",
-        );
-      }
-
-      ctx.shadowColor =
-        feather.color === "teal"
-          ? "rgba(0,128,128,0.12)"
-          : feather.color === "gold"
-            ? "rgba(218,157,80,0.1)"
-            : "rgba(0,0,0,0.62)";
-
-      ctx.shadowBlur =
-        depth > 0.65
-          ? 10
-          : 15;
-
-      ctx.shadowOffsetX = 4;
-      ctx.shadowOffsetY = 7;
-
-      /*
-       * MAIN FEATHER BODY
-       */
-
-      ctx.beginPath();
-
-      ctx.moveTo(
+      ctx.drawImage(
+        sprite,
         0,
-        0,
+        -sprite.height / 2,
+        sprite.width * scale,
+        sprite.height * scale,
       );
-
-      ctx.bezierCurveTo(
-        length * 0.18,
-        -featherWidth * 0.42,
-        length * 0.52,
-        -featherWidth * 0.62,
-        length,
-        0,
-      );
-
-      ctx.bezierCurveTo(
-        length * 0.68,
-        featherWidth * 0.49,
-        length * 0.28,
-        featherWidth * 0.42,
-        0,
-        0,
-      );
-
-      ctx.closePath();
-
-      ctx.fillStyle =
-        bodyGradient;
-
-      ctx.fill();
-
-      ctx.shadowColor =
-        "transparent";
-
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-
-      /*
-       * CENTRAL SHAFT
-       */
-
-      const shaftGradient =
-        ctx.createLinearGradient(
-          0,
-          0,
-          length,
-          0,
-        );
-
-      shaftGradient.addColorStop(
-        0,
-        "rgba(10,12,12,0.7)",
-      );
-
-      shaftGradient.addColorStop(
-        0.26,
-        "rgba(169,171,167,0.62)",
-      );
-
-      shaftGradient.addColorStop(
-        0.62,
-        "rgba(255,255,255,0.84)",
-      );
-
-      shaftGradient.addColorStop(
-        0.86,
-        "rgba(255,255,255,0.3)",
-      );
-
-      shaftGradient.addColorStop(
-        1,
-        "rgba(255,255,255,0)",
-      );
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        0,
-        0,
-      );
-
-      ctx.quadraticCurveTo(
-        length * 0.42,
-        feather.curve *
-          featherWidth,
-        length,
-        -featherWidth *
-          0.025,
-      );
-
-      ctx.strokeStyle =
-        shaftGradient;
-
-      ctx.lineWidth =
-        Math.max(
-          0.6,
-          featherWidth * 0.034,
-        );
-
-      ctx.stroke();
-
-      /*
-       * FINE BARBS
-       */
-
-      const barbCount =
-        Math.floor(
-          clamp(
-            length / 8.5,
-            8,
-            24,
-          ),
-        );
-
-      ctx.globalAlpha *=
-        0.65;
-
-      for (
-        let i = 2;
-        i < barbCount;
-        i += 1
-      ) {
-        const t =
-          i / barbCount;
-
-        const barbX =
-          length * t;
-
-        const envelope =
-          Math.sin(
-            Math.PI * t,
-          );
-
-        const barbHeight =
-          featherWidth *
-          envelope *
-          0.56;
-
-        const side =
-          i % 2 === 0
-            ? -1
-            : 1;
-
-        const curve =
-          side *
-          barbHeight *
-          (0.74 +
-            Math.sin(
-              time *
-                0.001 +
-                feather.phase +
-                i,
-            ) *
-              0.06);
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-          barbX,
-          0,
-        );
-
-        ctx.quadraticCurveTo(
-          barbX -
-            length * 0.05,
-          curve * 0.35,
-          barbX -
-            length * 0.11,
-          curve,
-        );
-
-        if (
-          feather.color ===
-          "teal"
-        ) {
-          ctx.strokeStyle =
-            "rgba(188,232,230,0.34)";
-        } else if (
-          feather.color ===
-          "gold"
-        ) {
-          ctx.strokeStyle =
-            "rgba(255,220,162,0.35)";
-        } else {
-          ctx.strokeStyle =
-            "rgba(255,255,255,0.25)";
-        }
-
-        ctx.lineWidth =
-          Math.max(
-            0.42,
-            featherWidth * 0.017,
-          );
-
-        ctx.stroke();
-      }
-
-      /*
-       * SPECULAR LIGHT
-       */
-
-      if (
-        depth > 0.68
-      ) {
-        const shineGradient =
-          ctx.createLinearGradient(
-            length * 0.12,
-            -featherWidth * 0.2,
-            length * 0.86,
-            0,
-          );
-
-        shineGradient.addColorStop(
-          0,
-          "rgba(255,255,255,0)",
-        );
-
-        shineGradient.addColorStop(
-          0.46,
-          "rgba(255,255,255,0.02)",
-        );
-
-        shineGradient.addColorStop(
-          0.57,
-          "rgba(255,255,255,0.26)",
-        );
-
-        shineGradient.addColorStop(
-          0.65,
-          "rgba(255,255,255,0.62)",
-        );
-
-        shineGradient.addColorStop(
-          0.72,
-          "rgba(255,255,255,0)",
-        );
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-          length * 0.18,
-          -featherWidth * 0.12,
-        );
-
-        ctx.quadraticCurveTo(
-          length * 0.52,
-          -featherWidth * 0.25,
-          length * 0.83,
-          -featherWidth * 0.015,
-        );
-
-        ctx.strokeStyle =
-          shineGradient;
-
-        ctx.lineWidth =
-          Math.max(
-            0.7,
-            featherWidth * 0.05,
-          );
-
-        ctx.stroke();
-      }
 
       ctx.restore();
-    };
+    }
 
-    const drawCore = (
+    function drawCore(
       time: number,
-    ) => {
-      const centerX =
+    ) {
+      const cx =
         width * 0.5;
 
-      const centerY =
+      const cy =
         height * 0.5;
 
       const coreRadius =
         Math.min(
           width,
           height,
-        ) * 0.11;
+        ) * 0.115;
 
       const aura =
         ctx.createRadialGradient(
-          centerX,
-          centerY,
+          cx,
+          cy,
           0,
-          centerX,
-          centerY,
-          coreRadius * 3.5,
+          cx,
+          cy,
+          coreRadius * 3,
         );
 
       aura.addColorStop(
@@ -1099,7 +1220,7 @@ export default function FenixIntro({
       );
 
       aura.addColorStop(
-        0.32,
+        0.35,
         "rgba(0,128,128,0.045)",
       );
 
@@ -1113,53 +1234,52 @@ export default function FenixIntro({
       ctx.beginPath();
 
       ctx.arc(
-        centerX,
-        centerY,
-        coreRadius * 3.5,
+        cx,
+        cy,
+        coreRadius * 3,
         0,
         TAU,
       );
 
       ctx.fill();
 
-      const coreGradient =
+      const core =
         ctx.createRadialGradient(
-          centerX,
-          centerY,
+          cx,
+          cy,
           0,
-          centerX,
-          centerY,
+          cx,
+          cy,
           coreRadius * 1.9,
         );
 
-      coreGradient.addColorStop(
+      core.addColorStop(
         0,
-        "rgba(1,3,3,0.995)",
+        "rgba(1,3,3,0.98)",
       );
 
-      coreGradient.addColorStop(
-        0.42,
-        "rgba(3,8,8,0.98)",
+      core.addColorStop(
+        0.45,
+        "rgba(5,10,10,0.94)",
       );
 
-      coreGradient.addColorStop(
+      core.addColorStop(
         0.7,
-        "rgba(8,17,17,0.7)",
+        "rgba(10,21,21,0.7)",
       );
 
-      coreGradient.addColorStop(
+      core.addColorStop(
         1,
-        "rgba(8,13,13,0)",
+        "rgba(10,15,15,0)",
       );
 
-      ctx.fillStyle =
-        coreGradient;
+      ctx.fillStyle = core;
 
       ctx.beginPath();
 
       ctx.arc(
-        centerX,
-        centerY,
+        cx,
+        cy,
         coreRadius * 1.9,
         0,
         TAU,
@@ -1167,87 +1287,90 @@ export default function FenixIntro({
 
       ctx.fill();
 
-      /*
-       * INNER ENERGY RING
-       */
+      if (tier !== "safe") {
+        ctx.save();
+
+        ctx.translate(
+          cx,
+          cy,
+        );
+
+        ctx.rotate(
+          time * 0.00015,
+        );
+
+        ctx.strokeStyle =
+          "rgba(0,180,180,0.2)";
+
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+
+        ctx.arc(
+          0,
+          0,
+          coreRadius * 1.05,
+          -0.7,
+          0.8,
+        );
+
+        ctx.stroke();
+
+        ctx.strokeStyle =
+          "rgba(255,215,0,0.12)";
+
+        ctx.beginPath();
+
+        ctx.arc(
+          0,
+          0,
+          coreRadius * 1.2,
+          2.3,
+          3.5,
+        );
+
+        ctx.stroke();
+
+        ctx.restore();
+      }
+    }
+
+    function drawSparks(
+      time: number,
+    ) {
+      if (
+        tier === "safe"
+      ) {
+        return;
+      }
+
+      const cx =
+        width * 0.5;
+
+      const cy =
+        height * 0.5;
 
       ctx.save();
 
-      ctx.translate(
-        centerX,
-        centerY,
-      );
-
-      ctx.rotate(
-        time * 0.00014,
-      );
-
-      ctx.strokeStyle =
-        "rgba(0,179,179,0.19)";
-
-      ctx.lineWidth = 1;
-
-      ctx.beginPath();
-
-      ctx.arc(
-        0,
-        0,
-        coreRadius * 1.02,
-        -0.72,
-        0.84,
-      );
-
-      ctx.stroke();
-
-      ctx.strokeStyle =
-        "rgba(255,215,0,0.115)";
-
-      ctx.beginPath();
-
-      ctx.arc(
-        0,
-        0,
-        coreRadius * 1.17,
-        2.25,
-        3.55,
-      );
-
-      ctx.stroke();
-
-      ctx.restore();
-    };
-
-    const drawSparks = (
-      time: number,
-    ) => {
-      const centerX =
-        width * 0.5;
-
-      const centerY =
-        height * 0.5;
-
-      for (
-        const spark of sparks
-      ) {
+      for (const spark of sparks) {
         const radius =
           spark.radius +
           Math.sin(
             time * 0.001 +
               spark.phase,
-          ) *
-            18;
+          ) * 18;
 
         const angle =
           spark.angle +
           time * spark.speed;
 
         const x =
-          centerX +
+          cx +
           Math.cos(angle) *
             radius;
 
         const y =
-          centerY +
+          cy +
           Math.sin(angle) *
             radius *
             0.78;
@@ -1255,7 +1378,7 @@ export default function FenixIntro({
         const pulse =
           0.55 +
           Math.sin(
-            time * 0.003 +
+            time * 0.0025 +
               spark.phase,
           ) *
             0.45;
@@ -1266,298 +1389,305 @@ export default function FenixIntro({
 
         ctx.fillStyle =
           spark.phase % 2 >
-          1.2
+          1
             ? "#008080"
-            : "#d9d6cd";
+            : "#d9d5cc";
 
-        ctx.beginPath();
-
-        ctx.arc(
+        ctx.fillRect(
           x,
           y,
           spark.size,
-          0,
-          TAU,
+          spark.size,
         );
-
-        ctx.fill();
       }
 
-      ctx.globalAlpha = 1;
-    };
+      ctx.restore();
+    }
 
-    const drawLightSweep =
-      (time: number) => {
-        const centerX =
-          width * 0.5;
+    function drawVignette() {
+      const cx =
+        width * 0.5;
 
-        const centerY =
-          height * 0.5;
+      const cy =
+        height * 0.5;
 
-        const sweep =
-          (time * 0.00008) %
-          TAU;
-
-        const startX =
-          centerX +
-          Math.cos(sweep) *
-            Math.max(
-              width,
-              height,
-            );
-
-        const startY =
-          centerY +
-          Math.sin(sweep) *
-            Math.max(
-              width,
-              height,
-            );
-
-        const gradient =
-          ctx.createRadialGradient(
-            centerX,
-            centerY,
-            0,
-            startX,
-            startY,
-            Math.max(
-              width,
-              height,
-            ) * 0.38,
-          );
-
-        gradient.addColorStop(
-          0,
-          "rgba(255,255,255,0.018)",
+      const vignette =
+        ctx.createRadialGradient(
+          cx,
+          cy,
+          Math.min(
+            width,
+            height,
+          ) * 0.18,
+          cx,
+          cy,
+          Math.max(
+            width,
+            height,
+          ) * 0.75,
         );
 
-        gradient.addColorStop(
-          1,
-          "rgba(255,255,255,0)",
-        );
+      vignette.addColorStop(
+        0,
+        "rgba(0,0,0,0)",
+      );
 
-        ctx.fillStyle =
-          gradient;
+      vignette.addColorStop(
+        0.58,
+        "rgba(0,0,0,0.08)",
+      );
 
-        ctx.fillRect(
-          0,
-          0,
-          width,
-          height,
-        );
-      };
+      vignette.addColorStop(
+        0.82,
+        "rgba(0,0,0,0.46)",
+      );
 
-    const drawVignette =
-      () => {
-        const centerX =
-          width * 0.5;
+      vignette.addColorStop(
+        1,
+        "rgba(0,0,0,0.88)",
+      );
 
-        const centerY =
-          height * 0.5;
+      ctx.fillStyle =
+        vignette;
 
-        const vignette =
-          ctx.createRadialGradient(
-            centerX,
-            centerY,
-            Math.min(
-              width,
-              height,
-            ) * 0.16,
-            centerX,
-            centerY,
-            Math.max(
-              width,
-              height,
-            ) * 0.78,
-          );
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        height,
+      );
+    }
 
-        vignette.addColorStop(
-          0,
-          "rgba(0,0,0,0)",
-        );
+    /*
+     * Performance monitor.
+     *
+     * The intro watches actual frame time.
+     * If the device struggles, quality drops.
+     */
+    function adaptQuality(
+      frameTime: number,
+    ) {
+      if (
+        reducedMotion ||
+        performance.now() -
+          lastQualityCheck <
+          500
+      ) {
+        return;
+      }
 
-        vignette.addColorStop(
-          0.53,
-          "rgba(0,0,0,0.06)",
-        );
+      lastQualityCheck =
+        performance.now();
 
-        vignette.addColorStop(
-          0.78,
-          "rgba(0,0,0,0.47)",
-        );
+      if (frameTime > 27) {
+        slowFrames += 1;
+        goodFrames = 0;
+      } else if (
+        frameTime < 17
+      ) {
+        goodFrames += 1;
+        slowFrames = 0;
+      } else {
+        slowFrames = 0;
+        goodFrames = 0;
+      }
 
-        vignette.addColorStop(
-          1,
-          "rgba(0,0,0,0.91)",
-        );
+      /*
+       * Drop one tier quickly if
+       * the device is struggling.
+       */
+      if (
+        slowFrames >= 2
+      ) {
+        const next =
+          tier === "ultra"
+            ? "high"
+            : tier === "high"
+              ? "balanced"
+              : "safe";
 
-        ctx.fillStyle =
-          vignette;
+        if (next !== tier) {
+          tier = next;
+          config =
+            getConfig(tier);
 
-        ctx.fillRect(
-          0,
-          0,
-          width,
-          height,
-        );
-      };
-
-    const drawGrain =
-      () => {
-        ctx.save();
-
-        ctx.globalAlpha =
-          0.024;
-
-        for (
-          let i = 0;
-          i < 58;
-          i += 1
-        ) {
-          const x =
-            Math.random() *
-            width;
-
-          const y =
-            Math.random() *
-            height;
-
-          ctx.fillStyle =
-            Math.random() >
-            0.5
-              ? "#ffffff"
-              : "#000000";
-
-          ctx.fillRect(
-            x,
-            y,
-            1,
-            1,
-          );
+          rebuildScene();
         }
 
-        ctx.restore();
-      };
+        slowFrames = 0;
 
-    const render = (
-      currentTime: number,
-    ) => {
+        return;
+      }
+
+      /*
+       * Upgrade only after sustained
+       * good performance.
+       */
+      if (
+        goodFrames >= 5
+      ) {
+        const next =
+          tier === "safe"
+            ? "balanced"
+            : tier === "balanced"
+              ? "high"
+              : tier === "high"
+                ? "ultra"
+                : "ultra";
+
+        if (next !== tier) {
+          tier = next;
+          config =
+            getConfig(tier);
+
+          rebuildScene();
+        }
+
+        goodFrames = 0;
+      }
+    }
+
+    function render(
+      now: number,
+    ) {
       if (destroyed) {
         return;
       }
 
       const delta =
         Math.min(
-          currentTime -
-            lastTime,
-          32,
+          now - lastTime,
+          34,
         );
 
-      lastTime =
-        currentTime;
+      lastTime = now;
 
       if (
-        document.visibilityState ===
+        document.visibilityState !==
         "visible"
       ) {
-        elapsed +=
-          reducedMotion
-            ? delta * 0.06
-            : delta;
+        animationFrame =
+          requestAnimationFrame(
+            render,
+          );
 
-        ctx.clearRect(
-          0,
-          0,
-          width,
-          height,
-        );
-
-        drawBackground();
-
-        feathers.sort(
-          (a, b) =>
-            a.depth - b.depth,
-        );
-
-        for (
-          const feather of feathers
-        ) {
-          if (
-            feather.depth <
-            0.52
-          ) {
-            drawFeather(
-              feather,
-              elapsed,
-            );
-          }
-        }
-
-        for (
-          const feather of feathers
-        ) {
-          if (
-            feather.depth >=
-            0.52
-          ) {
-            drawFeather(
-              feather,
-              elapsed,
-            );
-          }
-        }
-
-        drawCore(elapsed);
-
-        drawSparks(elapsed);
-
-        drawLightSweep(
-          elapsed,
-        );
-
-        drawVignette();
-
-        drawGrain();
+        return;
       }
 
+      elapsed +=
+        reducedMotion
+          ? delta * 0.08
+          : delta;
+
+      const frameStart =
+        performance.now();
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0,
+      );
+
+      ctx.globalAlpha = 1;
+
+      ctx.clearRect(
+        0,
+        0,
+        width,
+        height,
+      );
+
+      drawBackground();
+
+      /*
+       * No per-frame sort.
+       *
+       * Feathers are generated with
+       * random depth and don't need
+       * expensive sorting every frame.
+       */
+      for (
+        const feather of feathers
+      ) {
+        drawFeather(
+          feather,
+          elapsed,
+        );
+      }
+
+      drawCore(
+        elapsed,
+      );
+
+      drawSparks(
+        elapsed,
+      );
+
+      drawVignette();
+
+      const frameTime =
+        performance.now() -
+        frameStart;
+
+      adaptQuality(
+        frameTime,
+      );
+
       animationFrame =
-        window.requestAnimationFrame(
+        requestAnimationFrame(
           render,
         );
-    };
+    }
 
     animationFrame =
-      window.requestAnimationFrame(
+      requestAnimationFrame(
         render,
       );
 
     return () => {
       destroyed = true;
 
-      window.cancelAnimationFrame(
+      cancelAnimationFrame(
         animationFrame,
+      );
+
+      window.clearTimeout(
+        resizeTimer,
       );
 
       window.removeEventListener(
         "resize",
-        resize,
+        handleResize,
       );
+
+      /*
+       * Release canvas backing store.
+       */
+      canvas.width = 1;
+      canvas.height = 1;
+
+      feathers = [];
+      sparks = [];
+      sprites = {} as Record<
+        FeatherColor,
+        HTMLCanvasElement
+      >;
     };
   }, []);
 
   const isExit =
     stage === "exit";
 
-  const isEntered =
-    stage !== "enter";
-
   return (
     <div
       className={[
         "fixed inset-0 z-[999999]",
-        "min-h-screen overflow-hidden",
-        "bg-[#030506] text-white",
+        "overflow-hidden",
+        "bg-[#030506]",
+        "text-white",
         "transition-[opacity,transform]",
         "duration-[700ms]",
         "ease-[cubic-bezier(0.22,1,0.36,1)]",
@@ -1567,28 +1697,20 @@ export default function FenixIntro({
       ].join(" ")}
       aria-label="FeniX intro"
     >
-      {/* =====================================================
-          PROCEDURAL FEATHER VFX
-          ===================================================== */}
-
       <canvas
         ref={canvasRef}
         className={[
           "absolute inset-0",
           "h-full w-full",
-          "transition-[opacity,transform,filter]",
+          "transition-[transform,opacity,filter]",
           "duration-[900ms]",
           "ease-[cubic-bezier(0.22,1,0.36,1)]",
           isExit
-            ? "scale-[1.075] opacity-0 blur-[3px]"
+            ? "scale-[1.08] opacity-0 blur-[3px]"
             : "scale-100 opacity-100 blur-0",
         ].join(" ")}
         aria-hidden="true"
       />
-
-      {/* =====================================================
-          ATMOSPHERE
-          ===================================================== */}
 
       <div
         className={[
@@ -1602,21 +1724,17 @@ export default function FenixIntro({
         <div
           className="
             absolute inset-0
-            bg-[radial-gradient(circle_at_50%_46%,rgba(0,128,128,0.11),transparent_36%)]
+            bg-[radial-gradient(circle_at_50%_50%,rgba(0,128,128,0.10),transparent_34%)]
           "
         />
 
         <div
           className="
             absolute inset-0
-            bg-[linear-gradient(180deg,rgba(3,5,6,0.08),transparent_36%,rgba(0,0,0,0.62))]
+            bg-[linear-gradient(180deg,rgba(3,5,6,0.12),transparent_35%,rgba(0,0,0,0.55))]
           "
         />
       </div>
-
-      {/* =====================================================
-          RINGS
-          ===================================================== */}
 
       <div
         className={[
@@ -1626,15 +1744,12 @@ export default function FenixIntro({
           "-translate-x-1/2 -translate-y-1/2",
           "rounded-full",
           "border border-[#008080]/10",
-          "shadow-[0_0_90px_rgba(0,128,128,0.05)]",
-          "animate-[spin_11s_linear_infinite]",
-          "transition-[opacity,transform]",
-          "duration-[900ms]",
+          "shadow-[0_0_80px_rgba(0,128,128,0.06)]",
+          "transition-[transform,opacity]",
+          "duration-[1000ms]",
           isExit
-            ? "scale-[1.48] opacity-0"
+            ? "scale-[1.5] opacity-0"
             : "scale-100 opacity-100",
-          "sm:h-[320px] sm:w-[320px]",
-          "md:h-[380px] md:w-[380px]",
         ].join(" ")}
       />
 
@@ -1642,24 +1757,17 @@ export default function FenixIntro({
         className={[
           "pointer-events-none absolute",
           "left-1/2 top-1/2 z-20",
-          "h-[160px] w-[160px]",
+          "h-[310px] w-[310px]",
           "-translate-x-1/2 -translate-y-1/2",
           "rounded-full",
           "border border-white/[0.035]",
-          "animate-[spin_8s_linear_infinite_reverse]",
-          "transition-[opacity,transform]",
-          "duration-[900ms]",
+          "transition-[transform,opacity]",
+          "duration-[1100ms]",
           isExit
-            ? "scale-[1.34] opacity-0"
+            ? "scale-[1.35] opacity-0"
             : "scale-100 opacity-100",
-          "sm:h-[240px] sm:w-[240px]",
-          "md:h-[290px] md:w-[290px]",
         ].join(" ")}
       />
-
-      {/* =====================================================
-          BRAND
-          ===================================================== */}
 
       <div
         className="
@@ -1680,40 +1788,35 @@ export default function FenixIntro({
               : "translate-y-0 scale-100 opacity-100 blur-0",
           ].join(" ")}
         >
-          {/* FX MARK */}
-
           <div
             className={[
               "relative flex",
-              "h-[82px] w-[82px]",
+              "h-[88px] w-[88px]",
               "items-center justify-center",
-              "rounded-[25px]",
+              "rounded-[26px]",
               "border border-white/10",
-              "bg-[#05070b]/48",
-              "backdrop-blur-xl",
+              "bg-[#05070b]/45",
               "shadow-[0_0_100px_rgba(0,128,128,0.22)]",
-              "transition-[opacity,transform]",
-              "duration-[900ms]",
-              "ease-[cubic-bezier(0.22,1,0.36,1)]",
-              isEntered
-                ? "scale-100 opacity-100"
-                : "scale-[0.72] opacity-0",
-              "sm:h-[94px] sm:w-[94px]",
-              "md:h-[104px] md:w-[104px]",
+              "backdrop-blur-xl",
+              "transition-[transform,opacity]",
+              "duration-[1000ms]",
+              stage === "enter"
+                ? "scale-[0.72] opacity-0"
+                : "scale-100 opacity-100",
             ].join(" ")}
           >
             <div
               className="
                 absolute inset-[7px]
                 rounded-[20px]
-                border border-[#008080]/22
+                border border-[#008080]/25
               "
             />
 
             <div
               className="
-                absolute inset-[14px]
-                rounded-[16px]
+                absolute inset-[15px]
+                rounded-[15px]
                 border border-white/[0.045]
               "
             />
@@ -1722,24 +1825,21 @@ export default function FenixIntro({
               className="
                 absolute
                 left-1/2 top-1/2
-                h-[44px] w-[44px]
+                h-[46px] w-[46px]
                 -translate-x-1/2
                 -translate-y-1/2
                 rounded-full
                 border border-[#008080]/15
-                animate-[spin_10s_linear_infinite]
-                sm:h-[52px] sm:w-[52px]
+                animate-[spin_9s_linear_infinite]
               "
             />
 
             <span
               className="
                 relative
-                text-[35px]
+                text-[38px]
                 font-black
-                tracking-[-0.11em]
-                sm:text-[42px]
-                md:text-[46px]
+                tracking-[-0.1em]
               "
             >
               F
@@ -1762,27 +1862,24 @@ export default function FenixIntro({
             />
           </div>
 
-          {/* NAME */}
-
           <div
             className={[
               "mt-6 text-center",
               "transition-[opacity,transform]",
-              "duration-[1050ms]",
+              "duration-[1000ms]",
               "delay-[100ms]",
               "ease-[cubic-bezier(0.22,1,0.36,1)]",
-              isEntered
-                ? "translate-y-0 opacity-100"
-                : "translate-y-3 opacity-0",
+              stage === "enter"
+                ? "translate-y-3 opacity-0"
+                : "translate-y-0 opacity-100",
             ].join(" ")}
           >
             <h1
               className="
-                text-[29px]
+                text-[30px]
                 font-black
                 tracking-[-0.065em]
-                sm:text-[36px]
-                md:text-[40px]
+                sm:text-[38px]
               "
             >
               Feni
@@ -1806,18 +1903,16 @@ export default function FenixIntro({
             </p>
           </div>
 
-          {/* LOADING */}
-
           <div
             className={[
               "mt-8",
-              "h-[2px] w-[108px]",
+              "h-[2px] w-[112px]",
               "overflow-hidden rounded-full",
               "bg-white/[0.08]",
               "transition-opacity duration-700",
-              isEntered
-                ? "opacity-100"
-                : "opacity-0",
+              stage === "enter"
+                ? "opacity-0"
+                : "opacity-100",
             ].join(" ")}
           >
             <div
@@ -1825,10 +1920,10 @@ export default function FenixIntro({
                 h-full w-full
                 origin-left
                 bg-gradient-to-r
-                from-[#008080]/25
+                from-[#008080]/30
                 via-white
                 to-[#FFD700]/60
-                animate-[fenixLoad_3s_cubic-bezier(0.22,1,0.36,1)_forwards]
+                animate-[fenixLoad_2.8s_cubic-bezier(0.22,1,0.36,1)_forwards]
               "
             />
           </div>
@@ -1839,12 +1934,12 @@ export default function FenixIntro({
               "text-[7px]",
               "font-medium",
               "uppercase",
-              "tracking-[0.52em]",
-              "text-white/24",
+              "tracking-[0.5em]",
+              "text-white/25",
               "transition-opacity duration-700",
-              isEntered
-                ? "opacity-100"
-                : "opacity-0",
+              stage === "enter"
+                ? "opacity-0"
+                : "opacity-100",
             ].join(" ")}
           >
             Loading
@@ -1852,29 +1947,21 @@ export default function FenixIntro({
         </div>
       </div>
 
-      {/* =====================================================
-          VIGNETTE
-          ===================================================== */}
-
       <div
         className="
           pointer-events-none
           absolute inset-0
           z-40
-          bg-[radial-gradient(circle_at_center,transparent_18%,rgba(0,0,0,0.10)_44%,rgba(0,0,0,0.80)_100%)]
+          bg-[radial-gradient(circle_at_center,transparent_18%,rgba(0,0,0,0.08)_42%,rgba(0,0,0,0.78)_100%)]
         "
       />
-
-      {/* =====================================================
-          GRAIN
-          ===================================================== */}
 
       <div
         className="
           pointer-events-none
           absolute inset-0
           z-50
-          opacity-[0.024]
+          opacity-[0.018]
           [background-image:radial-gradient(rgba(255,255,255,0.8)_0.5px,transparent_0.5px)]
           [background-size:4px_4px]
         "
