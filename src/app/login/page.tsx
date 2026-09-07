@@ -252,18 +252,37 @@ export default function AuthPage() {
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-[#05070b] text-white">
-      <div className="absolute inset-0">
+
+      {/* Mobile Background */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden lg:hidden">
+        <img
+          src="/images/IMG_20260907_032431.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+
+        <div className="absolute inset-0 bg-[#05070b]/70" />
+
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05070b]/80 via-[#05070b]/45 to-[#05070b]/90" />
+
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(0,128,128,0.16),transparent_35%),radial-gradient(circle_at_50%_85%,rgba(255,215,0,0.05),transparent_28%)]" />
+      </div>
+
+      {/* Global subtle atmosphere */}
+      <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(0,128,128,0.13),transparent_30%),radial-gradient(circle_at_85%_80%,rgba(255,215,0,0.06),transparent_25%)]" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[2560px] flex-col lg:flex-row">
+
         {/* Desktop visual panel */}
         <section className="relative hidden min-h-screen overflow-hidden lg:flex lg:w-[52%] xl:w-[55%]">
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage:
-                "url('/images/IMG_20260907_032431.png')",
+                "url('/images/fenix-login-desktop.png')",
             }}
           />
 
@@ -272,6 +291,7 @@ export default function AuthPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#05070b]/90 via-[#05070b]/45 to-[#008080]/20" />
 
           <div className="relative z-10 flex w-full flex-col justify-between p-8 xl:p-12 2xl:p-16">
+
             <div className="flex items-center">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/10 backdrop-blur-xl">
                 <span className="text-lg font-black">
@@ -341,6 +361,7 @@ export default function AuthPage() {
         {/* Authentication panel */}
         <section className="flex min-h-screen w-full items-center justify-center px-4 py-8 sm:px-6 lg:w-[48%] lg:px-10 xl:w-[45%] xl:px-16 2xl:px-24">
           <div className="w-full max-w-[560px]">
+
             {/* Mobile logo */}
             <div className="mb-8 flex items-center justify-center lg:hidden">
               <div className="flex items-center">
@@ -363,6 +384,7 @@ export default function AuthPage() {
             </div>
 
             <div className="rounded-[28px] border border-white/[0.08] bg-white/[0.035] p-5 shadow-2xl backdrop-blur-2xl sm:p-8 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none xl:p-2">
+
               <div className="mb-8">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#008080]">
                   {mode === 'login'
@@ -385,6 +407,7 @@ export default function AuthPage() {
 
               {/* Social login */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+
                 <button
                   type="button"
                   disabled={loading || oauthLoading !== null}
@@ -466,6 +489,7 @@ export default function AuthPage() {
                 onSubmit={handleAuth}
                 className="space-y-4"
               >
+
                 {mode === 'signup' && (
                   <div>
                     <label
@@ -522,6 +546,7 @@ export default function AuthPage() {
 
                 <div>
                   <div className="mb-2 flex items-center justify-between">
+
                     <label
                       htmlFor="password"
                       className="block text-xs font-semibold text-white/55"
@@ -539,6 +564,7 @@ export default function AuthPage() {
                         পাসওয়ার্ড ভুলে গেছেন?
                       </button>
                     )}
+
                   </div>
 
                   <div className="relative">
@@ -661,6 +687,7 @@ export default function AuthPage() {
               <p className="mt-6 text-center text-[9px] uppercase tracking-[0.2em] text-white/15 lg:hidden">
                 FeniX — Feni Business Ecosystem
               </p>
+
             </div>
           </div>
         </section>
