@@ -19,7 +19,7 @@ body {
 
 /* =========================================================
    FENIX — LIVING FEATHER SPIRAL
-   No image required
+   Pure CSS — no image required
    ========================================================= */
 
 .fenix-feather-bg {
@@ -27,6 +27,8 @@ body {
   inset: -18%;
   overflow: hidden;
   pointer-events: none;
+  z-index: 0;
+
   background:
     radial-gradient(
       circle at 50% 48%,
@@ -36,6 +38,7 @@ body {
       #24282a 57%,
       #080909 100%
     );
+
   transform: translateZ(0) scale(1.04);
 }
 
@@ -44,6 +47,7 @@ body {
   position: absolute;
   inset: 0;
   z-index: 20;
+
   background:
     radial-gradient(
       circle at 50% 50%,
@@ -60,6 +64,7 @@ body {
   position: absolute;
   inset: 0;
   z-index: 21;
+
   background:
     radial-gradient(
       circle at 72% 35%,
@@ -71,17 +76,26 @@ body {
       rgba(150, 180, 190, 0.15),
       transparent 28%
     );
+
   mix-blend-mode: screen;
 }
+
+/* =========================================================
+   MAIN FEATHERS
+   ========================================================= */
 
 .fenix-feather {
   position: absolute;
   left: 50%;
   top: 50%;
+
   width: clamp(90px, 15vw, 260px);
   height: clamp(28px, 5vw, 82px);
+
   transform-origin: 0 50%;
+
   border-radius: 100% 8% 8% 100%;
+
   background:
     linear-gradient(
       90deg,
@@ -90,11 +104,14 @@ body {
       #d3ccc0 73%,
       #eee8dc 100%
     );
+
   box-shadow:
     inset 0 2px 4px rgba(255,255,255,.22),
     inset 0 -7px 11px rgba(0,0,0,.28),
     8px 12px 20px rgba(0,0,0,.42);
+
   opacity: .88;
+
   animation:
     fenixFeatherBreath
     8s
@@ -105,10 +122,13 @@ body {
 .fenix-feather::before {
   content: "";
   position: absolute;
+
   left: 8%;
   top: 48%;
+
   width: 88%;
   height: 2px;
+
   background:
     linear-gradient(
       90deg,
@@ -116,30 +136,45 @@ body {
       rgba(255,255,255,.58),
       transparent
     );
+
   transform: rotate(-7deg);
+
   opacity: .55;
 }
 
 .fenix-feather::after {
   content: "";
   position: absolute;
+
   right: 8%;
   top: 18%;
+
   width: 45%;
   height: 62%;
+
   border-radius: 100% 0 100% 0;
+
   border-top: 1px solid rgba(255,255,255,.3);
+
   transform: rotate(-18deg);
 }
+
+/* =========================================================
+   BLUE / SILVER FEATHERS
+   ========================================================= */
 
 .fenix-feather-blue {
   position: absolute;
   left: 50%;
   top: 50%;
+
   width: clamp(65px, 11vw, 190px);
   height: clamp(22px, 3.5vw, 58px);
+
   transform-origin: 0 50%;
+
   border-radius: 100% 8% 8% 100%;
+
   background:
     linear-gradient(
       90deg,
@@ -148,10 +183,13 @@ body {
       #aeb9bc 78%,
       #d9d5cc
     );
+
   box-shadow:
     inset 0 1px 3px rgba(255,255,255,.2),
     7px 9px 17px rgba(0,0,0,.4);
+
   opacity: .68;
+
   animation:
     fenixFeatherBlue
     9s
@@ -159,14 +197,22 @@ body {
     infinite;
 }
 
+/* =========================================================
+   GOLD ACCENT
+   ========================================================= */
+
 .fenix-feather-gold {
   position: absolute;
   left: 50%;
   top: 50%;
+
   width: clamp(55px, 9vw, 150px);
   height: clamp(20px, 3vw, 50px);
+
   transform-origin: 0 50%;
+
   border-radius: 100% 8% 8% 100%;
+
   background:
     linear-gradient(
       90deg,
@@ -175,10 +221,13 @@ body {
       #e3ad64 72%,
       #f4d28c
     );
+
   box-shadow:
     inset 0 1px 3px rgba(255,255,255,.24),
     5px 8px 15px rgba(0,0,0,.42);
+
   opacity: .7;
+
   animation:
     fenixFeatherGold
     7s
@@ -186,14 +235,23 @@ body {
     infinite;
 }
 
+/* =========================================================
+   CENTER
+   ========================================================= */
+
 .fenix-feather-core {
   position: absolute;
+
   left: 50%;
   top: 50%;
+
   width: clamp(90px, 16vw, 250px);
   height: clamp(90px, 16vw, 250px);
+
   transform: translate(-50%, -50%);
+
   border-radius: 50%;
+
   background:
     radial-gradient(
       circle,
@@ -202,21 +260,29 @@ body {
       #817c71 45%,
       transparent 71%
     );
+
   box-shadow:
     0 0 90px rgba(0,0,0,.8),
     inset 0 0 45px rgba(255,255,255,.08);
+
   z-index: 12;
 }
 
 .fenix-feather-core::after {
   content: "";
+
   position: absolute;
+
   left: 50%;
   top: 50%;
+
   width: 34%;
   height: 34%;
+
   transform: translate(-50%, -50%);
+
   border-radius: 50%;
+
   background:
     radial-gradient(
       circle,
@@ -224,13 +290,22 @@ body {
       #151819 55%,
       transparent 75%
     );
-  box-shadow: 0 0 35px rgba(0,0,0,.95);
+
+  box-shadow:
+    0 0 35px rgba(0,0,0,.95);
 }
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
 
 @keyframes fenixFeatherBreath {
   0%,
   100% {
-    filter: brightness(.82) saturate(.78);
+    filter:
+      brightness(.82)
+      saturate(.78);
+
     transform:
       rotate(calc(var(--i) * 8.57deg))
       translateX(calc(78px + var(--i) * 3.25px))
@@ -239,7 +314,10 @@ body {
   }
 
   50% {
-    filter: brightness(1) saturate(.96);
+    filter:
+      brightness(1)
+      saturate(.96);
+
     transform:
       rotate(calc(var(--i) * 8.57deg))
       translateX(calc(83px + var(--i) * 3.25px))
@@ -252,6 +330,7 @@ body {
   0%,
   100% {
     filter: brightness(.75);
+
     transform:
       rotate(calc(var(--i) * 12.85deg))
       translateX(calc(48px + var(--i) * 4px))
@@ -261,6 +340,7 @@ body {
 
   50% {
     filter: brightness(1);
+
     transform:
       rotate(calc(var(--i) * 12.85deg))
       translateX(calc(53px + var(--i) * 4px))
@@ -273,6 +353,7 @@ body {
   0%,
   100% {
     filter: brightness(.72);
+
     transform:
       rotate(calc(var(--i) * 18deg))
       translateX(calc(35px + var(--i) * 3.5px))
@@ -282,6 +363,7 @@ body {
 
   50% {
     filter: brightness(1.08);
+
     transform:
       rotate(calc(var(--i) * 18deg))
       translateX(calc(39px + var(--i) * 3.5px))
@@ -306,6 +388,10 @@ body {
   }
 }
 
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
 @media (max-width: 600px) {
   .fenix-feather-bg {
     inset: -28%;
@@ -327,10 +413,14 @@ body {
   }
 }
 
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
 @media (prefers-reduced-motion: reduce) {
   .fenix-feather,
   .fenix-feather-blue,
   .fenix-feather-gold {
     animation: none;
   }
-}
+  }
