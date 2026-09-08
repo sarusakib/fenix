@@ -244,3 +244,42 @@ html.dark {
     display: none;
   }
 }
+/* FeniX orientation backgrounds */
+
+.fenix-portrait-background,
+.fenix-landscape-background {
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.fenix-landscape-background {
+  display: none;
+}
+
+.fenix-portrait-background {
+  display: block;
+}
+
+@media (orientation: landscape) {
+  .fenix-portrait-background {
+    display: none;
+  }
+
+  .fenix-landscape-background {
+    display: block;
+  }
+}
+
+@media (orientation: portrait) {
+  .fenix-portrait-background {
+    display: block;
+  }
+
+  .fenix-landscape-background {
+    display: none;
+  }
+}
