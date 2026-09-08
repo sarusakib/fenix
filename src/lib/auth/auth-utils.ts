@@ -11,14 +11,14 @@ type ValidateAuthInput = {
   mode: AuthMode
   email: string
   password: string
-  name?: string
+  fullName?: string
 }
 
 export function validateAuthInput({
   mode,
   email,
   password,
-  name,
+  fullName,
 }: ValidateAuthInput): string | null {
   if (!email.trim()) {
     return 'Email is required.'
@@ -29,7 +29,7 @@ export function validateAuthInput({
   }
 
   if (mode === 'signup') {
-    if (!name?.trim()) {
+    if (!fullName?.trim()) {
       return 'Name is required.'
     }
 
@@ -77,14 +77,14 @@ export async function signUpWithEmail(
   supabase: FenixSupabaseClient,
   email: string,
   password: string,
-  name: string,
+  fullName: string,
 ) {
   return supabase.auth.signUp({
     email: email.trim(),
     password,
     options: {
       data: {
-        full_name: name.trim(),
+        full_name: fullName.trim(),
         role: 'user',
       },
     },
