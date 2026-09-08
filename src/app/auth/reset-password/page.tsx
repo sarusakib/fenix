@@ -2,10 +2,11 @@
 
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/utils/supabase/client'
+import { createClient } from '@/utils/supabase/client'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
+  const supabase = createClient()
 
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
