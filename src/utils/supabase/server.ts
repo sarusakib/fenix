@@ -18,7 +18,16 @@ export async function createClient() {
           cookiesToSet: Array<{
             name: string
             value: string
-            options?: Record<string, unknown>
+            options?: {
+              domain?: string
+              encode?: (value: string) => string
+              expires?: Date
+              httpOnly?: boolean
+              maxAge?: number
+              path?: string
+              sameSite?: 'lax' | 'strict' | 'none'
+              secure?: boolean
+            }
           }>,
         ) {
           try {
@@ -28,7 +37,13 @@ export async function createClient() {
               },
             )
           } catch {
-            // Server Component context may not allow cookie writes.
+            /*
+             * Server Components may not always allow
+             * cookie mutation.
+             *
+             * Middleware is responsible for refreshing
+             * the authentication session.
+             */
           }
         },
       },
