@@ -1,106 +1,144 @@
 'use client'
 
-export default function SiteBackground() {
+import Link from 'next/link'
+import { Moon, Sun } from '@phosphor-icons/react'
+
+import { useAuthStore } from '../store/useAuthStore'
+import { useHomeTheme } from './theme/HomeThemeProvider'
+
+export default function Navbar() {
+  const { user, role, logout } = useAuthStore()
+  const { resolvedTheme, setTheme } = useHomeTheme()
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+  }
+
   return (
-    <div
-      aria-hidden="true"
-      className="
-        pointer-events-none
-        fixed
-        inset-0
-        -z-50
-        overflow-hidden
-        bg-[#030506]
-      "
-    >
-      {/* =====================================================
-          PORTRAIT BACKGROUND
-          -----------------------------------------------------
-          Used when viewport is portrait.
+    <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/30 text-white backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between gap-4">
 
-          Image:
-          /public/images/IMG_20260907_032431.png
-          ===================================================== */}
-      <div
-        className="
-          fenix-portrait-background
-          absolute
-          inset-0
-          items-center
-          justify-center
-          bg-[#030506]
-        "
-        style={{
-          backgroundImage:
-            "url('/images/IMG_20260907_032431.png')",
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'contain',
-        }}
-      />
+          {/* Logo */}
+          <Link href="/" className="flex min-w-0 items-center gap-2">
+            <span className="text-2xl font-extrabold tracking-wider text-[#FFD700]">
+              FeniX
+            </span>
 
-      {/* =====================================================
-          LANDSCAPE BACKGROUND
-          -----------------------------------------------------
-          Used when viewport is landscape.
+            <span className="hidden rounded-full bg-[#008080] px-2 py-0.5 text-xs font-medium text-white sm:inline-flex">
+              Ecosystem
+            </span>
+          </Link>
 
-          Image:
-          /public/images/fenix-login-desktop.png
-          ===================================================== */}
-      <div
-        className="
-          fenix-landscape-background
-          absolute
-          inset-0
-          items-center
-          justify-center
-          bg-[#030506]
-        "
-        style={{
-          backgroundImage:
-            "url('/images/fenix-login-desktop.png')",
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'contain',
-        }}
-      />
+          {/* Navigation */}
+          <div className="hidden items-center gap-6 text-sm font-medium md:flex">
+            <Link
+              href="/"
+              className="transition-colors hover:text-[#FFD700]"
+            >
+              হোম
+            </Link>
 
-      {/* =====================================================
-          LIGHT / DARK CINEMATIC OVERLAY
-          ===================================================== */}
-      <div
-        className="
-          absolute
-          inset-0
-          bg-white/10
-          dark:bg-black/45
-        "
-      />
+            <Link
+              href="/directory"
+              className="transition-colors hover:text-[#FFD700]"
+            >
+              বিজনেস ডিরেক্টরি
+            </Link>
 
-      {/* =====================================================
-          PREMIUM VIGNETTE
-          ===================================================== */}
-      <div
-        className="
-          absolute
-          inset-0
-          bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.18)_100%)]
-          dark:bg-[radial-gradient(circle_at_center,transparent_15%,rgba(0,0,0,0.55)_100%)]
-        "
-      />
+            <Link
+              href="/invest"
+              className="transition-colors hover:text-[#FFD700]"
+            >
+              ইনভেস্টমেন্ট
+            </Link>
+          </div>
 
-      {/* =====================================================
-          SUBTLE TEAL CINEMATIC GLOW
-          ===================================================== */}
-      <div
-        className="
-          absolute
-          inset-0
-          opacity-20
-          dark:opacity-15
-          bg-[radial-gradient(circle_at_50%_20%,rgba(0,128,128,0.16),transparent_45%)]
-        "
-      />
-    </div>
+          {/* Right controls */}
+          <div className="flex items-center gap-2 sm:gap-3">
+
+            {/* Theme Switch */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={
+                resolvedTheme === 'dark'
+                  ? 'Switch to light mode'
+                  : 'Switch to dark mode'
+              }
+              title={
+                resolvedTheme === 'dark'
+                  ? 'Light mode'
+                  : 'Dark mode'
+              }
+              className="
+                inline-flex
+                h-10
+                w-10
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/10
+                bg-white/[0.06]
+                text-white/80
+                backdrop-blur-md
+                transition
+                hover:border-white/20
+                hover:bg-white/10
+                hover:text-white
+                active:scale-95
+              "
+            >
+              {resolvedTheme === 'dark' ? (
+                <Sun size={19} weight="duotone" />
+              ) : (
+                <Moon size={19} weight="duotone" />
+              )}
+            </button>
+
+            {/* Auth */}
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="hidden rounded border border-[#FFD700]/30 bg-amber-500/20 px-2 py-1 text-xs capitalize text-[#FFD700] sm:inline-flex">
+                  {role}
+                </span>
+
+                <span className="hidden max-w-[180px] truncate text-sm font-medium lg:inline">
+                  {user.email}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="rounded bg-red-600/80 px-3 py-1.5 text-xs text-white transition-colors hover:bg-red-600"
+                >
+                  লগআউট
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="
+                  rounded-lg
+                  bg-[#008080]
+                  px-4
+                  py-2
+                  text-sm
+                  font-medium
+                  text-white
+                  shadow-sm
+                  transition
+                  hover:bg-[#006666]
+                "
+              >
+                লগইন করুন
+              </Link>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </nav>
   )
 }
