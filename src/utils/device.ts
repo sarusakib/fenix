@@ -1,111 +1,84 @@
-export type DeviceType = 'mobile' | 'tablet' | 'desktop'
+'use client'
 
-export type ScreenOrientation = 'portrait' | 'landscape'
+import { useEffect, useState } from 'react'
+import {
+  DeviceInfo,
+  getDeviceInfo,
+} from './device'
 
-export interface DeviceInfo {
-  device: DeviceType
-  orientation: ScreenOrientation
+const DEFAULT_DEVICE_INFO: DeviceInfo = {
+  device: 'desktop',
+  orientation: 'landscape',
 
-  isMobile: boolean
-  isTablet: boolean
-  isDesktop: boolean
+  isMobile: false,
+  isTablet: false,
+  isDesktop: true,
 
-  isTouch: boolean
-  isLikelyMobile: boolean
+  isTouch: false,
+  isLikelyMobile: false,
 
-  width: number
-  height: number
+  width: 0,
+  height: 0,
 
-  pixelRatio: number
+  pixelRatio: 1,
 }
 
-export function getDeviceInfo(): DeviceInfo {
-  if (typeof window === 'undefined') {
-    return {
-      device: 'desktop',
-      orientation: 'landscape',
-      isMobile: false,
-      isTablet: false,
-      isDesktop: true,
-      isTouch: false,
-      isLikelyMobile: false,
-      width: 0,
-      height: 0,
-      pixelRatio: 1,
+export function useDeviceInfo(): DeviceInfo {
+  const [deviceInfo, setDeviceInfo] =
+    useState<DeviceInfo>(DEFAULT_DEVICE_INFO)
+
+  useEffect(() => {
+    let animationFrame = 0
+
+    const updateDeviceInfo = () => {
+      cancelAnimationFrame(animationFrame)
+
+      animationFrame = requestAnimationFrame(() => {
+        setDeviceInfo(getDeviceInfo())
+      })
     }
-  }
 
-  const width = window.innerWidth
-  const height = window.innerHeight
+    updateDeviceInfo()
 
-  const orientation: ScreenOrientation =
-    height >= width ? 'portrait' : 'landscape'
+    const orientationQuery =
+      window.matchMedia('(orientation: portrait)')
 
-  const touch =
-    'ontouchstart' in window ||
-    navigator.maxTouchPoints > 0
-
-  /*
-   * Normal responsive viewport classification.
-   */
-  let device: DeviceType
-
-  if (width < 768) {
-    device = 'mobile'
-  } else if (width < 1024) {
-    device = 'tablet'
-  } else {
-    device = 'desktop'
-  }
-
-  /*
-   * Extra heuristic for phones using "Desktop site".
-   *
-   * Desktop-site mode can make a phone report a wider
-   * CSS viewport than its normal mobile viewport.
-   *
-   * We therefore keep touch/mobile signals as an
-   * additional hint instead of relying only on width.
-   */
-  const ua = navigator.userAgent || navigator.vendor || ''
-
-  const mobileUserAgent =
-    /Android.*Mobile|iPhone|iPod|Windows Phone|Opera Mini|IEMobile/i.test(
-      ua
+    window.addEventListener(
+      'resize',
+      updateDeviceInfo,
+      { passive: true }
     )
 
-  const likelyMobile =
-    mobileUserAgent &&
-    touch
+    window.addEventListener(
+      'orientationchange',
+      updateDeviceInfo,
+      { passive: true }
+    )
 
-  /*
-   * iPadOS can sometimes identify itself like macOS.
-   * Touch + Mac platform is therefore treated as tablet-like.
-   */
-  const ipadLike =
-    touch &&
-    /Macintosh/i.test(navigator.platform || '')
+    orientationQuery.addEventListener(
+      'change',
+      updateDeviceInfo
+    )
 
-  if (likelyMobile) {
-    device = 'mobile'
-  } else if (ipadLike) {
-    device = 'tablet'
-  }
+    return () => {
+      cancelAnimationFrame(animationFrame)
 
-  return {
-    device,
-    orientation,
+      window.removeEventListener(
+        'resize',
+        updateDeviceInfo
+      )
 
-    isMobile: device === 'mobile',
-    isTablet: device === 'tablet',
-    isDesktop: device === 'desktop',
+      window.removeEventListener(
+        'orientationchange',
+        updateDeviceInfo
+      )
 
-    isTouch: touch,
-    isLikelyMobile: likelyMobile,
+      orientationQuery.removeEventListener(
+        'change',
+        updateDeviceInfo
+      )
+    }
+  }, [])
 
-    width,
-    height,
-
-    pixelRatio: window.devicePixelRatio || 1,
-  }
+  return deviceInfo
 }
