@@ -8,6 +8,11 @@ import type {
 
 type FenixSupabaseClient = SupabaseClient<Database>
 
+/**
+ * Get publicly visible businesses.
+ *
+ * RLS currently allows public SELECT.
+ */
 export async function getPublicBusinesses(
   supabase: FenixSupabaseClient,
 ): Promise<{
@@ -17,7 +22,9 @@ export async function getPublicBusinesses(
   const { data, error } = await supabase
     .from('businesses')
     .select('*')
-    .order('updated_at', { ascending: false })
+    .order('updated_at', {
+      ascending: false,
+    })
 
   if (error) {
     return {
@@ -32,6 +39,9 @@ export async function getPublicBusinesses(
   }
 }
 
+/**
+ * Get a single public business by ID.
+ */
 export async function getBusinessById(
   supabase: FenixSupabaseClient,
   businessId: string,
@@ -67,6 +77,12 @@ export async function getBusinessById(
   }
 }
 
+/**
+ * Create a business.
+ *
+ * Database RLS enforces:
+ * auth.uid() = owner_id
+ */
 export async function createBusiness(
   supabase: FenixSupabaseClient,
   input: BusinessInsert,
@@ -107,6 +123,11 @@ export async function createBusiness(
   }
 }
 
+/**
+ * Update an existing business.
+ *
+ * Database RLS ensures only the owner can update it.
+ */
 export async function updateBusiness(
   supabase: FenixSupabaseClient,
   businessId: string,
@@ -134,7 +155,9 @@ export async function updateBusiness(
     if (!trimmedName) {
       return {
         data: null,
-        error: new Error('Business name cannot be empty.'),
+        error: new Error(
+          'Business name cannot be empty.',
+        ),
       }
     }
 
@@ -161,6 +184,11 @@ export async function updateBusiness(
   }
 }
 
+/**
+ * Delete a business.
+ *
+ * Database RLS ensures only the owner can delete it.
+ */
 export async function deleteBusiness(
   supabase: FenixSupabaseClient,
   businessId: string,
