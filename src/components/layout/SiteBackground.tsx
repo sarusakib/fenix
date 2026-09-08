@@ -1,5 +1,3 @@
-'use client'
-
 export default function SiteBackground() {
   return (
     <div
@@ -15,11 +13,6 @@ export default function SiteBackground() {
     >
       {/* =====================================================
           PORTRAIT BACKGROUND
-          -----------------------------------------------------
-          Used when viewport is portrait.
-
-          Image:
-          /public/images/IMG_20260907_032431.png
           ===================================================== */}
       <div
         className="
@@ -31,8 +24,7 @@ export default function SiteBackground() {
           bg-[#030506]
         "
         style={{
-          backgroundImage:
-            "url('/images/IMG_20260907_032431.png')",
+          backgroundImage: "url('/images/IMG_20260907_032431.png')",
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'contain',
@@ -41,11 +33,6 @@ export default function SiteBackground() {
 
       {/* =====================================================
           LANDSCAPE BACKGROUND
-          -----------------------------------------------------
-          Used when viewport is landscape.
-
-          Image:
-          /public/images/fenix-login-desktop.png
           ===================================================== */}
       <div
         className="
@@ -57,8 +44,7 @@ export default function SiteBackground() {
           bg-[#030506]
         "
         style={{
-          backgroundImage:
-            "url('/images/fenix-login-desktop.png')",
+          backgroundImage: "url('/images/fenix-login-desktop.png')",
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'contain',
@@ -96,9 +82,9 @@ export default function SiteBackground() {
         className="
           absolute
           inset-0
+          bg-[radial-gradient(circle_at_50%_20%,rgba(0,128,128,0.16),transparent_45%)]
           opacity-20
           dark:opacity-15
-          bg-[radial-gradient(circle_at_50%_20%,rgba(0,128,128,0.16),transparent_45%)]
         "
       />
     </div>
