@@ -2,126 +2,154 @@
 
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { LockKey, ArrowLeft, CheckCircle } from '@phosphor-icons/react'
-
-import { createClient } from '../../../utils/supabase/client'
-import SiteBackground from '../../../components/layout/SiteBackground'
+import { supabase } from '@/utils/supabase/client'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (password.length < 8) {
-      setStatus('Password কমপক্ষে ৮ characters হতে হবে।')
+    setError('')
+    setMessage('')
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.')
       return
     }
 
     if (password !== confirmPassword) {
-      setStatus('Password দুটো একই নয়।')
+      setError('Passwords do not match.')
       return
     }
 
     setLoading(true)
-    setStatus('')
 
-    try {
-      const { error } = await supabase.auth.updateUser({
+    const { error: updateError } =
+      await supabase.auth.updateUser({
         password,
       })
 
-      if (error) {
-        setStatus('Password update করা যায়নি। Reset link নতুন করে নিন।')
-        return
-      }
-
-      setStatus('Password successfully updated.')
-
-      setTimeout(() => {
-        router.replace('/login')
-      }, 800)
-    } catch {
-      setStatus('Password update করা যায়নি।')
-    } finally {
+    if (updateError) {
+      setError(
+        updateError.message ||
+          'Unable to update your password. Please try again.'
+      )
       setLoading(false)
+      return
     }
+
+    setMessage(
+      'Password updated successfully. Redirecting to login...'
+    )
+
+    setTimeout(() => {
+      router.replace('/login')
+    }, 1200)
   }
 
   return (
-    <main className="relative min-h-dvh overflow-hidden bg-[#030506] text-white">
-      <SiteBackground />
-
-      <div className="relative z-10 flex min-h-dvh items-center justify-center px-4 py-10">
-        <div className="w-full max-w-md rounded-3xl border border-white/[0.08] bg-black/40 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
-          <Link
-            href="/login"
-            className="inline-flex min-h-10 items-center gap-2 text-sm text-white/45 transition hover:text-white"
-          >
-            <ArrowLeft size={17} />
-            Back to login
-          </Link>
-
-          <div className="mt-8 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#008080]/25 bg-[#008080]/10 text-[#72ddda]">
-            <LockKey size={23} weight="duotone" />
-          </div>
-
-          <h1 className="mt-5 text-3xl font-black">
-            Set new password
-          </h1>
-
-          <p className="mt-2 text-sm leading-6 text-white/45">
-            Choose a strong password for your FeniX account.
+    <main className="flex min-h-screen items-center justify-center bg-[#030506] px-4 py-8 text-white">
+      <section className="w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+        <div className="mb-8">
+          <p className="mb-2 text-sm font-medium uppercase tracking-[0.25em] text-teal-400">
+            FeniX
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-7 space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="New password"
-              autoComplete="new-password"
-              className="min-h-12 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm text-white outline-none placeholder:text-white/25 focus:border-[#008080]/50"
-            />
+          <h1 className="text-3xl font-semibold">
+            Reset password
+          </h1>
+
+          <p className="mt-2 text-sm text-white/60">
+            Create a new password for your account.
+          </p>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-5"
+        >
+          <div>
+            <label
+              htmlFor="password"
+              className="mb-2 block text-sm font-medium text-white/80"
+            >
+              New password
+            </label>
 
             <input
+              id="password"
               type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(event) =>
+                setPassword(event.target.value)
+              }
+              required
+              minLength={6}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+              placeholder="Enter new password"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirm-password"
+              className="mb-2 block text-sm font-medium text-white/80"
+            >
+              Confirm password
+            </label>
+
+            <input
+              id="confirm-password"
+              type="password"
+              autoComplete="new-password"
               value={confirmPassword}
               onChange={(event) =>
                 setConfirmPassword(event.target.value)
               }
+              required
+              minLength={6}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
               placeholder="Confirm new password"
-              autoComplete="new-password"
-              className="min-h-12 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm text-white outline-none placeholder:text-white/25 focus:border-[#008080]/50"
             />
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="min-h-12 w-full rounded-xl bg-[#008080] text-sm font-bold text-white transition hover:bg-[#079494] disabled:cursor-not-allowed disabled:opacity-50"
+          {error && (
+            <div
+              role="alert"
+              className="rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200"
             >
-              {loading ? 'Updating…' : 'Update password'}
-            </button>
-          </form>
-
-          {status && (
-            <div className="mt-5 flex gap-2 rounded-xl border border-white/[0.07] bg-white/[0.025] p-3 text-sm text-white/55">
-              <CheckCircle
-                size={17}
-                className="mt-0.5 shrink-0 text-[#72ddda]"
-              />
-              {status}
+              {error}
             </div>
           )}
-        </div>
-      </div>
+
+          {message && (
+            <div
+              role="status"
+              className="rounded-2xl border border-teal-400/20 bg-teal-400/10 px-4 py-3 text-sm text-teal-200"
+            >
+              {message}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-2xl bg-white px-5 py-3.5 font-semibold text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading
+              ? 'Updating password...'
+              : 'Update password'}
+          </button>
+        </form>
+      </section>
     </main>
   )
 }
