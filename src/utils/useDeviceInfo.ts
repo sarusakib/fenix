@@ -6,49 +6,61 @@ import {
   getDeviceInfo,
 } from './device'
 
+const DEFAULT_DEVICE_INFO: DeviceInfo = {
+  device: 'desktop',
+  orientation: 'landscape',
+
+  isMobile: false,
+  isTablet: false,
+  isDesktop: true,
+
+  isTouch: false,
+  isLikelyMobile: false,
+
+  width: 0,
+  height: 0,
+
+  pixelRatio: 1,
+}
+
 export function useDeviceInfo(): DeviceInfo {
-  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>(() => ({
-    device: 'desktop',
-    orientation: 'landscape',
-    isMobile: false,
-    isTablet: false,
-    isDesktop: true,
-    isTouch: false,
-    width: 0,
-    height: 0,
-  }))
+  const [deviceInfo, setDeviceInfo] =
+    useState<DeviceInfo>(DEFAULT_DEVICE_INFO)
 
   useEffect(() => {
-    const updateDeviceInfo = () => {
-      setDeviceInfo(getDeviceInfo())
+    let frame = 0
+
+    const update = () => {
+      cancelAnimationFrame(frame)
+
+      frame = requestAnimationFrame(() => {
+        setDeviceInfo(getDeviceInfo())
+      })
     }
 
-    updateDeviceInfo()
+    update()
 
     const orientationQuery = window.matchMedia(
       '(orientation: portrait)'
     )
 
-    const handleChange = () => {
-      updateDeviceInfo()
-    }
+    window.addEventListener('resize', update)
+    window.addEventListener('orientationchange', update)
 
-    window.addEventListener('resize', handleChange)
-
-    orientationQuery.addEventListener(
-      'change',
-      handleChange
-    )
+    orientationQuery.addEventListener('change', update)
 
     return () => {
+      cancelAnimationFrame(frame)
+
+      window.removeEventListener('resize', update)
       window.removeEventListener(
-        'resize',
-        handleChange
+        'orientationchange',
+        update
       )
 
       orientationQuery.removeEventListener(
         'change',
-        handleChange
+        update
       )
     }
   }, [])
