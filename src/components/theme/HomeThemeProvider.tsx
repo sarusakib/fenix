@@ -9,37 +9,40 @@ import {
   useState,
 } from 'react'
 
-export type HomeTheme = 'light' | 'dark' | 'system'
+export type HomeTheme =
+  | 'light'
+  | 'dark'
+  | 'system'
+
+type ResolvedTheme = 'light' | 'dark'
 
 type ThemeContextValue = {
   theme: HomeTheme
-  resolvedTheme: 'light' | 'dark'
+  resolvedTheme: ResolvedTheme
   setTheme: (theme: HomeTheme) => void
 }
 
 const STORAGE_KEY = 'fenix-home-theme'
 
-const ThemeContext = createContext<ThemeContextValue | null>(null)
+const ThemeContext =
+  createContext<ThemeContextValue | null>(null)
 
-function getSystemTheme(): 'light' | 'dark' {
+function getSystemTheme(): ResolvedTheme {
   if (typeof window === 'undefined') {
     return 'dark'
   }
 
   return window.matchMedia(
-    '(prefers-color-scheme: dark)'
+    '(prefers-color-scheme: dark)',
   ).matches
     ? 'dark'
     : 'light'
 }
 
-function getInitialTheme(): HomeTheme {
-  if (typeof window === 'undefined') {
-    return 'system'
-  }
-
+function getSavedTheme(): HomeTheme {
   try {
-    const saved = window.localStorage.getItem(STORAGE_KEY)
+    const saved =
+      window.localStorage.getItem(STORAGE_KEY)
 
     if (
       saved === 'light' ||
@@ -60,74 +63,95 @@ export default function HomeThemeProvider({
 }: {
   children: React.ReactNode
 }) {
+  /*
+   * Keep the first render deterministic.
+   * The saved preference is restored after mount.
+   */
   const [theme, setThemeState] =
-    useState<HomeTheme>(getInitialTheme)
+    useState<HomeTheme>('system')
 
   const [systemTheme, setSystemTheme] =
-    useState<'light' | 'dark'>(getSystemTheme)
+    useState<ResolvedTheme>('dark')
 
   const resolvedTheme =
-    theme === 'system' ? systemTheme : theme
+    theme === 'system'
+      ? systemTheme
+      : theme
 
-  const setTheme = useCallback((nextTheme: HomeTheme) => {
-    setThemeState(nextTheme)
+  const setTheme = useCallback(
+    (nextTheme: HomeTheme) => {
+      setThemeState(nextTheme)
 
-    try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        nextTheme
-      )
-    } catch {
-      // Ignore storage errors.
-    }
+      try {
+        window.localStorage.setItem(
+          STORAGE_KEY,
+          nextTheme,
+        )
+      } catch {
+        // Ignore storage errors.
+      }
+    },
+    [],
+  )
+
+  useEffect(() => {
+    const savedTheme = getSavedTheme()
+
+    setThemeState(savedTheme)
+    setSystemTheme(getSystemTheme())
   }, [])
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(
-      '(prefers-color-scheme: dark)'
+      '(prefers-color-scheme: dark)',
     )
 
-    const updateSystemTheme = () => {
+    const handleChange = () => {
       setSystemTheme(
-        mediaQuery.matches ? 'dark' : 'light'
+        mediaQuery.matches
+          ? 'dark'
+          : 'light',
       )
     }
 
-    updateSystemTheme()
+    handleChange()
 
     mediaQuery.addEventListener(
       'change',
-      updateSystemTheme
+      handleChange,
     )
 
     return () => {
       mediaQuery.removeEventListener(
         'change',
-        updateSystemTheme
+        handleChange,
       )
     }
   }, [])
 
   useEffect(() => {
-    const root = document.documentElement
+    const root =
+      document.documentElement
 
     root.classList.toggle(
       'dark',
-      resolvedTheme === 'dark'
+      resolvedTheme === 'dark',
     )
 
-    root.dataset.homeTheme = resolvedTheme
+    root.dataset.homeTheme =
+      resolvedTheme
 
-    root.style.colorScheme = resolvedTheme
+    root.style.colorScheme =
+      resolvedTheme
   }, [resolvedTheme])
 
-  const value = useMemo<ThemeContextValue>(
+  const value = useMemo(
     () => ({
       theme,
       resolvedTheme,
       setTheme,
     }),
-    [theme, resolvedTheme, setTheme]
+    [theme, resolvedTheme, setTheme],
   )
 
   return (
@@ -138,11 +162,12 @@ export default function HomeThemeProvider({
 }
 
 export function useHomeTheme() {
-  const context = useContext(ThemeContext)
+  const context =
+    useContext(ThemeContext)
 
   if (!context) {
     throw new Error(
-      'useHomeTheme must be used inside HomeThemeProvider'
+      'useHomeTheme must be used inside HomeThemeProvider',
     )
   }
 
