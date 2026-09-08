@@ -14,7 +14,7 @@ export default function SiteBackground() {
         dark:bg-[#030506]
       "
     >
-      {/* Portrait */}
+      {/* Portrait Background */}
       <div
         className="
           fenix-portrait-background
@@ -34,7 +34,7 @@ export default function SiteBackground() {
         }}
       />
 
-      {/* Landscape */}
+      {/* Landscape Background */}
       <div
         className="
           fenix-landscape-background
@@ -54,7 +54,7 @@ export default function SiteBackground() {
         }}
       />
 
-      {/* Very Light Overlay */}
+      {/* Minimal Light/Dark Overlay */}
       <div
         className="
           absolute
@@ -69,17 +69,17 @@ export default function SiteBackground() {
         className="
           absolute
           inset-0
-          bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.055)_100%)]
-          dark:bg-[radial-gradient(circle_at_center,transparent_25%,rgba(0,0,0,0.35)_100%)]
+          bg-[radial-gradient(circle_at_center,transparent_38%,rgba(0,0,0,0.045)_100%)]
+          dark:bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.30)_100%)]
         "
       />
 
-      {/* Subtle Teal Atmosphere */}
+      {/* Subtle FeniX Teal Atmosphere */}
       <div
         className="
           absolute
           inset-0
-          bg-[radial-gradient(circle_at_50%_15%,rgba(0,128,128,0.055),transparent_42%)]
+          bg-[radial-gradient(circle_at_50%_15%,rgba(0,128,128,0.045),transparent_42%)]
         "
       />
     </div>
