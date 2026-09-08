@@ -19,7 +19,7 @@ import {
   Users,
 } from '@phosphor-icons/react'
 
-import Navbar from '../components/Navbar'
+import Navbar from './components/Navbar'
 
 type Accent = 'teal' | 'gold'
 
@@ -83,10 +83,10 @@ function AccentIcon({
   return (
     <div
       className={[
-        'flex h-11 w-11 items-center justify-center rounded-2xl border',
+        'flex h-11 w-11 items-center justify-center rounded-2xl border backdrop-blur-sm',
         accent === 'teal'
-          ? 'border-[#008080]/15 bg-[#008080]/[0.06] text-[#007878] dark:border-[#008080]/25 dark:bg-[#008080]/10 dark:text-[#72ddda]'
-          : 'border-[#d4b879]/20 bg-[#d4b879]/[0.07] text-[#9a751f] dark:border-[#d4b879]/30 dark:bg-[#d4b879]/10 dark:text-[#d4b879]',
+          ? 'border-[#008080]/15 bg-[#008080]/[0.045] text-[#007878] dark:border-[#72ddda]/20 dark:bg-[#008080]/[0.08] dark:text-[#72ddda]'
+          : 'border-[#d4b879]/18 bg-[#d4b879]/[0.05] text-[#9a751f] dark:border-[#d4b879]/22 dark:bg-[#d4b879]/[0.08] dark:text-[#d4b879]',
       ].join(' ')}
     >
       {children}
@@ -129,7 +129,10 @@ export default function Home() {
       <div className="relative z-10">
         <Navbar />
 
-        {/* Hero */}
+        {/* =====================================================
+            HERO
+            ===================================================== */}
+
         <section className="mx-auto max-w-7xl px-4 pb-20 pt-14 sm:px-6 sm:pb-28 sm:pt-20 lg:px-8 lg:pt-24">
           <div className="mx-auto max-w-5xl text-center">
 
@@ -142,8 +145,8 @@ export default function Home() {
                 gap-2
                 rounded-full
                 border
-                border-black/[0.045]
-                bg-white/[0.18]
+                border-black/[0.035]
+                bg-white/[0.075]
                 px-3
                 py-1.5
                 text-[10px]
@@ -151,10 +154,10 @@ export default function Home() {
                 uppercase
                 tracking-[0.18em]
                 text-black/50
-                shadow-[0_4px_18px_rgba(0,0,0,0.025)]
-                backdrop-blur-md
-                dark:border-white/10
-                dark:bg-white/[0.04]
+                shadow-[0_4px_18px_rgba(0,0,0,0.018)]
+                backdrop-blur-sm
+                dark:border-white/[0.08]
+                dark:bg-white/[0.035]
                 dark:text-white/55
                 dark:shadow-none
                 sm:text-xs
@@ -210,20 +213,23 @@ export default function Home() {
               investors, businesses, suppliers and local growth.
             </p>
 
-            {/* Search */}
+            {/* =================================================
+                SEARCH
+                ================================================= */}
+
             <div className="mx-auto mt-8 max-w-3xl">
               <div
                 className="
                   rounded-2xl
                   border
-                  border-black/[0.055]
-                  bg-white/[0.26]
+                  border-black/[0.045]
+                  bg-white/[0.13]
                   p-2
-                  shadow-[0_12px_40px_rgba(0,0,0,0.055)]
-                  backdrop-blur-xl
-                  dark:border-white/10
-                  dark:bg-black/35
-                  dark:shadow-black/30
+                  shadow-[0_10px_32px_rgba(0,0,0,0.035)]
+                  backdrop-blur-lg
+                  dark:border-white/[0.09]
+                  dark:bg-black/[0.24]
+                  dark:shadow-[0_12px_35px_rgba(0,0,0,0.18)]
                   sm:rounded-3xl
                 "
               >
@@ -237,13 +243,13 @@ export default function Home() {
                       gap-3
                       rounded-xl
                       border
-                      border-black/[0.045]
-                      bg-white/[0.12]
+                      border-black/[0.035]
+                      bg-white/[0.075]
                       px-4
-                      backdrop-blur-md
+                      backdrop-blur-sm
                       sm:min-h-[58px]
                       sm:rounded-2xl
-                      dark:border-white/[0.07]
+                      dark:border-white/[0.065]
                       dark:bg-white/[0.035]
                     "
                   >
@@ -309,7 +315,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Quick prompts */}
+              {/* Quick Prompts */}
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {quickPrompts.map((prompt) => (
                   <button
@@ -320,24 +326,24 @@ export default function Home() {
                       min-h-10
                       rounded-full
                       border
-                      border-black/[0.05]
-                      bg-white/[0.16]
+                      border-black/[0.04]
+                      bg-white/[0.07]
                       px-3.5
                       text-xs
                       text-black/55
-                      shadow-[0_3px_14px_rgba(0,0,0,0.02)]
-                      backdrop-blur-md
+                      shadow-[0_3px_12px_rgba(0,0,0,0.015)]
+                      backdrop-blur-sm
                       transition
                       duration-200
-                      hover:border-black/[0.09]
-                      hover:bg-white/[0.28]
+                      hover:border-black/[0.07]
+                      hover:bg-white/[0.13]
                       hover:text-black
-                      dark:border-white/[0.07]
+                      dark:border-white/[0.065]
                       dark:bg-white/[0.025]
                       dark:text-white/45
                       dark:shadow-none
-                      dark:hover:border-white/15
-                      dark:hover:bg-white/[0.05]
+                      dark:hover:border-white/[0.13]
+                      dark:hover:bg-white/[0.045]
                       dark:hover:text-white/75
                     "
                   >
@@ -348,7 +354,10 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Action Cards */}
+          {/* =================================================
+              ACTION CARDS
+              ================================================= */}
+
           <div className="mx-auto mt-16 grid max-w-6xl gap-4 sm:mt-20 sm:grid-cols-2 xl:grid-cols-4">
             {actionCards.map((card) => {
               const Icon = card.icon
@@ -361,22 +370,22 @@ export default function Home() {
                     group
                     rounded-3xl
                     border
-                    border-black/[0.055]
-                    bg-white/[0.18]
+                    border-black/[0.045]
+                    bg-white/[0.085]
                     p-5
-                    shadow-[0_8px_28px_rgba(0,0,0,0.035)]
-                    backdrop-blur-lg
+                    shadow-[0_8px_26px_rgba(0,0,0,0.025)]
+                    backdrop-blur-md
                     transition
                     duration-300
                     hover:-translate-y-1
-                    hover:border-black/[0.09]
-                    hover:bg-white/[0.27]
-                    hover:shadow-[0_14px_36px_rgba(0,0,0,0.055)]
-                    dark:border-white/[0.08]
-                    dark:bg-black/30
-                    dark:shadow-none
-                    dark:hover:border-white/[0.15]
-                    dark:hover:bg-black/40
+                    hover:border-black/[0.075]
+                    hover:bg-white/[0.14]
+                    hover:shadow-[0_14px_34px_rgba(0,0,0,0.04)]
+                    dark:border-white/[0.075]
+                    dark:bg-black/[0.23]
+                    dark:shadow-[0_8px_28px_rgba(0,0,0,0.14)]
+                    dark:hover:border-white/[0.13]
+                    dark:hover:bg-black/[0.30]
                   "
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -391,7 +400,7 @@ export default function Home() {
                         text-black/20
                         transition
                         group-hover:translate-x-1
-                        group-hover:text-black/60
+                        group-hover:text-black/55
                         dark:text-white/20
                         dark:group-hover:text-white/60
                       "
@@ -411,14 +420,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Ecosystem */}
+        {/* =====================================================
+            ECOSYSTEM
+            ===================================================== */}
+
         <section
           className="
             border-y
-            border-black/[0.035]
-            bg-white/[0.06]
-            dark:border-white/[0.06]
-            dark:bg-black/20
+            border-black/[0.025]
+            bg-white/[0.025]
+            dark:border-white/[0.045]
+            dark:bg-black/[0.13]
           "
         >
           <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
@@ -438,6 +450,7 @@ export default function Home() {
                 guidance into a single experience.
               </p>
 
+              {/* Pill Highlights */}
               <div className="mt-8 flex flex-wrap gap-3">
                 {['Discover', 'Connect', 'Grow'].map((item) => (
                   <div
@@ -448,15 +461,15 @@ export default function Home() {
                       gap-2
                       rounded-full
                       border
-                      border-black/[0.05]
-                      bg-white/[0.14]
+                      border-black/[0.04]
+                      bg-white/[0.065]
                       px-4
                       py-2
                       text-xs
                       text-black/55
-                      backdrop-blur-md
-                      dark:border-white/10
-                      dark:bg-white/[0.03]
+                      backdrop-blur-sm
+                      dark:border-white/[0.08]
+                      dark:bg-white/[0.025]
                       dark:text-white/55
                     "
                   >
@@ -503,14 +516,14 @@ export default function Home() {
                   className="
                     rounded-3xl
                     border
-                    border-black/[0.055]
-                    bg-white/[0.16]
+                    border-black/[0.04]
+                    bg-white/[0.075]
                     p-6
-                    shadow-[0_8px_28px_rgba(0,0,0,0.03)]
-                    backdrop-blur-lg
-                    dark:border-white/[0.07]
-                    dark:bg-white/[0.025]
-                    dark:shadow-none
+                    shadow-[0_7px_24px_rgba(0,0,0,0.02)]
+                    backdrop-blur-md
+                    dark:border-white/[0.065]
+                    dark:bg-black/[0.20]
+                    dark:shadow-[0_8px_26px_rgba(0,0,0,0.12)]
                   "
                 >
                   <Icon size={25} className={accent} />
@@ -528,108 +541,89 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Foundation */}
+        {/* =====================================================
+            FOUNDATION
+            ===================================================== */}
+
         <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <div className="grid gap-5 lg:grid-cols-3">
-            <div
-              className="
-                rounded-3xl
-                border
-                border-black/[0.055]
-                bg-white/[0.16]
-                p-6
-                shadow-[0_8px_28px_rgba(0,0,0,0.03)]
-                backdrop-blur-lg
-                dark:border-white/[0.08]
-                dark:bg-black/25
-                dark:shadow-none
-              "
-            >
-              <ShieldCheck
-                size={25}
-                className="text-[#008080] dark:text-[#72ddda]"
-              />
+            {[
+              {
+                icon: ShieldCheck,
+                title: 'Security-minded foundation',
+                description:
+                  'Authentication, server-side operations and protected business actions are kept separate wherever they matter.',
+                accent: 'teal',
+              },
+              {
+                icon: Rocket,
+                title: 'Built to evolve',
+                description:
+                  'Future premium features can be introduced as optional modules without rebuilding the core experience.',
+                accent: 'gold',
+              },
+              {
+                icon: Sparkle,
+                title: 'Smart discovery',
+                description:
+                  'Feni Brain can turn natural-language questions into useful business discovery experiences.',
+                accent: 'teal',
+              },
+            ].map(
+              ({
+                icon: Icon,
+                title,
+                description,
+                accent,
+              }) => (
+                <div
+                  key={title}
+                  className="
+                    rounded-3xl
+                    border
+                    border-black/[0.04]
+                    bg-white/[0.075]
+                    p-6
+                    shadow-[0_7px_24px_rgba(0,0,0,0.02)]
+                    backdrop-blur-md
+                    dark:border-white/[0.07]
+                    dark:bg-black/[0.20]
+                    dark:shadow-[0_8px_26px_rgba(0,0,0,0.12)]
+                  "
+                >
+                  <Icon
+                    size={25}
+                    className={
+                      accent === 'teal'
+                        ? 'text-[#008080] dark:text-[#72ddda]'
+                        : 'text-[#9a751f] dark:text-[#d4b879]'
+                    }
+                  />
 
-              <h3 className="mt-5 text-lg font-bold text-[#111827] dark:text-white">
-                Security-minded foundation
-              </h3>
+                  <h3 className="mt-5 text-lg font-bold text-[#111827] dark:text-white">
+                    {title}
+                  </h3>
 
-              <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
-                Authentication, server-side operations and
-                protected business actions are kept separate
-                wherever they matter.
-              </p>
-            </div>
-
-            <div
-              className="
-                rounded-3xl
-                border
-                border-black/[0.055]
-                bg-white/[0.16]
-                p-6
-                shadow-[0_8px_28px_rgba(0,0,0,0.03)]
-                backdrop-blur-lg
-                dark:border-white/[0.08]
-                dark:bg-black/25
-                dark:shadow-none
-              "
-            >
-              <Rocket
-                size={25}
-                className="text-[#9a751f] dark:text-[#d4b879]"
-              />
-
-              <h3 className="mt-5 text-lg font-bold text-[#111827] dark:text-white">
-                Built to evolve
-              </h3>
-
-              <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
-                Future premium features can be introduced as
-                optional modules without rebuilding the core
-                experience.
-              </p>
-            </div>
-
-            <div
-              className="
-                rounded-3xl
-                border
-                border-black/[0.055]
-                bg-white/[0.16]
-                p-6
-                shadow-[0_8px_28px_rgba(0,0,0,0.03)]
-                backdrop-blur-lg
-                dark:border-white/[0.08]
-                dark:bg-black/25
-                dark:shadow-none
-              "
-            >
-              <Sparkle
-                size={25}
-                className="text-[#008080] dark:text-[#72ddda]"
-              />
-
-              <h3 className="mt-5 text-lg font-bold text-[#111827] dark:text-white">
-                Smart discovery
-              </h3>
-
-              <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
-                Feni Brain can turn natural-language questions
-                into useful business discovery experiences.
-              </p>
-            </div>
+                  <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
+                    {description}
+                  </p>
+                </div>
+              ),
+            )}
           </div>
         </section>
 
-        {/* Footer */}
+        {/* =====================================================
+            FOOTER
+            ===================================================== */}
+
         <footer
           className="
             border-t
-            border-black/[0.035]
-            bg-white/[0.07]
-            dark:border-white/[0.06]
-            dark:bg-black/30
+            border-black/[0.025]
+            bg-white/[0.025]
+            dark:border-white/[0.045]
+            dark:bg-black/[0.18]
           "
         >
           <div
