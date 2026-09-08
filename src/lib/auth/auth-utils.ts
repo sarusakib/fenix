@@ -87,4 +87,9 @@ export async function sendPasswordReset(
   const origin =
     typeof window !== 'undefined'
       ? window.location.origin
-      :
+      : ''
+
+  return supabase.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: `${origin}/auth/reset-password`,
+  })
+}
