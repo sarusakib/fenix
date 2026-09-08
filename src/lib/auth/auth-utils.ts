@@ -14,6 +14,31 @@ type ValidateAuthInput = {
   fullName?: string
 }
 
+type SignInWithEmailInput = {
+  supabase: FenixSupabaseClient
+  email: string
+  password: string
+}
+
+type SignUpWithEmailInput = {
+  supabase: FenixSupabaseClient
+  email: string
+  password: string
+  fullName: string
+}
+
+type SignInWithOAuthInput = {
+  supabase: FenixSupabaseClient
+  provider: OAuthProvider
+  origin: string
+}
+
+type SendPasswordResetInput = {
+  supabase: FenixSupabaseClient
+  email: string
+  origin: string
+}
+
 export function validateAuthInput({
   mode,
   email,
@@ -42,8 +67,12 @@ export function validateAuthInput({
 }
 
 export function getSafeAuthMessage(error: unknown): string {
+  if (typeof error === 'string' && error.trim()) {
+    return error.trim()
+  }
+
   if (error instanceof Error && error.message.trim()) {
-    return error.message
+    return error.message.trim()
   }
 
   if (
@@ -62,23 +91,23 @@ export function getSafeAuthMessage(error: unknown): string {
   return 'Something went wrong. Please try again.'
 }
 
-export async function signInWithEmail(
-  supabase: FenixSupabaseClient,
-  email: string,
-  password: string,
-) {
+export async function signInWithEmail({
+  supabase,
+  email,
+  password,
+}: SignInWithEmailInput) {
   return supabase.auth.signInWithPassword({
     email: email.trim(),
     password,
   })
 }
 
-export async function signUpWithEmail(
-  supabase: FenixSupabaseClient,
-  email: string,
-  password: string,
-  fullName: string,
-) {
+export async function signUpWithEmail({
+  supabase,
+  email,
+  password,
+  fullName,
+}: SignUpWithEmailInput) {
   return supabase.auth.signUp({
     email: email.trim(),
     password,
@@ -91,15 +120,11 @@ export async function signUpWithEmail(
   })
 }
 
-export async function signInWithOAuth(
-  supabase: FenixSupabaseClient,
-  provider: OAuthProvider,
-) {
-  const origin =
-    typeof window !== 'undefined'
-      ? window.location.origin
-      : ''
-
+export async function signInWithOAuth({
+  supabase,
+  provider,
+  origin,
+}: SignInWithOAuthInput) {
   return supabase.auth.signInWithOAuth({
     provider,
     options: {
@@ -108,15 +133,11 @@ export async function signInWithOAuth(
   })
 }
 
-export async function sendPasswordReset(
-  supabase: FenixSupabaseClient,
-  email: string,
-) {
-  const origin =
-    typeof window !== 'undefined'
-      ? window.location.origin
-      : ''
-
+export async function sendPasswordReset({
+  supabase,
+  email,
+  origin,
+}: SendPasswordResetInput) {
   return supabase.auth.resetPasswordForEmail(email.trim(), {
     redirectTo: `${origin}/auth/reset-password`,
   })
