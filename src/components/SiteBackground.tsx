@@ -54,14 +54,13 @@ export default function SiteBackground() {
         }}
       />
 
-      {/* Minimal Overlay
-          Keeps the original image clearly visible */}
+      {/* Very Light Overlay */}
       <div
         className="
           absolute
           inset-0
-          bg-white/[0.025]
-          dark:bg-black/[0.10]
+          bg-white/[0.005]
+          dark:bg-black/[0.06]
         "
       />
 
@@ -70,8 +69,8 @@ export default function SiteBackground() {
         className="
           absolute
           inset-0
-          bg-[radial-gradient(circle_at_center,transparent_38%,rgba(0,0,0,0.045)_100%)]
-          dark:bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.30)_100%)]
+          bg-[radial-gradient(circle_at_center,transparent_55%,rgba(0,0,0,0.025)_100%)]
+          dark:bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.25)_100%)]
         "
       />
 
