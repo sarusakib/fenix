@@ -1,10 +1,9 @@
 export default function Loading() {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-[#030506] text-white">
-      <div className="flex items-center gap-2">
-        <span className="h-2 w-2 animate-pulse rounded-full bg-[#56d1ce]" />
-        <span className="h-2 w-2 animate-pulse rounded-full bg-[#56d1ce] [animation-delay:120ms]" />
-        <span className="h-2 w-2 animate-pulse rounded-full bg-[#56d1ce] [animation-delay:240ms]" />
+    <main className="flex min-h-dvh items-center justify-center bg-[#030506] px-6 text-white">
+      <div className="text-center">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#72ddda]" />
+        <p className="mt-5 text-sm text-white/45">FeniX loading…</p>
       </div>
     </main>
   )
