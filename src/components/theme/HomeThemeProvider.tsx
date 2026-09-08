@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -10,16 +11,15 @@ import {
 
 export type HomeTheme = 'light' | 'dark' | 'system'
 
-type HomeThemeContextValue = {
+type ThemeContextValue = {
   theme: HomeTheme
   resolvedTheme: 'light' | 'dark'
   setTheme: (theme: HomeTheme) => void
 }
 
-const HomeThemeContext =
-  createContext<HomeThemeContextValue | null>(null)
-
 const STORAGE_KEY = 'fenix-home-theme'
+
+const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 function getSystemTheme(): 'light' | 'dark' {
   if (typeof window === 'undefined') {
@@ -33,25 +33,26 @@ function getSystemTheme(): 'light' | 'dark' {
     : 'light'
 }
 
-function applyTheme(theme: HomeTheme) {
-  if (typeof document === 'undefined') {
-    return
+function getInitialTheme(): HomeTheme {
+  if (typeof window === 'undefined') {
+    return 'system'
   }
 
-  const resolved =
-    theme === 'system'
-      ? getSystemTheme()
-      : theme
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY)
 
-  const root = document.documentElement
+    if (
+      saved === 'light' ||
+      saved === 'dark' ||
+      saved === 'system'
+    ) {
+      return saved
+    }
+  } catch {
+    // Ignore storage errors.
+  }
 
-  root.classList.toggle(
-    'dark',
-    resolved === 'dark'
-  )
-
-  root.dataset.homeTheme = theme
-  root.style.colorScheme = resolved
+  return 'system'
 }
 
 export default function HomeThemeProvider({
@@ -60,88 +61,16 @@ export default function HomeThemeProvider({
   children: React.ReactNode
 }) {
   const [theme, setThemeState] =
-    useState<HomeTheme>('system')
+    useState<HomeTheme>(getInitialTheme)
 
-  const [resolvedTheme, setResolvedTheme] =
-    useState<'light' | 'dark'>('dark')
+  const [systemTheme, setSystemTheme] =
+    useState<'light' | 'dark'>(getSystemTheme)
 
-  useEffect(() => {
-    try {
-      const saved =
-        window.localStorage.getItem(
-          STORAGE_KEY
-        ) as HomeTheme | null
+  const resolvedTheme =
+    theme === 'system' ? systemTheme : theme
 
-      const initialTheme =
-        saved === 'light' ||
-        saved === 'dark' ||
-        saved === 'system'
-          ? saved
-          : 'system'
-
-      setThemeState(initialTheme)
-
-      const resolved =
-        initialTheme === 'system'
-          ? getSystemTheme()
-          : initialTheme
-
-      setResolvedTheme(resolved)
-
-      applyTheme(initialTheme)
-    } catch {
-      applyTheme('system')
-      setResolvedTheme(getSystemTheme())
-    }
-  }, [])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const mediaQuery = window.matchMedia(
-      '(prefers-color-scheme: dark)'
-    )
-
-    const handleSystemChange = () => {
-      if (theme !== 'system') {
-        return
-      }
-
-      const nextTheme =
-        mediaQuery.matches
-          ? 'dark'
-          : 'light'
-
-      setResolvedTheme(nextTheme)
-      applyTheme('system')
-    }
-
-    mediaQuery.addEventListener(
-      'change',
-      handleSystemChange
-    )
-
-    return () => {
-      mediaQuery.removeEventListener(
-        'change',
-        handleSystemChange
-      )
-    }
-  }, [theme])
-
-  const setTheme = (nextTheme: HomeTheme) => {
+  const setTheme = useCallback((nextTheme: HomeTheme) => {
     setThemeState(nextTheme)
-
-    const resolved =
-      nextTheme === 'system'
-        ? getSystemTheme()
-        : nextTheme
-
-    setResolvedTheme(resolved)
-
-    applyTheme(nextTheme)
 
     try {
       window.localStorage.setItem(
@@ -149,29 +78,67 @@ export default function HomeThemeProvider({
         nextTheme
       )
     } catch {
-      // Storage may be unavailable.
+      // Ignore storage errors.
     }
-  }
+  }, [])
 
-  const value = useMemo(
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    )
+
+    const updateSystemTheme = () => {
+      setSystemTheme(
+        mediaQuery.matches ? 'dark' : 'light'
+      )
+    }
+
+    updateSystemTheme()
+
+    mediaQuery.addEventListener(
+      'change',
+      updateSystemTheme
+    )
+
+    return () => {
+      mediaQuery.removeEventListener(
+        'change',
+        updateSystemTheme
+      )
+    }
+  }, [])
+
+  useEffect(() => {
+    const root = document.documentElement
+
+    root.classList.toggle(
+      'dark',
+      resolvedTheme === 'dark'
+    )
+
+    root.dataset.homeTheme = resolvedTheme
+
+    root.style.colorScheme = resolvedTheme
+  }, [resolvedTheme])
+
+  const value = useMemo<ThemeContextValue>(
     () => ({
       theme,
       resolvedTheme,
       setTheme,
     }),
-    [theme, resolvedTheme]
+    [theme, resolvedTheme, setTheme]
   )
 
   return (
-    <HomeThemeContext.Provider value={value}>
+    <ThemeContext.Provider value={value}>
       {children}
-    </HomeThemeContext.Provider>
+    </ThemeContext.Provider>
   )
 }
 
 export function useHomeTheme() {
-  const context =
-    useContext(HomeThemeContext)
+  const context = useContext(ThemeContext)
 
   if (!context) {
     throw new Error(
@@ -180,4 +147,4 @@ export function useHomeTheme() {
   }
 
   return context
-  }
+}
