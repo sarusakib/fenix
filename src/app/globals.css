@@ -10,20 +10,30 @@ html {
   min-width: 320px;
   min-height: 100%;
   overflow-x: clip;
-  background: #030506;
-  color-scheme: dark;
+  background: #eef3f5;
+  color-scheme: light;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+}
+
+html.dark {
+  background: #030506;
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
   min-height: 100dvh;
   overflow-x: clip;
-  background: #030506;
-  color: #ffffff;
+  background: #eef3f5;
+  color: #111827;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html.dark body {
+  background: #030506;
+  color: #ffffff;
 }
 
 #__next {
@@ -63,6 +73,10 @@ a {
   text-decoration: none;
 }
 
+button {
+  cursor: pointer;
+}
+
 :focus-visible {
   outline: 2px solid #008080;
   outline-offset: 3px;
@@ -70,7 +84,11 @@ a {
 
 ::selection {
   background: rgba(0, 128, 128, 0.28);
-  color: #fff;
+  color: #111827;
+}
+
+html.dark ::selection {
+  color: #ffffff;
 }
 
 .text-balance {
@@ -120,13 +138,15 @@ a {
   }
 }
 
+/* Scrollbar */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #05070b;
+  background: #e7ecef;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -134,16 +154,31 @@ a {
   border-radius: 999px;
 }
 
+html.dark ::-webkit-scrollbar-track {
+  background: #05070b;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(0, 128, 128, 0.45);
+}
+
 html {
   scrollbar-width: thin;
+  scrollbar-color: rgba(0, 128, 128, 0.55) #e7ecef;
+}
+
+html.dark {
   scrollbar-color: rgba(0, 128, 128, 0.55) #05070b;
 }
-/* =========================================================
-   FeniX Orientation Background
-   ========================================================= */
+
+/* FeniX orientation backgrounds */
 
 .fenix-landscape-background {
   display: none;
+}
+
+.fenix-portrait-background {
+  display: flex;
 }
 
 @media (orientation: landscape) {
