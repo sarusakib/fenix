@@ -138,3 +138,30 @@ html {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 128, 128, 0.55) #05070b;
 }
+/* =========================================================
+   FeniX Orientation Background
+   ========================================================= */
+
+.fenix-landscape-background {
+  display: none;
+}
+
+@media (orientation: landscape) {
+  .fenix-portrait-background {
+    display: none;
+  }
+
+  .fenix-landscape-background {
+    display: flex;
+  }
+}
+
+@media (orientation: portrait) {
+  .fenix-portrait-background {
+    display: flex;
+  }
+
+  .fenix-landscape-background {
+    display: none;
+  }
+}
