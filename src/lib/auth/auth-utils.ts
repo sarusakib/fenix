@@ -7,12 +7,19 @@ export type AuthMode = 'login' | 'signup'
 
 export type OAuthProvider = 'google' | 'facebook'
 
-export function validateAuthInput(
-  mode: AuthMode,
-  email: string,
-  password: string,
-  name?: string,
-): string | null {
+type ValidateAuthInput = {
+  mode: AuthMode
+  email: string
+  password: string
+  name?: string
+}
+
+export function validateAuthInput({
+  mode,
+  email,
+  password,
+  name,
+}: ValidateAuthInput): string | null {
   if (!email.trim()) {
     return 'Email is required.'
   }
