@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ElementType, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -27,7 +27,7 @@ type ActionCard = {
   title: string
   description: string
   href: string
-  icon: React.ElementType
+  icon: ElementType
   accent: Accent
 }
 
@@ -78,15 +78,15 @@ function AccentIcon({
   children,
 }: {
   accent: Accent
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <div
       className={[
-        'flex h-11 w-11 items-center justify-center rounded-2xl border',
+        'flex h-11 w-11 items-center justify-center rounded-2xl border backdrop-blur-sm',
         accent === 'teal'
-          ? 'border-[#008080]/20 bg-[#008080]/[0.07] text-[#007d7d] dark:border-[#72ddda]/20 dark:bg-[#72ddda]/[0.07] dark:text-[#72ddda]'
-          : 'border-[#d4b879]/25 bg-[#d4b879]/[0.07] text-[#9a751f] dark:border-[#d4b879]/25 dark:bg-[#d4b879]/[0.07] dark:text-[#d4b879]',
+          ? 'border-[#008080]/15 bg-[#008080]/[0.045] text-[#007878] dark:border-[#72ddda]/20 dark:bg-[#008080]/[0.08] dark:text-[#72ddda]'
+          : 'border-[#d4b879]/18 bg-[#d4b879]/[0.05] text-[#9a751f] dark:border-[#d4b879]/22 dark:bg-[#d4b879]/[0.08] dark:text-[#d4b879]',
       ].join(' ')}
     >
       {children}
@@ -141,19 +141,21 @@ export default function Home() {
                 gap-2
                 rounded-full
                 border
-                border-black/[0.07]
-                bg-white/[0.16]
+                border-black/[0.035]
+                bg-white/[0.075]
                 px-3
                 py-1.5
                 text-[10px]
                 font-semibold
                 uppercase
                 tracking-[0.18em]
-                text-black/55
+                text-black/50
+                shadow-[0_4px_18px_rgba(0,0,0,0.018)]
                 backdrop-blur-sm
                 dark:border-white/[0.08]
-                dark:bg-black/[0.16]
+                dark:bg-white/[0.035]
                 dark:text-white/55
+                dark:shadow-none
                 sm:text-xs
               "
             >
@@ -212,15 +214,14 @@ export default function Home() {
                 className="
                   rounded-2xl
                   border
-                  border-black/[0.07]
+                  border-black/[0.045]
                   bg-white/[0.13]
                   p-2
-                  shadow-xl
-                  shadow-black/[0.05]
+                  shadow-[0_10px_32px_rgba(0,0,0,0.035)]
                   backdrop-blur-lg
-                  dark:border-white/[0.08]
-                  dark:bg-black/[0.22]
-                  dark:shadow-black/20
+                  dark:border-white/[0.09]
+                  dark:bg-black/[0.24]
+                  dark:shadow-[0_12px_35px_rgba(0,0,0,0.18)]
                   sm:rounded-3xl
                 "
               >
@@ -234,14 +235,261 @@ export default function Home() {
                       gap-3
                       rounded-xl
                       border
-                      border-black/[0.06]
-                      bg-white/[0.07]
+                      border-black/[0.035]
+                      bg-white/[0.075]
                       px-4
                       backdrop-blur-sm
                       sm:min-h-[58px]
                       sm:rounded-2xl
-                      dark:border-white/[0.06]
-                      dark:bg-white/[0.025]
+                      dark:border-white/[0.065]
+                      dark:bg-white/[0.035]
                     "
                   >
-                    <Magn
+                    <MagnifyingGlass
+                      size={21}
+                      className="shrink-0 text-black/35 dark:text-white/35"
+                    />
+
+                    <input
+                      type="search"
+                      value={searchQuery}
+                      onChange={(event) =>
+                        setSearchQuery(event.target.value.slice(0, 120))
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          handleSearch()
+                        }
+                      }}
+                      placeholder="Ask FeniX anything about business in Feni..."
+                      aria-label="Search FeniX"
+                      maxLength={120}
+                      className="
+                        w-full
+                        bg-transparent
+                        text-sm
+                        text-[#111827]
+                        outline-none
+                        placeholder:text-black/30
+                        sm:text-base
+                        dark:text-white
+                        dark:placeholder:text-white/25
+                      "
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSearch}
+                    className="
+                      flex
+                      min-h-[54px]
+                      items-center
+                      justify-center
+                      gap-2
+                      rounded-xl
+                      bg-[#008080]
+                      px-5
+                      text-sm
+                      font-bold
+                      text-white
+                      transition
+                      duration-200
+                      hover:bg-[#079494]
+                      active:scale-[0.99]
+                      sm:min-h-[58px]
+                      sm:rounded-2xl
+                    "
+                  >
+                    Search
+                    <ArrowRight size={18} weight="bold" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Prompts */}
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                {quickPrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => handlePrompt(prompt)}
+                    className="
+                      min-h-10
+                      rounded-full
+                      border
+                      border-black/[0.04]
+                      bg-white/[0.07]
+                      px-3.5
+                      text-xs
+                      text-black/55
+                      shadow-[0_3px_12px_rgba(0,0,0,0.015)]
+                      backdrop-blur-sm
+                      transition
+                      duration-200
+                      hover:border-black/[0.07]
+                      hover:bg-white/[0.13]
+                      hover:text-black
+                      dark:border-white/[0.065]
+                      dark:bg-white/[0.025]
+                      dark:text-white/45
+                      dark:shadow-none
+                      dark:hover:border-white/[0.13]
+                      dark:hover:bg-white/[0.045]
+                      dark:hover:text-white/75
+                    "
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ================= ACTION CARDS ================= */}
+          <div className="mx-auto mt-16 grid max-w-6xl gap-4 sm:mt-20 sm:grid-cols-2 xl:grid-cols-4">
+            {actionCards.map((card) => {
+              const Icon = card.icon
+
+              return (
+                <Link
+                  key={card.title}
+                  href={card.href}
+                  className="
+                    group
+                    rounded-3xl
+                    border
+                    border-black/[0.045]
+                    bg-white/[0.085]
+                    p-5
+                    shadow-[0_8px_26px_rgba(0,0,0,0.025)]
+                    backdrop-blur-md
+                    transition
+                    duration-300
+                    hover:-translate-y-1
+                    hover:border-black/[0.075]
+                    hover:bg-white/[0.14]
+                    hover:shadow-[0_14px_34px_rgba(0,0,0,0.04)]
+                    dark:border-white/[0.075]
+                    dark:bg-black/[0.23]
+                    dark:shadow-[0_8px_28px_rgba(0,0,0,0.14)]
+                    dark:hover:border-white/[0.13]
+                    dark:hover:bg-black/[0.30]
+                  "
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <AccentIcon accent={card.accent}>
+                      <Icon size={21} weight="duotone" />
+                    </AccentIcon>
+
+                    <CaretRight
+                      size={18}
+                      className="
+                        mt-1
+                        text-black/20
+                        transition
+                        group-hover:translate-x-1
+                        group-hover:text-black/55
+                        dark:text-white/20
+                        dark:group-hover:text-white/60
+                      "
+                    />
+                  </div>
+
+                  <h2 className="mt-5 text-lg font-bold text-[#111827] dark:text-white">
+                    {card.title}
+                  </h2>
+
+                  <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
+                    {card.description}
+                  </p>
+                </Link>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ================= ECOSYSTEM ================= */}
+        <section
+          className="
+            border-y
+            border-black/[0.025]
+            bg-white/[0.025]
+            dark:border-white/[0.045]
+            dark:bg-black/[0.13]
+          "
+        >
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
+            <div>
+              <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#008080] dark:text-[#72ddda]">
+                <Compass size={16} />
+                One ecosystem
+              </div>
+
+              <h2 className="mt-4 max-w-2xl text-3xl font-black tracking-tight text-[#111827] sm:text-5xl dark:text-white">
+                Local business growth, connected in one place.
+              </h2>
+
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-black/55 sm:text-base sm:leading-8 dark:text-white/50">
+                FeniX is designed to bring local commerce,
+                business discovery, investment and practical
+                guidance into a single experience.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                {['Discover', 'Connect', 'Grow'].map((item) => (
+                  <div
+                    key={item}
+                    className="
+                      inline-flex
+                      items-center
+                      gap-2
+                      rounded-full
+                      border
+                      border-black/[0.04]
+                      bg-white/[0.065]
+                      px-4
+                      py-2
+                      text-xs
+                      text-black/55
+                      backdrop-blur-sm
+                      dark:border-white/[0.08]
+                      dark:bg-white/[0.025]
+                      dark:text-white/55
+                    "
+                  >
+                    <CheckCircle
+                      size={15}
+                      className="text-[#008080] dark:text-[#72ddda]"
+                    />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                {
+                  icon: Buildings,
+                  number: '01',
+                  text: 'Businesses can build presence, discover connections and grow.',
+                  accent: 'text-[#008080] dark:text-[#72ddda]',
+                },
+                {
+                  icon: Users,
+                  number: '02',
+                  text: 'People can find useful local services and opportunities faster.',
+                  accent: 'text-[#9a751f] dark:text-[#d4b879]',
+                },
+                {
+                  icon: TrendUp,
+                  number: '03',
+                  text: 'Investors can discover potential ideas and local momentum.',
+                  accent: 'text-[#008080] dark:text-[#72ddda]',
+                },
+                {
+                  icon: Lightbulb,
+                  number: '04',
+                  text: 'Practical guidance turns questions into the next action.',
+                  accent: 'text-[#
