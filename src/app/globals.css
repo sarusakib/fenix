@@ -2,57 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* =========================================================
-   FENIX — GLOBAL FOUNDATION
-   ========================================================= */
-
-*,
-*::before,
-*::after {
+* {
   box-sizing: border-box;
 }
 
 html {
-  margin: 0;
-  padding: 0;
   min-width: 320px;
   min-height: 100%;
-  background: #030506;
-  color-scheme: dark;
   overflow-x: clip;
   scroll-behavior: smooth;
-  text-size-adjust: 100%;
+  background: #030506;
+  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   padding: 0;
-  min-width: 320px;
   min-height: 100dvh;
-
+  overflow-x: clip;
   background: #030506;
   color: #ffffff;
-
-  overflow-x: clip;
-
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-/* =========================================================
-   NEXT ROOT
-   ========================================================= */
 
 #__next {
   min-height: 100dvh;
   width: 100%;
   overflow-x: clip;
 }
-
-/* =========================================================
-   MEDIA SAFETY
-   ========================================================= */
 
 img,
 svg,
@@ -62,40 +41,11 @@ canvas {
   max-width: 100%;
 }
 
-img {
-  height: auto;
-}
-
-/* =========================================================
-   TEXT SAFETY
-   ========================================================= */
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-span,
-a {
-  overflow-wrap: break-word;
-}
-
-/* =========================================================
-   FORM SAFETY
-   ========================================================= */
-
 button,
 input,
 textarea,
 select {
   font: inherit;
-}
-
-button,
-a {
-  touch-action: manipulation;
 }
 
 input,
@@ -104,27 +54,20 @@ select {
   font-size: 16px;
 }
 
-/* =========================================================
-   FOCUS / ACCESSIBILITY
-   ========================================================= */
+button,
+a {
+  touch-action: manipulation;
+}
 
 :focus-visible {
-  outline: 2px solid #56d1ce;
+  outline: 2px solid #008080;
   outline-offset: 3px;
 }
 
-/* =========================================================
-   SELECTION
-   ========================================================= */
-
 ::selection {
   background: rgba(0, 128, 128, 0.28);
-  color: #ffffff;
+  color: #fff;
 }
-
-/* =========================================================
-   FENIX INTRO — LOADING
-   ========================================================= */
 
 @keyframes fenixLoad {
   0% {
@@ -152,10 +95,6 @@ select {
   }
 }
 
-/* =========================================================
-   FENIX AMBIENT MOTION
-   ========================================================= */
-
 @keyframes fenixAmbientPulse {
   0%,
   100% {
@@ -180,9 +119,22 @@ select {
   }
 }
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
+@media (hover: none) and (pointer: coarse) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 @media (max-width: 600px) {
   html,
@@ -195,72 +147,12 @@ select {
   }
 }
 
-/* =========================================================
-   TABLET
-   ========================================================= */
-
-@media (min-width: 601px) and (max-width: 1024px) {
-  html,
-  body {
-    overflow-x: clip;
-  }
-}
-
-/* =========================================================
-   LARGE / 4K
-   ========================================================= */
-
 @media (min-width: 1920px) {
   html,
   body {
     overflow-x: clip;
   }
 }
-
-/* =========================================================
-   TOUCH DEVICES
-   ========================================================= */
-
-@media (hover: none) and (pointer: coarse) {
-  * {
-    -webkit-tap-highlight-color: transparent;
-  }
-}
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .backdrop-blur-xl,
-  .backdrop-blur-2xl {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-}
-
-/* =========================================================
-   VERY SMALL DEVICES
-   ========================================================= */
-
-@media (max-width: 359px) {
-  html {
-    font-size: 15px;
-  }
-}
-
-/* =========================================================
-   SAFE AREA
-   ========================================================= */
 
 .safe-top {
   padding-top: env(safe-area-inset-top);
@@ -269,14 +161,6 @@ select {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
 }
-
-.min-screen-safe {
-  min-height: 100dvh;
-}
-
-/* =========================================================
-   SCROLLBAR
-   ========================================================= */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -290,10 +174,6 @@ select {
 ::-webkit-scrollbar-thumb {
   background: rgba(0, 128, 128, 0.45);
   border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 128, 128, 0.7);
 }
 
 html {
