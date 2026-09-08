@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================================
+   FeniX — Global Foundation
+   ========================================================= */
+
 * {
   box-sizing: border-box;
 }
@@ -107,6 +111,10 @@ html.dark ::selection {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* =========================================================
+   Touch / Motion
+   ========================================================= */
+
 @media (hover: none) and (pointer: coarse) {
   * {
     -webkit-tap-highlight-color: transparent;
@@ -124,6 +132,10 @@ html.dark ::selection {
   }
 }
 
+/* =========================================================
+   Responsive Overflow
+   ========================================================= */
+
 @media (max-width: 600px) {
   html,
   body {
@@ -138,7 +150,9 @@ html.dark ::selection {
   }
 }
 
-/* Scrollbar */
+/* =========================================================
+   Scrollbar
+   ========================================================= */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -171,15 +185,43 @@ html.dark {
   scrollbar-color: rgba(0, 128, 128, 0.55) #05070b;
 }
 
-/* FeniX orientation backgrounds */
+/* =========================================================
+   FeniX Background — Portrait / Landscape
+   ========================================================= */
+
+/*
+  Important:
+  SiteBackground.tsx uses bg-cover.
+  These rules make sure no older CSS can force
+  the image back to contain.
+*/
+
+.fenix-portrait-background,
+.fenix-landscape-background {
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+
+  /*
+    Prevent any accidental visual frame from
+    old styles / inherited borders.
+  */
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Default: portrait */
 
 .fenix-landscape-background {
   display: none;
 }
 
 .fenix-portrait-background {
-  display: flex;
+  display: block;
 }
+
+/* Landscape devices */
 
 @media (orientation: landscape) {
   .fenix-portrait-background {
@@ -187,13 +229,15 @@ html.dark {
   }
 
   .fenix-landscape-background {
-    display: flex;
+    display: block;
   }
 }
 
+/* Portrait devices */
+
 @media (orientation: portrait) {
   .fenix-portrait-background {
-    display: flex;
+    display: block;
   }
 
   .fenix-landscape-background {
