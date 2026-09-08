@@ -8,6 +8,11 @@ import type {
 
 type FenixSupabaseClient = SupabaseClient<Database>
 
+/**
+ * Get a public profile by user ID.
+ *
+ * Current RLS allows public SELECT.
+ */
 export async function getProfileById(
   supabase: FenixSupabaseClient,
   userId: string,
@@ -43,6 +48,12 @@ export async function getProfileById(
   }
 }
 
+/**
+ * Create a profile.
+ *
+ * Database RLS enforces:
+ * auth.uid() = id
+ */
 export async function createProfile(
   supabase: FenixSupabaseClient,
   input: ProfileInsert,
@@ -50,16 +61,23 @@ export async function createProfile(
   data: Profile | null
   error: Error | null
 }> {
-  if (!input.id.trim()) {
+  const id = input.id.trim()
+
+  if (!id) {
     return {
       data: null,
       error: new Error('Profile ID is required.'),
     }
   }
 
+  const payload: ProfileInsert = {
+    ...input,
+    id,
+  }
+
   const { data, error } = await supabase
     .from('profiles')
-    .insert(input)
+    .insert(payload)
     .select('*')
     .single()
 
@@ -76,6 +94,12 @@ export async function createProfile(
   }
 }
 
+/**
+ * Update a profile.
+ *
+ * Database RLS ensures users can update only
+ * their own profile.
+ */
 export async function updateProfile(
   supabase: FenixSupabaseClient,
   userId: string,
