@@ -11,57 +11,31 @@ import {
   useHomeTheme,
 } from './HomeThemeProvider'
 
-const options: {
+const options: Array<{
   value: HomeTheme
   label: string
-}[] = [
+  shortLabel: string
+  icon: typeof Sun
+}> = [
   {
     value: 'light',
     label: 'Light',
+    shortLabel: 'Light',
+    icon: Sun,
   },
   {
     value: 'dark',
     label: 'Dark',
+    shortLabel: 'Dark',
+    icon: Moon,
   },
   {
     value: 'system',
     label: 'System',
+    shortLabel: 'Auto',
+    icon: Monitor,
   },
 ]
-
-function ThemeIcon({
-  theme,
-}: {
-  theme: HomeTheme
-}) {
-  if (theme === 'light') {
-    return (
-      <Sun
-        size={17}
-        weight="duotone"
-        aria-hidden="true"
-      />
-    )
-  }
-
-  if (theme === 'dark') {
-    return (
-      <Moon
-        size={17}
-        weight="duotone"
-        aria-hidden="true"
-      />
-    )
-  }
-
-  return (
-    <Monitor
-      size={17}
-      weight="duotone"
-      aria-hidden="true"
-    />
-  )
-}
 
 export default function HomeThemeSwitch() {
   const {
@@ -71,53 +45,54 @@ export default function HomeThemeSwitch() {
 
   return (
     <div
+      role="group"
+      aria-label="Theme selection"
       className="
         inline-flex
         items-center
         gap-1
-        rounded-full
+        rounded-2xl
         border
         border-black/10
         bg-white/80
         p-1
-        shadow-sm
+        shadow-lg
         backdrop-blur-xl
         dark:border-white/10
         dark:bg-black/40
       "
-      role="group"
-      aria-label="Theme selection"
     >
       {options.map((option) => {
-        const active =
-          theme === option.value
+        const Icon = option.icon
+        const active = theme === option.value
 
         return (
           <button
             key={option.value}
             type="button"
-            onClick={() =>
-              setTheme(option.value)
-            }
-            aria-pressed={active}
+            onClick={() => setTheme(option.value)}
             aria-label={`Use ${option.label} theme`}
+            aria-pressed={active}
             title={option.label}
             className={`
-              flex
+              inline-flex
               min-h-10
               min-w-10
               items-center
               justify-center
-              gap-1.5
-              rounded-full
+              gap-2
+              rounded-xl
               px-3
               text-sm
               font-medium
               transition-all
               duration-200
-              focus-visible:outline-none
+              ease-out
+              focus:outline-none
               focus-visible:ring-2
               focus-visible:ring-teal-500
+              focus-visible:ring-offset-2
+              dark:focus-visible:ring-offset-black
 
               ${
                 active
@@ -139,16 +114,18 @@ export default function HomeThemeSwitch() {
               }
             `}
           >
-            <ThemeIcon
-              theme={option.value}
+            <Icon
+              size={18}
+              weight={active ? 'fill' : 'regular'}
+              aria-hidden="true"
             />
 
             <span className="hidden sm:inline">
-              {option.label}
+              {option.shortLabel}
             </span>
           </button>
         )
       })}
     </div>
   )
-              }
+}
