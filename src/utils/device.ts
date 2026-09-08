@@ -1,84 +1,136 @@
-'use client'
+export type DeviceType = 'mobile' | 'tablet' | 'desktop'
 
-import { useEffect, useState } from 'react'
-import {
-  DeviceInfo,
-  getDeviceInfo,
-} from './device'
+export type ScreenOrientation = 'portrait' | 'landscape'
 
-const DEFAULT_DEVICE_INFO: DeviceInfo = {
-  device: 'desktop',
-  orientation: 'landscape',
+export interface DeviceInfo {
+  device: DeviceType
+  orientation: ScreenOrientation
 
-  isMobile: false,
-  isTablet: false,
-  isDesktop: true,
+  isMobile: boolean
+  isTablet: boolean
+  isDesktop: boolean
 
-  isTouch: false,
-  isLikelyMobile: false,
+  isTouch: boolean
+  isLikelyMobile: boolean
 
-  width: 0,
-  height: 0,
+  width: number
+  height: number
 
-  pixelRatio: 1,
+  pixelRatio: number
 }
 
-export function useDeviceInfo(): DeviceInfo {
-  const [deviceInfo, setDeviceInfo] =
-    useState<DeviceInfo>(DEFAULT_DEVICE_INFO)
+function detectTouchDevice(): boolean {
+  if (typeof window === 'undefined') {
+    return false
+  }
 
-  useEffect(() => {
-    let animationFrame = 0
+  return (
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0
+  )
+}
 
-    const updateDeviceInfo = () => {
-      cancelAnimationFrame(animationFrame)
+function detectMobileUserAgent(): boolean {
+  if (typeof navigator === 'undefined') {
+    return false
+  }
 
-      animationFrame = requestAnimationFrame(() => {
-        setDeviceInfo(getDeviceInfo())
-      })
+  const userAgent = navigator.userAgent || ''
+
+  return /Android.*Mobile|iPhone|iPod|Windows Phone|Opera Mini|IEMobile/i.test(
+    userAgent
+  )
+}
+
+function detectIPadLikeDevice(): boolean {
+  if (typeof navigator === 'undefined') {
+    return false
+  }
+
+  /*
+   * Some iPads identify themselves as Macintosh.
+   * Touch support helps identify those devices.
+   */
+  return (
+    detectTouchDevice() &&
+    /Macintosh/i.test(navigator.platform || '')
+  )
+}
+
+export function getDeviceInfo(): DeviceInfo {
+  if (typeof window === 'undefined') {
+    return {
+      device: 'desktop',
+      orientation: 'landscape',
+
+      isMobile: false,
+      isTablet: false,
+      isDesktop: true,
+
+      isTouch: false,
+      isLikelyMobile: false,
+
+      width: 0,
+      height: 0,
+
+      pixelRatio: 1,
     }
+  }
 
-    updateDeviceInfo()
+  const width = window.innerWidth
+  const height = window.innerHeight
 
-    const orientationQuery =
-      window.matchMedia('(orientation: portrait)')
+  /*
+   * Orientation is determined independently
+   * from device type.
+   */
+  const orientation: ScreenOrientation =
+    height >= width ? 'portrait' : 'landscape'
 
-    window.addEventListener(
-      'resize',
-      updateDeviceInfo,
-      { passive: true }
-    )
+  const isTouch = detectTouchDevice()
+  const isMobileUA = detectMobileUserAgent()
+  const isIPadLike = detectIPadLikeDevice()
 
-    window.addEventListener(
-      'orientationchange',
-      updateDeviceInfo,
-      { passive: true }
-    )
+  /*
+   * First classify by viewport.
+   */
+  let device: DeviceType
 
-    orientationQuery.addEventListener(
-      'change',
-      updateDeviceInfo
-    )
+  if (width < 768) {
+    device = 'mobile'
+  } else if (width < 1024) {
+    device = 'tablet'
+  } else {
+    device = 'desktop'
+  }
 
-    return () => {
-      cancelAnimationFrame(animationFrame)
+  /*
+   * Improve detection for mobile browsers using
+   * "Desktop site".
+   */
+  const isLikelyMobile =
+    isMobileUA && isTouch
 
-      window.removeEventListener(
-        'resize',
-        updateDeviceInfo
-      )
+  if (isLikelyMobile) {
+    device = 'mobile'
+  } else if (isIPadLike) {
+    device = 'tablet'
+  }
 
-      window.removeEventListener(
-        'orientationchange',
-        updateDeviceInfo
-      )
+  return {
+    device,
+    orientation,
 
-      orientationQuery.removeEventListener(
-        'change',
-        updateDeviceInfo
-      )
-    }
-  }, [])
+    isMobile: device === 'mobile',
+    isTablet: device === 'tablet',
+    isDesktop: device === 'desktop',
 
-  return deviceInfo
+    isTouch,
+    isLikelyMobile,
+
+    width,
+    height,
+
+    pixelRatio: window.devicePixelRatio || 1,
+  }
 }
