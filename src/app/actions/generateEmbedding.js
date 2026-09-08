@@ -1,65 +1,55 @@
-"use server";
+'use server'
 
-import { HfInference } from "@huggingface/inference";
+import { HfInference } from '@huggingface/inference'
+
+const MODEL = 'sentence-transformers/all-MiniLM-L6-v2'
+const EMBEDDING_DIMENSION = 384
+const MAX_TEXT_LENGTH = 1200
 
 export async function generateEmbedding(text) {
-  const hfToken = process.env.HUGGINGFACE_API_KEY;
+  const hfToken = process.env.HUGGINGFACE_API_KEY
 
   if (!hfToken) {
-    throw new Error("HUGGINGFACE_API_KEY পাওয়া যায়নি।");
+    console.error('Feni Brain: HUGGINGFACE_API_KEY is not configured.')
+    throw new Error('Feni Brain service is not configured.')
   }
 
-  if (!text || !text.trim()) {
-    throw new Error("Embedding তৈরির জন্য text প্রয়োজন।");
+  if (typeof text !== 'string') {
+    throw new Error('Invalid embedding input.')
+  }
+
+  const cleanText = text.trim().slice(0, MAX_TEXT_LENGTH)
+
+  if (!cleanText) {
+    throw new Error('Embedding text is required.')
   }
 
   try {
-    console.log("Feni Brain: Starting embedding request...");
-
-    const hf = new HfInference(hfToken);
+    const hf = new HfInference(hfToken)
 
     const result = await hf.featureExtraction({
-      model: "sentence-transformers/all-MiniLM-L6-v2",
-      inputs: text.trim(),
-      provider: "hf-inference",
-    });
+      model: MODEL,
+      inputs: cleanText,
+      provider: 'hf-inference',
+    })
 
-    console.log("Feni Brain: Hugging Face response received.");
-
-    const embedding = Array.isArray(result[0])
-      ? result[0]
-      : result;
+    const embedding = Array.isArray(result?.[0]) ? result[0] : result
 
     if (!Array.isArray(embedding)) {
-      throw new Error(
-        "DIAGNOSTIC: Hugging Face response array নয়।"
-      );
+      throw new Error('Invalid embedding response.')
     }
 
-    console.log(
-      `Feni Brain: Embedding dimension = ${embedding.length}`
-    );
-
-    if (embedding.length !== 384) {
-      throw new Error(
-        `DIAGNOSTIC: Embedding dimension ${embedding.length}, expected 384.`
-      );
+    if (embedding.length !== EMBEDDING_DIMENSION) {
+      throw new Error('Invalid embedding dimension.')
     }
 
-    return embedding;
+    return embedding
   } catch (error) {
-    console.error("========== FENI BRAIN ERROR ==========");
-    console.error("Error name:", error?.name);
-    console.error("Error message:", error?.message);
-    console.error("Error status:", error?.status);
-    console.error("Error cause:", error?.cause);
-    console.error("Full error:", error);
-    console.error("======================================");
+    console.error('Feni Brain embedding request failed:', {
+      name: error?.name,
+      status: error?.status,
+    })
 
-    const message = error?.message || "Unknown Hugging Face error.";
-
-    throw new Error(
-      `Feni Brain diagnostic: ${message}`
-    );
+    throw new Error('Feni Brain is temporarily unavailable.')
   }
-    }
+}
