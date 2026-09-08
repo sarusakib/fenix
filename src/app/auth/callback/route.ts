@@ -1,58 +1,34 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '../../../utils/supabase/server'
-
-function getSafeRedirectPath(value: string | null) {
-  if (!value) {
-    return '/'
-  }
-
-  if (!value.startsWith('/')) {
-    return '/'
-  }
-
-  if (value.startsWith('//')) {
-    return '/'
-  }
-
-  return value
-}
+import { createClient } from '@/utils/supabase/server'
 
 export async function GET(request: Request) {
-  const requestUrl = new URL(request.url)
+  const { searchParams, origin } = new URL(request.url)
 
-  const code = requestUrl.searchParams.get('code')
-  const next = getSafeRedirectPath(
-    requestUrl.searchParams.get('next'),
-  )
+  const code = searchParams.get('code')
+  const requestedNext = searchParams.get('next')
 
-  if (!code) {
-    return NextResponse.redirect(
-      new URL('/login?error=Authentication+failed', requestUrl.origin),
-    )
-  }
+  // Only allow internal relative redirects.
+  // This prevents an external redirect such as:
+  // https://malicious-site.com
+  const next =
+    requestedNext &&
+    requestedNext.startsWith('/') &&
+    !requestedNext.startsWith('//')
+      ? requestedNext
+      : '/'
 
-  try {
-    const supabase = await createClient()
+  if (code) {
+    const supabase = createClient()
 
     const { error } =
       await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return NextResponse.redirect(
-        new URL(next, requestUrl.origin),
-      )
+      return NextResponse.redirect(`${origin}${next}`)
     }
-
-    console.error('Supabase auth callback failed:', {
-      message: error.message,
-    })
-  } catch (error) {
-    console.error('Auth callback failed:', {
-      name: error instanceof Error ? error.name : 'UnknownError',
-    })
   }
 
   return NextResponse.redirect(
-    new URL('/login?error=Could+not+authenticate+user', requestUrl.origin),
+    `${origin}/login?error=Could+not+authenticate+user`
   )
 }
