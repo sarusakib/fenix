@@ -28,39 +28,54 @@ export function useDeviceInfo(): DeviceInfo {
     useState<DeviceInfo>(DEFAULT_DEVICE_INFO)
 
   useEffect(() => {
-    let frame = 0
+    let animationFrame = 0
 
-    const update = () => {
-      cancelAnimationFrame(frame)
+    const updateDeviceInfo = () => {
+      cancelAnimationFrame(animationFrame)
 
-      frame = requestAnimationFrame(() => {
+      animationFrame = requestAnimationFrame(() => {
         setDeviceInfo(getDeviceInfo())
       })
     }
 
-    update()
+    updateDeviceInfo()
 
-    const orientationQuery = window.matchMedia(
-      '(orientation: portrait)'
+    const orientationQuery =
+      window.matchMedia('(orientation: portrait)')
+
+    window.addEventListener(
+      'resize',
+      updateDeviceInfo,
+      { passive: true }
     )
 
-    window.addEventListener('resize', update)
-    window.addEventListener('orientationchange', update)
+    window.addEventListener(
+      'orientationchange',
+      updateDeviceInfo,
+      { passive: true }
+    )
 
-    orientationQuery.addEventListener('change', update)
+    orientationQuery.addEventListener(
+      'change',
+      updateDeviceInfo
+    )
 
     return () => {
-      cancelAnimationFrame(frame)
+      cancelAnimationFrame(animationFrame)
 
-      window.removeEventListener('resize', update)
+      window.removeEventListener(
+        'resize',
+        updateDeviceInfo
+      )
+
       window.removeEventListener(
         'orientationchange',
-        update
+        updateDeviceInfo
       )
 
       orientationQuery.removeEventListener(
         'change',
-        update
+        updateDeviceInfo
       )
     }
   }, [])
