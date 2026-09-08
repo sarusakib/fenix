@@ -1,5 +1,3 @@
-'use client'
-
 export default function SiteBackground() {
   return (
     <div
@@ -8,19 +6,14 @@ export default function SiteBackground() {
         pointer-events-none
         fixed
         inset-0
-        -z-50
+        z-0
         overflow-hidden
-        bg-[#030506]
+        bg-[#eef3f5]
+        dark:bg-[#030506]
       "
     >
-      {/* =====================================================
-          PORTRAIT BACKGROUND
-          -----------------------------------------------------
-          Used when viewport is portrait.
+      {/* Portrait */}
 
-          Image:
-          /public/images/IMG_20260907_032431.png
-          ===================================================== */}
       <div
         className="
           fenix-portrait-background
@@ -28,25 +21,20 @@ export default function SiteBackground() {
           inset-0
           items-center
           justify-center
-          bg-[#030506]
+          bg-[#eef3f5]
+          bg-center
+          bg-no-repeat
+          dark:bg-[#030506]
         "
         style={{
           backgroundImage:
             "url('/images/IMG_20260907_032431.png')",
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
           backgroundSize: 'contain',
         }}
       />
 
-      {/* =====================================================
-          LANDSCAPE BACKGROUND
-          -----------------------------------------------------
-          Used when viewport is landscape.
+      {/* Landscape */}
 
-          Image:
-          /public/images/fenix-login-desktop.png
-          ===================================================== */}
       <div
         className="
           fenix-landscape-background
@@ -54,51 +42,49 @@ export default function SiteBackground() {
           inset-0
           items-center
           justify-center
-          bg-[#030506]
+          bg-[#eef3f5]
+          bg-center
+          bg-no-repeat
+          dark:bg-[#030506]
         "
         style={{
           backgroundImage:
             "url('/images/fenix-login-desktop.png')",
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
           backgroundSize: 'contain',
         }}
       />
 
-      {/* =====================================================
-          LIGHT / DARK CINEMATIC OVERLAY
-          ===================================================== */}
+      {/* Light / dark cinematic overlay */}
+
       <div
         className="
           absolute
           inset-0
-          bg-white/10
-          dark:bg-black/45
+          bg-white/35
+          dark:bg-black/35
         "
       />
 
-      {/* =====================================================
-          PREMIUM VIGNETTE
-          ===================================================== */}
+      {/* Vignette */}
+
       <div
         className="
           absolute
           inset-0
-          bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.18)_100%)]
-          dark:bg-[radial-gradient(circle_at_center,transparent_15%,rgba(0,0,0,0.55)_100%)]
+          bg-[radial-gradient(circle_at_center,transparent_18%,rgba(0,0,0,0.10)_100%)]
+          dark:bg-[radial-gradient(circle_at_center,transparent_12%,rgba(0,0,0,0.58)_100%)]
         "
       />
 
-      {/* =====================================================
-          SUBTLE TEAL CINEMATIC GLOW
-          ===================================================== */}
+      {/* Teal cinematic glow */}
+
       <div
         className="
           absolute
           inset-0
-          opacity-20
-          dark:opacity-15
-          bg-[radial-gradient(circle_at_50%_20%,rgba(0,128,128,0.16),transparent_45%)]
+          bg-[radial-gradient(circle_at_50%_18%,rgba(0,128,128,0.12),transparent_45%)]
+          opacity-80
+          dark:opacity-30
         "
       />
     </div>
