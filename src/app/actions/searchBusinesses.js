@@ -1,53 +1,76 @@
-"use server";
+'use server'
 
-import { generateEmbedding } from "./generateEmbedding";
-import { createClient } from "../../utils/supabase/server";
+import { generateEmbedding } from './generateEmbedding'
+import { createClient } from '../../utils/supabase/server'
+
+const MAX_QUERY_LENGTH = 120
+const MAX_RESULTS = 10
 
 export async function searchBusinesses(query) {
   try {
-    if (!query?.trim()) {
+    if (typeof query !== 'string') {
       return {
         success: false,
-        error: "Search query প্রয়োজন।",
-      };
+        error: 'Invalid search query.',
+      }
     }
 
-    const embedding = await generateEmbedding(query.trim());
+    const cleanQuery = query.trim().slice(0, MAX_QUERY_LENGTH)
 
-    if (!embedding || embedding.length !== 384) {
+    if (!cleanQuery) {
       return {
         success: false,
-        error: "Valid 384-dimensional embedding পাওয়া যায়নি।",
-      };
+        error: 'Search query প্রয়োজন।',
+      }
     }
 
-    const supabase = await createClient();
+    if (cleanQuery.length < 2) {
+      return {
+        success: false,
+        error: 'কমপক্ষে ২টি অক্ষর লিখুন।',
+      }
+    }
 
-    const { data, error } = await supabase.rpc("match_businesses", {
+    const embedding = await generateEmbedding(cleanQuery)
+
+    if (!Array.isArray(embedding) || embedding.length !== 384) {
+      return {
+        success: false,
+        error: 'Search service বর্তমানে unavailable.',
+      }
+    }
+
+    const supabase = await createClient()
+
+    const { data, error } = await supabase.rpc('match_businesses', {
       query_embedding: embedding,
-      match_threshold: 0.50,
-      match_count: 10,
-    });
+      match_threshold: 0.5,
+      match_count: MAX_RESULTS,
+    })
 
     if (error) {
-      console.error("Feni Brain search error:", error);
+      console.error('Feni Brain database search failed:', {
+        code: error.code,
+      })
 
       return {
         success: false,
-        error: "Business search করা যায়নি।",
-      };
+        error: 'Business search করা যায়নি।',
+      }
     }
 
     return {
       success: true,
-      results: data || [],
-    };
+      results: Array.isArray(data) ? data.slice(0, MAX_RESULTS) : [],
+    }
   } catch (error) {
-    console.error("Feni Brain search failed:", error);
+    console.error('Feni Brain search failed:', {
+      name: error?.name,
+    })
 
     return {
       success: false,
-      error: error?.message || "Search failed.",
-    };
+      error: 'Business search বর্তমানে unavailable.',
+    }
   }
 }
