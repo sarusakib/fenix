@@ -1,64 +1,117 @@
 'use client'
 
-import { useEffect } from 'react'
-import { ArrowClockwise, WarningCircle } from '@phosphor-icons/react'
+import Link from 'next/link'
+import { ArrowLeft, Compass } from '@phosphor-icons/react'
 
-type ErrorPageProps = {
-  error: Error & {
-    digest?: string
-  }
-  reset: () => void
-}
-
-export default function ErrorPage({
-  error,
-  reset,
-}: ErrorPageProps) {
-  useEffect(() => {
-    // Keep production logs minimal.
-    // Next.js/Vercel can associate errors using the digest.
-    if (process.env.NODE_ENV === 'development') {
-      console.error('[FeniX] Application error:', error)
-    }
-  }, [error])
-
+export default function NotFound() {
   return (
     <main
-      role="alert"
-      className="flex min-h-[100dvh] items-center justify-center px-5 py-12"
+      className="
+        flex
+        min-h-[100dvh]
+        items-center
+        justify-center
+        bg-[#eef3f5]
+        px-5
+        py-12
+        text-[#111827]
+        dark:bg-[#030506]
+        dark:text-white
+      "
     >
-      <section className="w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.03] p-7 text-center shadow-2xl backdrop-blur-xl sm:p-9">
+      <section
+        className="
+          w-full
+          max-w-lg
+          rounded-3xl
+          border
+          border-black/[0.08]
+          bg-white/65
+          p-8
+          text-center
+          shadow-2xl
+          shadow-black/10
+          backdrop-blur-xl
+          dark:border-white/10
+          dark:bg-white/[0.03]
+          dark:shadow-black/30
+          sm:p-10
+        "
+      >
         <div
           aria-hidden="true"
-          className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05]"
+          className="
+            mx-auto
+            flex
+            h-16
+            w-16
+            items-center
+            justify-center
+            rounded-2xl
+            border
+            border-[#008080]/20
+            bg-[#008080]/10
+            text-[#008080]
+            dark:text-[#72ddda]
+          "
         >
-          <WarningCircle
-            size={28}
+          <Compass
+            size={30}
             weight="duotone"
-            className="text-white"
           />
         </div>
 
-        <p className="mb-2 text-xs font-medium uppercase tracking-[0.24em] text-white/40">
+        <p
+          className="
+            mt-6
+            text-xs
+            font-semibold
+            uppercase
+            tracking-[0.25em]
+            text-[#008080]
+            dark:text-[#72ddda]
+          "
+        >
           FeniX
         </p>
 
-        <h1 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
-          Something went wrong
+        <h1 className="mt-3 text-5xl font-black tracking-tight sm:text-6xl">
+          404
         </h1>
 
-        <p className="mt-3 text-sm leading-6 text-white/55">
-          The page could not be loaded correctly. Please try again.
+        <h2 className="mt-3 text-xl font-bold sm:text-2xl">
+          Page not found
+        </h2>
+
+        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-black/55 dark:text-white/50">
+          The page you are looking for does not exist
+          or may have been moved.
         </p>
 
-        <button
-          type="button"
-          onClick={reset}
-          className="mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.98]"
+        <Link
+          href="/"
+          className="
+            mt-7
+            inline-flex
+            min-h-11
+            items-center
+            justify-center
+            gap-2
+            rounded-full
+            bg-[#008080]
+            px-5
+            py-2.5
+            text-sm
+            font-semibold
+            text-white
+            transition
+            hover:bg-[#079494]
+            active:scale-[0.98]
+          "
         >
-          <ArrowClockwise size={17} weight="bold" />
-          Try again
-        </button>
+          <ArrowLeft size={17} weight="bold" />
+          Back to FeniX
+        </Link>
       </section>
     </main>
   )
