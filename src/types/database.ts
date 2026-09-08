@@ -1,12 +1,15 @@
 /**
  * FeniX — Database Contract
  *
- * This file describes the verified public database schema.
+ * Verified against the current Supabase public schema.
+ *
+ * Tables:
+ * - public.profiles
+ * - public.businesses
  *
  * Important:
- * - Keep this aligned with the actual Supabase schema.
- * - Do not place secrets here.
- * - Database fields remain nullable where the database allows NULL.
+ * - Keep this synchronized with Supabase schema changes.
+ * - Never put secrets in this file.
  */
 
 export type Database = {
@@ -20,6 +23,7 @@ export type Database = {
           phone: string | null
           created_at: string
         }
+
         Insert: {
           id: string
           full_name?: string | null
@@ -27,6 +31,7 @@ export type Database = {
           phone?: string | null
           created_at?: string
         }
+
         Update: {
           id?: string
           full_name?: string | null
@@ -34,6 +39,7 @@ export type Database = {
           phone?: string | null
           created_at?: string
         }
+
         Relationships: []
       }
 
@@ -49,6 +55,7 @@ export type Database = {
           category: string | null
           feni_brain_embedding: number[] | null
         }
+
         Insert: {
           id?: string
           owner_id?: string | null
@@ -60,6 +67,7 @@ export type Database = {
           category?: string | null
           feni_brain_embedding?: number[] | null
         }
+
         Update: {
           id?: string
           owner_id?: string | null
@@ -71,6 +79,7 @@ export type Database = {
           category?: string | null
           feni_brain_embedding?: number[] | null
         }
+
         Relationships: [
           {
             foreignKeyName: 'businesses_owner_id_fkey'
@@ -93,9 +102,6 @@ export type Database = {
   }
 }
 
-/**
- * Convenient domain aliases
- */
 export type Profile =
   Database['public']['Tables']['profiles']['Row']
 
