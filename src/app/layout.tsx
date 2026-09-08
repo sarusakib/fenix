@@ -2,7 +2,6 @@ import './globals.css'
 
 import AuthSync from '../components/AuthSync'
 import FenixFlow from './FenixFlow'
-
 import HomeThemeProvider from '../components/theme/HomeThemeProvider'
 import SiteBackground from '../components/layout/SiteBackground'
 
@@ -18,20 +17,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-    >
-      <body
-        className="
-          min-h-screen
-          w-full
-          overflow-x-hidden
-          bg-[#030506]
-          text-white
-          antialiased
-        "
-      >
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen w-full overflow-x-clip bg-[#eef3f5] text-[#111827] antialiased dark:bg-[#030506] dark:text-white">
         <AuthSync />
 
         <FenixFlow>
