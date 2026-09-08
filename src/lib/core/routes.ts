@@ -2,9 +2,8 @@
  * FeniX — Central Route Registry
  *
  * Keep application routes in one place.
- *
  * Future services can be added here without scattering
- * hard-coded paths across the application.
+ * hard-coded paths throughout the application.
  */
 
 export const ROUTES = {
@@ -16,11 +15,8 @@ export const ROUTES = {
     resetPassword: '/auth/reset-password',
   },
 
-  current: {
-    guide: '/guide',
-  },
-
   core: {
+    guide: '/guide',
     directory: '/directory',
     business: '/business',
     brain: '/brain',
@@ -44,7 +40,3 @@ export const ROUTES = {
     settings: '/dashboard/settings',
   },
 } as const
-
-export type FenixRoute =
-  | (typeof ROUTES)[keyof typeof ROUTES][keyof (typeof ROUTES)[keyof typeof ROUTES]]
-  | string
