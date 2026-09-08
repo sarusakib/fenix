@@ -129,9 +129,12 @@ export default function Home() {
       <div className="relative z-10">
         <Navbar />
 
-        {/* ================= HERO ================= */}
+        {/* =====================================================
+            HERO
+            ===================================================== */}
         <section className="mx-auto max-w-7xl px-4 pb-20 pt-14 sm:px-6 sm:pb-28 sm:pt-20 lg:px-8 lg:pt-24">
           <div className="mx-auto max-w-5xl text-center">
+
             {/* Eyebrow */}
             <div
               className="
@@ -164,6 +167,7 @@ export default function Home() {
                 className="text-[#008080] dark:text-[#72ddda]"
                 weight="fill"
               />
+
               FeniX Business Ecosystem
             </div>
 
@@ -208,7 +212,9 @@ export default function Home() {
               investors, businesses, suppliers and local growth.
             </p>
 
-            {/* ================= SEARCH ================= */}
+            {/* =================================================
+                SEARCH
+                ================================================= */}
             <div className="mx-auto mt-8 max-w-3xl">
               <div
                 className="
@@ -346,7 +352,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ================= ACTION CARDS ================= */}
+          {/* =================================================
+              ACTION CARDS
+              ================================================= */}
           <div className="mx-auto mt-16 grid max-w-6xl gap-4 sm:mt-20 sm:grid-cols-2 xl:grid-cols-4">
             {actionCards.map((card) => {
               const Icon = card.icon
@@ -409,7 +417,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ================= ECOSYSTEM ================= */}
+        {/* =====================================================
+            ECOSYSTEM
+            ===================================================== */}
         <section
           className="
             border-y
@@ -436,6 +446,7 @@ export default function Home() {
                 guidance into a single experience.
               </p>
 
+              {/* Pill Highlights */}
               <div className="mt-8 flex flex-wrap gap-3">
                 {['Discover', 'Connect', 'Grow'].map((item) => (
                   <div
@@ -468,6 +479,7 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Ecosystem Cards */}
             <div className="grid gap-4 sm:grid-cols-2">
               {[
                 {
@@ -492,4 +504,173 @@ export default function Home() {
                   icon: Lightbulb,
                   number: '04',
                   text: 'Practical guidance turns questions into the next action.',
-                  accent: 'text-[#
+                  accent: 'text-[#9a751f] dark:text-[#d4b879]',
+                },
+              ].map(({ icon: Icon, number, text, accent }) => (
+                <div
+                  key={number}
+                  className="
+                    rounded-3xl
+                    border
+                    border-black/[0.04]
+                    bg-white/[0.075]
+                    p-6
+                    shadow-[0_7px_24px_rgba(0,0,0,0.02)]
+                    backdrop-blur-md
+                    dark:border-white/[0.065]
+                    dark:bg-black/[0.20]
+                    dark:shadow-[0_8px_26px_rgba(0,0,0,0.12)]
+                  "
+                >
+                  <Icon size={25} className={accent} />
+
+                  <div className="mt-6 text-3xl font-black text-[#111827] dark:text-white">
+                    {number}
+                  </div>
+
+                  <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
+                    {text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* =====================================================
+            FOUNDATION
+            ===================================================== */}
+        <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+          <div className="grid gap-5 lg:grid-cols-3">
+            {[
+              {
+                icon: ShieldCheck,
+                title: 'Security-minded foundation',
+                description:
+                  'Authentication, server-side operations and protected business actions are kept separate wherever they matter.',
+                accent: 'teal',
+              },
+              {
+                icon: Rocket,
+                title: 'Built to evolve',
+                description:
+                  'Future premium features can be introduced as optional modules without rebuilding the core experience.',
+                accent: 'gold',
+              },
+              {
+                icon: Sparkle,
+                title: 'Smart discovery',
+                description:
+                  'Feni Brain can turn natural-language questions into useful business discovery experiences.',
+                accent: 'teal',
+              },
+            ].map(
+              ({
+                icon: Icon,
+                title,
+                description,
+                accent,
+              }) => (
+                <div
+                  key={title}
+                  className="
+                    rounded-3xl
+                    border
+                    border-black/[0.04]
+                    bg-white/[0.075]
+                    p-6
+                    shadow-[0_7px_24px_rgba(0,0,0,0.02)]
+                    backdrop-blur-md
+                    dark:border-white/[0.07]
+                    dark:bg-black/[0.20]
+                    dark:shadow-[0_8px_26px_rgba(0,0,0,0.12)]
+                  "
+                >
+                  <Icon
+                    size={25}
+                    className={
+                      accent === 'teal'
+                        ? 'text-[#008080] dark:text-[#72ddda]'
+                        : 'text-[#9a751f] dark:text-[#d4b879]'
+                    }
+                  />
+
+                  <h3 className="mt-5 text-lg font-bold text-[#111827] dark:text-white">
+                    {title}
+                  </h3>
+
+                  <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
+                    {description}
+                  </p>
+                </div>
+              ),
+            )}
+          </div>
+        </section>
+
+        {/* =====================================================
+            FOOTER
+            ===================================================== */}
+        <footer
+          className="
+            border-t
+            border-black/[0.025]
+            bg-white/[0.025]
+            dark:border-white/[0.045]
+            dark:bg-black/[0.18]
+          "
+        >
+          <div
+            className="
+              mx-auto
+              flex
+              max-w-7xl
+              flex-col
+              gap-4
+              px-4
+              py-8
+              text-xs
+              text-black/40
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
+              sm:px-6
+              lg:px-8
+              dark:text-white/35
+            "
+          >
+            <div>
+              <span className="font-bold text-black/75 dark:text-white/75">
+                FeniX
+              </span>{' '}
+              — Feni Business Ecosystem
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Link
+                href="/guide"
+                className="transition hover:text-black dark:hover:text-white/70"
+              >
+                Guide
+              </Link>
+
+              <Link
+                href="/directory"
+                className="transition hover:text-black dark:hover:text-white/70"
+              >
+                Directory
+              </Link>
+
+              <Link
+                href="/login"
+                className="transition hover:text-black dark:hover:text-white/70"
+              >
+                Login
+              </Link>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </main>
+  )
+}
