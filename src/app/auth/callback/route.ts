@@ -8,8 +8,6 @@ export async function GET(request: Request) {
   const requestedNext = searchParams.get('next')
 
   // Only allow internal relative redirects.
-  // This prevents an external redirect such as:
-  // https://malicious-site.com
   const next =
     requestedNext &&
     requestedNext.startsWith('/') &&
@@ -18,7 +16,7 @@ export async function GET(request: Request) {
       : '/'
 
   if (code) {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { error } =
       await supabase.auth.exchangeCodeForSession(code)
