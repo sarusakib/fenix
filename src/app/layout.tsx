@@ -15,12 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-[#030506] text-white antialiased">
+      <body className="min-h-dvh bg-[#030506] text-white antialiased">
         <AuthSync />
-
-        <FenixFlow>
-          {children}
-        </FenixFlow>
+        <FenixFlow>{children}</FenixFlow>
       </body>
     </html>
   )
