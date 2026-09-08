@@ -7,142 +7,157 @@ import {
   useEffect,
   useMemo,
   useState,
+  type ReactNode,
 } from 'react'
 
 export type HomeTheme = 'light' | 'dark' | 'system'
+export type ResolvedHomeTheme = 'light' | 'dark'
 
-type ThemeContextValue = {
+interface HomeThemeContextValue {
   theme: HomeTheme
-  resolvedTheme: 'light' | 'dark'
+  resolvedTheme: ResolvedHomeTheme
   setTheme: (theme: HomeTheme) => void
 }
 
+const HomeThemeContext = createContext<HomeThemeContextValue | undefined>(
+  undefined,
+)
+
 const STORAGE_KEY = 'fenix-home-theme'
 
-const ThemeContext = createContext<ThemeContextValue | null>(null)
-
-function getSystemTheme(): 'light' | 'dark' {
+function getSystemTheme(): ResolvedHomeTheme {
   if (typeof window === 'undefined') {
     return 'dark'
   }
 
-  return window.matchMedia(
-    '(prefers-color-scheme: dark)'
-  ).matches
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light'
 }
 
 function getInitialTheme(): HomeTheme {
   if (typeof window === 'undefined') {
-    return 'system'
+    return 'dark'
   }
 
   try {
-    const saved = window.localStorage.getItem(STORAGE_KEY)
+    const storedTheme = window.localStorage.getItem(STORAGE_KEY)
 
     if (
-      saved === 'light' ||
-      saved === 'dark' ||
-      saved === 'system'
+      storedTheme === 'light' ||
+      storedTheme === 'dark' ||
+      storedTheme === 'system'
     ) {
-      return saved
+      return storedTheme
     }
   } catch {
-    // Ignore storage errors.
+    // localStorage may be unavailable.
   }
 
-  return 'system'
+  return 'dark'
 }
 
 export default function HomeThemeProvider({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
-  const [theme, setThemeState] =
-    useState<HomeTheme>(getInitialTheme)
-
-  const [systemTheme, setSystemTheme] =
-    useState<'light' | 'dark'>(getSystemTheme)
-
-  const resolvedTheme =
-    theme === 'system' ? systemTheme : theme
+  const [theme, setThemeState] = useState<HomeTheme>('dark')
+  const [mounted, setMounted] = useState(false)
 
   const setTheme = useCallback((nextTheme: HomeTheme) => {
     setThemeState(nextTheme)
 
     try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        nextTheme
-      )
+      window.localStorage.setItem(STORAGE_KEY, nextTheme)
     } catch {
-      // Ignore storage errors.
+      // Ignore storage errors and keep theme in memory.
     }
   }, [])
 
+  const resolvedTheme: ResolvedHomeTheme = useMemo(() => {
+    if (theme === 'system') {
+      return getSystemTheme()
+    }
+
+    return theme
+  }, [theme])
+
+  /* Load saved theme after hydration */
   useEffect(() => {
-    const mediaQuery = window.matchMedia(
-      '(prefers-color-scheme: dark)'
-    )
-
-    const updateSystemTheme = () => {
-      setSystemTheme(
-        mediaQuery.matches ? 'dark' : 'light'
-      )
-    }
-
-    updateSystemTheme()
-
-    mediaQuery.addEventListener(
-      'change',
-      updateSystemTheme
-    )
-
-    return () => {
-      mediaQuery.removeEventListener(
-        'change',
-        updateSystemTheme
-      )
-    }
+    setThemeState(getInitialTheme())
+    setMounted(true)
   }, [])
 
+  /* Apply theme to <html> */
   useEffect(() => {
+    if (!mounted) {
+      return
+    }
+
     const root = document.documentElement
 
-    root.classList.toggle(
-      'dark',
-      resolvedTheme === 'dark'
+    root.classList.toggle('dark', resolvedTheme === 'dark')
+
+    root.dataset.homeTheme = theme
+    root.style.colorScheme = resolvedTheme
+  }, [mounted, theme, resolvedTheme])
+
+  /* Follow OS theme when "system" is selected */
+  useEffect(() => {
+    if (!mounted || theme !== 'system') {
+      return
+    }
+
+    const mediaQuery = window.matchMedia(
+      '(prefers-color-scheme: dark)',
     )
 
-    root.dataset.homeTheme = resolvedTheme
+    const handleChange = () => {
+      const nextResolvedTheme = mediaQuery.matches
+        ? 'dark'
+        : 'light'
 
-    root.style.colorScheme = resolvedTheme
-  }, [resolvedTheme])
+      document.documentElement.classList.toggle(
+        'dark',
+        nextResolvedTheme === 'dark',
+      )
 
-  const value = useMemo<ThemeContextValue>(
+      document.documentElement.style.colorScheme =
+        nextResolvedTheme
+    }
+
+    handleChange()
+
+    mediaQuery.addEventListener('change', handleChange)
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange)
+    }
+  }, [mounted, theme])
+
+  const value = useMemo<HomeThemeContextValue>(
     () => ({
       theme,
       resolvedTheme,
       setTheme,
     }),
-    [theme, resolvedTheme, setTheme]
+    [theme, resolvedTheme, setTheme],
   )
 
   return (
-    <ThemeContext.Provider value={value}>
+    <HomeThemeContext.Provider value={value}>
       {children}
-    </ThemeContext.Provider>
+    </HomeThemeContext.Provider>
   )
 }
 
-export function useHomeTheme() {
-  const context = useContext(ThemeContext)
+export function useHomeTheme(): HomeThemeContextValue {
+  const context = useContext(HomeThemeContext)
 
   if (!context) {
     throw new Error(
-      'useHomeTheme must be used inside HomeThemeProvider'
+      'useHomeTheme must be used inside HomeThemeProvider',
     )
   }
 
