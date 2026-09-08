@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ElementType, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -27,7 +27,7 @@ type ActionCard = {
   title: string
   description: string
   href: string
-  icon: React.ElementType
+  icon: ElementType
   accent: Accent
 }
 
@@ -78,15 +78,15 @@ function AccentIcon({
   children,
 }: {
   accent: Accent
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <div
       className={[
         'flex h-11 w-11 items-center justify-center rounded-2xl border',
         accent === 'teal'
-          ? 'border-[#008080]/25 bg-[#008080]/10 text-[#007d7d] dark:text-[#72ddda]'
-          : 'border-[#d4b879]/30 bg-[#d4b879]/10 text-[#9a751f] dark:text-[#d4b879]',
+          ? 'border-[#008080]/15 bg-[#008080]/[0.06] text-[#007878] dark:border-[#008080]/25 dark:bg-[#008080]/10 dark:text-[#72ddda]'
+          : 'border-[#d4b879]/20 bg-[#d4b879]/[0.07] text-[#9a751f] dark:border-[#d4b879]/30 dark:bg-[#d4b879]/10 dark:text-[#d4b879]',
       ].join(' ')}
     >
       {children}
@@ -109,15 +109,11 @@ export default function Home() {
       return
     }
 
-    router.push(
-      `/guide?q=${encodeURIComponent(normalizedQuery)}`,
-    )
+    router.push(`/guide?q=${encodeURIComponent(normalizedQuery)}`)
   }
 
   const handlePrompt = (prompt: string) => {
-    router.push(
-      `/guide?q=${encodeURIComponent(prompt)}`,
-    )
+    router.push(`/guide?q=${encodeURIComponent(prompt)}`)
   }
 
   return (
@@ -131,14 +127,13 @@ export default function Home() {
       "
     >
       <div className="relative z-10">
-
         <Navbar />
 
         {/* Hero */}
-
         <section className="mx-auto max-w-7xl px-4 pb-20 pt-14 sm:px-6 sm:pb-28 sm:pt-20 lg:px-8 lg:pt-24">
           <div className="mx-auto max-w-5xl text-center">
 
+            {/* Eyebrow */}
             <div
               className="
                 mx-auto
@@ -147,16 +142,16 @@ export default function Home() {
                 gap-2
                 rounded-full
                 border
-                border-black/10
-                bg-white/55
+                border-black/[0.045]
+                bg-white/[0.18]
                 px-3
                 py-1.5
                 text-[10px]
                 font-semibold
                 uppercase
                 tracking-[0.18em]
-                text-black/55
-                shadow-sm
+                text-black/50
+                shadow-[0_4px_18px_rgba(0,0,0,0.025)]
                 backdrop-blur-md
                 dark:border-white/10
                 dark:bg-white/[0.04]
@@ -174,6 +169,7 @@ export default function Home() {
               FeniX Business Ecosystem
             </div>
 
+            {/* Heading */}
             <h1
               className="
                 mx-auto
@@ -195,6 +191,7 @@ export default function Home() {
               </span>
             </h1>
 
+            {/* Description */}
             <p
               className="
                 mx-auto
@@ -214,18 +211,15 @@ export default function Home() {
             </p>
 
             {/* Search */}
-
             <div className="mx-auto mt-8 max-w-3xl">
-
               <div
                 className="
                   rounded-2xl
                   border
-                  border-black/10
-                  bg-white/60
+                  border-black/[0.055]
+                  bg-white/[0.26]
                   p-2
-                  shadow-2xl
-                  shadow-black/10
+                  shadow-[0_12px_40px_rgba(0,0,0,0.055)]
                   backdrop-blur-xl
                   dark:border-white/10
                   dark:bg-black/35
@@ -234,7 +228,6 @@ export default function Home() {
                 "
               >
                 <div className="flex flex-col gap-2 sm:flex-row">
-
                   <div
                     className="
                       flex
@@ -244,9 +237,10 @@ export default function Home() {
                       gap-3
                       rounded-xl
                       border
-                      border-black/[0.07]
-                      bg-black/[0.025]
+                      border-black/[0.045]
+                      bg-white/[0.12]
                       px-4
+                      backdrop-blur-md
                       sm:min-h-[58px]
                       sm:rounded-2xl
                       dark:border-white/[0.07]
@@ -262,9 +256,7 @@ export default function Home() {
                       type="search"
                       value={searchQuery}
                       onChange={(event) =>
-                        setSearchQuery(
-                          event.target.value.slice(0, 120),
-                        )
+                        setSearchQuery(event.target.value.slice(0, 120))
                       }
                       onKeyDown={(event) => {
                         if (event.key === 'Enter') {
@@ -304,6 +296,7 @@ export default function Home() {
                       font-bold
                       text-white
                       transition
+                      duration-200
                       hover:bg-[#079494]
                       active:scale-[0.99]
                       sm:min-h-[58px]
@@ -316,6 +309,7 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Quick prompts */}
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {quickPrompts.map((prompt) => (
                   <button
@@ -326,18 +320,22 @@ export default function Home() {
                       min-h-10
                       rounded-full
                       border
-                      border-black/[0.08]
-                      bg-white/50
+                      border-black/[0.05]
+                      bg-white/[0.16]
                       px-3.5
                       text-xs
                       text-black/55
+                      shadow-[0_3px_14px_rgba(0,0,0,0.02)]
+                      backdrop-blur-md
                       transition
-                      hover:border-black/15
-                      hover:bg-white/75
+                      duration-200
+                      hover:border-black/[0.09]
+                      hover:bg-white/[0.28]
                       hover:text-black
                       dark:border-white/[0.07]
                       dark:bg-white/[0.025]
                       dark:text-white/45
+                      dark:shadow-none
                       dark:hover:border-white/15
                       dark:hover:bg-white/[0.05]
                       dark:hover:text-white/75
@@ -351,7 +349,6 @@ export default function Home() {
           </div>
 
           {/* Action Cards */}
-
           <div className="mx-auto mt-16 grid max-w-6xl gap-4 sm:mt-20 sm:grid-cols-2 xl:grid-cols-4">
             {actionCards.map((card) => {
               const Icon = card.icon
@@ -364,16 +361,17 @@ export default function Home() {
                     group
                     rounded-3xl
                     border
-                    border-black/[0.08]
-                    bg-white/50
+                    border-black/[0.055]
+                    bg-white/[0.18]
                     p-5
-                    shadow-sm
-                    backdrop-blur-xl
+                    shadow-[0_8px_28px_rgba(0,0,0,0.035)]
+                    backdrop-blur-lg
                     transition
                     duration-300
                     hover:-translate-y-1
-                    hover:border-black/[0.15]
-                    hover:bg-white/70
+                    hover:border-black/[0.09]
+                    hover:bg-white/[0.27]
+                    hover:shadow-[0_14px_36px_rgba(0,0,0,0.055)]
                     dark:border-white/[0.08]
                     dark:bg-black/30
                     dark:shadow-none
@@ -414,18 +412,16 @@ export default function Home() {
         </section>
 
         {/* Ecosystem */}
-
         <section
           className="
             border-y
-            border-black/[0.07]
-            bg-white/25
+            border-black/[0.035]
+            bg-white/[0.06]
             dark:border-white/[0.06]
             dark:bg-black/20
           "
         >
           <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
-
             <div>
               <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#008080] dark:text-[#72ddda]">
                 <Compass size={16} />
@@ -443,42 +439,39 @@ export default function Home() {
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
-
-                {['Discover', 'Connect', 'Grow'].map(
-                  (item) => (
-                    <div
-                      key={item}
-                      className="
-                        inline-flex
-                        items-center
-                        gap-2
-                        rounded-full
-                        border
-                        border-black/10
-                        bg-white/50
-                        px-4
-                        py-2
-                        text-xs
-                        text-black/55
-                        dark:border-white/10
-                        dark:bg-white/[0.03]
-                        dark:text-white/55
-                      "
-                    >
-                      <CheckCircle
-                        size={15}
-                        className="text-[#008080] dark:text-[#72ddda]"
-                      />
-                      {item}
-                    </div>
-                  ),
-                )}
-
+                {['Discover', 'Connect', 'Grow'].map((item) => (
+                  <div
+                    key={item}
+                    className="
+                      inline-flex
+                      items-center
+                      gap-2
+                      rounded-full
+                      border
+                      border-black/[0.05]
+                      bg-white/[0.14]
+                      px-4
+                      py-2
+                      text-xs
+                      text-black/55
+                      backdrop-blur-md
+                      dark:border-white/10
+                      dark:bg-white/[0.03]
+                      dark:text-white/55
+                    "
+                  >
+                    <CheckCircle
+                      size={15}
+                      className="text-[#008080] dark:text-[#72ddda]"
+                    />
+                    {item}
+                  </div>
+                ))}
               </div>
             </div>
 
+            {/* Ecosystem Cards */}
             <div className="grid gap-4 sm:grid-cols-2">
-
               {[
                 {
                   icon: Buildings,
@@ -504,59 +497,49 @@ export default function Home() {
                   text: 'Practical guidance turns questions into the next action.',
                   accent: 'text-[#9a751f] dark:text-[#d4b879]',
                 },
-              ].map(
-                ({
-                  icon: Icon,
-                  number,
-                  text,
-                  accent,
-                }) => (
-                  <div
-                    key={number}
-                    className="
-                      rounded-3xl
-                      border
-                      border-black/[0.08]
-                      bg-white/45
-                      p-6
-                      shadow-sm
-                      backdrop-blur-xl
-                      dark:border-white/[0.07]
-                      dark:bg-white/[0.025]
-                      dark:shadow-none
-                    "
-                  >
-                    <Icon size={25} className={accent} />
+              ].map(({ icon: Icon, number, text, accent }) => (
+                <div
+                  key={number}
+                  className="
+                    rounded-3xl
+                    border
+                    border-black/[0.055]
+                    bg-white/[0.16]
+                    p-6
+                    shadow-[0_8px_28px_rgba(0,0,0,0.03)]
+                    backdrop-blur-lg
+                    dark:border-white/[0.07]
+                    dark:bg-white/[0.025]
+                    dark:shadow-none
+                  "
+                >
+                  <Icon size={25} className={accent} />
 
-                    <div className="mt-6 text-3xl font-black text-[#111827] dark:text-white">
-                      {number}
-                    </div>
-
-                    <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
-                      {text}
-                    </p>
+                  <div className="mt-6 text-3xl font-black text-[#111827] dark:text-white">
+                    {number}
                   </div>
-                ),
-              )}
 
+                  <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
+                    {text}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Foundation */}
-
         <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <div className="grid gap-5 lg:grid-cols-3">
-
             <div
               className="
                 rounded-3xl
                 border
-                border-black/[0.08]
-                bg-white/45
+                border-black/[0.055]
+                bg-white/[0.16]
                 p-6
-                shadow-sm
-                backdrop-blur-xl
+                shadow-[0_8px_28px_rgba(0,0,0,0.03)]
+                backdrop-blur-lg
                 dark:border-white/[0.08]
                 dark:bg-black/25
                 dark:shadow-none
@@ -582,11 +565,11 @@ export default function Home() {
               className="
                 rounded-3xl
                 border
-                border-black/[0.08]
-                bg-white/45
+                border-black/[0.055]
+                bg-white/[0.16]
                 p-6
-                shadow-sm
-                backdrop-blur-xl
+                shadow-[0_8px_28px_rgba(0,0,0,0.03)]
+                backdrop-blur-lg
                 dark:border-white/[0.08]
                 dark:bg-black/25
                 dark:shadow-none
@@ -612,11 +595,11 @@ export default function Home() {
               className="
                 rounded-3xl
                 border
-                border-black/[0.08]
-                bg-white/45
+                border-black/[0.055]
+                bg-white/[0.16]
                 p-6
-                shadow-sm
-                backdrop-blur-xl
+                shadow-[0_8px_28px_rgba(0,0,0,0.03)]
+                backdrop-blur-lg
                 dark:border-white/[0.08]
                 dark:bg-black/25
                 dark:shadow-none
@@ -636,17 +619,15 @@ export default function Home() {
                 into useful business discovery experiences.
               </p>
             </div>
-
           </div>
         </section>
 
         {/* Footer */}
-
         <footer
           className="
             border-t
-            border-black/[0.07]
-            bg-white/30
+            border-black/[0.035]
+            bg-white/[0.07]
             dark:border-white/[0.06]
             dark:bg-black/30
           "
@@ -701,7 +682,6 @@ export default function Home() {
             </div>
           </div>
         </footer>
-
       </div>
     </main>
   )
