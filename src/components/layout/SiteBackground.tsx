@@ -5,22 +5,24 @@ export default function SiteBackground() {
       className="
         pointer-events-none
         fixed
-        inset-0
+        left-0
+        top-0
         z-0
+        h-[100svh]
+        w-screen
         overflow-hidden
         bg-[#eef3f5]
         dark:bg-[#030506]
       "
     >
       {/* Portrait */}
-
       <div
         className="
           fenix-portrait-background
           absolute
           inset-0
-          items-center
-          justify-center
+          h-full
+          w-full
           bg-[#eef3f5]
           bg-center
           bg-no-repeat
@@ -34,14 +36,13 @@ export default function SiteBackground() {
       />
 
       {/* Landscape */}
-
       <div
         className="
           fenix-landscape-background
           absolute
           inset-0
-          items-center
-          justify-center
+          h-full
+          w-full
           bg-[#eef3f5]
           bg-center
           bg-no-repeat
@@ -54,37 +55,33 @@ export default function SiteBackground() {
         }}
       />
 
-      {/* Light / dark cinematic overlay */}
-
+      {/* Controlled cinematic overlay */}
       <div
         className="
           absolute
           inset-0
-          bg-white/35
-          dark:bg-black/35
+          bg-white/15
+          dark:bg-black/40
         "
       />
 
-      {/* Vignette */}
-
+      {/* Stable vignette */}
       <div
         className="
           absolute
           inset-0
-          bg-[radial-gradient(circle_at_center,transparent_18%,rgba(0,0,0,0.10)_100%)]
-          dark:bg-[radial-gradient(circle_at_center,transparent_12%,rgba(0,0,0,0.58)_100%)]
+          bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.08)_100%)]
+          dark:bg-[radial-gradient(circle_at_center,transparent_12%,rgba(0,0,0,0.62)_100%)]
         "
       />
 
-      {/* Teal cinematic glow */}
-
+      {/* Subtle teal atmosphere */}
       <div
         className="
           absolute
           inset-0
-          bg-[radial-gradient(circle_at_50%_18%,rgba(0,128,128,0.12),transparent_45%)]
-          opacity-80
-          dark:opacity-30
+          bg-[radial-gradient(circle_at_50%_18%,rgba(0,128,128,0.08),transparent_45%)]
+          dark:bg-[radial-gradient(circle_at_50%_18%,rgba(0,128,128,0.08),transparent_45%)]
         "
       />
     </div>
