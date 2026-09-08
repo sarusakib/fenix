@@ -42,7 +42,7 @@ export default function SiteBackground() {
           inset-0
           h-full
           w-full
-          bg-[#eef3f5]
+          bg-[#030506]
           bg-center
           bg-cover
           bg-no-repeat
@@ -54,7 +54,8 @@ export default function SiteBackground() {
         }}
       />
 
-      {/* Minimal Light/Dark Overlay */}
+      {/* Minimal Overlay
+          Keeps the original image clearly visible */}
       <div
         className="
           absolute
@@ -74,7 +75,7 @@ export default function SiteBackground() {
         "
       />
 
-      {/* Subtle FeniX Teal Atmosphere */}
+      {/* Subtle FeniX Atmosphere */}
       <div
         className="
           absolute
