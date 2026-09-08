@@ -1,6 +1,10 @@
 import './globals.css'
+
 import AuthSync from '../components/AuthSync'
 import FenixFlow from './FenixFlow'
+
+import HomeThemeProvider from '../components/theme/HomeThemeProvider'
+import SiteBackground from '../components/SiteBackground'
 
 export const metadata = {
   title: 'FeniX | Business Ecosystem',
@@ -14,10 +18,25 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-dvh bg-[#030506] text-white antialiased">
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className="
+          min-h-screen
+          overflow-x-hidden
+          bg-[#030506]
+          text-white
+          antialiased
+        "
+      >
         <AuthSync />
-        <FenixFlow>{children}</FenixFlow>
+
+        <FenixFlow>
+          <HomeThemeProvider>
+            <SiteBackground />
+
+            {children}
+          </HomeThemeProvider>
+        </FenixFlow>
       </body>
     </html>
   )
