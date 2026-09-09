@@ -85,8 +85,8 @@ function AccentIcon({
       className={[
         'flex h-11 w-11 items-center justify-center rounded-2xl border backdrop-blur-sm',
         accent === 'teal'
-          ? 'border-[#008080]/15 bg-[#008080]/[0.045] text-[#007878] dark:border-[#72ddda]/20 dark:bg-[#008080]/[0.08] dark:text-[#72ddda]'
-          : 'border-[#d4b879]/18 bg-[#d4b879]/[0.05] text-[#9a751f] dark:border-[#d4b879]/22 dark:bg-[#d4b879]/[0.08] dark:text-[#d4b879]',
+          ? 'border-[#72ddda]/15 bg-[#008080]/[0.055] text-[#72ddda] dark:border-[#72ddda]/20 dark:bg-[#008080]/[0.08] dark:text-[#72ddda]'
+          : 'border-[#d4b879]/18 bg-[#d4b879]/[0.06] text-[#d4b879] dark:border-[#d4b879]/22 dark:bg-[#d4b879]/[0.08] dark:text-[#d4b879]',
       ].join(' ')}
     >
       {children}
@@ -122,8 +122,7 @@ export default function Home() {
         relative
         min-h-dvh
         overflow-x-clip
-        text-[#111827]
-        dark:text-white
+        text-white
       "
     >
       <div className="relative z-10">
@@ -134,7 +133,6 @@ export default function Home() {
             ===================================================== */}
         <section className="mx-auto max-w-7xl px-4 pb-20 pt-14 sm:px-6 sm:pb-28 sm:pt-20 lg:px-8 lg:pt-24">
           <div className="mx-auto max-w-5xl text-center">
-
             {/* Eyebrow */}
             <div
               className="
@@ -144,27 +142,23 @@ export default function Home() {
                 gap-2
                 rounded-full
                 border
-                border-black/[0.035]
-                bg-white/[0.075]
+                border-white/[0.10]
+                bg-black/[0.18]
                 px-3
                 py-1.5
                 text-[10px]
                 font-semibold
                 uppercase
                 tracking-[0.18em]
-                text-black/50
-                shadow-[0_4px_18px_rgba(0,0,0,0.018)]
+                text-white/65
+                shadow-[0_4px_18px_rgba(0,0,0,0.10)]
                 backdrop-blur-sm
-                dark:border-white/[0.08]
-                dark:bg-white/[0.035]
-                dark:text-white/55
-                dark:shadow-none
                 sm:text-xs
               "
             >
               <Sparkle
                 size={13}
-                className="text-[#008080] dark:text-[#72ddda]"
+                className="text-[#72ddda]"
                 weight="fill"
               />
 
@@ -181,14 +175,13 @@ export default function Home() {
                 text-4xl
                 font-black
                 tracking-[-0.04em]
-                text-[#111827]
+                text-white
                 sm:text-6xl
                 lg:text-7xl
-                dark:text-white
               "
             >
               Build the future of business in{' '}
-              <span className="text-[#008080] dark:text-[#72ddda]">
+              <span className="text-[#72ddda]">
                 Feni.
               </span>
             </h1>
@@ -202,10 +195,9 @@ export default function Home() {
                 text-pretty
                 text-sm
                 leading-7
-                text-black/55
+                text-white/60
                 sm:text-base
                 sm:leading-8
-                dark:text-white/55
               "
             >
               One connected ecosystem for entrepreneurs,
@@ -220,14 +212,11 @@ export default function Home() {
                 className="
                   rounded-2xl
                   border
-                  border-black/[0.045]
-                  bg-white/[0.13]
+                  border-white/[0.10]
+                  bg-black/[0.22]
                   p-2
-                  shadow-[0_10px_32px_rgba(0,0,0,0.035)]
+                  shadow-[0_10px_32px_rgba(0,0,0,0.14)]
                   backdrop-blur-lg
-                  dark:border-white/[0.09]
-                  dark:bg-black/[0.24]
-                  dark:shadow-[0_12px_35px_rgba(0,0,0,0.18)]
                   sm:rounded-3xl
                 "
               >
@@ -241,19 +230,17 @@ export default function Home() {
                       gap-3
                       rounded-xl
                       border
-                      border-black/[0.035]
-                      bg-white/[0.075]
+                      border-white/[0.08]
+                      bg-black/[0.16]
                       px-4
                       backdrop-blur-sm
                       sm:min-h-[58px]
                       sm:rounded-2xl
-                      dark:border-white/[0.065]
-                      dark:bg-white/[0.035]
                     "
                   >
                     <MagnifyingGlass
                       size={21}
-                      className="shrink-0 text-black/35 dark:text-white/35"
+                      className="shrink-0 text-white/40"
                     />
 
                     <input
@@ -274,12 +261,10 @@ export default function Home() {
                         w-full
                         bg-transparent
                         text-sm
-                        text-[#111827]
+                        text-white
                         outline-none
-                        placeholder:text-black/30
+                        placeholder:text-white/30
                         sm:text-base
-                        dark:text-white
-                        dark:placeholder:text-white/25
                       "
                     />
                   </div>
@@ -324,25 +309,18 @@ export default function Home() {
                       min-h-10
                       rounded-full
                       border
-                      border-black/[0.04]
-                      bg-white/[0.07]
+                      border-white/[0.09]
+                      bg-black/[0.14]
                       px-3.5
                       text-xs
-                      text-black/55
-                      shadow-[0_3px_12px_rgba(0,0,0,0.015)]
+                      text-white/60
+                      shadow-[0_3px_12px_rgba(0,0,0,0.08)]
                       backdrop-blur-sm
                       transition
                       duration-200
-                      hover:border-black/[0.07]
-                      hover:bg-white/[0.13]
-                      hover:text-black
-                      dark:border-white/[0.065]
-                      dark:bg-white/[0.025]
-                      dark:text-white/45
-                      dark:shadow-none
-                      dark:hover:border-white/[0.13]
-                      dark:hover:bg-white/[0.045]
-                      dark:hover:text-white/75
+                      hover:border-white/[0.16]
+                      hover:bg-black/[0.22]
+                      hover:text-white
                     "
                   >
                     {prompt}
@@ -367,22 +345,17 @@ export default function Home() {
                     group
                     rounded-3xl
                     border
-                    border-black/[0.045]
-                    bg-white/[0.085]
+                    border-white/[0.09]
+                    bg-black/[0.20]
                     p-5
-                    shadow-[0_8px_26px_rgba(0,0,0,0.025)]
+                    shadow-[0_8px_26px_rgba(0,0,0,0.12)]
                     backdrop-blur-md
                     transition
                     duration-300
                     hover:-translate-y-1
-                    hover:border-black/[0.075]
-                    hover:bg-white/[0.14]
-                    hover:shadow-[0_14px_34px_rgba(0,0,0,0.04)]
-                    dark:border-white/[0.075]
-                    dark:bg-black/[0.23]
-                    dark:shadow-[0_8px_28px_rgba(0,0,0,0.14)]
-                    dark:hover:border-white/[0.13]
-                    dark:hover:bg-black/[0.30]
+                    hover:border-white/[0.15]
+                    hover:bg-black/[0.28]
+                    hover:shadow-[0_14px_34px_rgba(0,0,0,0.18)]
                   "
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -394,21 +367,19 @@ export default function Home() {
                       size={18}
                       className="
                         mt-1
-                        text-black/20
+                        text-white/25
                         transition
                         group-hover:translate-x-1
-                        group-hover:text-black/55
-                        dark:text-white/20
-                        dark:group-hover:text-white/60
+                        group-hover:text-white/70
                       "
                     />
                   </div>
 
-                  <h2 className="mt-5 text-lg font-bold text-[#111827] dark:text-white">
+                  <h2 className="mt-5 text-lg font-bold text-white">
                     {card.title}
                   </h2>
 
-                  <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
+                  <p className="mt-2 text-sm leading-6 text-white/50">
                     {card.description}
                   </p>
                 </Link>
@@ -423,24 +394,22 @@ export default function Home() {
         <section
           className="
             border-y
-            border-black/[0.025]
-            bg-white/[0.025]
-            dark:border-white/[0.045]
-            dark:bg-black/[0.13]
+            border-white/[0.06]
+            bg-black/[0.12]
           "
         >
           <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
             <div>
-              <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#008080] dark:text-[#72ddda]">
+              <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#72ddda]">
                 <Compass size={16} />
                 One ecosystem
               </div>
 
-              <h2 className="mt-4 max-w-2xl text-3xl font-black tracking-tight text-[#111827] sm:text-5xl dark:text-white">
+              <h2 className="mt-4 max-w-2xl text-3xl font-black tracking-tight text-white sm:text-5xl">
                 Local business growth, connected in one place.
               </h2>
 
-              <p className="mt-5 max-w-2xl text-sm leading-7 text-black/55 sm:text-base sm:leading-8 dark:text-white/50">
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-white/55 sm:text-base sm:leading-8">
                 FeniX is designed to bring local commerce,
                 business discovery, investment and practical
                 guidance into a single experience.
@@ -457,21 +426,18 @@ export default function Home() {
                       gap-2
                       rounded-full
                       border
-                      border-black/[0.04]
-                      bg-white/[0.065]
+                      border-white/[0.08]
+                      bg-black/[0.14]
                       px-4
                       py-2
                       text-xs
-                      text-black/55
+                      text-white/60
                       backdrop-blur-sm
-                      dark:border-white/[0.08]
-                      dark:bg-white/[0.025]
-                      dark:text-white/55
                     "
                   >
                     <CheckCircle
                       size={15}
-                      className="text-[#008080] dark:text-[#72ddda]"
+                      className="text-[#72ddda]"
                     />
                     {item}
                   </div>
@@ -486,25 +452,25 @@ export default function Home() {
                   icon: Buildings,
                   number: '01',
                   text: 'Businesses can build presence, discover connections and grow.',
-                  accent: 'text-[#008080] dark:text-[#72ddda]',
+                  accent: 'text-[#72ddda]',
                 },
                 {
                   icon: Users,
                   number: '02',
                   text: 'People can find useful local services and opportunities faster.',
-                  accent: 'text-[#9a751f] dark:text-[#d4b879]',
+                  accent: 'text-[#d4b879]',
                 },
                 {
                   icon: TrendUp,
                   number: '03',
                   text: 'Investors can discover potential ideas and local momentum.',
-                  accent: 'text-[#008080] dark:text-[#72ddda]',
+                  accent: 'text-[#72ddda]',
                 },
                 {
                   icon: Lightbulb,
                   number: '04',
                   text: 'Practical guidance turns questions into the next action.',
-                  accent: 'text-[#9a751f] dark:text-[#d4b879]',
+                  accent: 'text-[#d4b879]',
                 },
               ].map(({ icon: Icon, number, text, accent }) => (
                 <div
@@ -512,23 +478,20 @@ export default function Home() {
                   className="
                     rounded-3xl
                     border
-                    border-black/[0.04]
-                    bg-white/[0.075]
+                    border-white/[0.08]
+                    bg-black/[0.18]
                     p-6
-                    shadow-[0_7px_24px_rgba(0,0,0,0.02)]
+                    shadow-[0_7px_24px_rgba(0,0,0,0.10)]
                     backdrop-blur-md
-                    dark:border-white/[0.065]
-                    dark:bg-black/[0.20]
-                    dark:shadow-[0_8px_26px_rgba(0,0,0,0.12)]
                   "
                 >
                   <Icon size={25} className={accent} />
 
-                  <div className="mt-6 text-3xl font-black text-[#111827] dark:text-white">
+                  <div className="mt-6 text-3xl font-black text-white">
                     {number}
                   </div>
 
-                  <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
+                  <p className="mt-2 text-sm leading-6 text-white/50">
                     {text}
                   </p>
                 </div>
@@ -576,30 +539,27 @@ export default function Home() {
                   className="
                     rounded-3xl
                     border
-                    border-black/[0.04]
-                    bg-white/[0.075]
+                    border-white/[0.08]
+                    bg-black/[0.18]
                     p-6
-                    shadow-[0_7px_24px_rgba(0,0,0,0.02)]
+                    shadow-[0_7px_24px_rgba(0,0,0,0.10)]
                     backdrop-blur-md
-                    dark:border-white/[0.07]
-                    dark:bg-black/[0.20]
-                    dark:shadow-[0_8px_26px_rgba(0,0,0,0.12)]
                   "
                 >
                   <Icon
                     size={25}
                     className={
                       accent === 'teal'
-                        ? 'text-[#008080] dark:text-[#72ddda]'
-                        : 'text-[#9a751f] dark:text-[#d4b879]'
+                        ? 'text-[#72ddda]'
+                        : 'text-[#d4b879]'
                     }
                   />
 
-                  <h3 className="mt-5 text-lg font-bold text-[#111827] dark:text-white">
+                  <h3 className="mt-5 text-lg font-bold text-white">
                     {title}
                   </h3>
 
-                  <p className="mt-2 text-sm leading-6 text-black/50 dark:text-white/45">
+                  <p className="mt-2 text-sm leading-6 text-white/50">
                     {description}
                   </p>
                 </div>
@@ -614,10 +574,8 @@ export default function Home() {
         <footer
           className="
             border-t
-            border-black/[0.025]
-            bg-white/[0.025]
-            dark:border-white/[0.045]
-            dark:bg-black/[0.18]
+            border-white/[0.06]
+            bg-black/[0.16]
           "
         >
           <div
@@ -630,17 +588,16 @@ export default function Home() {
               px-4
               py-8
               text-xs
-              text-black/40
+              text-white/40
               sm:flex-row
               sm:items-center
               sm:justify-between
               sm:px-6
               lg:px-8
-              dark:text-white/35
             "
           >
             <div>
-              <span className="font-bold text-black/75 dark:text-white/75">
+              <span className="font-bold text-white/80">
                 FeniX
               </span>{' '}
               — Feni Business Ecosystem
@@ -649,21 +606,21 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <Link
                 href="/guide"
-                className="transition hover:text-black dark:hover:text-white/70"
+                className="transition hover:text-white/80"
               >
                 Guide
               </Link>
 
               <Link
                 href="/directory"
-                className="transition hover:text-black dark:hover:text-white/70"
+                className="transition hover:text-white/80"
               >
                 Directory
               </Link>
 
               <Link
                 href="/login"
-                className="transition hover:text-black dark:hover:text-white/70"
+                className="transition hover:text-white/80"
               >
                 Login
               </Link>
