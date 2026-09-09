@@ -1,633 +1,921 @@
 'use client'
 
-import { useMemo, useState, type ElementType, type ReactNode } from 'react'
-import Link from 'next/link'
+import { ElementType, ReactNode, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  ArrowRight,
-  Buildings,
-  CaretRight,
-  CheckCircle,
-  Compass,
+  Rocket,
+  TrendUp,
+  Storefront,
   Lightbulb,
   MagnifyingGlass,
-  Rocket,
-  ShieldCheck,
   Sparkle,
-  Storefront,
-  TrendUp,
+  ArrowRight,
+  ShieldCheck,
+  Buildings,
   Users,
+  Compass,
+  CaretRight,
+  CheckCircle,
 } from '@phosphor-icons/react'
 
-import Navbar from '../components/Navbar'
+import Navbar from '../components/layout/Navbar'
 
-type Accent = 'teal' | 'gold'
+/* ============================================================
+   TYPES
+   ============================================================ */
+
+type Accent = 'teal' | 'gold' | 'white'
 
 type ActionCard = {
   title: string
   description: string
-  href: string
   icon: ElementType
   accent: Accent
+  href: string
+  badge?: string
 }
 
-const actionCards: ActionCard[] = [
-  {
-    title: 'Start a Business',
-    description:
-      'Build your business journey with guidance, discovery and a connected local ecosystem.',
-    href: '/start',
-    icon: Rocket,
-    accent: 'teal',
-  },
-  {
-    title: 'Invest in Feni',
-    description:
-      'Discover emerging opportunities and connect ideas with local growth.',
-    href: '/invest',
-    icon: TrendUp,
-    accent: 'gold',
-  },
-  {
-    title: 'Find Suppliers',
-    description:
-      'Explore businesses, suppliers and useful commercial connections across Feni.',
-    href: '/directory',
-    icon: Storefront,
-    accent: 'teal',
-  },
-  {
-    title: 'Business Guide',
-    description:
-      'Get practical answers and discover the right next step for your business.',
-    href: '/guide',
-    icon: Lightbulb,
-    accent: 'gold',
-  },
-]
+type Prompt = {
+  label: string
+  value: string
+}
 
-const quickPrompts = [
-  'How do I start a business in Feni?',
-  'Find suppliers in Feni',
-  'Investment opportunities in Feni',
-  'Business registration guide',
-]
+/* ============================================================
+   ACCENT ICON
+   ============================================================ */
 
 function AccentIcon({
-  accent,
-  children,
+  icon: Icon,
+  accent = 'teal',
 }: {
-  accent: Accent
-  children: ReactNode
+  icon: ElementType
+  accent?: Accent
 }) {
+  const accentClasses: Record<Accent, string> = {
+    teal: 'bg-teal-400/10 text-teal-300 border-teal-300/20',
+    gold: 'bg-amber-300/10 text-amber-200 border-amber-200/20',
+    white: 'bg-white/10 text-white border-white/20',
+  }
+
   return (
     <div
-      className={[
-        'flex h-11 w-11 items-center justify-center rounded-2xl border backdrop-blur-sm',
-        accent === 'teal'
-          ? 'border-[#72ddda]/15 bg-[#008080]/[0.055] text-[#72ddda] dark:border-[#72ddda]/20 dark:bg-[#008080]/[0.08] dark:text-[#72ddda]'
-          : 'border-[#d4b879]/18 bg-[#d4b879]/[0.06] text-[#d4b879] dark:border-[#d4b879]/22 dark:bg-[#d4b879]/[0.08] dark:text-[#d4b879]',
-      ].join(' ')}
+      className={`
+        flex
+        h-11
+        w-11
+        shrink-0
+        items-center
+        justify-center
+        rounded-2xl
+        border
+        ${accentClasses[accent]}
+      `}
     >
-      {children}
+      <Icon size={22} weight="duotone" />
     </div>
   )
 }
 
-export default function Home() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState('')
+/* ============================================================
+   MASTER GLASS
+   ============================================================ */
 
-  const normalizedQuery = useMemo(
-    () => searchQuery.trim().slice(0, 120),
-    [searchQuery],
+const glassClass = `
+  relative
+  overflow-hidden
+  rounded-3xl
+  border
+  border-white/[0.18]
+  bg-white/[0.055]
+  backdrop-blur-xl
+  shadow-[0_8px_40px_rgba(0,0,0,0.12)]
+  transition-all
+  duration-300
+  ease-out
+  hover:border-white/[0.28]
+  hover:bg-white/[0.085]
+  hover:shadow-[0_14px_55px_rgba(0,0,0,0.18)]
+`
+
+/* ============================================================
+   GLASS SHINE
+   ============================================================ */
+
+function GlassShine() {
+  return (
+    <>
+      {/* Top glass reflection */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          inset-x-0
+          top-0
+          z-10
+          h-px
+          bg-white/70
+        "
+      />
+
+      {/* Diagonal light reflection */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          z-10
+          bg-[linear-gradient(120deg,rgba(255,255,255,0.12),transparent_28%,transparent_70%,rgba(255,255,255,0.035))]
+        "
+      />
+
+      {/* Soft upper glow */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          -top-20
+          left-1/2
+          h-40
+          w-72
+          -translate-x-1/2
+          rounded-full
+          bg-white/[0.035]
+          blur-3xl
+        "
+      />
+    </>
+  )
+}
+
+/* ============================================================
+   ACTION DATA
+   ============================================================ */
+
+const actionCards: ActionCard[] = [
+  {
+    title: 'Launch Your Business',
+    description:
+      'Build a stronger digital presence and take your business to the next level.',
+    icon: Rocket,
+    accent: 'teal',
+    href: '/business',
+    badge: 'Business',
+  },
+  {
+    title: 'Grow & Discover',
+    description:
+      'Explore opportunities, discover local businesses and connect with the ecosystem.',
+    icon: TrendUp,
+    accent: 'gold',
+    href: '/discover',
+    badge: 'Discover',
+  },
+  {
+    title: 'Find Local Services',
+    description:
+      'Search for products, services, businesses and useful resources around you.',
+    icon: Storefront,
+    accent: 'white',
+    href: '/directory',
+    badge: 'Directory',
+  },
+  {
+    title: 'Ideas & Innovation',
+    description:
+      'Turn ideas into practical projects with tools, resources and smart guidance.',
+    icon: Lightbulb,
+    accent: 'gold',
+    href: '/ideas',
+    badge: 'Ideas',
+  },
+]
+
+/* ============================================================
+   QUICK PROMPTS
+   ============================================================ */
+
+const prompts: Prompt[] = [
+  {
+    label: 'Find a business',
+    value: 'Find businesses and services near me',
+  },
+  {
+    label: 'Start a business',
+    value: 'How can I start a business?',
+  },
+  {
+    label: 'Grow my business',
+    value: 'How can I grow my business?',
+  },
+  {
+    label: 'Explore Feni',
+    value: 'Explore businesses and opportunities in Feni',
+  },
+]
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+
+export default function HomePage() {
+  const router = useRouter()
+
+  const [search, setSearch] = useState('')
+
+  const normalizedSearch = useMemo(
+    () => search.trim(),
+    [search],
   )
 
-  const handleSearch = () => {
-    if (!normalizedQuery) {
+  /* ==========================================================
+     SEARCH
+     ========================================================== */
+
+  function handleSearch() {
+    if (!normalizedSearch) {
       router.push('/guide')
       return
     }
 
-    router.push(`/guide?q=${encodeURIComponent(normalizedQuery)}`)
+    router.push(
+      `/guide?q=${encodeURIComponent(normalizedSearch)}`,
+    )
   }
 
-  const handlePrompt = (prompt: string) => {
-    router.push(`/guide?q=${encodeURIComponent(prompt)}`)
+  function handlePrompt(value: string) {
+    setSearch(value)
+
+    router.push(
+      `/guide?q=${encodeURIComponent(value)}`,
+    )
+  }
+
+  function handleAction(href: string) {
+    router.push(href)
   }
 
   return (
-    <main
-      className="
-        relative
-        min-h-dvh
-        overflow-x-clip
-        text-white
-      "
-    >
-      <div className="relative z-10">
-        <Navbar />
+    <main className="relative z-10 min-h-screen w-full overflow-x-clip text-white">
+      {/* ========================================================
+          NAVBAR
+          ======================================================== */}
 
-        {/* =====================================================
-            HERO
-            ===================================================== */}
-        <section className="mx-auto max-w-7xl px-4 pb-20 pt-14 sm:px-6 sm:pb-28 sm:pt-20 lg:px-8 lg:pt-24">
-          <div className="mx-auto max-w-5xl text-center">
-            {/* Eyebrow */}
-            <div
-              className="
-                mx-auto
-                inline-flex
-                items-center
-                gap-2
-                rounded-full
-                border
-                border-white/[0.10]
-                bg-black/[0.18]
-                px-3
-                py-1.5
-                text-[10px]
-                font-semibold
-                uppercase
-                tracking-[0.18em]
-                text-white/65
-                shadow-[0_4px_18px_rgba(0,0,0,0.10)]
-                backdrop-blur-sm
-                sm:text-xs
-              "
-            >
-              <Sparkle
-                size={13}
-                className="text-[#72ddda]"
-                weight="fill"
-              />
+      <Navbar />
 
-              FeniX Business Ecosystem
-            </div>
+      {/* ========================================================
+          HERO
+          ======================================================== */}
 
-            {/* Heading */}
-            <h1
-              className="
-                mx-auto
-                mt-6
-                max-w-5xl
-                text-balance
-                text-4xl
-                font-black
-                tracking-[-0.04em]
-                text-white
-                sm:text-6xl
-                lg:text-7xl
-              "
-            >
-              Build the future of business in{' '}
-              <span className="text-[#72ddda]">
-                Feni.
-              </span>
-            </h1>
+      <section
+        className="
+          mx-auto
+          flex
+          min-h-[calc(100svh-72px)]
+          w-full
+          max-w-7xl
+          flex-col
+          items-center
+          justify-center
+          px-4
+          pb-16
+          pt-12
+          sm:px-6
+          lg:px-8
+          lg:pt-16
+        "
+      >
+        {/* Eyebrow */}
 
-            {/* Description */}
-            <p
-              className="
-                mx-auto
-                mt-6
-                max-w-2xl
-                text-pretty
-                text-sm
-                leading-7
-                text-white/60
-                sm:text-base
-                sm:leading-8
-              "
-            >
-              One connected ecosystem for entrepreneurs,
-              investors, businesses, suppliers and local growth.
-            </p>
-
-            {/* =================================================
-                SEARCH
-                ================================================= */}
-            <div className="mx-auto mt-8 max-w-3xl">
-              <div
-                className="
-                  rounded-2xl
-                  border
-                  border-white/[0.10]
-                  bg-black/[0.22]
-                  p-2
-                  shadow-[0_10px_32px_rgba(0,0,0,0.14)]
-                  backdrop-blur-lg
-                  sm:rounded-3xl
-                "
-              >
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <div
-                    className="
-                      flex
-                      min-h-[54px]
-                      flex-1
-                      items-center
-                      gap-3
-                      rounded-xl
-                      border
-                      border-white/[0.08]
-                      bg-black/[0.16]
-                      px-4
-                      backdrop-blur-sm
-                      sm:min-h-[58px]
-                      sm:rounded-2xl
-                    "
-                  >
-                    <MagnifyingGlass
-                      size={21}
-                      className="shrink-0 text-white/40"
-                    />
-
-                    <input
-                      type="search"
-                      value={searchQuery}
-                      onChange={(event) =>
-                        setSearchQuery(event.target.value.slice(0, 120))
-                      }
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                          handleSearch()
-                        }
-                      }}
-                      placeholder="Ask FeniX anything about business in Feni..."
-                      aria-label="Search FeniX"
-                      maxLength={120}
-                      className="
-                        w-full
-                        bg-transparent
-                        text-sm
-                        text-white
-                        outline-none
-                        placeholder:text-white/30
-                        sm:text-base
-                      "
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleSearch}
-                    className="
-                      flex
-                      min-h-[54px]
-                      items-center
-                      justify-center
-                      gap-2
-                      rounded-xl
-                      bg-[#008080]
-                      px-5
-                      text-sm
-                      font-bold
-                      text-white
-                      transition
-                      duration-200
-                      hover:bg-[#079494]
-                      active:scale-[0.99]
-                      sm:min-h-[58px]
-                      sm:rounded-2xl
-                    "
-                  >
-                    Search
-                    <ArrowRight size={18} weight="bold" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Quick Prompts */}
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {quickPrompts.map((prompt) => (
-                  <button
-                    key={prompt}
-                    type="button"
-                    onClick={() => handlePrompt(prompt)}
-                    className="
-                      min-h-10
-                      rounded-full
-                      border
-                      border-white/[0.09]
-                      bg-black/[0.14]
-                      px-3.5
-                      text-xs
-                      text-white/60
-                      shadow-[0_3px_12px_rgba(0,0,0,0.08)]
-                      backdrop-blur-sm
-                      transition
-                      duration-200
-                      hover:border-white/[0.16]
-                      hover:bg-black/[0.22]
-                      hover:text-white
-                    "
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* =================================================
-              ACTION CARDS
-              ================================================= */}
-          <div className="mx-auto mt-16 grid max-w-6xl gap-4 sm:mt-20 sm:grid-cols-2 xl:grid-cols-4">
-            {actionCards.map((card) => {
-              const Icon = card.icon
-
-              return (
-                <Link
-                  key={card.title}
-                  href={card.href}
-                  className="
-                    group
-                    rounded-3xl
-                    border
-                    border-white/[0.09]
-                    bg-black/[0.20]
-                    p-5
-                    shadow-[0_8px_26px_rgba(0,0,0,0.12)]
-                    backdrop-blur-md
-                    transition
-                    duration-300
-                    hover:-translate-y-1
-                    hover:border-white/[0.15]
-                    hover:bg-black/[0.28]
-                    hover:shadow-[0_14px_34px_rgba(0,0,0,0.18)]
-                  "
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <AccentIcon accent={card.accent}>
-                      <Icon size={21} weight="duotone" />
-                    </AccentIcon>
-
-                    <CaretRight
-                      size={18}
-                      className="
-                        mt-1
-                        text-white/25
-                        transition
-                        group-hover:translate-x-1
-                        group-hover:text-white/70
-                      "
-                    />
-                  </div>
-
-                  <h2 className="mt-5 text-lg font-bold text-white">
-                    {card.title}
-                  </h2>
-
-                  <p className="mt-2 text-sm leading-6 text-white/50">
-                    {card.description}
-                  </p>
-                </Link>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* =====================================================
-            ECOSYSTEM
-            ===================================================== */}
-        <section
+        <div
           className="
-            border-y
-            border-white/[0.06]
-            bg-black/[0.12]
+            mb-6
+            inline-flex
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-white/[0.18]
+            bg-white/[0.045]
+            px-4
+            py-2
+            text-xs
+            font-medium
+            tracking-[0.16em]
+            text-white/80
+            backdrop-blur-xl
+            shadow-[0_8px_30px_rgba(0,0,0,0.10)]
           "
         >
-          <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
-            <div>
-              <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#72ddda]">
-                <Compass size={16} />
-                One ecosystem
-              </div>
+          <Sparkle
+            size={14}
+            weight="fill"
+            className="text-teal-300"
+          />
 
-              <h2 className="mt-4 max-w-2xl text-3xl font-black tracking-tight text-white sm:text-5xl">
-                Local business growth, connected in one place.
-              </h2>
+          <span>FENIX BUSINESS ECOSYSTEM</span>
+        </div>
 
-              <p className="mt-5 max-w-2xl text-sm leading-7 text-white/55 sm:text-base sm:leading-8">
-                FeniX is designed to bring local commerce,
-                business discovery, investment and practical
-                guidance into a single experience.
-              </p>
+        {/* Heading */}
 
-              {/* Pill Highlights */}
-              <div className="mt-8 flex flex-wrap gap-3">
-                {['Discover', 'Connect', 'Grow'].map((item) => (
-                  <div
-                    key={item}
-                    className="
-                      inline-flex
-                      items-center
-                      gap-2
-                      rounded-full
-                      border
-                      border-white/[0.08]
-                      bg-black/[0.14]
-                      px-4
-                      py-2
-                      text-xs
-                      text-white/60
-                      backdrop-blur-sm
-                    "
-                  >
-                    <CheckCircle
-                      size={15}
-                      className="text-[#72ddda]"
-                    />
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Ecosystem Cards */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                {
-                  icon: Buildings,
-                  number: '01',
-                  text: 'Businesses can build presence, discover connections and grow.',
-                  accent: 'text-[#72ddda]',
-                },
-                {
-                  icon: Users,
-                  number: '02',
-                  text: 'People can find useful local services and opportunities faster.',
-                  accent: 'text-[#d4b879]',
-                },
-                {
-                  icon: TrendUp,
-                  number: '03',
-                  text: 'Investors can discover potential ideas and local momentum.',
-                  accent: 'text-[#72ddda]',
-                },
-                {
-                  icon: Lightbulb,
-                  number: '04',
-                  text: 'Practical guidance turns questions into the next action.',
-                  accent: 'text-[#d4b879]',
-                },
-              ].map(({ icon: Icon, number, text, accent }) => (
-                <div
-                  key={number}
-                  className="
-                    rounded-3xl
-                    border
-                    border-white/[0.08]
-                    bg-black/[0.18]
-                    p-6
-                    shadow-[0_7px_24px_rgba(0,0,0,0.10)]
-                    backdrop-blur-md
-                  "
-                >
-                  <Icon size={25} className={accent} />
-
-                  <div className="mt-6 text-3xl font-black text-white">
-                    {number}
-                  </div>
-
-                  <p className="mt-2 text-sm leading-6 text-white/50">
-                    {text}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* =====================================================
-            FOUNDATION
-            ===================================================== */}
-        <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="grid gap-5 lg:grid-cols-3">
-            {[
-              {
-                icon: ShieldCheck,
-                title: 'Security-minded foundation',
-                description:
-                  'Authentication, server-side operations and protected business actions are kept separate wherever they matter.',
-                accent: 'teal',
-              },
-              {
-                icon: Rocket,
-                title: 'Built to evolve',
-                description:
-                  'Future premium features can be introduced as optional modules without rebuilding the core experience.',
-                accent: 'gold',
-              },
-              {
-                icon: Sparkle,
-                title: 'Smart discovery',
-                description:
-                  'Feni Brain can turn natural-language questions into useful business discovery experiences.',
-                accent: 'teal',
-              },
-            ].map(
-              ({
-                icon: Icon,
-                title,
-                description,
-                accent,
-              }) => (
-                <div
-                  key={title}
-                  className="
-                    rounded-3xl
-                    border
-                    border-white/[0.08]
-                    bg-black/[0.18]
-                    p-6
-                    shadow-[0_7px_24px_rgba(0,0,0,0.10)]
-                    backdrop-blur-md
-                  "
-                >
-                  <Icon
-                    size={25}
-                    className={
-                      accent === 'teal'
-                        ? 'text-[#72ddda]'
-                        : 'text-[#d4b879]'
-                    }
-                  />
-
-                  <h3 className="mt-5 text-lg font-bold text-white">
-                    {title}
-                  </h3>
-
-                  <p className="mt-2 text-sm leading-6 text-white/50">
-                    {description}
-                  </p>
-                </div>
-              ),
-            )}
-          </div>
-        </section>
-
-        {/* =====================================================
-            FOOTER
-            ===================================================== */}
-        <footer
+        <h1
           className="
-            border-t
-            border-white/[0.06]
-            bg-black/[0.16]
+            max-w-5xl
+            text-center
+            text-4xl
+            font-semibold
+            leading-[1.05]
+            tracking-[-0.04em]
+            text-white
+            sm:text-5xl
+            md:text-6xl
+            lg:text-7xl
+          "
+        >
+          One Account.
+          <br />
+
+          <span className="bg-gradient-to-r from-white via-white to-white/65 bg-clip-text text-transparent">
+            One Ecosystem.
+          </span>
+        </h1>
+
+        {/* Description */}
+
+        <p
+          className="
+            mt-6
+            max-w-2xl
+            text-center
+            text-sm
+            leading-7
+            text-white/75
+            sm:text-base
+            sm:leading-8
+          "
+        >
+          FeniX connects people, businesses, ideas and
+          opportunities into one intelligent digital ecosystem.
+        </p>
+
+        {/* ======================================================
+            SEARCH GLASS
+            ====================================================== */}
+
+        <div
+          className="
+            relative
+            mt-9
+            w-full
+            max-w-3xl
           "
         >
           <div
             className="
-              mx-auto
-              flex
-              max-w-7xl
-              flex-col
-              gap-4
-              px-4
-              py-8
-              text-xs
-              text-white/40
-              sm:flex-row
-              sm:items-center
-              sm:justify-between
-              sm:px-6
-              lg:px-8
+              relative
+              overflow-hidden
+              rounded-[1.75rem]
+              border
+              border-white/[0.22]
+              bg-white/[0.065]
+              backdrop-blur-2xl
+              shadow-[0_15px_60px_rgba(0,0,0,0.18)]
+            "
+          >
+            <GlassShine />
+
+            <div className="relative z-20 flex items-center gap-3 p-2">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/[0.07] text-white/80">
+                <MagnifyingGlass
+                  size={22}
+                  weight="regular"
+                />
+              </div>
+
+              <input
+                type="search"
+                value={search}
+                onChange={(event) =>
+                  setSearch(event.target.value)
+                }
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    handleSearch()
+                  }
+                }}
+                placeholder="Search businesses, services, ideas..."
+                aria-label="Search FeniX"
+                className="
+                  min-w-0
+                  flex-1
+                  bg-transparent
+                  px-1
+                  text-sm
+                  text-white
+                  outline-none
+                  placeholder:text-white/50
+                  sm:text-base
+                "
+              />
+
+              <button
+                type="button"
+                onClick={handleSearch}
+                className="
+                  inline-flex
+                  h-12
+                  shrink-0
+                  items-center
+                  gap-2
+                  rounded-2xl
+                  border
+                  border-white/[0.16]
+                  bg-white/[0.10]
+                  px-4
+                  text-sm
+                  font-medium
+                  text-white
+                  shadow-[0_5px_25px_rgba(0,0,0,0.12)]
+                  transition-all
+                  duration-300
+                  hover:bg-white/[0.17]
+                  hover:border-white/[0.28]
+                  active:scale-[0.98]
+                  sm:px-5
+                "
+              >
+                <span className="hidden sm:inline">
+                  Search
+                </span>
+
+                <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ======================================================
+            QUICK PROMPTS
+            ====================================================== */}
+
+        <div className="mt-5 flex w-full max-w-3xl flex-wrap justify-center gap-2">
+          {prompts.map((prompt) => (
+            <button
+              key={prompt.label}
+              type="button"
+              onClick={() => handlePrompt(prompt.value)}
+              className="
+                rounded-full
+                border
+                border-white/[0.13]
+                bg-white/[0.035]
+                px-3.5
+                py-2
+                text-xs
+                text-white/70
+                backdrop-blur-lg
+                transition-all
+                duration-300
+                hover:border-white/[0.24]
+                hover:bg-white/[0.075]
+                hover:text-white
+                active:scale-[0.98]
+              "
+            >
+              {prompt.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ========================================================
+          ACTION CARDS
+          ======================================================== */}
+
+      <section
+        className="
+          mx-auto
+          w-full
+          max-w-7xl
+          px-4
+          py-16
+          sm:px-6
+          lg:px-8
+        "
+      >
+        <div className="mb-8">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-teal-200/80">
+            Explore
+          </p>
+
+          <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            Everything starts here.
+          </h2>
+
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-white/65 sm:text-base">
+            Choose where you want to go and let FeniX take you
+            there.
+          </p>
+        </div>
+
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-4
+            sm:grid-cols-2
+            xl:grid-cols-4
+          "
+        >
+          {actionCards.map((card) => {
+            const Icon = card.icon
+
+            return (
+              <button
+                key={card.title}
+                type="button"
+                onClick={() => handleAction(card.href)}
+                className={`
+                  ${glassClass}
+                  min-h-[250px]
+                  w-full
+                  text-left
+                  active:scale-[0.99]
+                `}
+              >
+                <GlassShine />
+
+                <div className="relative z-20 flex h-full flex-col p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <AccentIcon
+                      icon={Icon}
+                      accent={card.accent}
+                    />
+
+                    {card.badge && (
+                      <span className="rounded-full border border-white/[0.12] bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white/55">
+                        {card.badge}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-auto pt-10">
+                    <h3 className="text-xl font-semibold text-white">
+                      {card.title}
+                    </h3>
+
+                    <p className="mt-3 text-sm leading-6 text-white/65">
+                      {card.description}
+                    </p>
+
+                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-white/85">
+                      Explore
+                      <ArrowRight size={16} />
+                    </div>
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* ========================================================
+          ECOSYSTEM
+          ======================================================== */}
+
+      <section
+        className="
+          mx-auto
+          w-full
+          max-w-7xl
+          px-4
+          py-16
+          sm:px-6
+          lg:px-8
+        "
+      >
+        <div
+          className={`
+            ${glassClass}
+            w-full
+          `}
+        >
+          <GlassShine />
+
+          <div
+            className="
+              relative
+              z-20
+              grid
+              gap-10
+              p-7
+              sm:p-10
+              lg:grid-cols-[1.15fr_0.85fr]
+              lg:p-14
             "
           >
             <div>
-              <span className="font-bold text-white/80">
-                FeniX
-              </span>{' '}
-              — Feni Business Ecosystem
+              <div className="flex items-center gap-3">
+                <AccentIcon
+                  icon={Buildings}
+                  accent="teal"
+                />
+
+                <span className="text-xs font-semibold uppercase tracking-[0.16em] text-white/55">
+                  The Ecosystem
+                </span>
+              </div>
+
+              <h2 className="mt-7 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                A smarter digital foundation for Feni.
+              </h2>
+
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-white/65 sm:text-base">
+                FeniX is designed to bring businesses,
+                customers, creators and opportunities closer
+                together through one connected platform.
+              </p>
+
+              <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                {[
+                  'Business discovery',
+                  'Digital presence',
+                  'Local opportunities',
+                  'Smart ecosystem tools',
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      rounded-2xl
+                      border
+                      border-white/[0.10]
+                      bg-white/[0.035]
+                      px-4
+                      py-3
+                    "
+                  >
+                    <CheckCircle
+                      size={18}
+                      weight="fill"
+                      className="shrink-0 text-teal-300"
+                    />
+
+                    <span className="text-sm text-white/75">
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <Link
-                href="/guide"
-                className="transition hover:text-white/80"
-              >
-                Guide
-              </Link>
+            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+              {[
+                {
+                  icon: Users,
+                  title: 'People',
+                  text: 'Connect with the local ecosystem.',
+                },
+                {
+                  icon: Storefront,
+                  title: 'Businesses',
+                  text: 'Discover and grow local businesses.',
+                },
+                {
+                  icon: Compass,
+                  title: 'Opportunities',
+                  text: 'Find ideas, services and possibilities.',
+                },
+              ].map((item) => {
+                const Icon = item.icon
 
-              <Link
-                href="/directory"
-                className="transition hover:text-white/80"
-              >
-                Directory
-              </Link>
+                return (
+                  <div
+                    key={item.title}
+                    className="
+                      rounded-2xl
+                      border
+                      border-white/[0.11]
+                      bg-white/[0.035]
+                      p-5
+                      transition-all
+                      duration-300
+                      hover:bg-white/[0.06]
+                    "
+                  >
+                    <Icon
+                      size={22}
+                      weight="duotone"
+                      className="text-white/80"
+                    />
 
-              <Link
-                href="/login"
-                className="transition hover:text-white/80"
-              >
-                Login
-              </Link>
+                    <h3 className="mt-4 text-base font-semibold text-white">
+                      {item.title}
+                    </h3>
+
+                    <p className="mt-2 text-sm leading-6 text-white/55">
+                      {item.text}
+                    </p>
+                  </div>
+                )
+              })}
             </div>
           </div>
-        </footer>
-      </div>
+        </div>
+      </section>
+
+      {/* ========================================================
+          FOUNDATION
+          ======================================================== */}
+
+      <section
+        className="
+          mx-auto
+          w-full
+          max-w-7xl
+          px-4
+          py-16
+          sm:px-6
+          lg:px-8
+        "
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            {
+              icon: ShieldCheck,
+              title: 'Built with Trust',
+              text: 'Security and responsible architecture are part of the foundation.',
+            },
+            {
+              icon: Sparkle,
+              title: 'Built for Growth',
+              text: 'The ecosystem is designed to evolve as new capabilities are added.',
+            },
+            {
+              icon: Compass,
+              title: 'Built for Feni',
+              text: 'Focused on connecting local people, businesses and opportunities.',
+            },
+          ].map((item) => {
+            const Icon = item.icon
+
+            return (
+              <div
+                key={item.title}
+                className={`
+                  ${glassClass}
+                `}
+              >
+                <GlassShine />
+
+                <div className="relative z-20 p-7">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/[0.14] bg-white/[0.055] text-white/80">
+                    <Icon size={21} weight="duotone" />
+                  </div>
+
+                  <h3 className="mt-6 text-lg font-semibold text-white">
+                    {item.title}
+                  </h3>
+
+                  <p className="mt-3 text-sm leading-6 text-white/60">
+                    {item.text}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* ========================================================
+          FINAL CTA
+          ======================================================== */}
+
+      <section
+        className="
+          mx-auto
+          w-full
+          max-w-5xl
+          px-4
+          py-20
+          text-center
+          sm:px-6
+        "
+      >
+        <div
+          className="
+            relative
+            overflow-hidden
+            rounded-[2rem]
+            border
+            border-white/[0.18]
+            bg-white/[0.055]
+            px-6
+            py-12
+            backdrop-blur-2xl
+            shadow-[0_20px_80px_rgba(0,0,0,0.16)]
+            sm:px-10
+            sm:py-16
+          "
+        >
+          <GlassShine />
+
+          <div className="relative z-20">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-200/80">
+              Start with FeniX
+            </p>
+
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+              Your next opportunity
+              <br />
+              could start here.
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/65 sm:text-base">
+              Explore the ecosystem, discover local businesses
+              and turn your next idea into something real.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => router.push('/guide')}
+              className="
+                mt-8
+                inline-flex
+                items-center
+                gap-2
+                rounded-2xl
+                border
+                border-white/[0.20]
+                bg-white/[0.10]
+                px-6
+                py-3.5
+                text-sm
+                font-semibold
+                text-white
+                shadow-[0_8px_30px_rgba(0,0,0,0.14)]
+                transition-all
+                duration-300
+                hover:border-white/[0.32]
+                hover:bg-white/[0.17]
+                active:scale-[0.98]
+              "
+            >
+              Explore FeniX
+              <ArrowRight size={18} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================
+          FOOTER
+          ======================================================== */}
+
+      <footer
+        className="
+          border-t
+          border-white/[0.08]
+          px-4
+          py-10
+          sm:px-6
+        "
+      >
+        <div
+          className="
+            mx-auto
+            flex
+            w-full
+            max-w-7xl
+            flex-col
+            gap-4
+            text-center
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+            sm:text-left
+          "
+        >
+          <div>
+            <div className="text-sm font-semibold tracking-wide text-white">
+              FeniX
+            </div>
+
+            <div className="mt-1 text-xs text-white/45">
+              One Account. One Ecosystem.
+            </div>
+          </div>
+
+          <div className="text-xs text-white/40">
+            Built for the future of Feni.
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }
