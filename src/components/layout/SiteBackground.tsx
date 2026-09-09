@@ -1,3 +1,5 @@
+'use client'
+
 export default function SiteBackground() {
   return (
     <div
@@ -15,7 +17,9 @@ export default function SiteBackground() {
         dark:bg-[#030506]
       "
     >
-      {/* Portrait */}
+      {/* =========================================================
+          PORTRAIT BACKGROUND
+          ========================================================= */}
       <div
         className="
           fenix-portrait-background
@@ -35,7 +39,9 @@ export default function SiteBackground() {
         }}
       />
 
-      {/* Landscape */}
+      {/* =========================================================
+          LANDSCAPE BACKGROUND
+          ========================================================= */}
       <div
         className="
           fenix-landscape-background
@@ -55,32 +61,40 @@ export default function SiteBackground() {
         }}
       />
 
-      {/* Controlled cinematic overlay */}
+      {/* =========================================================
+          BACKGROUND OVERLAY
+          LIGHT = 0% WHITE
+          DARK = 40% BLACK
+          ========================================================= */}
       <div
         className="
           absolute
           inset-0
-          bg-white/15
+          bg-transparent
           dark:bg-black/40
         "
       />
 
-      {/* Stable vignette */}
+      {/* =========================================================
+          CINEMATIC VIGNETTE
+          ========================================================= */}
       <div
         className="
           absolute
           inset-0
-          bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.08)_100%)]
+          bg-[radial-gradient(circle_at_center,transparent_18%,rgba(0,0,0,0.06)_100%)]
           dark:bg-[radial-gradient(circle_at_center,transparent_12%,rgba(0,0,0,0.62)_100%)]
         "
       />
 
-      {/* Subtle teal atmosphere */}
+      {/* =========================================================
+          SUBTLE TEAL ATMOSPHERE
+          ========================================================= */}
       <div
         className="
           absolute
           inset-0
-          bg-[radial-gradient(circle_at_50%_18%,rgba(0,128,128,0.08),transparent_45%)]
+          bg-[radial-gradient(circle_at_50%_18%,rgba(0,128,128,0.07),transparent_45%)]
           dark:bg-[radial-gradient(circle_at_50%_18%,rgba(0,128,128,0.08),transparent_45%)]
         "
       />
