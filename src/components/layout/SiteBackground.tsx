@@ -7,19 +7,17 @@ export default function SiteBackground() {
       className="
         pointer-events-none
         fixed
-        left-0
+        inset-x-0
         top-0
         z-0
         h-[100svh]
-        w-screen
+        w-full
         overflow-hidden
         bg-[#eef3f5]
         dark:bg-[#030506]
       "
     >
-      {/* =========================================================
-          PORTRAIT BACKGROUND
-          ========================================================= */}
+      {/* Portrait background */}
       <div
         className="
           fenix-portrait-background
@@ -39,9 +37,7 @@ export default function SiteBackground() {
         }}
       />
 
-      {/* =========================================================
-          LANDSCAPE BACKGROUND
-          ========================================================= */}
+      {/* Landscape background */}
       <div
         className="
           fenix-landscape-background
@@ -61,11 +57,10 @@ export default function SiteBackground() {
         }}
       />
 
-      {/* =========================================================
-          BACKGROUND OVERLAY
-          LIGHT = 0% WHITE
-          DARK = 40% BLACK
-          ========================================================= */}
+      {/* IMPORTANT:
+          Light mode = 0% white overlay
+          Dark mode = cinematic black overlay
+      */}
       <div
         className="
           absolute
@@ -75,9 +70,7 @@ export default function SiteBackground() {
         "
       />
 
-      {/* =========================================================
-          CINEMATIC VIGNETTE
-          ========================================================= */}
+      {/* Stable vignette */}
       <div
         className="
           absolute
@@ -87,9 +80,7 @@ export default function SiteBackground() {
         "
       />
 
-      {/* =========================================================
-          SUBTLE TEAL ATMOSPHERE
-          ========================================================= */}
+      {/* Very subtle teal atmosphere */}
       <div
         className="
           absolute
