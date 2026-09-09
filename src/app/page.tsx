@@ -1,6 +1,6 @@
 'use client'
 
-import { ElementType, ReactNode, useMemo, useState } from 'react'
+import { ElementType, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Rocket,
@@ -14,11 +14,10 @@ import {
   Buildings,
   Users,
   Compass,
-  CaretRight,
   CheckCircle,
 } from '@phosphor-icons/react'
 
-import Navbar from '../components/layout/Navbar'
+import Navbar from '../components/Navbar'
 
 /* ============================================================
    TYPES
@@ -32,7 +31,7 @@ type ActionCard = {
   icon: ElementType
   accent: Accent
   href: string
-  badge?: string
+  badge: string
 }
 
 type Prompt = {
@@ -52,9 +51,21 @@ function AccentIcon({
   accent?: Accent
 }) {
   const accentClasses: Record<Accent, string> = {
-    teal: 'bg-teal-400/10 text-teal-300 border-teal-300/20',
-    gold: 'bg-amber-300/10 text-amber-200 border-amber-200/20',
-    white: 'bg-white/10 text-white border-white/20',
+    teal: `
+      border-teal-200/20
+      bg-teal-300/10
+      text-teal-200
+    `,
+    gold: `
+      border-amber-200/20
+      bg-amber-200/10
+      text-amber-100
+    `,
+    white: `
+      border-white/20
+      bg-white/10
+      text-white
+    `,
   }
 
   return (
@@ -104,7 +115,7 @@ const glassClass = `
 function GlassShine() {
   return (
     <>
-      {/* Top glass reflection */}
+      {/* Clean top reflection */}
       <div
         aria-hidden="true"
         className="
@@ -118,7 +129,7 @@ function GlassShine() {
         "
       />
 
-      {/* Diagonal light reflection */}
+      {/* Soft diagonal reflection */}
       <div
         aria-hidden="true"
         className="
@@ -130,7 +141,7 @@ function GlassShine() {
         "
       />
 
-      {/* Soft upper glow */}
+      {/* Very soft upper shine */}
       <div
         aria-hidden="true"
         className="
@@ -138,6 +149,7 @@ function GlassShine() {
           absolute
           -top-20
           left-1/2
+          z-10
           h-40
           w-72
           -translate-x-1/2
@@ -151,14 +163,14 @@ function GlassShine() {
 }
 
 /* ============================================================
-   ACTION DATA
+   ACTION CARDS
    ============================================================ */
 
 const actionCards: ActionCard[] = [
   {
     title: 'Launch Your Business',
     description:
-      'Build a stronger digital presence and take your business to the next level.',
+      'Build your digital presence and take your business to the next level.',
     icon: Rocket,
     accent: 'teal',
     href: '/business',
@@ -167,7 +179,7 @@ const actionCards: ActionCard[] = [
   {
     title: 'Grow & Discover',
     description:
-      'Explore opportunities, discover local businesses and connect with the ecosystem.',
+      'Explore opportunities and discover businesses across the ecosystem.',
     icon: TrendUp,
     accent: 'gold',
     href: '/discover',
@@ -176,7 +188,7 @@ const actionCards: ActionCard[] = [
   {
     title: 'Find Local Services',
     description:
-      'Search for products, services, businesses and useful resources around you.',
+      'Search for products, services, businesses and useful local resources.',
     icon: Storefront,
     accent: 'white',
     href: '/directory',
@@ -185,7 +197,7 @@ const actionCards: ActionCard[] = [
   {
     title: 'Ideas & Innovation',
     description:
-      'Turn ideas into practical projects with tools, resources and smart guidance.',
+      'Turn ideas into practical projects with smart tools and guidance.',
     icon: Lightbulb,
     accent: 'gold',
     href: '/ideas',
@@ -217,7 +229,7 @@ const prompts: Prompt[] = [
 ]
 
 /* ============================================================
-   PAGE
+   HOME
    ============================================================ */
 
 export default function HomePage() {
@@ -234,7 +246,7 @@ export default function HomePage() {
      SEARCH
      ========================================================== */
 
-  function handleSearch() {
+  const handleSearch = () => {
     if (!normalizedSearch) {
       router.push('/guide')
       return
@@ -245,7 +257,7 @@ export default function HomePage() {
     )
   }
 
-  function handlePrompt(value: string) {
+  const handlePrompt = (value: string) => {
     setSearch(value)
 
     router.push(
@@ -253,27 +265,23 @@ export default function HomePage() {
     )
   }
 
-  function handleAction(href: string) {
-    router.push(href)
-  }
-
   return (
     <main className="relative z-10 min-h-screen w-full overflow-x-clip text-white">
-      {/* ========================================================
+      {/* ======================================================
           NAVBAR
-          ======================================================== */}
+          ====================================================== */}
 
       <Navbar />
 
-      {/* ========================================================
+      {/* ======================================================
           HERO
-          ======================================================== */}
+          ====================================================== */}
 
       <section
         className="
           mx-auto
           flex
-          min-h-[calc(100svh-72px)]
+          min-h-[calc(100svh-64px)]
           w-full
           max-w-7xl
           flex-col
@@ -281,10 +289,9 @@ export default function HomePage() {
           justify-center
           px-4
           pb-16
-          pt-12
+          pt-10
           sm:px-6
           lg:px-8
-          lg:pt-16
         "
       >
         {/* Eyebrow */}
@@ -327,7 +334,7 @@ export default function HomePage() {
             text-4xl
             font-semibold
             leading-[1.05]
-            tracking-[-0.04em]
+            tracking-[-0.045em]
             text-white
             sm:text-5xl
             md:text-6xl
@@ -337,7 +344,7 @@ export default function HomePage() {
           One Account.
           <br />
 
-          <span className="bg-gradient-to-r from-white via-white to-white/65 bg-clip-text text-transparent">
+          <span className="text-white/90">
             One Ecosystem.
           </span>
         </h1>
@@ -361,17 +368,10 @@ export default function HomePage() {
         </p>
 
         {/* ======================================================
-            SEARCH GLASS
+            SEARCH
             ====================================================== */}
 
-        <div
-          className="
-            relative
-            mt-9
-            w-full
-            max-w-3xl
-          "
-        >
+        <div className="mt-9 w-full max-w-3xl">
           <div
             className="
               relative
@@ -387,7 +387,21 @@ export default function HomePage() {
             <GlassShine />
 
             <div className="relative z-20 flex items-center gap-3 p-2">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/[0.07] text-white/80">
+              <div
+                className="
+                  flex
+                  h-12
+                  w-12
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  border
+                  border-white/[0.10]
+                  bg-white/[0.07]
+                  text-white/80
+                "
+              >
                 <MagnifyingGlass
                   size={22}
                   weight="regular"
@@ -437,11 +451,10 @@ export default function HomePage() {
                   text-sm
                   font-medium
                   text-white
-                  shadow-[0_5px_25px_rgba(0,0,0,0.12)]
                   transition-all
                   duration-300
-                  hover:bg-white/[0.17]
                   hover:border-white/[0.28]
+                  hover:bg-white/[0.17]
                   active:scale-[0.98]
                   sm:px-5
                 "
@@ -490,9 +503,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========================================================
+      {/* ======================================================
           ACTION CARDS
-          ======================================================== */}
+          ====================================================== */}
 
       <section
         className="
@@ -536,7 +549,7 @@ export default function HomePage() {
               <button
                 key={card.title}
                 type="button"
-                onClick={() => handleAction(card.href)}
+                onClick={() => router.push(card.href)}
                 className={`
                   ${glassClass}
                   min-h-[250px]
@@ -554,11 +567,23 @@ export default function HomePage() {
                       accent={card.accent}
                     />
 
-                    {card.badge && (
-                      <span className="rounded-full border border-white/[0.12] bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white/55">
-                        {card.badge}
-                      </span>
-                    )}
+                    <span
+                      className="
+                        rounded-full
+                        border
+                        border-white/[0.12]
+                        bg-white/[0.04]
+                        px-2.5
+                        py-1
+                        text-[10px]
+                        font-medium
+                        uppercase
+                        tracking-[0.12em]
+                        text-white/55
+                      "
+                    >
+                      {card.badge}
+                    </span>
                   </div>
 
                   <div className="mt-auto pt-10">
@@ -582,9 +607,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========================================================
+      {/* ======================================================
           ECOSYSTEM
-          ======================================================== */}
+          ====================================================== */}
 
       <section
         className="
@@ -597,12 +622,7 @@ export default function HomePage() {
           lg:px-8
         "
       >
-        <div
-          className={`
-            ${glassClass}
-            w-full
-          `}
-        >
+        <div className={glassClass}>
           <GlassShine />
 
           <div
@@ -729,9 +749,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========================================================
+      {/* ======================================================
           FOUNDATION
-          ======================================================== */}
+          ====================================================== */}
 
       <section
         className="
@@ -767,14 +787,25 @@ export default function HomePage() {
             return (
               <div
                 key={item.title}
-                className={`
-                  ${glassClass}
-                `}
+                className={glassClass}
               >
                 <GlassShine />
 
                 <div className="relative z-20 p-7">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/[0.14] bg-white/[0.055] text-white/80">
+                  <div
+                    className="
+                      flex
+                      h-11
+                      w-11
+                      items-center
+                      justify-center
+                      rounded-2xl
+                      border
+                      border-white/[0.14]
+                      bg-white/[0.055]
+                      text-white/80
+                    "
+                  >
                     <Icon size={21} weight="duotone" />
                   </div>
 
@@ -792,9 +823,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========================================================
+      {/* ======================================================
           FINAL CTA
-          ======================================================== */}
+          ====================================================== */}
 
       <section
         className="
@@ -873,9 +904,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========================================================
+      {/* ======================================================
           FOOTER
-          ======================================================== */}
+          ====================================================== */}
 
       <footer
         className="
