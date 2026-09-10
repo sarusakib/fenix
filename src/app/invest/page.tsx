@@ -3,8 +3,6 @@
 import Link from 'next/link'
 import { ArrowLeft, TrendUp, CheckCircle } from '@phosphor-icons/react'
 
-import SiteBackground from '../../components/layout/SiteBackground'
-
 const items = [
   'Explore sectors with local demand.',
   'Understand the opportunity before committing capital.',
@@ -15,8 +13,6 @@ const items = [
 export default function InvestPage() {
   return (
     <main className="relative min-h-dvh overflow-x-clip bg-[#030506] text-white">
-      <SiteBackground />
-
       <div className="relative z-10 mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <Link
           href="/"
@@ -55,6 +51,7 @@ export default function InvestPage() {
                   className="mt-0.5 shrink-0 text-[#d4b879]"
                   weight="fill"
                 />
+
                 <span className="text-sm leading-6 text-white/60">
                   {item}
                 </span>
