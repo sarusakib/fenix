@@ -4,22 +4,11 @@
  * Single source of truth for application routes.
  *
  * Rules:
- * - Keep active routes aligned with real App Router pages.
- * - Keep future modules organized without scattering paths.
- * - Avoid hard-coded routes where ROUTES can be used.
- * - Route changes should normally happen in this file only.
- *
- * Current foundation:
- *   /login
- *   /auth/callback
- *   /auth/reset-password
- *   /guide
- *   /directory
- *   /start
- *   /invest
- *
- * Future modules are registered here for architecture planning,
- * but registering a route does NOT create the page automatically.
+ * - Keep routes centralized.
+ * - Keep active routes aligned with the App Router.
+ * - Keep future modules organized from the beginning.
+ * - Avoid scattering hard-coded paths across the application.
+ * - Adding a route here does NOT create a page automatically.
  */
 
 export const ROUTES = {
@@ -40,7 +29,7 @@ export const ROUTES = {
   },
 
   /* ============================================================
-     CURRENT CORE
+     CORE FENIX
      ============================================================ */
 
   core: {
@@ -50,7 +39,7 @@ export const ROUTES = {
     guide: '/guide',
 
     /**
-     * Business and local service directory
+     * Local business and service directory
      */
     directory: '/directory',
 
@@ -60,136 +49,106 @@ export const ROUTES = {
     start: '/start',
 
     /**
-     * Investment / opportunity discovery
+     * Investment and opportunity discovery
      */
     invest: '/invest',
-
-    /**
-     * Backward-compatible aliases.
-     *
-     * These are kept temporarily so existing code that may still
-     * reference the older registry names does not break.
-     *
-     * They point to real active routes instead of nonexistent pages.
-     */
-    business: '/start',
-    brain: '/guide',
   },
 
   /* ============================================================
      COMMERCE
      *
-     * Commerce is kept as a separate module so it can grow into
-     * a complete multi-vendor marketplace without coupling its
-     * routes to the main FeniX core.
+     * Complete commerce module.
      *
-     * Registering these paths does NOT mean every page exists yet.
-     * Pages will be activated phase-by-phase.
+     * Public:
+     *   /commerce
+     *   /shop/[slug]
+     *   /product/[slug]
+     *   /cart
+     *   /checkout
+     *   /orders
+     *
+     * Seller:
+     *   /seller
+     *   /seller/products
+     *   /seller/products/new
+     *   /seller/products/[id]
+     *   /seller/orders
+     *   /seller/orders/[id]
+     *   /seller/inventory
+     *   /seller/settings
      * ============================================================ */
 
   commerce: {
     root: '/commerce',
 
     shop: '/shop',
+
     product: '/product',
 
     cart: '/cart',
+
     checkout: '/checkout',
 
     orders: '/orders',
-    order: (id: string) => `/orders/${encodeURIComponent(id)}`,
+
+    order: (id: string) =>
+      `/orders/${encodeURIComponent(id)}`,
 
     seller: '/seller',
 
     sellerProducts: '/seller/products',
+
     sellerNewProduct: '/seller/products/new',
+
     sellerProduct: (id: string) =>
       `/seller/products/${encodeURIComponent(id)}`,
 
     sellerOrders: '/seller/orders',
+
     sellerOrder: (id: string) =>
       `/seller/orders/${encodeURIComponent(id)}`,
 
     sellerInventory: '/seller/inventory',
+
     sellerSettings: '/seller/settings',
 
     /**
-     * Dynamic public URLs.
-     *
-     * Slugs are encoded so spaces/special characters cannot
-     * accidentally create malformed URLs.
+     * Public shop URL
      */
     shopBySlug: (slug: string) =>
       `/shop/${encodeURIComponent(slug)}`,
 
+    /**
+     * Public product URL
+     */
     productBySlug: (slug: string) =>
       `/product/${encodeURIComponent(slug)}`,
   },
 
   /* ============================================================
-     FUTURE ECOSYSTEM MODULES
+     ECOSYSTEM
      *
-     * These are intentionally separated from the active core.
-     * They can be activated later without restructuring ROUTES.
+     * These routes are part of the planned FeniX ecosystem.
+     * They will be implemented in their respective phases.
      * ============================================================ */
 
-  future: {
-    /**
-     * Business
-     */
-    startBusiness: '/start',
-
-    /**
-     * Investment
-     */
-    investment: '/invest',
-
-    /**
-     * Commerce compatibility alias.
-     *
-     * Old marketplace references can move toward /commerce
-     * without pointing to a nonexistent route.
-     */
-    marketplace: '/commerce',
-
-    /**
-     * Future opportunity/deal discovery
-     */
+  ecosystem: {
     deals: '/deals',
 
-    /**
-     * Jobs and career ecosystem
-     */
     jobs: '/jobs',
 
-    /**
-     * Business/customer requests
-     */
     requests: '/requests',
 
-    /**
-     * Messaging
-     */
     messages: '/messages',
 
-    /**
-     * Notifications
-     */
     notifications: '/notifications',
 
-    /**
-     * Future payment module.
-     *
-     * This is a route registry entry only.
-     * Payment processing must never be implemented by trusting
-     * client-side route access.
-     */
     payments: '/payments',
   },
 
   /* ============================================================
      DASHBOARD
-     * ============================================================ */
+     ============================================================ */
 
   dashboard: {
     root: '/dashboard',
@@ -201,10 +160,7 @@ export const ROUTES = {
 } as const
 
 /* ==============================================================
-   TYPE HELPERS
-   ==============================================================
-   These types allow future code to derive route keys from the
-   central registry without duplicating string unions manually.
+   ROUTE TYPES
    ============================================================== */
 
 export type RouteRegistry = typeof ROUTES
@@ -213,20 +169,22 @@ export type CoreRoute = keyof RouteRegistry['core']
 
 export type CommerceRoute = keyof RouteRegistry['commerce']
 
-export type FutureRoute = keyof RouteRegistry['future']
+export type EcosystemRoute = keyof RouteRegistry['ecosystem']
 
 export type DashboardRoute = keyof RouteRegistry['dashboard']
 
 /* ==============================================================
-   COMMON ROUTE HELPERS
+   ROUTE HELPERS
    ============================================================== */
 
 /**
- * Safely create a query URL for FeniX search.
+ * Build a Feni Brain search URL.
  *
  * Example:
  *   buildSearchRoute('mobile shops')
- *   -> /guide?q=mobile%20shops
+ *
+ * Result:
+ *   /guide?q=mobile%20shops
  */
 export function buildSearchRoute(query: string): string {
   const normalizedQuery = query.trim()
@@ -241,9 +199,13 @@ export function buildSearchRoute(query: string): string {
 }
 
 /**
- * Safely create an authentication callback URL.
+ * Build an authentication callback URL.
  *
- * Useful when an absolute URL is required by an auth provider.
+ * Example:
+ *   buildAuthCallbackUrl('https://example.com')
+ *
+ * Result:
+ *   https://example.com/auth/callback
  */
 export function buildAuthCallbackUrl(origin: string): string {
   const normalizedOrigin = origin.replace(/\/+$/, '')
