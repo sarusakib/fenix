@@ -8,13 +8,9 @@ import {
   Storefront,
 } from '@phosphor-icons/react'
 
-import SiteBackground from '../../components/layout/SiteBackground'
-
 export default function DirectoryPage() {
   return (
     <main className="relative min-h-dvh overflow-x-clip bg-[#030506] text-white">
-      <SiteBackground />
-
       <div className="relative z-10 mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <Link
           href="/"
