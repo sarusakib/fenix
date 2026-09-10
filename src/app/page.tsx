@@ -1,6 +1,7 @@
 'use client'
 
-import { ElementType, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import type { ElementType } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Rocket,
@@ -173,7 +174,7 @@ const actionCards: ActionCard[] = [
       'Build your digital presence and take your business to the next level.',
     icon: Rocket,
     accent: 'teal',
-    href: '/business',
+    href: '/start',
     badge: 'Business',
   },
   {
@@ -182,8 +183,8 @@ const actionCards: ActionCard[] = [
       'Explore opportunities and discover businesses across the ecosystem.',
     icon: TrendUp,
     accent: 'gold',
-    href: '/discover',
-    badge: 'Discover',
+    href: '/invest',
+    badge: 'Investment',
   },
   {
     title: 'Find Local Services',
@@ -200,8 +201,8 @@ const actionCards: ActionCard[] = [
       'Turn ideas into practical projects with smart tools and guidance.',
     icon: Lightbulb,
     accent: 'gold',
-    href: '/ideas',
-    badge: 'Ideas',
+    href: '/guide',
+    badge: 'Guide',
   },
 ]
 
@@ -896,41 +897,13 @@ export default function HomePage() {
                 hover:bg-white/[0.17]
                 active:scale-[0.98]
               "
-            const actionCards: ActionCard[] = [
-  {
-    title: 'Launch Your Business',
-    description:
-      'Build your digital presence and take your business to the next level.',
-    icon: Rocket,
-    accent: 'teal',
-    href: '/start',
-    badge: 'Business',
-  },
-  {
-    title: 'Grow & Discover',
-    description:
-      'Explore opportunities and discover businesses across the ecosystem.',
-    icon: TrendUp,
-    accent: 'gold',
-    href: '/invest',
-    badge: 'Investment',
-  },
-  {
-    title: 'Find Local Services',
-    description:
-      'Search for products, services, businesses and useful local resources.',
-    icon: Storefront,
-    accent: 'white',
-    href: '/directory',
-    badge: 'Directory',
-  },
-  {
-    title: 'Ideas & Innovation',
-    description:
-      'Turn ideas into practical projects with smart tools and guidance.',
-    icon: Lightbulb,
-    accent: 'gold',
-    href: '/guide',
-    badge: 'Guide',
-  },
-]
+            >
+              Explore FeniX
+              <ArrowRight size={18} />
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  )
+        }
