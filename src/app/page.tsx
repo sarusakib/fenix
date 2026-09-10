@@ -896,57 +896,41 @@ export default function HomePage() {
                 hover:bg-white/[0.17]
                 active:scale-[0.98]
               "
-            >
-              Explore FeniX
-              <ArrowRight size={18} />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ======================================================
-          FOOTER
-          ====================================================== */}
-
-      <footer
-        className="
-          border-t
-          border-white/[0.08]
-          px-4
-          py-10
-          sm:px-6
-        "
-      >
-        <div
-          className="
-            mx-auto
-            flex
-            w-full
-            max-w-7xl
-            flex-col
-            gap-4
-            text-center
-            sm:flex-row
-            sm:items-center
-            sm:justify-between
-            sm:text-left
-          "
-        >
-          <div>
-            <div className="text-sm font-semibold tracking-wide text-white">
-              FeniX
-            </div>
-
-            <div className="mt-1 text-xs text-white/45">
-              One Account. One Ecosystem.
-            </div>
-          </div>
-
-          <div className="text-xs text-white/40">
-            Built for the future of Feni.
-          </div>
-        </div>
-      </footer>
-    </main>
-  )
-}
+            const actionCards: ActionCard[] = [
+  {
+    title: 'Launch Your Business',
+    description:
+      'Build your digital presence and take your business to the next level.',
+    icon: Rocket,
+    accent: 'teal',
+    href: '/start',
+    badge: 'Business',
+  },
+  {
+    title: 'Grow & Discover',
+    description:
+      'Explore opportunities and discover businesses across the ecosystem.',
+    icon: TrendUp,
+    accent: 'gold',
+    href: '/invest',
+    badge: 'Investment',
+  },
+  {
+    title: 'Find Local Services',
+    description:
+      'Search for products, services, businesses and useful local resources.',
+    icon: Storefront,
+    accent: 'white',
+    href: '/directory',
+    badge: 'Directory',
+  },
+  {
+    title: 'Ideas & Innovation',
+    description:
+      'Turn ideas into practical projects with smart tools and guidance.',
+    icon: Lightbulb,
+    accent: 'gold',
+    href: '/guide',
+    badge: 'Guide',
+  },
+]
