@@ -11,7 +11,6 @@ import {
 import Link from 'next/link'
 
 import { searchBusinesses } from '../actions/searchBusinesses'
-import SiteBackground from '../../components/layout/SiteBackground'
 
 type BusinessResult = {
   id: string
@@ -79,8 +78,6 @@ export default function GuidePage() {
 
   return (
     <main className="relative min-h-dvh overflow-x-clip bg-[#030506] text-white">
-      <SiteBackground />
-
       <div className="relative z-10">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <Link
@@ -169,7 +166,8 @@ export default function GuidePage() {
                         </h2>
 
                         <p className="mt-2 text-sm leading-6 text-white/45">
-                          {business.description || 'Business description unavailable.'}
+                          {business.description ||
+                            'Business description unavailable.'}
                         </p>
                       </div>
 
