@@ -9,11 +9,88 @@ import type {
 type FenixSupabaseClient = SupabaseClient<Database>
 
 /**
- * Get a public profile by user ID.
+ * Fields safe for public profile display.
  *
- * Current RLS allows public SELECT.
+ * Never expose through the public profile helper:
+ * - role
+ * - phone
+ *
+ * Role is authorization-related.
+ * Phone is private contact information.
  */
-export async function getProfileById(
+export type PublicProfile = Pick<
+  Profile,
+  | 'id'
+  | 'full_name'
+  | 'created_at'
+  | 'updated_at'
+>
+
+const PUBLIC_PROFILE_COLUMNS = [
+  'id',
+  'full_name',
+  'created_at',
+  'updated_at',
+].join(', ')
+
+const PRIVATE_PROFILE_COLUMNS = [
+  'id',
+  'full_name',
+  'role',
+  'phone',
+  'created_at',
+  'updated_at',
+].join(', ')
+
+/**
+ * Get a publicly visible profile.
+ *
+ * This helper intentionally excludes role and phone.
+ * Database RLS remains the final authorization boundary.
+ */
+export async function getPublicProfileById(
+  supabase: FenixSupabaseClient,
+  userId: string,
+): Promise<{
+  data: PublicProfile | null
+  error: Error | null
+}> {
+  const id = userId.trim()
+
+  if (!id) {
+    return {
+      data: null,
+      error: new Error('User ID is required.'),
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select(PUBLIC_PROFILE_COLUMNS)
+    .eq('id', id)
+    .maybeSingle()
+
+  if (error) {
+    return {
+      data: null,
+      error,
+    }
+  }
+
+  return {
+    data,
+    error: null,
+  }
+}
+
+/**
+ * Get the authenticated user's own profile.
+ *
+ * This includes role and phone because those fields are private
+ * account data. Database RLS must ensure the caller can only
+ * access their own profile.
+ */
+export async function getOwnProfile(
   supabase: FenixSupabaseClient,
   userId: string,
 ): Promise<{
@@ -31,7 +108,7 @@ export async function getProfileById(
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select(PRIVATE_PROFILE_COLUMNS)
     .eq('id', id)
     .maybeSingle()
 
@@ -53,6 +130,10 @@ export async function getProfileById(
  *
  * Database RLS enforces:
  * auth.uid() = id
+ *
+ * Normally profiles are created automatically by the
+ * auth.users trigger. This helper remains available for
+ * controlled future use.
  */
 export async function createProfile(
   supabase: FenixSupabaseClient,
@@ -78,7 +159,7 @@ export async function createProfile(
   const { data, error } = await supabase
     .from('profiles')
     .insert(payload)
-    .select('*')
+    .select(PRIVATE_PROFILE_COLUMNS)
     .single()
 
   if (error) {
@@ -97,8 +178,11 @@ export async function createProfile(
 /**
  * Update a profile.
  *
- * Database RLS ensures users can update only
+ * Database RLS must ensure users can update only
  * their own profile.
+ *
+ * Authorization-sensitive fields such as role should
+ * NOT be changed through an ordinary profile update.
  */
 export async function updateProfile(
   supabase: FenixSupabaseClient,
@@ -117,11 +201,21 @@ export async function updateProfile(
     }
   }
 
+  const payload: ProfileUpdate = {
+    ...input,
+  }
+
+  /**
+   * Role changes belong to the future authorization/admin
+   * layer, not ordinary profile editing.
+   */
+  delete payload.role
+
   const { data, error } = await supabase
     .from('profiles')
-    .update(input)
+    .update(payload)
     .eq('id', id)
-    .select('*')
+    .select(PRIVATE_PROFILE_COLUMNS)
     .single()
 
   if (error) {
@@ -135,4 +229,4 @@ export async function updateProfile(
     data,
     error: null,
   }
-}
+    }
