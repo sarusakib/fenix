@@ -22,6 +22,7 @@ export type Database = {
           role: string | null
           phone: string | null
           created_at: string
+          updated_at: string
         }
 
         Insert: {
@@ -30,6 +31,7 @@ export type Database = {
           role?: string | null
           phone?: string | null
           created_at?: string
+          updated_at?: string
         }
 
         Update: {
@@ -38,6 +40,7 @@ export type Database = {
           role?: string | null
           phone?: string | null
           created_at?: string
+          updated_at?: string
         }
 
         Relationships: []
@@ -54,6 +57,7 @@ export type Database = {
           description: string | null
           category: string | null
           feni_brain_embedding: number[] | null
+          created_at: string
         }
 
         Insert: {
@@ -66,6 +70,7 @@ export type Database = {
           description?: string | null
           category?: string | null
           feni_brain_embedding?: number[] | null
+          created_at?: string
         }
 
         Update: {
@@ -78,6 +83,7 @@ export type Database = {
           description?: string | null
           category?: string | null
           feni_brain_embedding?: number[] | null
+          created_at?: string
         }
 
         Relationships: [
