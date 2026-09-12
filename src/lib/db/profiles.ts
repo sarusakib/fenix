@@ -26,21 +26,11 @@ export type PublicProfile = Pick<
   | 'updated_at'
 >
 
-const PUBLIC_PROFILE_COLUMNS = [
-  'id',
-  'full_name',
-  'created_at',
-  'updated_at',
-].join(', ')
+const PUBLIC_PROFILE_COLUMNS =
+  'id, full_name, created_at, updated_at'
 
-const PRIVATE_PROFILE_COLUMNS = [
-  'id',
-  'full_name',
-  'role',
-  'phone',
-  'created_at',
-  'updated_at',
-].join(', ')
+const PRIVATE_PROFILE_COLUMNS =
+  'id, full_name, role, phone, created_at, updated_at'
 
 /**
  * Get a publicly visible profile.
@@ -78,7 +68,7 @@ export async function getPublicProfileById(
   }
 
   return {
-    data,
+    data: data as PublicProfile | null,
     error: null,
   }
 }
@@ -120,7 +110,7 @@ export async function getOwnProfile(
   }
 
   return {
-    data,
+    data: data as Profile | null,
     error: null,
   }
 }
@@ -170,7 +160,7 @@ export async function createProfile(
   }
 
   return {
-    data,
+    data: data as Profile,
     error: null,
   }
 }
@@ -226,7 +216,7 @@ export async function updateProfile(
   }
 
   return {
-    data,
+    data: data as Profile,
     error: null,
   }
-    }
+}
