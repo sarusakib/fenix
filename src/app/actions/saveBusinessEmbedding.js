@@ -73,21 +73,29 @@ export async function saveBusinessEmbedding(businessId, text) {
       }
     }
 
-    const { error: updateError } = await supabase
-      .from('businesses')
-      .update({
-        feni_brain_embedding: embedding,
-      })
-      .eq('id', business.id)
+    const { data: saved, error: saveError } = await supabase.rpc(
+      'save_business_embedding',
+      {
+        p_business_id: business.id,
+        p_embedding: embedding,
+      },
+    )
 
-    if (updateError) {
-      console.error('Embedding update failed:', {
-        code: updateError.code,
+    if (saveError) {
+      console.error('Embedding RPC failed:', {
+        code: saveError.code,
       })
 
       return {
         success: false,
         error: 'Embedding database-এ save করা যায়নি।',
+      }
+    }
+
+    if (saved !== true) {
+      return {
+        success: false,
+        error: 'এই business-এর embedding save করার অনুমতি নেই।',
       }
     }
 
