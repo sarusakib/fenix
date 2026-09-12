@@ -29,16 +29,11 @@ export type PublicBusiness = Pick<
   | 'updated_at'
 >
 
-const PUBLIC_BUSINESS_COLUMNS = [
-  'id',
-  'name',
-  'title_bn',
-  'title_en',
-  'description',
-  'category',
-  'created_at',
-  'updated_at',
-].join(', ')
+const PUBLIC_BUSINESS_COLUMNS =
+  'id, name, title_bn, title_en, description, category, created_at, updated_at'
+
+const BUSINESS_RETURN_COLUMNS =
+  'id, owner_id, name, updated_at, title_bn, title_en, description, category, created_at'
 
 /**
  * Get publicly visible businesses.
@@ -67,7 +62,7 @@ export async function getPublicBusinesses(
   }
 
   return {
-    data: data ?? [],
+    data: (data ?? []) as PublicBusiness[],
     error: null,
   }
 }
@@ -107,7 +102,7 @@ export async function getBusinessById(
   }
 
   return {
-    data,
+    data: data as PublicBusiness | null,
     error: null,
   }
 }
@@ -144,19 +139,7 @@ export async function createBusiness(
   const { data, error } = await supabase
     .from('businesses')
     .insert(payload)
-    .select(
-      [
-        'id',
-        'owner_id',
-        'name',
-        'updated_at',
-        'title_bn',
-        'title_en',
-        'description',
-        'category',
-        'created_at',
-      ].join(', '),
-    )
+    .select(BUSINESS_RETURN_COLUMNS)
     .single()
 
   if (error) {
@@ -167,7 +150,7 @@ export async function createBusiness(
   }
 
   return {
-    data,
+    data: data as Business,
     error: null,
   }
 }
@@ -216,19 +199,7 @@ export async function updateBusiness(
     .from('businesses')
     .update(payload)
     .eq('id', id)
-    .select(
-      [
-        'id',
-        'owner_id',
-        'name',
-        'updated_at',
-        'title_bn',
-        'title_en',
-        'description',
-        'category',
-        'created_at',
-      ].join(', '),
-    )
+    .select(BUSINESS_RETURN_COLUMNS)
     .single()
 
   if (error) {
@@ -239,7 +210,7 @@ export async function updateBusiness(
   }
 
   return {
-    data,
+    data: data as Business,
     error: null,
   }
 }
@@ -281,4 +252,4 @@ export async function deleteBusiness(
     success: true,
     error: null,
   }
-        }
+}
