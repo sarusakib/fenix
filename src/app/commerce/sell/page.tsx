@@ -14,10 +14,16 @@ import {
 import Navbar from '../../../components/Navbar'
 import { createClient } from '../../../utils/supabase/client'
 
+type VendorStatus =
+  | 'pending'
+  | 'approved'
+  | 'suspended'
+  | 'rejected'
+
 type VendorProfile = {
   id: string
   display_name: string
-  status: 'pending' | 'approved' | 'suspended' | 'rejected'
+  status: VendorStatus
   is_verified: boolean
 }
 
@@ -107,6 +113,8 @@ export default function CommerceSellPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
+    if (submitting) return
+
     if (!userId) {
       router.push('/login?next=/commerce/sell')
       return
@@ -142,24 +150,41 @@ export default function CommerceSellPage() {
     try {
       const supabase = createClient()
 
-      const { data: currentUser } = await supabase.auth.getUser()
+      const {
+        data: { user: currentUser },
+        error: currentUserError,
+      } = await supabase.auth.getUser()
 
-      if (!currentUser.user || currentUser.user.id !== userId) {
-        setError('আপনার login session পাওয়া যায়নি। আবার login করুন।')
+      if (
+        currentUserError ||
+        !currentUser ||
+        currentUser.id !== userId
+      ) {
+        setError(
+          'আপনার login session পাওয়া যায়নি। আবার login করুন.',
+        )
         return
       }
 
+      /*
+       * Important:
+       * Use array payload with Supabase typed insert.
+       * This avoids the `never[]` inference problem that occurred
+       * when the Commerce tables were added to Database types.
+       */
       const { data: createdVendor, error: insertError } = await supabase
         .from('vendor_profiles')
-        .insert({
-          user_id: userId,
-          display_name: cleanDisplayName,
-          display_name_bn: cleanDisplayNameBn || null,
-          display_name_en: cleanDisplayNameEn || null,
-          description_bn: cleanDescriptionBn || null,
-          description_en: cleanDescriptionEn || null,
-          phone: cleanPhone,
-        })
+        .insert([
+          {
+            user_id: userId,
+            display_name: cleanDisplayName,
+            display_name_bn: cleanDisplayNameBn || null,
+            display_name_en: cleanDisplayNameEn || null,
+            description_bn: cleanDescriptionBn || null,
+            description_en: cleanDescriptionEn || null,
+            phone: cleanPhone,
+          },
+        ])
         .select('id, display_name, status, is_verified')
         .single()
 
@@ -181,6 +206,13 @@ export default function CommerceSellPage() {
         return
       }
 
+      if (!createdVendor) {
+        setError(
+          'Seller application তৈরি হয়েছে কি না নিশ্চিত হওয়া যায়নি।',
+        )
+        return
+      }
+
       setExistingVendor(createdVendor as VendorProfile)
       setSuccess(
         'আপনার seller application সফলভাবে জমা হয়েছে।',
@@ -199,14 +231,17 @@ export default function CommerceSellPage() {
     }
   }
 
-  function getStatusText(status: VendorProfile['status']) {
+  function getStatusText(status: VendorStatus) {
     switch (status) {
       case 'approved':
         return 'আপনার seller account approved হয়েছে।'
+
       case 'suspended':
         return 'আপনার seller account বর্তমানে suspended।'
+
       case 'rejected':
         return 'আপনার previous seller application rejected হয়েছে।'
+
       default:
         return 'আপনার application review-এর জন্য অপেক্ষমাণ।'
     }
@@ -284,6 +319,7 @@ export default function CommerceSellPage() {
                   <p className="text-sm font-semibold">
                     Verification first
                   </p>
+
                   <p className="mt-1 text-xs leading-5 text-[#0b1736]/50 dark:text-white/40">
                     Application pending থাকবে যতক্ষণ না seller verification
                     complete হয়।
@@ -307,6 +343,7 @@ export default function CommerceSellPage() {
                   <p className="text-sm font-semibold">
                     Customer account ≠ Seller account
                   </p>
+
                   <p className="mt-1 text-xs leading-5 text-[#0b1736]/50 dark:text-white/40">
                     Shopping করার জন্য seller হওয়া প্রয়োজন নেই।
                   </p>
@@ -332,6 +369,7 @@ export default function CommerceSellPage() {
             {loading ? (
               <div className="py-16 text-center">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#008080]/20 border-t-[#008080]" />
+
                 <p className="mt-4 text-sm text-[#0b1736]/50 dark:text-white/45">
                   Seller information checking...
                 </p>
@@ -417,6 +455,7 @@ export default function CommerceSellPage() {
                       <p className="text-xs text-[#0b1736]/45 dark:text-white/40">
                         Status
                       </p>
+
                       <p className="mt-1 text-sm font-semibold capitalize">
                         {existingVendor.status}
                       </p>
@@ -426,6 +465,7 @@ export default function CommerceSellPage() {
                       <p className="text-xs text-[#0b1736]/45 dark:text-white/40">
                         Verification
                       </p>
+
                       <p className="mt-1 text-sm font-semibold">
                         {existingVendor.is_verified
                           ? 'Verified'
@@ -780,4 +820,4 @@ export default function CommerceSellPage() {
       </section>
     </main>
   )
-}
+            }
