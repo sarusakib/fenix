@@ -16,6 +16,7 @@ import {
   Users,
   Compass,
   CheckCircle,
+  ShoppingBag,
 } from '@phosphor-icons/react'
 
 import Navbar from '../components/Navbar'
@@ -116,7 +117,6 @@ const glassClass = `
 function GlassShine() {
   return (
     <>
-      {/* Clean top reflection */}
       <div
         aria-hidden="true"
         className="
@@ -130,7 +130,6 @@ function GlassShine() {
         "
       />
 
-      {/* Soft diagonal reflection */}
       <div
         aria-hidden="true"
         className="
@@ -142,7 +141,6 @@ function GlassShine() {
         "
       />
 
-      {/* Very soft upper shine */}
       <div
         aria-hidden="true"
         className="
@@ -196,6 +194,15 @@ const actionCards: ActionCard[] = [
     badge: 'Directory',
   },
   {
+    title: 'Shop Local',
+    description:
+      'Discover local products, sellers and businesses. Buy directly from Feni.',
+    icon: ShoppingBag,
+    accent: 'teal',
+    href: '/commerce',
+    badge: 'Commerce',
+  },
+  {
     title: 'Ideas & Innovation',
     description:
       'Turn ideas into practical projects with smart tools and guidance.',
@@ -216,12 +223,12 @@ const prompts: Prompt[] = [
     value: 'Find businesses and services near me',
   },
   {
-    label: 'Start a business',
-    value: 'How can I start a business?',
+    label: 'Shop local',
+    value: 'Find products and local sellers in Feni',
   },
   {
-    label: 'Grow my business',
-    value: 'How can I grow my business?',
+    label: 'Start a business',
+    value: 'How can I start a business?',
   },
   {
     label: 'Explore Feni',
@@ -239,7 +246,7 @@ export default function HomePage() {
   const [search, setSearch] = useState('')
 
   const normalizedSearch = useMemo(
-    () => search.trim(),
+    () => search.trim().slice(0, 120),
     [search],
   )
 
@@ -295,8 +302,6 @@ export default function HomePage() {
           lg:px-8
         "
       >
-        {/* Eyebrow */}
-
         <div
           className="
             mb-6
@@ -326,8 +331,6 @@ export default function HomePage() {
           <span>FENIX BUSINESS ECOSYSTEM</span>
         </div>
 
-        {/* Heading */}
-
         <h1
           className="
             max-w-5xl
@@ -350,8 +353,6 @@ export default function HomePage() {
           </span>
         </h1>
 
-        {/* Description */}
-
         <p
           className="
             mt-6
@@ -364,13 +365,13 @@ export default function HomePage() {
             sm:leading-8
           "
         >
-          FeniX connects people, businesses, ideas and
+          FeniX connects people, businesses, products, ideas and
           opportunities into one intelligent digital ecosystem.
         </p>
 
-        {/* ======================================================
+        {/* ====================================================
             SEARCH
-            ====================================================== */}
+            ==================================================== */}
 
         <div className="mt-9 w-full max-w-3xl">
           <div
@@ -420,7 +421,7 @@ export default function HomePage() {
                     handleSearch()
                   }
                 }}
-                placeholder="Search businesses, services, ideas..."
+                placeholder="Search businesses, products, services..."
                 aria-label="Search FeniX"
                 className="
                   min-w-0
@@ -470,9 +471,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* ======================================================
+        {/* ====================================================
             QUICK PROMPTS
-            ====================================================== */}
+            ==================================================== */}
 
         <div className="mt-5 flex w-full max-w-3xl flex-wrap justify-center gap-2">
           {prompts.map((prompt) => (
@@ -540,7 +541,7 @@ export default function HomePage() {
             grid-cols-1
             gap-4
             sm:grid-cols-2
-            xl:grid-cols-4
+            xl:grid-cols-5
           "
         >
           {actionCards.map((card) => {
@@ -655,14 +656,15 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-5 max-w-2xl text-sm leading-7 text-white/65 sm:text-base">
-                FeniX is designed to bring businesses,
-                customers, creators and opportunities closer
-                together through one connected platform.
+                FeniX brings people, businesses, products,
+                customers and opportunities closer together
+                through one connected platform.
               </p>
 
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
                 {[
                   'Business discovery',
+                  'Local commerce',
                   'Digital presence',
                   'Local opportunities',
                   'Smart ecosystem tools',
@@ -695,7 +697,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
               {[
                 {
                   icon: Users,
@@ -706,6 +708,11 @@ export default function HomePage() {
                   icon: Storefront,
                   title: 'Businesses',
                   text: 'Discover and grow local businesses.',
+                },
+                {
+                  icon: ShoppingBag,
+                  title: 'Commerce',
+                  text: 'Discover and buy products from local sellers.',
                 },
                 {
                   icon: Compass,
@@ -869,38 +876,68 @@ export default function HomePage() {
             </h2>
 
             <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/65 sm:text-base">
-              Explore the ecosystem, discover local businesses
-              and turn your next idea into something real.
+              Explore the ecosystem, discover local businesses,
+              shop local products and turn your next idea into
+              something real.
             </p>
 
-            <button
-              type="button"
-              onClick={() => router.push('/guide')}
-              className="
-                mt-8
-                inline-flex
-                items-center
-                gap-2
-                rounded-2xl
-                border
-                border-white/[0.20]
-                bg-white/[0.10]
-                px-6
-                py-3.5
-                text-sm
-                font-semibold
-                text-white
-                shadow-[0_8px_30px_rgba(0,0,0,0.14)]
-                transition-all
-                duration-300
-                hover:border-white/[0.32]
-                hover:bg-white/[0.17]
-                active:scale-[0.98]
-              "
-            >
-              Explore FeniX
-              <ArrowRight size={18} />
-            </button>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => router.push('/commerce')}
+                className="
+                  inline-flex
+                  items-center
+                  gap-2
+                  rounded-2xl
+                  border
+                  border-teal-200/[0.24]
+                  bg-teal-300/[0.10]
+                  px-6
+                  py-3.5
+                  text-sm
+                  font-semibold
+                  text-white
+                  shadow-[0_8px_30px_rgba(0,0,0,0.14)]
+                  transition-all
+                  duration-300
+                  hover:border-teal-200/[0.38]
+                  hover:bg-teal-300/[0.17]
+                  active:scale-[0.98]
+                "
+              >
+                Shop Local
+                <ShoppingBag size={18} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => router.push('/guide')}
+                className="
+                  inline-flex
+                  items-center
+                  gap-2
+                  rounded-2xl
+                  border
+                  border-white/[0.20]
+                  bg-white/[0.10]
+                  px-6
+                  py-3.5
+                  text-sm
+                  font-semibold
+                  text-white
+                  shadow-[0_8px_30px_rgba(0,0,0,0.14)]
+                  transition-all
+                  duration-300
+                  hover:border-white/[0.32]
+                  hover:bg-white/[0.17]
+                  active:scale-[0.98]
+                "
+              >
+                Explore FeniX
+                <ArrowRight size={18} />
+              </button>
+            </div>
           </div>
         </div>
       </section>
