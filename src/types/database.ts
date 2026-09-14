@@ -1,11 +1,10 @@
-/**
- * FeniX — Database Contract
- *
- * Canonical application-side contract for the public Supabase schema.
- *
- * Keep this file synchronized with Supabase migrations.
- * Never place secrets in this file.
- */
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   public: {
@@ -14,31 +13,36 @@ export type Database = {
         Row: {
           id: string
           full_name: string | null
-          role: string | null
+          role: 'admin' | 'vendor' | 'customer'
           phone: string | null
           created_at: string
           updated_at: string
         }
-
         Insert: {
           id: string
           full_name?: string | null
-          role?: string | null
+          role?: 'admin' | 'vendor' | 'customer'
           phone?: string | null
           created_at?: string
           updated_at?: string
         }
-
         Update: {
           id?: string
           full_name?: string | null
-          role?: string | null
+          role?: 'admin' | 'vendor' | 'customer'
           phone?: string | null
           created_at?: string
           updated_at?: string
         }
-
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'profiles_id_fkey'
+            columns: ['id']
+            isOneToOne: true
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
       }
 
       businesses: {
@@ -54,7 +58,6 @@ export type Database = {
           feni_brain_embedding: number[] | null
           created_at: string
         }
-
         Insert: {
           id?: string
           owner_id?: string | null
@@ -67,7 +70,6 @@ export type Database = {
           feni_brain_embedding?: number[] | null
           created_at?: string
         }
-
         Update: {
           id?: string
           owner_id?: string | null
@@ -80,7 +82,6 @@ export type Database = {
           feni_brain_embedding?: number[] | null
           created_at?: string
         }
-
         Relationships: [
           {
             foreignKeyName: 'businesses_owner_id_fkey'
@@ -95,8 +96,8 @@ export type Database = {
       product_categories: {
         Row: {
           id: string
-          name_bn: string | null
-          name_en: string | null
+          name_bn: string
+          name_en: string
           slug: string
           description_bn: string | null
           description_en: string | null
@@ -107,11 +108,10 @@ export type Database = {
           created_at: string
           updated_at: string
         }
-
         Insert: {
           id?: string
-          name_bn?: string | null
-          name_en?: string | null
+          name_bn: string
+          name_en: string
           slug: string
           description_bn?: string | null
           description_en?: string | null
@@ -122,11 +122,10 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-
         Update: {
           id?: string
-          name_bn?: string | null
-          name_en?: string | null
+          name_bn?: string
+          name_en?: string
           slug?: string
           description_bn?: string | null
           description_en?: string | null
@@ -137,7 +136,6 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-
         Relationships: [
           {
             foreignKeyName: 'product_categories_parent_id_fkey'
@@ -160,12 +158,11 @@ export type Database = {
           description_bn: string | null
           description_en: string | null
           phone: string | null
-          status: 'pending' | 'approved' | 'suspended' | 'rejected'
+          status: 'pending' | 'approved' | 'rejected' | 'suspended'
           is_verified: boolean
           created_at: string
           updated_at: string
         }
-
         Insert: {
           id?: string
           user_id: string
@@ -176,12 +173,11 @@ export type Database = {
           description_bn?: string | null
           description_en?: string | null
           phone?: string | null
-          status?: 'pending' | 'approved' | 'suspended' | 'rejected'
+          status?: 'pending' | 'approved' | 'rejected' | 'suspended'
           is_verified?: boolean
           created_at?: string
           updated_at?: string
         }
-
         Update: {
           id?: string
           user_id?: string
@@ -192,17 +188,16 @@ export type Database = {
           description_bn?: string | null
           description_en?: string | null
           phone?: string | null
-          status?: 'pending' | 'approved' | 'suspended' | 'rejected'
+          status?: 'pending' | 'approved' | 'rejected' | 'suspended'
           is_verified?: boolean
           created_at?: string
           updated_at?: string
         }
-
         Relationships: [
           {
             foreignKeyName: 'vendor_profiles_user_id_fkey'
             columns: ['user_id']
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: 'profiles'
             referencedColumns: ['id']
           },
@@ -222,15 +217,15 @@ export type Database = {
           vendor_id: string
           business_id: string | null
           category_id: string | null
-          name_bn: string | null
-          name_en: string | null
+          name_bn: string
+          name_en: string
           slug: string
           description_bn: string | null
           description_en: string | null
           sku: string | null
           price: number
           compare_at_price: number | null
-          currency: 'BDT'
+          currency: string
           status:
             | 'draft'
             | 'pending'
@@ -243,21 +238,20 @@ export type Database = {
           created_at: string
           updated_at: string
         }
-
         Insert: {
           id?: string
           vendor_id: string
           business_id?: string | null
           category_id?: string | null
-          name_bn?: string | null
-          name_en?: string | null
+          name_bn: string
+          name_en: string
           slug: string
           description_bn?: string | null
           description_en?: string | null
           sku?: string | null
           price: number
           compare_at_price?: number | null
-          currency?: 'BDT'
+          currency?: string
           status?:
             | 'draft'
             | 'pending'
@@ -270,21 +264,20 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-
         Update: {
           id?: string
           vendor_id?: string
           business_id?: string | null
           category_id?: string | null
-          name_bn?: string | null
-          name_en?: string | null
+          name_bn?: string
+          name_en?: string
           slug?: string
           description_bn?: string | null
           description_en?: string | null
           sku?: string | null
           price?: number
           compare_at_price?: number | null
-          currency?: 'BDT'
+          currency?: string
           status?:
             | 'draft'
             | 'pending'
@@ -297,7 +290,6 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-
         Relationships: [
           {
             foreignKeyName: 'products_vendor_id_fkey'
@@ -335,11 +327,10 @@ export type Database = {
           is_primary: boolean
           created_at: string
         }
-
         Insert: {
           id?: string
           product_id: string
-          storage_bucket?: string
+          storage_bucket: string
           storage_path: string
           alt_text_bn?: string | null
           alt_text_en?: string | null
@@ -347,7 +338,6 @@ export type Database = {
           is_primary?: boolean
           created_at?: string
         }
-
         Update: {
           id?: string
           product_id?: string
@@ -359,7 +349,6 @@ export type Database = {
           is_primary?: boolean
           created_at?: string
         }
-
         Relationships: [
           {
             foreignKeyName: 'product_images_product_id_fkey'
@@ -380,7 +369,6 @@ export type Database = {
           low_stock_threshold: number
           updated_at: string
         }
-
         Insert: {
           id?: string
           product_id: string
@@ -389,7 +377,6 @@ export type Database = {
           low_stock_threshold?: number
           updated_at?: string
         }
-
         Update: {
           id?: string
           product_id?: string
@@ -398,7 +385,6 @@ export type Database = {
           low_stock_threshold?: number
           updated_at?: string
         }
-
         Relationships: [
           {
             foreignKeyName: 'inventory_product_id_fkey'
@@ -434,8 +420,11 @@ export type Database = {
             | 'failed'
             | 'refunded'
             | 'partially_refunded'
-          payment_method: 'cash_on_delivery' | 'online' | 'manual'
-          currency: 'BDT'
+          payment_method:
+            | 'cash_on_delivery'
+            | 'online'
+            | 'manual'
+          currency: string
           subtotal: number
           delivery_fee: number
           discount_amount: number
@@ -450,7 +439,6 @@ export type Database = {
           created_at: string
           updated_at: string
         }
-
         Insert: {
           id?: string
           order_number?: string
@@ -474,8 +462,11 @@ export type Database = {
             | 'failed'
             | 'refunded'
             | 'partially_refunded'
-          payment_method?: 'cash_on_delivery' | 'online' | 'manual'
-          currency?: 'BDT'
+          payment_method?:
+            | 'cash_on_delivery'
+            | 'online'
+            | 'manual'
+          currency?: string
           subtotal?: number
           delivery_fee?: number
           discount_amount?: number
@@ -490,7 +481,6 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-
         Update: {
           id?: string
           order_number?: string
@@ -514,8 +504,11 @@ export type Database = {
             | 'failed'
             | 'refunded'
             | 'partially_refunded'
-          payment_method?: 'cash_on_delivery' | 'online' | 'manual'
-          currency?: 'BDT'
+          payment_method?:
+            | 'cash_on_delivery'
+            | 'online'
+            | 'manual'
+          currency?: string
           subtotal?: number
           delivery_fee?: number
           discount_amount?: number
@@ -530,7 +523,6 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-
         Relationships: [
           {
             foreignKeyName: 'orders_customer_id_fkey'
@@ -556,7 +548,6 @@ export type Database = {
           line_total: number
           created_at: string
         }
-
         Insert: {
           id?: string
           order_id: string
@@ -570,7 +561,6 @@ export type Database = {
           line_total: number
           created_at?: string
         }
-
         Update: {
           id?: string
           order_id?: string
@@ -584,7 +574,6 @@ export type Database = {
           line_total?: number
           created_at?: string
         }
-
         Relationships: [
           {
             foreignKeyName: 'order_items_order_id_fkey'
@@ -611,29 +600,27 @@ export type Database = {
       }
     }
 
-    Views: Record<string, never>
+    Views: {
+      [_ in never]: never
+    }
 
     Functions: {
       create_commerce_order: {
         Args: {
-          p_items: unknown
-          p_customer_id?: string | null
-          p_guest_name?: string | null
-          p_guest_phone?: string | null
-          p_guest_email?: string | null
-          p_shipping_name?: string | null
-          p_shipping_phone?: string | null
-          p_shipping_address?: string | null
-          p_shipping_area?: string | null
-          p_shipping_upazila?: string | null
-          p_shipping_district?: string | null
-          p_customer_note?: string | null
+          p_customer_id: string | null
+          p_guest_name: string | null
+          p_guest_phone: string | null
+          p_guest_email: string | null
+          p_items: Json
+          p_shipping_name: string
+          p_shipping_phone: string
+          p_shipping_address: string
+          p_shipping_area: string | null
+          p_shipping_upazila: string | null
+          p_shipping_district: string | null
+          p_customer_note: string | null
         }
-        Returns: {
-          order_id: string
-          order_number: string
-          total_amount: number
-        }[]
+        Returns: string
       }
 
       generate_commerce_order_number: {
@@ -664,89 +651,74 @@ export type Database = {
       }
     }
 
-    Enums: Record<string, never>
+    Enums: {
+      [_ in never]: never
+    }
 
-    CompositeTypes: Record<string, never>
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
 
-export type Profile =
-  Database['public']['Tables']['profiles']['Row']
+/* -------------------------------------------------------------------------- */
+/* Convenience aliases                                                        */
+/* -------------------------------------------------------------------------- */
 
+export type Profile = Database['public']['Tables']['profiles']['Row']
 export type ProfileInsert =
   Database['public']['Tables']['profiles']['Insert']
-
 export type ProfileUpdate =
   Database['public']['Tables']['profiles']['Update']
 
-export type Business =
-  Database['public']['Tables']['businesses']['Row']
-
+export type Business = Database['public']['Tables']['businesses']['Row']
 export type BusinessInsert =
   Database['public']['Tables']['businesses']['Insert']
-
 export type BusinessUpdate =
   Database['public']['Tables']['businesses']['Update']
 
 export type ProductCategory =
   Database['public']['Tables']['product_categories']['Row']
-
 export type ProductCategoryInsert =
   Database['public']['Tables']['product_categories']['Insert']
-
 export type ProductCategoryUpdate =
   Database['public']['Tables']['product_categories']['Update']
 
 export type VendorProfile =
   Database['public']['Tables']['vendor_profiles']['Row']
-
 export type VendorProfileInsert =
   Database['public']['Tables']['vendor_profiles']['Insert']
-
 export type VendorProfileUpdate =
   Database['public']['Tables']['vendor_profiles']['Update']
 
-export type Product =
-  Database['public']['Tables']['products']['Row']
-
+export type Product = Database['public']['Tables']['products']['Row']
 export type ProductInsert =
   Database['public']['Tables']['products']['Insert']
-
 export type ProductUpdate =
   Database['public']['Tables']['products']['Update']
 
 export type ProductImage =
   Database['public']['Tables']['product_images']['Row']
-
 export type ProductImageInsert =
   Database['public']['Tables']['product_images']['Insert']
-
 export type ProductImageUpdate =
   Database['public']['Tables']['product_images']['Update']
 
-export type Inventory =
-  Database['public']['Tables']['inventory']['Row']
-
+export type Inventory = Database['public']['Tables']['inventory']['Row']
 export type InventoryInsert =
   Database['public']['Tables']['inventory']['Insert']
-
 export type InventoryUpdate =
   Database['public']['Tables']['inventory']['Update']
 
-export type Order =
-  Database['public']['Tables']['orders']['Row']
-
+export type Order = Database['public']['Tables']['orders']['Row']
 export type OrderInsert =
   Database['public']['Tables']['orders']['Insert']
-
 export type OrderUpdate =
   Database['public']['Tables']['orders']['Update']
 
 export type OrderItem =
   Database['public']['Tables']['order_items']['Row']
-
 export type OrderItemInsert =
   Database['public']['Tables']['order_items']['Insert']
-
 export type OrderItemUpdate =
   Database['public']['Tables']['order_items']['Update']
