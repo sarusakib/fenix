@@ -34,15 +34,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'profiles_id_fkey'
-            columns: ['id']
-            isOneToOne: true
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
 
       businesses: {
@@ -82,15 +74,7 @@ export type Database = {
           feni_brain_embedding?: number[] | null
           created_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'businesses_owner_id_fkey'
-            columns: ['owner_id']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
 
       product_categories: {
@@ -136,15 +120,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'product_categories_parent_id_fkey'
-            columns: ['parent_id']
-            isOneToOne: false
-            referencedRelation: 'product_categories'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
 
       vendor_profiles: {
@@ -193,22 +169,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'vendor_profiles_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'vendor_profiles_business_id_fkey'
-            columns: ['business_id']
-            isOneToOne: false
-            referencedRelation: 'businesses'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
 
       products: {
@@ -290,29 +251,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'products_vendor_id_fkey'
-            columns: ['vendor_id']
-            isOneToOne: false
-            referencedRelation: 'vendor_profiles'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'products_business_id_fkey'
-            columns: ['business_id']
-            isOneToOne: false
-            referencedRelation: 'businesses'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'products_category_id_fkey'
-            columns: ['category_id']
-            isOneToOne: false
-            referencedRelation: 'product_categories'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
 
       product_images: {
@@ -349,15 +288,7 @@ export type Database = {
           is_primary?: boolean
           created_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'product_images_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
 
       inventory: {
@@ -385,15 +316,7 @@ export type Database = {
           low_stock_threshold?: number
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'inventory_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: true
-            referencedRelation: 'products'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
 
       orders: {
@@ -523,15 +446,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'orders_customer_id_fkey'
-            columns: ['customer_id']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
 
       order_items: {
@@ -574,29 +489,7 @@ export type Database = {
           line_total?: number
           created_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'order_items_order_id_fkey'
-            columns: ['order_id']
-            isOneToOne: false
-            referencedRelation: 'orders'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'order_items_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'order_items_vendor_id_fkey'
-            columns: ['vendor_id']
-            isOneToOne: false
-            referencedRelation: 'vendor_profiles'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
     }
 
@@ -665,60 +558,83 @@ export type Database = {
 /* Convenience aliases                                                        */
 /* -------------------------------------------------------------------------- */
 
-export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Profile =
+  Database['public']['Tables']['profiles']['Row']
+
 export type ProfileInsert =
   Database['public']['Tables']['profiles']['Insert']
+
 export type ProfileUpdate =
   Database['public']['Tables']['profiles']['Update']
 
-export type Business = Database['public']['Tables']['businesses']['Row']
+export type Business =
+  Database['public']['Tables']['businesses']['Row']
+
 export type BusinessInsert =
   Database['public']['Tables']['businesses']['Insert']
+
 export type BusinessUpdate =
   Database['public']['Tables']['businesses']['Update']
 
 export type ProductCategory =
   Database['public']['Tables']['product_categories']['Row']
+
 export type ProductCategoryInsert =
   Database['public']['Tables']['product_categories']['Insert']
+
 export type ProductCategoryUpdate =
   Database['public']['Tables']['product_categories']['Update']
 
 export type VendorProfile =
   Database['public']['Tables']['vendor_profiles']['Row']
+
 export type VendorProfileInsert =
   Database['public']['Tables']['vendor_profiles']['Insert']
+
 export type VendorProfileUpdate =
   Database['public']['Tables']['vendor_profiles']['Update']
 
-export type Product = Database['public']['Tables']['products']['Row']
+export type Product =
+  Database['public']['Tables']['products']['Row']
+
 export type ProductInsert =
   Database['public']['Tables']['products']['Insert']
+
 export type ProductUpdate =
   Database['public']['Tables']['products']['Update']
 
 export type ProductImage =
   Database['public']['Tables']['product_images']['Row']
+
 export type ProductImageInsert =
   Database['public']['Tables']['product_images']['Insert']
+
 export type ProductImageUpdate =
   Database['public']['Tables']['product_images']['Update']
 
-export type Inventory = Database['public']['Tables']['inventory']['Row']
+export type Inventory =
+  Database['public']['Tables']['inventory']['Row']
+
 export type InventoryInsert =
   Database['public']['Tables']['inventory']['Insert']
+
 export type InventoryUpdate =
   Database['public']['Tables']['inventory']['Update']
 
-export type Order = Database['public']['Tables']['orders']['Row']
+export type Order =
+  Database['public']['Tables']['orders']['Row']
+
 export type OrderInsert =
   Database['public']['Tables']['orders']['Insert']
+
 export type OrderUpdate =
   Database['public']['Tables']['orders']['Update']
 
 export type OrderItem =
   Database['public']['Tables']['order_items']['Row']
+
 export type OrderItemInsert =
   Database['public']['Tables']['order_items']['Insert']
+
 export type OrderItemUpdate =
   Database['public']['Tables']['order_items']['Update']
