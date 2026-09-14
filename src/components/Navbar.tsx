@@ -12,6 +12,8 @@ import {
   SignOut,
   Sun,
   Moon,
+  ShoppingBag,
+  Lightbulb,
 } from '@phosphor-icons/react'
 
 import { useAuthStore } from '../store/useAuthStore'
@@ -25,8 +27,7 @@ export default function Navbar() {
     setTheme,
   } = useHomeTheme()
 
-  const [menuOpen, setMenuOpen] =
-    useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const closeMenu = () => {
     setMenuOpen(false)
@@ -113,6 +114,7 @@ export default function Navbar() {
           {/* Desktop Navigation */}
 
           <div className="hidden items-center gap-1 md:flex">
+
             <Link
               href="/"
               className="
@@ -187,6 +189,37 @@ export default function Navbar() {
               "
             >
               Guide
+            </Link>
+
+            {/* Commerce */}
+
+            <Link
+              href="/commerce"
+              className="
+                group
+                flex
+                items-center
+                gap-1.5
+                rounded-lg
+                px-3
+                py-2
+                text-sm
+                font-medium
+                text-[#007373]
+                transition
+                hover:bg-[#008080]/10
+                hover:text-[#006666]
+                dark:text-[#72ddda]
+                dark:hover:bg-[#008080]/10
+                dark:hover:text-[#8be8e5]
+              "
+            >
+              <ShoppingBag
+                size={16}
+                weight="bold"
+                className="transition-transform group-hover:scale-105"
+              />
+              Shop Local
             </Link>
           </div>
 
@@ -503,8 +536,44 @@ export default function Navbar() {
                 dark:hover:text-white
               "
             >
-              <Storefront size={19} />
+              <Lightbulb size={19} />
               Guide
+            </Link>
+
+            {/* Commerce */}
+
+            <Link
+              href="/commerce"
+              onClick={closeMenu}
+              className="
+                flex
+                min-h-[48px]
+                items-center
+                gap-3
+                rounded-xl
+                border
+                border-[#008080]/15
+                bg-[#008080]/[0.06]
+                px-3
+                text-sm
+                font-semibold
+                text-[#007373]
+                transition
+                hover:bg-[#008080]/10
+                dark:border-[#56d1ce]/15
+                dark:bg-[#008080]/[0.08]
+                dark:text-[#72ddda]
+                dark:hover:bg-[#008080]/15
+              "
+            >
+              <ShoppingBag
+                size={19}
+                weight="bold"
+              />
+              Shop Local
+              <span className="ml-auto rounded-full bg-[#008080]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#007373] dark:bg-white/[0.06] dark:text-[#72ddda]">
+                Commerce
+              </span>
             </Link>
 
             <div className="my-2 h-px bg-black/[0.07] dark:bg-white/[0.06]" />
