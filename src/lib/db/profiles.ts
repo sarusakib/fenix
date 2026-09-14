@@ -24,18 +24,6 @@ export type PublicProfile = Pick<
 >
 
 /**
- * Keep these as literal types.
- *
- * Supabase's typed select() parser needs the exact string literal
- * so it can infer the selected row shape correctly.
- */
-const PUBLIC_PROFILE_COLUMNS =
-  'id, full_name, created_at, updated_at' as const
-
-const PRIVATE_PROFILE_COLUMNS =
-  'id, full_name, role, phone, created_at, updated_at' as const
-
-/**
  * Get a publicly visible profile.
  *
  * This helper intentionally excludes role and phone.
@@ -59,7 +47,7 @@ export async function getPublicProfileById(
 
   const { data, error } = await supabase
     .from('profiles')
-    .select(PUBLIC_PROFILE_COLUMNS)
+    .select('id, full_name, created_at, updated_at')
     .eq('id', id)
     .maybeSingle()
 
@@ -101,7 +89,7 @@ export async function getOwnProfile(
 
   const { data, error } = await supabase
     .from('profiles')
-    .select(PRIVATE_PROFILE_COLUMNS)
+    .select('id, full_name, role, phone, created_at, updated_at')
     .eq('id', id)
     .maybeSingle()
 
@@ -152,7 +140,7 @@ export async function createProfile(
   const { data, error } = await supabase
     .from('profiles')
     .insert(payload)
-    .select(PRIVATE_PROFILE_COLUMNS)
+    .select('id, full_name, role, phone, created_at, updated_at')
     .single()
 
   if (error) {
@@ -208,13 +196,13 @@ export async function updateProfile(
     .from('profiles')
     .update(payload)
     .eq('id', id)
-    .select(PRIVATE_PROFILE_COLUMNS)
+    .select('id, full_name, role, phone, created_at, updated_at')
     .single()
 
   if (error) {
     return {
-      data,
-      error: null,
+      data: null,
+      error,
     }
   }
 
@@ -222,4 +210,4 @@ export async function updateProfile(
     data,
     error: null,
   }
-  }
+}
