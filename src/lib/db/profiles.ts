@@ -20,17 +20,20 @@ type FenixSupabaseClient = SupabaseClient<Database>
  */
 export type PublicProfile = Pick<
   Profile,
-  | 'id'
-  | 'full_name'
-  | 'created_at'
-  | 'updated_at'
+  'id' | 'full_name' | 'created_at' | 'updated_at'
 >
 
+/**
+ * Keep these as literal types.
+ *
+ * Supabase's typed select() parser needs the exact string literal
+ * so it can infer the selected row shape correctly.
+ */
 const PUBLIC_PROFILE_COLUMNS =
-  'id, full_name, created_at, updated_at'
+  'id, full_name, created_at, updated_at' as const
 
 const PRIVATE_PROFILE_COLUMNS =
-  'id, full_name, role, phone, created_at, updated_at'
+  'id, full_name, role, phone, created_at, updated_at' as const
 
 /**
  * Get a publicly visible profile.
@@ -68,7 +71,7 @@ export async function getPublicProfileById(
   }
 
   return {
-    data: data as PublicProfile | null,
+    data,
     error: null,
   }
 }
@@ -110,7 +113,7 @@ export async function getOwnProfile(
   }
 
   return {
-    data: data as Profile | null,
+    data,
     error: null,
   }
 }
@@ -160,7 +163,7 @@ export async function createProfile(
   }
 
   return {
-    data: data as Profile,
+    data,
     error: null,
   }
 }
@@ -210,13 +213,13 @@ export async function updateProfile(
 
   if (error) {
     return {
-      data: null,
-      error,
+      data,
+      error: null,
     }
   }
 
   return {
-    data: data as Profile,
+    data,
     error: null,
   }
-}
+  }
