@@ -13,6 +13,7 @@ import {
 
 import Navbar from '../../../components/Navbar'
 import { createClient } from '../../../utils/supabase/client'
+import type { VendorProfileInsert } from '../../../types/database'
 
 type VendorStatus =
   | 'pending'
@@ -83,7 +84,12 @@ export default function CommerceSellPage() {
 
           setError('Seller information load করা যায়নি।')
         } else if (vendor) {
-          setExistingVendor(vendor as VendorProfile)
+          setExistingVendor({
+            id: vendor.id,
+            display_name: vendor.display_name,
+            status: vendor.status,
+            is_verified: vendor.is_verified,
+          })
         }
       } catch (loadError) {
         console.error('Seller page load failed:', {
@@ -167,26 +173,28 @@ export default function CommerceSellPage() {
       }
 
       /*
-       * Important:
-       * Use array payload with Supabase typed insert.
-       * This avoids the `never[]` inference problem that occurred
-       * when the Commerce tables were added to Database types.
+       * Keep the insert payload explicitly typed.
+       *
+       * This prevents TypeScript from inferring the insert
+       * array/object as `never` while preserving the
+       * Database contract defined in src/types/database.ts.
        */
-      const { data: createdVendor, error: insertError } = await supabase
-        .from('vendor_profiles')
-        .insert([
-          {
-            user_id: userId,
-            display_name: cleanDisplayName,
-            display_name_bn: cleanDisplayNameBn || null,
-            display_name_en: cleanDisplayNameEn || null,
-            description_bn: cleanDescriptionBn || null,
-            description_en: cleanDescriptionEn || null,
-            phone: cleanPhone,
-          },
-        ])
-        .select('id, display_name, status, is_verified')
-        .single()
+      const vendorPayload: VendorProfileInsert = {
+        user_id: userId,
+        display_name: cleanDisplayName,
+        display_name_bn: cleanDisplayNameBn || null,
+        display_name_en: cleanDisplayNameEn || null,
+        description_bn: cleanDescriptionBn || null,
+        description_en: cleanDescriptionEn || null,
+        phone: cleanPhone,
+      }
+
+      const { data: createdVendor, error: insertError } =
+        await supabase
+          .from('vendor_profiles')
+          .insert(vendorPayload)
+          .select('id, display_name, status, is_verified')
+          .single()
 
       if (insertError) {
         if (insertError.code === '23505') {
@@ -213,7 +221,13 @@ export default function CommerceSellPage() {
         return
       }
 
-      setExistingVendor(createdVendor as VendorProfile)
+      setExistingVendor({
+        id: createdVendor.id,
+        display_name: createdVendor.display_name,
+        status: createdVendor.status,
+        is_verified: createdVendor.is_verified,
+      })
+
       setSuccess(
         'আপনার seller application সফলভাবে জমা হয়েছে।',
       )
@@ -274,7 +288,6 @@ export default function CommerceSellPage() {
         </button>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          {/* Intro */}
           <div>
             <div
               className="
@@ -352,7 +365,6 @@ export default function CommerceSellPage() {
             </div>
           </div>
 
-          {/* Form / Status */}
           <div
             className="
               rounded-[2rem]
@@ -649,7 +661,6 @@ export default function CommerceSellPage() {
                           dark:text-white
                           dark:placeholder:text-white/25
                           dark:focus:border-teal-300/30
-                          dark:focus:ring-teal-300/10
                         "
                       />
                     </div>
@@ -688,7 +699,6 @@ export default function CommerceSellPage() {
                         dark:text-white
                         dark:placeholder:text-white/25
                         dark:focus:border-teal-300/30
-                        dark:focus:ring-teal-300/10
                       "
                     />
                   </div>
@@ -820,4 +830,4 @@ export default function CommerceSellPage() {
       </section>
     </main>
   )
-            }
+}
