@@ -14,26 +14,15 @@ export async function createClient() {
           return cookieStore.getAll()
         },
 
-        setAll(
-          cookiesToSet: Array<{
-            name: string
-            value: string
-            options?: {
-              domain?: string
-              encode?: (value: string) => string
-              expires?: Date
-              httpOnly?: boolean
-              maxAge?: number
-              path?: string
-              sameSite?: 'lax' | 'strict' | 'none'
-              secure?: boolean
-            }
-          }>,
-        ) {
+        setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(
               ({ name, value, options }) => {
-                cookieStore.set(name, value, options)
+                cookieStore.set(
+                  name,
+                  value,
+                  options,
+                )
               },
             )
           } catch {
