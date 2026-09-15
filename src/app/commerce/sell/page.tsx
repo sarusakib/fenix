@@ -257,7 +257,7 @@ try {
     error: insertError,
   } = await supabase
     .from('vendor_profiles')
-    .insert(vendorPayload)
+    .insert([vendorPayload])
     .select(
       'id, display_name, status, is_verified',
     )
