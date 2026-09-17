@@ -10,7 +10,7 @@ export type Database = {
     Tables: {
       profiles: { Row: { id: string; full_name: string | null; role: string; phone: string | null; created_at: string; updated_at: string }; Insert: { id: string; full_name?: string | null; role?: string; phone?: string | null; created_at?: string; updated_at?: string }; Update: { id?: string; full_name?: string | null; role?: string; phone?: string | null; created_at?: string; updated_at?: string }; Relationships: [] }
       businesses: { Row: { id: string; owner_id: string | null; name: string; updated_at: string; title_bn: string | null; title_en: string | null; description: string | null; category: string | null; feni_brain_embedding: number[] | null; created_at: string }; Insert: { id?: string; owner_id?: string | null; name: string; updated_at?: string; title_bn?: string | null; title_en?: string | null; description?: string | null; category?: string | null; feni_brain_embedding?: number[] | null; created_at?: string }; Update: { id?: string; owner_id?: string | null; name?: string; updated_at?: string; title_bn?: string | null; title_en?: string | null; description?: string | null; category?: string | null; feni_brain_embedding?: number[] | null; created_at?: string }; Relationships: [] }
-      product_categories: { Row: { id: string; name_bn: string | null; name_en: string | null; slug: string; description_bn: string | null; description_en: string | null; parent_id: string | null; image_url: string | null; is_active: boolean; sort_order: number; created_at: string; updated_at: string }; Insert: { id?: string; name_bn?: string | null; name_en?: string | null; slug: string; description_bn?: string | null; description_en?: string | null; parent_id?: string | null; image_url?: string | null; is_active?: boolean; sort_order?: number; created_at?: string; updated_at?: string }; Update: { id?: string; name_bn?: string | null; name_en?: string | null; slug?: string; description_bn?: string | null; description_en?: string | null; parent_id?: string | null; image_url?: string | null; is_active?: boolean; sort_order?: number; created_at?: string; updated_at?: string }; Relationships: [] }
+      product_categories: { Row: { id: string; name_bn: string | null; name_en: string | null; slug: string; description_bn: string | null; description_en: string | null; parent_id: string | null; image_url: string | null; is_active: boolean; sort_order: number; created_at: string; updated_at: string }; Insert: { id?: string; name_bn?: string | null; name_en?: string | null; slug: string; description_bn?: string | null; description_en?: string | null; parent_id?: string | null; image_url?: string | null; is_active?: boolean; sort_order?: number; created_at?: string; updated_at?: string }; Update: { id?: string; name_bn?: string | null; name_en?: string | null; slug?: string; description_bn?: string | null; description_en?: string | null; parent_id?: string | null; image_url?: string | null; is_active?: boolean; is_featured?: boolean; sort_order?: number; created_at?: string; updated_at?: string }; Relationships: [] }
       vendor_profiles: { Row: { id: string; user_id: string; business_id: string | null; display_name: string; display_name_bn: string | null; display_name_en: string | null; description_bn: string | null; description_en: string | null; phone: string | null; shop_slug: string | null; status: VendorStatus; is_verified: boolean; created_at: string; updated_at: string }; Insert: { id?: string; user_id: string; business_id?: string | null; display_name: string; display_name_bn?: string | null; display_name_en?: string | null; description_bn?: string | null; description_en?: string | null; phone?: string | null; shop_slug?: string | null; status?: VendorStatus; is_verified?: boolean; created_at?: string; updated_at?: string }; Update: { id?: string; user_id?: string; business_id?: string | null; display_name?: string; display_name_bn?: string | null; display_name_en?: string | null; description_bn?: string | null; description_en?: string | null; phone?: string | null; shop_slug?: string | null; status?: VendorStatus; is_verified?: boolean; created_at?: string; updated_at?: string }; Relationships: [] }
       products: { Row: { id: string; vendor_id: string; business_id: string | null; category_id: string | null; name_bn: string; name_en: string; slug: string; description_bn: string | null; description_en: string | null; sku: string | null; price: number; compare_at_price: number | null; currency: string; status: ProductStatus; is_active: boolean; is_featured: boolean; allow_guest_purchase: boolean; created_at: string; updated_at: string }; Insert: { id?: string; vendor_id: string; business_id?: string | null; category_id?: string | null; name_bn: string; name_en: string; slug: string; description_bn?: string | null; description_en?: string | null; sku?: string | null; price: number; compare_at_price?: number | null; currency?: string; status?: ProductStatus; is_active?: boolean; is_featured?: boolean; allow_guest_purchase?: boolean; created_at?: string; updated_at?: string }; Update: { id?: string; vendor_id?: string; business_id?: string | null; category_id?: string | null; name_bn?: string; name_en?: string; slug?: string; description_bn?: string | null; description_en?: string | null; sku?: string | null; price?: number; compare_at_price?: number | null; currency?: string; status?: ProductStatus; is_active?: boolean; is_featured?: boolean; allow_guest_purchase?: boolean; created_at?: string; updated_at?: string }; Relationships: [] }
       product_images: { Row: { id: string; product_id: string; storage_bucket: string; storage_path: string; alt_text_bn: string | null; alt_text_en: string | null; sort_order: number; is_primary: boolean; created_at: string }; Insert: { id?: string; product_id: string; storage_bucket: string; storage_path: string; alt_text_bn?: string | null; alt_text_en?: string | null; sort_order?: number; is_primary?: boolean; created_at?: string }; Update: { id?: string; product_id?: string; storage_bucket?: string; storage_path?: string; alt_text_bn?: string | null; alt_text_en?: string | null; sort_order?: number; is_primary?: boolean; created_at?: string }; Relationships: [] }
@@ -34,7 +34,7 @@ export type Database = {
       update_vendor_profile: { Args:{p_display_name:string;p_display_name_bn?:string|null;p_display_name_en?:string|null;p_description_bn?:string|null;p_description_en?:string|null;p_phone?:string|null;p_shop_slug?:string|null}; Returns:boolean }
       update_vendor_product: { Args:{p_product_id:string;p_name_bn:string;p_name_en:string;p_slug:string;p_description_bn?:string|null;p_description_en?:string|null;p_sku?:string|null;p_price?:number;p_compare_at_price?:number|null;p_category_id?:string|null;p_allow_guest_purchase?:boolean}; Returns:boolean }
       set_product_primary_image: { Args:{p_image_id:string}; Returns:boolean }
-      get_public_vendor_shop: { Args:{p_slug:string}; Returns:{id:string;shop_slug:string;display_name:string;display_name_bn:string|null;display_name_en:string|null;description_bn:string|null;description_en:string|null;is_verified:boolean;business_id:string|null}[] }
+      get_public_vendor_shop: { Args:{p_slug:string}; Returns:{id:string;shop_slug:string;display_name:string;display_name_bn:string|null;display_name_en:string|null;description_bn:string|null;description_en:string|null;is_verified:boolean;shop_slug:string|null;business_id:string|null}[] }
       calculate_commerce_delivery_fee: { Args:{p_district:string|null;p_upazila:string|null;p_subtotal:number}; Returns:number }
       set_vendor_order_status: { Args:{p_order_id:string;p_status:string}; Returns:boolean }
       create_product_review: { Args:{p_product_id:string;p_rating:number;p_title?:string|null;p_body?:string|null}; Returns:string }
@@ -56,14 +56,35 @@ export type Database = {
 }
 
 export type Profile = Database['public']['Tables']['profiles']['Row']
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
+export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
 export type Business = Database['public']['Tables']['businesses']['Row']
+export type BusinessInsert = Database['public']['Tables']['businesses']['Insert']
+export type BusinessUpdate = Database['public']['Tables']['businesses']['Update']
 export type ProductCategory = Database['public']['Tables']['product_categories']['Row']
+export type ProductCategoryInsert = Database['public']['Tables']['product_categories']['Insert']
+export type ProductCategoryUpdate = Database['public']['Tables']['product_categories']['Update']
 export type VendorProfile = Database['public']['Tables']['vendor_profiles']['Row']
 export type VendorProfileInsert = Database['public']['Tables']['vendor_profiles']['Insert']
+export type VendorProfileUpdate = Database['public']['Tables']['vendor_profiles']['Update']
 export type Product = Database['public']['Tables']['products']['Row']
+export type ProductInsert = Database['public']['Tables']['products']['Insert']
+export type ProductUpdate = Database['public']['Tables']['products']['Update']
 export type ProductImage = Database['public']['Tables']['product_images']['Row']
+export type ProductImageInsert = Database['public']['Tables']['product_images']['Insert']
+export type ProductImageUpdate = Database['public']['Tables']['product_images']['Update']
 export type Inventory = Database['public']['Tables']['inventory']['Row']
+export type InventoryInsert = Database['public']['Tables']['inventory']['Insert']
+export type InventoryUpdate = Database['public']['Tables']['inventory']['Update']
 export type Order = Database['public']['Tables']['orders']['Row']
+export type OrderInsert = Database['public']['Tables']['orders']['Insert']
+export type OrderUpdate = Database['public']['Tables']['orders']['Update']
 export type OrderItem = Database['public']['Tables']['order_items']['Row']
+export type OrderItemInsert = Database['public']['Tables']['order_items']['Insert']
+export type OrderItemUpdate = Database['public']['Tables']['order_items']['Update']
 export type ProductReview = Database['public']['Tables']['product_reviews']['Row']
+export type ProductReviewInsert = Database['public']['Tables']['product_reviews']['Insert']
+export type ProductReviewUpdate = Database['public']['Tables']['product_reviews']['Update']
 export type CommerceReturnRequest = Database['public']['Tables']['commerce_return_requests']['Row']
+export type CommerceReturnRequestInsert = Database['public']['Tables']['commerce_return_requests']['Insert']
+export type CommerceReturnRequestUpdate = Database['public']['Tables']['commerce_return_requests']['Update']
