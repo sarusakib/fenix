@@ -10,7 +10,7 @@ import {
 } from '@phosphor-icons/react'
 import Link from 'next/link'
 
-import { searchFeniBrain } from '../actions/searchFeniBrain'
+import { answerFeniBrain } from '../actions/answerFeniBrain'
 
 type BrainResult = {
   id: string
@@ -43,6 +43,7 @@ export default function GuidePage() {
   const [results, setResults] = useState<BrainResult[]>([])
   const [locations, setLocations] = useState<LocationResult[]>([])
   const [intent, setIntent] = useState('')
+  const [answer, setAnswer] = useState('')
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -68,9 +69,12 @@ export default function GuidePage() {
     setLoading(true)
     setStatus('Feni Brain search করছে...')
     setResults([])
+    setLocations([])
+    setIntent('')
+    setAnswer('')
 
     try {
-      const result = await searchFeniBrain(nextQuery)
+      const result = await answerFeniBrain(nextQuery)
 
       if (!result.success) {
         setStatus(
@@ -85,6 +89,7 @@ export default function GuidePage() {
 
       setResults(nextResults)
       setLocations(result.locations || [])
+      setAnswer(result.answer || '')
       setIntent(result.intent || 'general_feni')
 
       setStatus(
@@ -308,6 +313,17 @@ export default function GuidePage() {
                 />
 
                 {status}
+              </div>
+            )}
+
+            {answer && (
+              <div className="mt-8 rounded-3xl border border-[#72ddda]/15 bg-[#008080]/[0.06] p-5 sm:p-6">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#72ddda]">
+                  Feni Brain Answer
+                </div>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white/80">
+                  {answer}
+                </p>
               </div>
             )}
 
