@@ -94,7 +94,7 @@ grant update on public.fenix_brain_update_candidates to authenticated;
 grant select on public.fenix_brain_update_runs to authenticated;
 
 insert into public.fenix_brain_source_refresh (source_id, refresh_interval_hours, parser_key, auto_publish)
-select id, 24, 'generic_html', trust_tier = 1
+select id, 24, 'generic_html', false
 from public.fenix_brain_sources
 where status = 'active'
 on conflict (source_id) do nothing;
