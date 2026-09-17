@@ -554,7 +554,7 @@ insert into public.fenix_brain_facts (
 select district.id, x.subject_key, x.value_number, x.value_unit, source.id
 from district
 cross join source
-join (
+cross join (
   values
     ('area', 928.34::numeric, 'square_km'),
     ('upazila_count', 6::numeric, 'count'),
