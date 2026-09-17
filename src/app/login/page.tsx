@@ -2,7 +2,7 @@
 
 import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 import { createClient } from '../../utils/supabase/client'
 import { useAuthStore } from '../../store/useAuthStore'
@@ -29,7 +29,6 @@ import SecurityNotice from './components/SecurityNotice'
 
 export default function LoginPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const supabase = createClient()
 
   const setAuth = useAuthStore((state) => state.setAuth)
@@ -67,7 +66,7 @@ export default function LoginPage() {
         return
       }
 
-      const callbackError = searchParams.get('error')
+      const callbackError = new URLSearchParams(window.location.search).get('error')
 
       if (callbackError) {
         setError(callbackError)
@@ -81,7 +80,7 @@ export default function LoginPage() {
     return () => {
       mounted = false
     }
-  }, [router, searchParams, setAuth, supabase])
+  }, [router, setAuth, supabase])
 
   const clearMessages = () => {
     setError('')
