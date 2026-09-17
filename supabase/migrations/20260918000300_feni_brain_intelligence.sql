@@ -602,7 +602,7 @@ as $function$
     c.id,
     c.document_id,
     c.content,
-    1 - (c.embedding <=> query_embedding) as similarity,
+    1 - (c.embedding <=> query_embedding::extensions.vector) as similarity,
     s.id as source_id,
     s.title as source_title,
     s.url as source_url,
@@ -615,8 +615,8 @@ as $function$
     and d.status = 'active'
     and s.status = 'active'
     and c.embedding is not null
-    and 1 - (c.embedding <=> query_embedding) >= greatest(0, least(match_threshold, 1))
-  order by c.embedding <=> query_embedding asc
+    and 1 - (c.embedding <=> query_embedding::extensions.vector) >= greatest(0, least(match_threshold, 1))
+  order by c.embedding <=> query_embedding::extensions.vector asc
   limit least(greatest(match_count, 1), 50);
 $function$;
 
