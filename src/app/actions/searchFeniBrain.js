@@ -6,22 +6,6 @@ import { createClient } from '../../utils/supabase/server'
 const MAX_QUERY_LENGTH = 120
 const MAX_RESULTS = 8
 
-type BrainSource = {
-  source_title: string
-  source_url: string | null
-  trust_tier: number
-  document_title: string
-}
-
-type BrainResult = {
-  content: string
-  similarity: number
-  source_title: string
-  source_url: string | null
-  trust_tier: number
-  document_title: string
-}
-
 function normalize(value) {
   return value
     .normalize('NFKC')
