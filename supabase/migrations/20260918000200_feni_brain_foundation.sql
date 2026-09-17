@@ -398,7 +398,7 @@ select
   src.id
 from district
 cross join src
-join (
+cross cross join (
   values
     ('upazila','ফেনী সদর','Feni Sadar','feni-sadar'),
     ('upazila','ছাগলনাইয়া','Chhagalnaiya','chhagalnaiya'),
@@ -407,7 +407,6 @@ join (
     ('upazila','পরশুরাম','Parshuram','parshuram'),
     ('upazila','সোনাগাজী','Sonagazi','sonagazi')
 ) as x(level, name_bn, name_en, slug)
-on true
 where not exists (
   select 1 from public.fenix_brain_locations l where l.slug = x.slug
 );
@@ -490,7 +489,6 @@ from (
     ('sonagazi','union','আমিরাবাদ ইউনিয়ন','Amirabad Union','amirabad','https://sonagazi.feni.gov.bd/pages/static-pages/6990ef3f35ce18e1c072c850'),
     ('sonagazi','union','নবাবপুর ইউনিয়ন','Nawabpur Union','nawabpur','https://sonagazi.feni.gov.bd/pages/static-pages/6990ef3f35ce18e1c072c850')
 ) as x(parent_slug, level, name_bn, name_en, slug, source_url)
-on true
 join upazila_map u on u.slug = x.parent_slug
 left join src s on s.url = x.source_url
 where not exists (
@@ -567,7 +565,6 @@ join (
     ('union_land_office_count', 27::numeric, 'count'),
     ('market_count', 123::numeric, 'count')
 ) as x(subject_key, value_number, value_unit)
-on true
 where not exists (
   select 1
   from public.fenix_brain_facts f
