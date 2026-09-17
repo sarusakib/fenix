@@ -34,7 +34,7 @@ export default function ProductCard({
 
   return (
     <article className="group overflow-hidden rounded-3xl border border-[#0b1736]/10 bg-white/80 shadow-[0_14px_50px_rgba(11,23,54,0.06)] backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(11,23,54,0.10)] dark:border-white/10 dark:bg-white/[0.045] dark:shadow-none">
-      <Link href={`/commerce/product/${encodeURIComponent(product.slug)}`} className="block">
+      <Link href={`/product/${encodeURIComponent(product.slug)}`} className="block">
         <div className="aspect-[4/3] overflow-hidden bg-black/[0.035] dark:bg-white/[0.04]">
           {product.imageUrl ? (
             <img
@@ -66,7 +66,7 @@ export default function ProductCard({
           )}
         </div>
 
-        <Link href={`/commerce/product/${encodeURIComponent(product.slug)}`} className="mt-2 block">
+        <Link href={`/product/${encodeURIComponent(product.slug)}`} className="mt-2 block">
           <h3 className="line-clamp-2 text-lg font-bold leading-6">{title}</h3>
           {subtitle && <p className="mt-1 line-clamp-1 text-xs opacity-45">{subtitle}</p>}
         </Link>
@@ -85,7 +85,7 @@ export default function ProductCard({
 
           <AddToCartButton
             product={{
-              id: product.id,
+              productId: product.id,
               slug: product.slug,
               name: title,
               price: product.price,
