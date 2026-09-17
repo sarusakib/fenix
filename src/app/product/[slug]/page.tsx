@@ -89,7 +89,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {vendor?.display_name && <p className="mt-5 inline-flex items-center gap-2 text-sm opacity-55"><Storefront size={17} /> {vendor.display_name}</p>}
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <AddToCartButton product={{ id: product.id, slug: product.slug, name: title, price: Number(product.price), currency: product.currency, allowGuestPurchase: product.allow_guest_purchase, imageUrl: null }} />
+              <AddToCartButton product={{ productId: product.id, slug: product.slug, name: title, price: Number(product.price), currency: product.currency, allowGuestPurchase: product.allow_guest_purchase, imageUrl: null }} />
               <Link href="/commerce/cart" className="inline-flex items-center gap-2 rounded-xl border border-[#0b1736]/10 px-5 py-3 text-sm font-bold dark:border-white/10">
                 View cart <ShoppingCart size={17} />
               </Link>
