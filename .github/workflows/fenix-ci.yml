@@ -30,10 +30,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
+      # The repository currently has no package-lock.json, so npm ci and
+      # setup-node's npm cache cannot be used safely. Use the same install
+      # model Vercel uses for this lockfile-free repository.
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Lint
         run: npm run lint
