@@ -398,7 +398,7 @@ select
   src.id
 from district
 cross join src
-cross cross join (
+cross join (
   values
     ('upazila','ফেনী সদর','Feni Sadar','feni-sadar'),
     ('upazila','ছাগলনাইয়া','Chhagalnaiya','chhagalnaiya'),
