@@ -71,7 +71,7 @@ export async function searchFeniBrain(query) {
       })
     }
 
-    let semantic: BrainResult[] = []
+    let semantic = []
 
     try {
       const embedding = await generateEmbedding(cleanQuery)
@@ -92,7 +92,7 @@ export async function searchFeniBrain(query) {
       // Keyword retrieval remains usable when the embedding provider is unavailable.
     }
 
-    const keyword: BrainResult[] = Array.isArray(keywordResult.data)
+    const keyword = Array.isArray(keywordResult.data)
       ? keywordResult.data
       : []
 
@@ -119,7 +119,7 @@ export async function searchFeniBrain(query) {
           source_url: row.source_url,
           trust_tier: row.trust_tier,
           document_title: row.document_title,
-        })) as BrainSource[],
+        }))
     }
   } catch (error) {
     console.error('Feni Brain search failed:', {
