@@ -1,19 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle, Package, Archive, UploadSimple, WarningCircle } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
+import { ArrowLeft, CheckCircle, Package, Archive, UploadSimple } from '@phosphor-icons/react'
+import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 
-export default function SellerProductPage({ params }: { params: { id: string } }) {
+type ProductState = { id: string; name_bn: string; name_en: string; price: number; status: string; is_active: boolean }
+
+export default function SellerProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [product, setProduct] = useState<{ id: string; name_bn: string; name_en: string; price: number; status: string; is_active: boolean } | null>(null)
+  const [product, setProduct] = useState<ProductState | null>(null)
   const [quantity, setQuantity] = useState('0')
   const [threshold, setThreshold] = useState('5')
 
@@ -22,26 +25,26 @@ export default function SellerProductPage({ params }: { params: { id: string } }
     async function load() {
       const supabase = createClient()
       const { data: auth } = await supabase.auth.getUser()
-      if (!auth.user) { router.replace(`/login?next=/commerce/seller/products/${encodeURIComponent(params.id)}`); return }
+      if (!auth.user) { router.replace(`/login?next=/commerce/seller/products/${encodeURIComponent(id)}`); return }
       const { data: vendor } = await supabase.from('vendor_profiles').select('id, status').eq('user_id', auth.user.id).maybeSingle()
       if (!vendor || vendor.status !== 'approved') { router.replace('/commerce/seller'); return }
-      const { data, error: productError } = await supabase.from('products').select('id, name_bn, name_en, price, status, is_active').eq('id', params.id).eq('vendor_id', vendor.id).maybeSingle()
+      const { data, error: productError } = await supabase.from('products').select('id, name_bn, name_en, price, status, is_active').eq('id', id).eq('vendor_id', vendor.id).maybeSingle()
       if (!active) return
       if (productError || !data) { setError('Product পাওয়া যায়নি।'); setLoading(false); return }
-      const { data: stock } = await supabase.from('inventory').select('quantity, low_stock_threshold').eq('product_id', params.id).maybeSingle()
-      setProduct(data)
+      const { data: stock } = await supabase.from('inventory').select('quantity, low_stock_threshold').eq('product_id', id).maybeSingle()
+      setProduct(data as ProductState)
       setQuantity(String(stock?.quantity ?? 0))
       setThreshold(String(stock?.low_stock_threshold ?? 5))
       setLoading(false)
     }
     void load()
     return () => { active = false }
-  }, [params.id, router])
+  }, [id, router])
 
   async function inventorySave() {
     setSaving(true); setError('')
     const supabase = createClient()
-    const { error: rpcError } = await supabase.rpc('set_vendor_product_inventory', { p_product_id: params.id, p_quantity: Number(quantity), p_low_stock_threshold: Number(threshold) })
+    const { error: rpcError } = await supabase.rpc('set_vendor_product_inventory', { p_product_id: id, p_quantity: Number(quantity), p_low_stock_threshold: Number(threshold) })
     if (rpcError) setError('Inventory update করা যায়নি।')
     setSaving(false)
   }
@@ -49,8 +52,9 @@ export default function SellerProductPage({ params }: { params: { id: string } }
   async function productAction(action: 'publish' | 'archive') {
     setSaving(true); setError('')
     const supabase = createClient()
-    const { error: rpcError } = await supabase.rpc(action === 'publish' ? 'publish_vendor_product' : 'archive_vendor_product', { p_product_id: params.id })
-    if (rpcError) setError(action === 'publish' ? 'Product publish করা যায়নি। আগে required information ও seller approval check করুন।' : 'Product archive করা যায়নি.')
+    const functionName = action === 'publish' ? 'publish_vendor_product' : 'archive_vendor_product'
+    const { error: rpcError } = await supabase.rpc(functionName, { p_product_id: id })
+    if (rpcError) setError(action === 'publish' ? 'Product publish করা যায়নি। Required information ও seller approval check করুন।' : 'Product archive করা যায়নি।')
     else setProduct((current) => current ? { ...current, status: action === 'publish' ? 'published' : 'archived', is_active: action === 'publish' } : current)
     setSaving(false)
   }
