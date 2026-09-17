@@ -2344,7 +2344,7 @@ export default function FenixIntro({
         }}
       />
 
-      <style jsx>{`
+      <style>{`
         @keyframes fenixIntroLoading {
           0% {
             transform: translate3d(-130%, 0, 0);
