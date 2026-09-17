@@ -22,6 +22,15 @@ type BrainResult = {
   document_title: string
 }
 
+type BrainAnswer = {
+  success: boolean
+  error?: string
+  answer?: string
+  intent?: string
+  locations?: LocationResult[]
+  results?: BrainResult[]
+}
+
 type LocationResult = {
   id: string
   level: string
@@ -74,7 +83,7 @@ export default function GuidePage() {
     setAnswer('')
 
     try {
-      const result = await answerFeniBrain(nextQuery)
+      const result = (await answerFeniBrain(nextQuery)) as BrainAnswer
 
       if (!result.success) {
         setStatus(
