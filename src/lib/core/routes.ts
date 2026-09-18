@@ -9,6 +9,14 @@ export const ROUTES = {
   admin: '/admin',
   auth: { login: '/login', callback: '/auth/callback', resetPassword: '/auth/reset-password' },
   core: { guide: '/guide', directory: '/directory', start: '/start', invest: '/invest' },
+  investment: {
+    root: '/invest',
+    create: '/invest/create',
+    profile: '/invest/profile',
+    dashboard: '/invest/dashboard',
+    manage: '/invest/manage',
+    opportunity: (id: string) => `/invest/${encodeURIComponent(id)}`,
+  },
   commerce: {
     root: '/commerce',
     shop: '/shop',
