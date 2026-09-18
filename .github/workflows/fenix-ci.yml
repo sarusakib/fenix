@@ -46,7 +46,9 @@ jobs:
           deno-version: v2.x
 
       - name: Check Supabase Edge Functions
-        run: deno check --config supabase/functions/deno.json supabase/functions/fenix-brain-source-refresh/index.ts
+        run: |
+          deno check --config supabase/functions/deno.json supabase/functions/fenix-brain-source-refresh/index.ts
+          deno check --config supabase/functions/feni-brain-embed-backfill/deno.json supabase/functions/feni-brain-embed-backfill/index.ts
 
       - name: Production build
         run: npm run build
