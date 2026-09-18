@@ -38,6 +38,8 @@ type SendPasswordResetInput = {
   origin: string
 }
 
+const MIN_PASSWORD_LENGTH = 12
+
 export function validateAuthInput({
   mode,
   email,
@@ -57,12 +59,58 @@ export function validateAuthInput({
       return 'Name is required.'
     }
 
-    if (password.length < 6) {
-      return 'Password must be at least 6 characters.'
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      return 'Signup password must be at least 12 characters.'
+    }
+
+    if (!/[a-z]/.test(password)) {
+      return 'Signup password must include a lowercase letter.'
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      return 'Signup password must include an uppercase letter.'
+    }
+
+    if (!/\d/.test(password)) {
+      return 'Signup password must include a number.'
+    }
+
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      return 'Signup password must include a special character.'
     }
   }
 
   return null
+}
+
+export async function isPasswordCompromised(password: string): Promise<boolean> {
+  const encoder = new TextEncoder()
+  const digest = await crypto.subtle.digest('SHA-1', encoder.encode(password))
+  const bytes = Array.from(new Uint8Array(digest))
+  const hash = bytes.map((byte) => byte.toString(16).padStart(2, '0')).join('').toUpperCase()
+  const prefix = hash.slice(0, 5)
+  const suffix = hash.slice(5)
+
+  const response = await fetch(
+    `https://api.pwnedpasswords.com/range/${prefix}`,
+    {
+      headers: {
+        'Add-Padding': 'true',
+      },
+      cache: 'no-store',
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error('Password security check is temporarily unavailable.')
+  }
+
+  const body = await response.text()
+
+  return body.split('\n').some((line) => {
+    const [returnedSuffix, count] = line.trim().split(':')
+    return returnedSuffix?.trim().toUpperCase() === suffix && Number.parseInt(count ?? '0', 10) > 0
+  })
 }
 
 export function getSafeAuthMessage(error: unknown): string {
