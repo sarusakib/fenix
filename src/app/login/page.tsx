@@ -62,7 +62,7 @@ export default function LoginPage() {
 
       if (session) {
         setAuth(session)
-        router.replace('/')
+        router.replace('/intro')
         return
       }
 
@@ -126,7 +126,7 @@ export default function LoginPage() {
           setAuth(data.session)
           resetFailedAttempts()
 
-          router.replace('/')
+          router.replace('/intro')
           router.refresh()
 
           return
@@ -160,7 +160,7 @@ export default function LoginPage() {
       setAuth(data.session)
       resetFailedAttempts()
 
-      router.replace('/')
+      router.replace('/intro')
       router.refresh()
     } catch (authError: unknown) {
       const message =
