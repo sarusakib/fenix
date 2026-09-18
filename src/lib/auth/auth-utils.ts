@@ -127,7 +127,7 @@ export async function signInWithOAuth({
   return supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: `${origin}/auth/callback?next=%2Fintro`,
     },
   })
 }
