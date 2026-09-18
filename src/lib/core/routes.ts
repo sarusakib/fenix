@@ -6,6 +6,7 @@
  */
 export const ROUTES = {
   home: '/',
+  admin: '/admin',
   auth: { login: '/login', callback: '/auth/callback', resetPassword: '/auth/reset-password' },
   core: { guide: '/guide', directory: '/directory', start: '/start', invest: '/invest' },
   commerce: {
