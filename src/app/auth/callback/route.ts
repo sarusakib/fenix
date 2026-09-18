@@ -6,7 +6,10 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get('code')
   const requestedNext = requestUrl.searchParams.get('next')
 
-  // Only allow internal relative redirects.
+  // Keep the callback redirect on the exact host that received
+  // the OAuth callback. Do not rebuild the host from proxy headers.
+  // This prevents OAuth from being redirected to an invalid or
+  // deployment-specific Vercel hostname.
   const next =
     requestedNext &&
     requestedNext.startsWith('/') &&
@@ -21,24 +24,17 @@ export async function GET(request: Request) {
       await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      const forwardedHost =
-        request.headers.get('x-forwarded-host')
-      const forwardedProto =
-        request.headers.get('x-forwarded-proto') ?? 'https'
-
-      // Vercel sits behind a proxy, so prefer the original host
-      // when it is provided; otherwise use the request origin.
-      const targetOrigin = forwardedHost
-        ? `${forwardedProto}://${forwardedHost}`
-        : requestUrl.origin
-
       return NextResponse.redirect(
-        `${targetOrigin}${next}`
+        new URL(next, requestUrl.origin),
       )
     }
   }
 
-  return NextResponse.redirect(
-    `${requestUrl.origin}/login?error=Could+not+authenticate+user`
+  const errorUrl = new URL('/login', requestUrl.origin)
+  errorUrl.searchParams.set(
+    'error',
+    'Could not authenticate user',
   )
+
+  return NextResponse.redirect(errorUrl)
 }
