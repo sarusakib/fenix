@@ -15,6 +15,7 @@ export const ROUTES = {
     profile: '/invest/profile',
     dashboard: '/invest/dashboard',
     manage: '/invest/manage',
+    calculator: '/invest/calculator',
     opportunity: (id: string) => `/invest/${encodeURIComponent(id)}`,
   },
   commerce: {
