@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, CheckCircle, LockKey, MapPin, ShoppingBag, User } from '@phosphor-icons/react'
+import { ArrowLeft, ArrowRight, LockKey, MapPin, ShoppingBag } from '@phosphor-icons/react'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -24,6 +24,8 @@ export default function CommerceCheckoutPage() {
   const [upazila, setUpazila] = useState('')
   const [district, setDistrict] = useState('Feni')
   const [note, setNote] = useState('')
+  const [deliveryFee, setDeliveryFee] = useState(0)
+  const [feeLoading, setFeeLoading] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -42,6 +44,26 @@ export default function CommerceCheckoutPage() {
   }, [])
 
   const subtotal = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.quantity, 0), [cart])
+
+  useEffect(() => {
+    let active = true
+    async function loadDeliveryFee() {
+      if (!cart.length) { setDeliveryFee(0); return }
+      setFeeLoading(true)
+      const supabase = createClient()
+      const { data, error: feeError } = await supabase.rpc('calculate_commerce_delivery_fee', {
+        p_district: district.trim() || null,
+        p_upazila: upazila.trim() || null,
+        p_subtotal: subtotal,
+      })
+      if (active) {
+        setDeliveryFee(feeError ? 0 : Number(data ?? 0))
+        setFeeLoading(false)
+      }
+    }
+    void loadDeliveryFee()
+    return () => { active = false }
+  }, [cart.length, district, upazila, subtotal])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -116,7 +138,7 @@ export default function CommerceCheckoutPage() {
               <button disabled={submitting || !cart.length} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#008080] px-5 py-4 text-sm font-bold text-white disabled:opacity-50">{submitting ? 'Placing order…' : 'Place order — Cash on Delivery'} <ArrowRight size={17} /></button>
             </div>
           </form>
-          <aside className="h-fit rounded-[2rem] border border-[#0b1736]/10 bg-white/80 p-6 dark:border-white/10 dark:bg-white/[0.045]"><div className="flex items-center gap-2"><ShoppingBag size={20} /><h2 className="font-black">Order summary</h2></div><div className="mt-5 space-y-3">{cart.map((item) => <div key={item.productId} className="flex justify-between gap-3 text-sm"><span className="min-w-0 truncate opacity-60">{item.name} × {item.quantity}</span><strong>{item.currency} {(item.price * item.quantity).toLocaleString('en-BD')}</strong></div>)}</div><div className="my-5 border-t border-[#0b1736]/10 dark:border-white/10" /><div className="flex justify-between"><span className="font-bold">Total</span><strong className="text-xl">{cart[0]?.currency ?? 'BDT'} {subtotal.toLocaleString('en-BD')}</strong></div><p className="mt-4 text-xs opacity-45">Delivery fee: currently 0 BDT</p></aside>
+          <aside className="h-fit rounded-[2rem] border border-[#0b1736]/10 bg-white/80 p-6 dark:border-white/10 dark:bg-white/[0.045]"><div className="flex items-center gap-2"><ShoppingBag size={20} /><h2 className="font-black">Order summary</h2></div><div className="mt-5 space-y-3">{cart.map((item) => <div key={item.productId} className="flex justify-between gap-3 text-sm"><span className="min-w-0 truncate opacity-60">{item.name} × {item.quantity}</span><strong>{item.currency} {(item.price * item.quantity).toLocaleString('en-BD')}</strong></div>)}</div><div className="my-5 border-t border-[#0b1736]/10 dark:border-white/10" /><div className="flex justify-between text-sm"><span className="opacity-55">Subtotal</span><strong>{cart[0]?.currency ?? 'BDT'} {subtotal.toLocaleString('en-BD')}</strong></div><div className="mt-3 flex justify-between text-sm"><span className="opacity-55">Delivery</span><strong>{feeLoading ? 'Calculating…' : `${cart[0]?.currency ?? 'BDT'} ${deliveryFee.toLocaleString('en-BD')}`}</strong></div><div className="my-5 border-t border-[#0b1736]/10 dark:border-white/10" /><div className="flex justify-between"><span className="font-bold">Total</span><strong className="text-xl">{cart[0]?.currency ?? 'BDT'} {(subtotal + deliveryFee).toLocaleString('en-BD')}</strong></div><p className="mt-4 text-xs opacity-45">Final price and stock are revalidated by the database when you place the order.</p></aside>
         </div>
       </section>
     </main>
