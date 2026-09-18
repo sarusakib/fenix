@@ -35,6 +35,7 @@ export const ROUTES = {
 
 export type RouteRegistry = typeof ROUTES
 export type CoreRoute = keyof RouteRegistry['core']
+export type InvestmentRoute = keyof RouteRegistry['investment']
 export type CommerceRoute = keyof RouteRegistry['commerce']
 export type EcosystemRoute = keyof RouteRegistry['ecosystem']
 export type DashboardRoute = keyof RouteRegistry['dashboard']
