@@ -609,7 +609,7 @@ begin
      or new.verified_at is distinct from old.verified_at
      or new.verification_status in ('verified','needs_changes')
      or new.raised_amount is distinct from old.raised_amount
-     or new.verification_note is distinct from old.verification_note) then
+     or new.verification_note is distinct from old.verification_note then
     raise exception 'Protected investment fields can only be changed by an administrator.';
   end if;
 
