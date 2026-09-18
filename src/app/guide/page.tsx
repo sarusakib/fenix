@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
   ArrowLeft,
@@ -65,7 +65,7 @@ type BrainAnswer = {
   confidence?: number
 }
 
-export default function GuidePage() {
+function FeniBrainGuide() {
   const searchParams = useSearchParams()
   const initialQuery = searchParams.get('q') ?? ''
 
@@ -361,5 +361,21 @@ export default function GuidePage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function GuidePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-dvh bg-[#030506] px-4 py-10 text-white">
+          <div className="mx-auto max-w-6xl rounded-3xl border border-white/[0.08] bg-black/35 p-8 text-sm text-white/60 backdrop-blur-xl">
+            Feni Brain loading…
+          </div>
+        </main>
+      }
+    >
+      <FeniBrainGuide />
+    </Suspense>
   )
 }
