@@ -79,6 +79,29 @@ Deno.serve(async (req) => {
   const db = createClient(url, key, { auth: { persistSession: false } });
   const hf = Deno.env.get("HUGGINGFACE_API_KEY");
   const body = await req.json().catch(() => ({}));
+  const action = String(body.action ?? "refresh");
+  if (action === "backfill_embeddings") {
+    if (!hf) return Response.json({ success: false, error: "HUGGINGFACE_API_KEY is not configured.", embedded: 0 }, { status: 503 });
+    const requestedLimit = Number(body.limit ?? 5);
+    const backfillLimit = Math.min(Math.max(Number.isFinite(requestedLimit) ? requestedLimit : 5, 1), 10);
+    const { data: chunks, error: chunkError } = await db.from("fenix_brain_chunks").select("id, content").eq("status", "active").is("embedding", null).order("created_at", { ascending: true }).limit(backfillLimit);
+    if (chunkError) return Response.json({ success: false, error: chunkError.message, embedded: 0 }, { status: 500 });
+    let embedded = 0;
+    const failures: Array<{ id: string; error: string }> = [];
+    for (const chunk of chunks ?? []) {
+      try {
+        const vector = await embed(chunk.content, hf);
+        const { error: updateError } = await db.from("fenix_brain_chunks").update({ embedding: vector, embedding_model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", updated_at: new Date().toISOString() }).eq("id", chunk.id).is("embedding", null);
+        if (updateError) throw new Error(updateError.message);
+        embedded++;
+      } catch (error) {
+        failures.push({ id: chunk.id, error: error instanceof Error ? error.message : "Unknown error" });
+      }
+    }
+    const { count: remaining } = await db.from("fenix_brain_chunks").select("id", { count: "exact", head: true }).eq("status", "active").is("embedding", null);
+    return Response.json({ success: true, embedded, remaining: remaining ?? 0, failures, model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2" });
+  }
+
   const limit = Math.min(Math.max(Number(body.limit ?? 5), 1), 20);
   const { data: sources, error } = await db.rpc("claim_due_feni_brain_sources", { p_limit: limit });
   if (error) return Response.json({ error: error.message }, { status: 500 });
