@@ -1,144 +1,325 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import type { ElementType } from 'react'
+import { useMemo, useState, type ElementType } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  ArrowRight, Buildings, CheckCircle, Compass, Lightbulb,
-  MagnifyingGlass, Rocket, ShieldCheck, ShoppingBag, Sparkle,
-  Storefront, TrendUp, Users,
+  ArrowRight,
+  Buildings,
+  CheckCircle,
+  Compass,
+  Lightbulb,
+  MagnifyingGlass,
+  Rocket,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkle,
+  Storefront,
+  TrendUp,
+  Users,
 } from '@phosphor-icons/react'
 import Navbar from '../components/Navbar'
 
 type Accent = 'teal' | 'gold' | 'neutral'
+
 type ActionCard = {
   title: string
   description: string
   icon: ElementType
   accent: Accent
   href: string
-  badge: string
+  eyebrow: string
 }
 
-const actionCards: ActionCard[] = [
-  { title:'Start a Business', description:'Turn an idea into a practical local business journey.', icon:Rocket, accent:'teal', href:'/start', badge:'Build' },
-  { title:'Explore Investment', description:'Discover local opportunities and the information behind them.', icon:TrendUp, accent:'gold', href:'/invest', badge:'Invest' },
-  { title:'Find Local Businesses', description:'Discover businesses, services and useful local resources.', icon:Storefront, accent:'neutral', href:'/directory', badge:'Discover' },
-  { title:'Shop Local', description:'Explore local products and sellers through FeniX Commerce.', icon:ShoppingBag, accent:'teal', href:'/commerce', badge:'Commerce' },
-  { title:'Feni Guide', description:'Get practical guidance for navigating business and local life.', icon:Lightbulb, accent:'gold', href:'/guide', badge:'Guide' },
+const actions: ActionCard[] = [
+  {
+    title: 'Start a Business',
+    description: 'Move from idea to a practical local business journey.',
+    icon: Rocket,
+    accent: 'teal',
+    href: '/start',
+    eyebrow: 'BUILD',
+  },
+  {
+    title: 'Explore Investment',
+    description: 'Discover local opportunities with context and clarity.',
+    icon: TrendUp,
+    accent: 'gold',
+    href: '/invest',
+    eyebrow: 'INVEST',
+  },
+  {
+    title: 'Find Local Businesses',
+    description: 'Explore services, suppliers and useful places in Feni.',
+    icon: Storefront,
+    accent: 'neutral',
+    href: '/directory',
+    eyebrow: 'CONNECT',
+  },
+  {
+    title: 'Shop Local',
+    description: 'Browse local products and sellers through FeniX Commerce.',
+    icon: ShoppingBag,
+    accent: 'teal',
+    href: '/commerce',
+    eyebrow: 'COMMERCE',
+  },
+  {
+    title: 'Ask Feni Brain',
+    description: 'Ask natural questions about Feni and get guided answers.',
+    icon: Lightbulb,
+    accent: 'gold',
+    href: '/guide',
+    eyebrow: 'GUIDE',
+  },
 ]
 
 const prompts = [
-  ['Find a business','Find businesses and services in Feni'],
-  ['Shop local','Find products and local sellers in Feni'],
-  ['Start a business','How can I start a business in Feni?'],
-  ['Ask Feni Brain','What are the upazilas of Feni?'],
+  'Find businesses in Feni',
+  'How do I start a business in Feni?',
+  'Find products and local sellers',
+  'What are the upazilas of Feni?',
 ]
 
-function IconBox({ icon: Icon, accent }: { icon: ElementType; accent: Accent }) {
-  const cls = accent === 'gold'
-    ? 'border-amber-500/15 bg-amber-500/[0.08] text-amber-700 dark:border-amber-300/15 dark:bg-amber-300/[0.08] dark:text-amber-200'
-    : accent === 'neutral'
-      ? 'border-slate-500/15 bg-slate-500/[0.06] text-slate-700 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/80'
-      : 'border-teal-600/15 bg-teal-600/[0.08] text-teal-700 dark:border-teal-300/15 dark:bg-teal-300/[0.08] dark:text-teal-200'
-  return <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${cls}`}><Icon size={23} weight="duotone" /></div>
+function AccentIcon({
+  icon: Icon,
+  accent,
+}: {
+  icon: ElementType
+  accent: Accent
+}) {
+  const tone =
+    accent === 'gold'
+      ? 'bg-amber-500/[0.08] text-amber-800 dark:bg-amber-300/[0.08] dark:text-amber-200'
+      : accent === 'neutral'
+        ? 'bg-slate-500/[0.07] text-slate-700 dark:bg-white/[0.05] dark:text-white/80'
+        : 'bg-teal-600/[0.08] text-teal-800 dark:bg-teal-300/[0.08] dark:text-teal-100'
+
+  return (
+    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl">
+      <span className={'grid h-12 w-12 place-items-center rounded-2xl ' + tone}>
+        <Icon size={23} weight="duotone" />
+      </span>
+    </div>
+  )
 }
 
 export default function HomePage() {
   const router = useRouter()
-  const [search,setSearch] = useState('')
-  const query = useMemo(()=>search.trim().slice(0,120),[search])
-  const goSearch=()=>router.push(query ? `/guide?q=${encodeURIComponent(query)}` : '/guide')
+  const [search, setSearch] = useState('')
+  const query = useMemo(() => search.trim().slice(0, 120), [search])
+
+  const runSearch = () => {
+    router.push(
+      query ? '/guide?q=' + encodeURIComponent(query) : '/guide',
+    )
+  }
+
+  const usePrompt = (value: string) => {
+    setSearch(value)
+    router.push('/guide?q=' + encodeURIComponent(value))
+  }
+
   return (
     <main className="fenix-shell min-h-screen overflow-x-clip">
-      <div className="fenix-orb left-[8%] top-32 h-56 w-56 bg-teal-500/10 dark:bg-teal-400/10" />
-      <div className="fenix-orb right-[6%] top-[28%] h-64 w-64 bg-amber-400/10 dark:bg-amber-300/[0.06]" />
+      <div className="fenix-orb left-[3%] top-32 h-64 w-64 bg-teal-400/[0.09]" />
+      <div className="fenix-orb right-[4%] top-[26%] h-72 w-72 bg-amber-300/[0.06]" />
+
       <Navbar />
 
-      <section className="relative mx-auto flex min-h-[calc(100svh-64px)] w-full max-w-7xl flex-col items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
-        <div className="inline-flex items-center gap-2 rounded-full border border-teal-600/15 bg-teal-600/[0.06] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-teal-700 dark:border-teal-300/15 dark:bg-teal-300/[0.06] dark:text-teal-200">
-          <Sparkle size={14} weight="fill" /> Feni Business Ecosystem
-        </div>
+      <section className="relative mx-auto flex min-h-[calc(100svh-72px)] w-full max-w-7xl flex-col justify-center px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.18fr_.82fr]">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-teal-600/[0.07] px-3.5 py-2 text-[10px] font-bold uppercase tracking-[.18em] text-teal-800 dark:bg-teal-300/[0.07] dark:text-teal-100">
+              <Sparkle size={13} weight="fill" />
+              Feni Business Ecosystem
+            </div>
 
-        <h1 className="mt-7 max-w-4xl text-center text-4xl font-semibold tracking-[-0.055em] text-[#0b1736] sm:text-6xl lg:text-7xl dark:text-white">
-          Build. Connect. <span className="text-teal-700 dark:text-teal-300">Grow.</span>
-        </h1>
+            <h1 className="mt-6 max-w-3xl text-balance text-5xl font-semibold tracking-[-.065em] text-[#0b1736] sm:text-6xl lg:text-[5.25rem] dark:text-white">
+              Build.
+              <br />
+              Connect.
+              <br />
+              <span className="text-teal-700 dark:text-teal-300">Grow.</span>
+            </h1>
 
-        <p className="mt-6 max-w-2xl text-center text-sm leading-7 text-slate-600 sm:text-base dark:text-white/60">
-          One place to discover people, businesses, products, guidance and opportunities across Feni.
-        </p>
+            <p className="mt-7 max-w-xl text-base leading-8 text-slate-600 dark:text-white/58">
+              One calm place to discover people, businesses, products,
+              guidance and opportunities across Feni.
+            </p>
 
-        <div className="mt-9 w-full max-w-3xl">
-          <div className="fenix-surface relative rounded-[1.65rem] p-2 shadow-[0_18px_70px_rgba(0,128,128,.08)]">
-            <div className="flex items-center gap-2">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-teal-600/[0.08] text-teal-700 dark:bg-teal-300/[0.08] dark:text-teal-200">
-                <MagnifyingGlass size={22} />
-              </div>
-              <input
-                value={search}
-                onChange={e=>setSearch(e.target.value)}
-                onKeyDown={e=>{if(e.key==='Enter') goSearch()}}
-                aria-label="Search FeniX"
-                placeholder="What are you looking for in Feni?"
-                className="min-w-0 flex-1 bg-transparent px-1 text-sm text-[#0b1736] outline-none placeholder:text-slate-400 sm:text-base dark:text-white dark:placeholder:text-white/35"
-              />
-              <button onClick={goSearch} className="flex h-12 shrink-0 items-center gap-2 rounded-2xl bg-[#008080] px-4 text-sm font-semibold text-white transition hover:bg-[#007474] active:scale-[.98] sm:px-5">
-                <span className="hidden sm:inline">Search</span><ArrowRight size={18}/>
-              </button>
+            <div className="mt-8 grid max-w-xl grid-cols-3 gap-3 text-left">
+              {[
+                ['01', 'DISCOVER'],
+                ['02', 'CONNECT'],
+                ['03', 'GROW'],
+              ].map(([number, label]) => (
+                <div key={number} className="rounded-2xl bg-black/[0.025] px-4 py-3 dark:bg-white/[0.03]">
+                  <div className="text-[10px] font-bold tracking-[.16em] text-teal-700 dark:text-teal-300">{number}</div>
+                  <div className="mt-1 text-[10px] font-semibold tracking-[.12em] text-slate-500 dark:text-white/40">{label}</div>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {prompts.map(([label,value])=><button key={label} onClick={()=>{setSearch(value);router.push(`/guide?q=${encodeURIComponent(value)}`)}} className="rounded-full border border-black/[0.08] bg-white/55 px-3.5 py-2 text-xs text-slate-600 transition hover:border-teal-600/20 hover:bg-teal-600/[0.06] hover:text-teal-800 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-white/55 dark:hover:bg-white/[0.06] dark:hover:text-white">{label}</button>)}
-          </div>
-        </div>
 
-        <div className="mt-10 grid w-full max-w-3xl grid-cols-3 gap-3 text-center">
-          {[['01','Discover'],['02','Connect'],['03','Grow']].map(([n,t])=><div key={n} className="text-xs text-slate-500 dark:text-white/40"><span className="font-semibold text-teal-700 dark:text-teal-300">{n}</span><span className="mx-2 opacity-30">—</span>{t}</div>)}
+          <div className="relative">
+            <div className="fenix-surface-strong fenix-glow rounded-[2rem] p-3 sm:p-4">
+              <div className="rounded-[1.5rem] bg-[#0b1736] p-5 text-white shadow-2xl sm:p-6 dark:bg-[#071019]">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-[.2em] text-teal-300/80">FeniX Search</div>
+                    <div className="mt-2 text-xl font-semibold tracking-tight">What do you want to do?</div>
+                  </div>
+                  <div className="grid h-11 w-11 place-items-center rounded-2xl bg-teal-300/10 text-teal-200">
+                    <MagnifyingGlass size={20} />
+                  </div>
+                </div>
+
+                <div className="mt-6 rounded-2xl bg-white/[0.07] p-2 ring-1 ring-white/[0.09]">
+                  <div className="flex items-center gap-2 rounded-xl bg-white/[0.05] px-3">
+                    <MagnifyingGlass size={18} className="shrink-0 text-white/45" />
+                    <input
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') runSearch()
+                      }}
+                      aria-label="Search FeniX"
+                      placeholder="Search FeniX…"
+                      className="min-w-0 flex-1 bg-transparent py-4 text-sm text-white outline-none placeholder:text-white/30"
+                    />
+                    <button
+                      type="button"
+                      onClick={runSearch}
+                      className="grid h-11 w-11 place-items-center rounded-xl bg-teal-400 text-[#062324] transition hover:bg-teal-300"
+                      aria-label="Search"
+                    >
+                      <ArrowRight size={18} weight="bold" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {prompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() => usePrompt(prompt)}
+                      className="rounded-full bg-white/[0.06] px-3 py-2 text-left text-xs text-white/65 transition hover:bg-white/[0.11] hover:text-white"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute -bottom-5 -left-4 hidden rounded-2xl bg-white/80 px-4 py-3 shadow-xl ring-1 ring-black/[0.06] backdrop-blur-xl sm:block dark:bg-white/[0.06] dark:ring-white/[0.06]">
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={18} className="text-teal-700 dark:text-teal-300" weight="duotone" />
+                <span className="text-xs font-semibold text-slate-700 dark:text-white/70">
+                  Built for trusted local discovery
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300">Explore</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[#0b1736] sm:text-4xl dark:text-white">Everything in one ecosystem.</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-white/55">Simple paths for the things people actually come to FeniX to do.</p>
+      <section id="explore" className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[.2em] text-teal-700 dark:text-teal-300">Explore FeniX</div>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[#0b1736] sm:text-4xl dark:text-white">Your next move starts here.</h2>
+          </div>
+          <p className="max-w-md text-sm leading-6 text-slate-500 dark:text-white/45">
+            Five clear entry points today, with room for the ecosystem to grow without changing how FeniX feels.
+          </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          {actionCards.map(card=>{
-            const Icon=card.icon
-            return <button key={card.title} onClick={()=>router.push(card.href)} className="fenix-surface fenix-interactive group min-h-[235px] rounded-3xl p-6 text-left">
-              <div className="flex items-start justify-between gap-3">
-                <IconBox icon={Icon} accent={card.accent}/>
-                <span className="rounded-full border border-black/[0.07] bg-black/[0.025] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-white/40">{card.badge}</span>
-              </div>
-              <div className="mt-12">
-                <h3 className="text-lg font-semibold text-[#0b1736] dark:text-white">{card.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">{card.description}</p>
-                <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-teal-700 dark:text-teal-300">Explore <ArrowRight size={16} className="transition-transform group-hover:translate-x-1"/></span>
-              </div>
-            </button>
+
+        <div className="mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          {actions.map((action) => {
+            const Icon = action.icon
+
+            return (
+              <button
+                key={action.title}
+                type="button"
+                onClick={() => router.push(action.href)}
+                className="fenix-surface fenix-interactive group min-h-[248px] rounded-[1.7rem] p-6 text-left"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <AccentIcon icon={Icon} accent={action.accent} />
+                  <span className="rounded-full bg-black/[0.025] px-2.5 py-1 text-[9px] font-bold tracking-[.16em] text-slate-400 dark:bg-white/[0.04] dark:text-white/35">
+                    {action.eyebrow}
+                  </span>
+                </div>
+
+                <div className="mt-11">
+                  <h3 className="text-lg font-semibold tracking-tight text-[#0b1736] dark:text-white">{action.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/48">{action.description}</p>
+                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-teal-700 dark:text-teal-300">
+                    Open
+                    <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </button>
+            )
           })}
         </div>
       </section>
 
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="fenix-surface rounded-[2rem] p-7 sm:p-10 lg:p-14">
-          <div className="grid gap-10 lg:grid-cols-[1.15fr_.85fr]">
+        <div className="fenix-surface rounded-[2rem] p-7 sm:p-10 lg:p-12">
+          <div className="grid gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
             <div>
-              <div className="flex items-center gap-3"><IconBox icon={Buildings} accent="teal"/><span className="text-xs font-bold uppercase tracking-[.17em] text-slate-500 dark:text-white/45">The FeniX idea</span></div>
-              <h2 className="mt-7 max-w-2xl text-3xl font-semibold tracking-tight text-[#0b1736] sm:text-4xl dark:text-white">One account. One connected local experience.</h2>
-              <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base dark:text-white/55">FeniX is designed to bring discovery, business, commerce, guidance and local opportunities into a single, calm interface.</p>
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-2xl bg-teal-600/[0.08] text-teal-700 dark:bg-teal-300/[0.08] dark:text-teal-200">
+                  <Buildings size={22} weight="duotone" />
+                </div>
+                <span className="text-xs font-bold uppercase tracking-[.18em] text-slate-500 dark:text-white/40">The FeniX idea</span>
+              </div>
+
+              <h2 className="mt-6 max-w-2xl text-3xl font-semibold tracking-tight text-[#0b1736] sm:text-4xl dark:text-white">
+                One account. One connected local experience.
+              </h2>
+
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base dark:text-white/50">
+                FeniX brings discovery, business presence, commerce and guidance into one visual system—so future services can plug into the same ecosystem.
+              </p>
+
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                {['Local discovery','Business presence','Commerce','Guidance & knowledge','Future opportunities'].map(item=><div key={item} className="flex items-center gap-3 rounded-2xl border border-black/[0.07] bg-black/[0.02] px-4 py-3 dark:border-white/[0.07] dark:bg-white/[0.025]"><CheckCircle size={18} weight="fill" className="shrink-0 text-teal-600 dark:text-teal-300"/><span className="text-sm text-slate-700 dark:text-white/65">{item}</span></div>)}
+                {[
+                  'Local discovery',
+                  'Business presence',
+                  'Commerce',
+                  'Guidance & knowledge',
+                  'Future opportunities',
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-3 rounded-2xl bg-black/[0.025] px-4 py-3 dark:bg-white/[0.025]">
+                    <CheckCircle size={18} weight="fill" className="shrink-0 text-teal-700 dark:text-teal-300" />
+                    <span className="text-sm text-slate-700 dark:text-white/65">{item}</span>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+
+            <div className="grid gap-3">
               {[
-                [Users,'People','A simple identity layer for members.'],
-                [Storefront,'Businesses','Discover local businesses and services.'],
-                [ShoppingBag,'Commerce','Connect local products with customers.'],
-                [Compass,'Opportunities','Create room for future ecosystem tools.'],
-              ].map(([I,title,text])=>{const Icon=I as ElementType;return <div key={String(title)} className="rounded-2xl border border-black/[0.07] bg-black/[0.02] p-5 dark:border-white/[0.07] dark:bg-white/[0.025]"><Icon size={22} className="text-teal-700 dark:text-teal-300" weight="duotone"/><h3 className="mt-4 text-base font-semibold text-[#0b1736] dark:text-white">{String(title)}</h3><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/50">{String(text)}</p></div>})}
+                [Users, 'People', 'A simple identity layer for members.'],
+                [Storefront, 'Businesses', 'Find local businesses and services.'],
+                [ShoppingBag, 'Commerce', 'Connect local products with customers.'],
+                [Compass, 'Opportunities', 'Make room for future ecosystem tools.'],
+              ].map(([Icon, title, description]) => {
+                const ItemIcon = Icon as ElementType
+
+                return (
+                  <div key={String(title)} className="rounded-[1.45rem] bg-black/[0.025] p-5 dark:bg-white/[0.025]">
+                    <ItemIcon size={22} className="text-teal-700 dark:text-teal-300" weight="duotone" />
+                    <h3 className="mt-4 text-base font-semibold text-[#0b1736] dark:text-white">{String(title)}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/45">{String(description)}</p>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -147,15 +328,27 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            [ShieldCheck,'Trust by design','Clear information, responsible verification and safer defaults.'],
-            [Sparkle,'Designed to evolve','A visual foundation ready for future FeniX services.'],
-            [Compass,'Made for Feni','Local-first navigation without unnecessary complexity.'],
-          ].map(([I,title,text])=>{const Icon=I as ElementType;return <div key={String(title)} className="fenix-surface rounded-3xl p-7"><Icon size={24} className="text-teal-700 dark:text-teal-300" weight="duotone"/><h3 className="mt-5 text-lg font-semibold text-[#0b1736] dark:text-white">{String(title)}</h3><p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/50">{String(text)}</p></div>})}
+            [ShieldCheck, 'Trust by design', 'Clear information, responsible verification and safer defaults.'],
+            [Sparkle, 'Designed to evolve', 'A visual foundation ready for future FeniX services.'],
+            [Compass, 'Made for Feni', 'Local-first navigation without unnecessary complexity.'],
+          ].map(([Icon, title, description]) => {
+            const ItemIcon = Icon as ElementType
+
+            return (
+              <div key={String(title)} className="fenix-surface rounded-[1.7rem] p-7">
+                <ItemIcon size={24} className="text-teal-700 dark:text-teal-300" weight="duotone" />
+                <h3 className="mt-5 text-lg font-semibold text-[#0b1736] dark:text-white">{String(title)}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/45">{String(description)}</p>
+              </div>
+            )
+          })}
         </div>
       </section>
 
       <footer className="mx-auto w-full max-w-7xl px-4 pb-12 pt-4 text-center sm:px-6 lg:px-8">
-        <div className="border-t border-black/[0.07] pt-8 text-xs text-slate-500 dark:border-white/[0.07] dark:text-white/35">FeniX · Build. Connect. Grow.</div>
+        <div className="border-t border-black/[0.07] pt-8 text-xs text-slate-500 dark:border-white/[0.07] dark:text-white/35">
+          FeniX · Build. Connect. Grow.
+        </div>
       </footer>
     </main>
   )
