@@ -21,7 +21,7 @@ function requestedChildLevel(normalizedQuery) {
   return null
 }
 
-function wantsList(normalizedQuery) {
+function wantsNamedList(normalizedQuery) {
   const query = normalizedQuery.toLowerCase()
   return (
     query.includes('কোন কোন') ||
@@ -29,10 +29,8 @@ function wantsList(normalizedQuery) {
     query.includes('গুলো') ||
     query.includes('গুলি') ||
     query.includes('list') ||
-    query.includes('কয়টা') ||
-    query.includes('কত') ||
-    query.includes('how many') ||
-    query.includes('which')
+    query.includes('which') ||
+    query.includes('what are')
   )
 }
 
@@ -246,7 +244,7 @@ export async function searchFeniBrain(query) {
 
     if (
       childLevel &&
-      wantsList(normalizedQuery) &&
+      wantsNamedList(normalizedQuery) &&
       Array.isArray(locations) &&
       locations.length > 0
     ) {
