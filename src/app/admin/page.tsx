@@ -4,18 +4,8 @@ import { ArrowRight, Brain, Buildings, ChartLineUp, GearSix, ShieldCheck, Shoppi
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import type { Database } from '@/types/database'
 
 export const dynamic = 'force-dynamic'
-
-type TableName = keyof Database['public']['Tables']
-
-async function countRows(supabase: Awaited<ReturnType<typeof createClient>>, table: TableName, filter?: { column: string; value: string }) {
-  const query = supabase.from(table).select('id', { count: 'exact', head: true })
-  const filtered = filter ? query.eq(filter.column, filter.value) : query
-  const { count } = await filtered
-  return count ?? 0
-}
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -38,26 +28,36 @@ export default async function AdminPage() {
   }
 
   const [
-    users,
-    businesses,
-    sellers,
-    products,
-    orders,
-    returns,
-    reviews,
-    brainSources,
-    brainCandidates,
+    usersResult,
+    businessesResult,
+    sellersResult,
+    productsResult,
+    ordersResult,
+    returnsResult,
+    reviewsResult,
+    brainSourcesResult,
+    brainCandidatesResult,
   ] = await Promise.all([
-    countRows(supabase, 'profiles'),
-    countRows(supabase, 'businesses'),
-    countRows(supabase, 'vendor_profiles'),
-    countRows(supabase, 'products'),
-    countRows(supabase, 'orders'),
-    countRows(supabase, 'commerce_return_requests'),
-    countRows(supabase, 'product_reviews'),
-    countRows(supabase, 'fenix_brain_sources', { column: 'status', value: 'active' }),
-    countRows(supabase, 'fenix_brain_update_candidates'),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }),
+    supabase.from('businesses').select('id', { count: 'exact', head: true }),
+    supabase.from('vendor_profiles').select('id', { count: 'exact', head: true }),
+    supabase.from('products').select('id', { count: 'exact', head: true }),
+    supabase.from('orders').select('id', { count: 'exact', head: true }),
+    supabase.from('commerce_return_requests').select('id', { count: 'exact', head: true }),
+    supabase.from('product_reviews').select('id', { count: 'exact', head: true }),
+    supabase.from('fenix_brain_sources').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('fenix_brain_update_candidates').select('id', { count: 'exact', head: true }),
   ])
+
+  const users = usersResult.count ?? 0
+  const businesses = businessesResult.count ?? 0
+  const sellers = sellersResult.count ?? 0
+  const products = productsResult.count ?? 0
+  const orders = ordersResult.count ?? 0
+  const returns = returnsResult.count ?? 0
+  const reviews = reviewsResult.count ?? 0
+  const brainSources = brainSourcesResult.count ?? 0
+  const brainCandidates = brainCandidatesResult.count ?? 0
 
   const stats = [
     { label: 'Users', value: users, icon: UsersThree },
@@ -89,7 +89,7 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        <div className="mt-7 grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <div className="mt-7 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {stats.map(({ label, value, icon: Icon }) => (
             <div key={label} className="rounded-[1.5rem] border border-[#0b1736]/10 bg-white/75 p-5 dark:border-white/10 dark:bg-white/[.04]">
               <div className="flex items-center justify-between gap-3">
@@ -140,7 +140,17 @@ export default async function AdminPage() {
   )
 }
 
-function AdminLink({ href, icon, title, description }: { href: string; icon: ReactNode; title: string; description: string }) {
+function AdminLink({
+  href,
+  icon,
+  title,
+  description,
+}: {
+  href: string
+  icon: ReactNode
+  title: string
+  description: string
+}) {
   return (
     <Link
       href={href}
