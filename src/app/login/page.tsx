@@ -22,7 +22,6 @@ import UltraAqueousBackground from '@/components/ultra/UltraAqueousBackground'
 
 export default function LoginPage() {
   const router = useRouter()
-  const supabase = createClient()
   const setAuth = useAuthStore((state) => state.setAuth)
   const resetFailedAttempts = useAuthStore((state) => state.resetFailedAttempts)
   const [mode, setMode] = useState<AuthMode>('login')
@@ -39,7 +38,7 @@ export default function LoginPage() {
   useEffect(() => {
     let mounted = true
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session } } = await createClient().auth.getSession()
       if (!mounted) return
       if (session) {
         setAuth(session)
@@ -65,7 +64,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       if (mode === 'signup') {
-        const { data, error: signUpError } = await signUpWithEmail({ supabase, email, password, fullName })
+        const { data, error: signUpError } = await signUpWithEmail({ supabase: createClient(), email, password, fullName })
         if (signUpError) throw signUpError
         if (data.session) {
           setAuth(data.session)
@@ -78,7 +77,7 @@ export default function LoginPage() {
         setMessage('Account created. Confirm your email, then sign in.')
         return
       }
-      const { data, error: signInError } = await signInWithEmail({ supabase, email, password })
+      const { data, error: signInError } = await signInWithEmail({ supabase: createClient(), email, password })
       if (signInError) throw signInError
       if (!data.session) throw new Error('Login session could not be created.')
       setAuth(data.session)
@@ -95,7 +94,7 @@ export default function LoginPage() {
     clear()
     setOauthLoading(provider)
     try {
-      const { error: oauthError } = await signInWithOAuth({ supabase, provider, origin: window.location.origin })
+      const { error: oauthError } = await signInWithOAuth({ supabase: createClient(), provider, origin: window.location.origin })
       if (oauthError) throw oauthError
     } catch (authError: unknown) {
       setError(authError instanceof Error ? getSafeAuthMessage(authError.message) : 'Social login could not be started.')
@@ -108,7 +107,7 @@ export default function LoginPage() {
     if (!email.trim()) { setError('Enter your email first to reset your password.'); return }
     setLoading(true)
     try {
-      const { error: resetError } = await sendPasswordReset({ supabase, email, origin: window.location.origin })
+      const { error: resetError } = await sendPasswordReset({ supabase: createClient(), email, origin: window.location.origin })
       if (resetError) throw resetError
       setMessage('Password reset instructions have been sent to your email.')
     } catch (resetError: unknown) {
