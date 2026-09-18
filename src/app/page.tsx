@@ -114,7 +114,7 @@ export default function HomePage() {
     )
   }
 
-  const usePrompt = (value: string) => {
+  const runPrompt = (value: string) => {
     setSearch(value)
     router.push('/guide?q=' + encodeURIComponent(value))
   }
@@ -203,7 +203,7 @@ export default function HomePage() {
                     <button
                       key={prompt}
                       type="button"
-                      onClick={() => usePrompt(prompt)}
+                      onClick={() => runPrompt(prompt)}
                       className="rounded-full bg-white/[0.06] px-3 py-2 text-left text-xs text-white/65 transition hover:bg-white/[0.11] hover:text-white"
                     >
                       {prompt}
