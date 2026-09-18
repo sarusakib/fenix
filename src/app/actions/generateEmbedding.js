@@ -2,7 +2,7 @@
 
 import { HfInference } from '@huggingface/inference'
 
-const MODEL = 'sentence-transformers/all-MiniLM-L6-v2'
+const MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
 const EMBEDDING_DIMENSION = 384
 const MAX_TEXT_LENGTH = 1200
 

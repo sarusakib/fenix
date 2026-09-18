@@ -10,13 +10,35 @@ import {
 } from '@phosphor-icons/react'
 import Link from 'next/link'
 
-import { searchBusinesses } from '../actions/searchBusinesses'
+import { answerFeniBrain } from '../actions/answerFeniBrain'
 
-type BusinessResult = {
+type BrainResult = {
   id: string
-  name: string
-  description: string | null
+  content: string
   similarity: number
+  source_title: string
+  source_url: string | null
+  trust_tier: number
+  document_title: string
+}
+
+type BrainAnswer = {
+  success: boolean
+  error?: string
+  answer?: string
+  intent?: string
+  locations?: LocationResult[]
+  results?: BrainResult[]
+}
+
+type LocationResult = {
+  id: string
+  level: string
+  name_bn: string
+  name_en: string | null
+  slug: string
+  alias: string
+  match_type: string
 }
 
 export default function GuidePage() {
@@ -27,9 +49,10 @@ export default function GuidePage() {
   const [query, setQuery] = useState(
     initialQuery.slice(0, 120),
   )
-  const [results, setResults] = useState<
-    BusinessResult[]
-  >([])
+  const [results, setResults] = useState<BrainResult[]>([])
+  const [locations, setLocations] = useState<LocationResult[]>([])
+  const [intent, setIntent] = useState('')
+  const [answer, setAnswer] = useState('')
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -55,11 +78,12 @@ export default function GuidePage() {
     setLoading(true)
     setStatus('Feni Brain search করছে...')
     setResults([])
+    setLocations([])
+    setIntent('')
+    setAnswer('')
 
     try {
-      const result = await searchBusinesses(
-        nextQuery,
-      )
+      const result = (await answerFeniBrain(nextQuery)) as BrainAnswer
 
       if (!result.success) {
         setStatus(
@@ -73,11 +97,14 @@ export default function GuidePage() {
         result.results || []
 
       setResults(nextResults)
+      setLocations(result.locations || [])
+      setAnswer(result.answer || '')
+      setIntent(result.intent || 'general_feni')
 
       setStatus(
         nextResults.length
-          ? `${nextResults.length}টি business result পাওয়া গেছে।`
-          : 'কোনো matching business পাওয়া যায়নি।',
+          ? nextResults.length + 'টি source-backed knowledge result পাওয়া গেছে।'
+          : 'এই প্রশ্নের জন্য এখনো matching Feni knowledge পাওয়া যায়নি.',
       )
     } catch {
       setStatus(
@@ -298,72 +325,54 @@ export default function GuidePage() {
               </div>
             )}
 
+            {answer && (
+              <div className="mt-8 rounded-3xl border border-[#72ddda]/15 bg-[#008080]/[0.06] p-5 sm:p-6">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#72ddda]">
+                  Feni Brain Answer
+                </div>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white/80">
+                  {answer}
+                </p>
+              </div>
+            )}
+
+            {(intent || locations.length > 0) && (
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#72ddda]">Detected intent</div>
+                  <div className="mt-2 text-sm font-semibold text-white">{intent || 'general_feni'}</div>
+                </div>
+                {locations.length > 0 && (
+                  <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
+                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#72ddda]">Feni location</div>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {locations.slice(0, 5).map((location) => (
+                        <span key={location.id} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/70">
+                          {location.name_bn}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {results.length > 0 && (
               <div className="mt-8 grid gap-4">
-                {results.map(
-                  (business) => (
-                    <article
-                      key={business.id}
-                      className="
-                        rounded-2xl
-                        border
-                        border-white/[0.07]
-                        bg-white/[0.025]
-                        p-5
-                      "
-                    >
-                      <div
-                        className="
-                          flex
-                          flex-col
-                          gap-4
-                          sm:flex-row
-                          sm:items-start
-                          sm:justify-between
-                        "
-                      >
-                        <div className="min-w-0">
-                          <h2 className="text-lg font-bold text-white">
-                            {business.name}
-                          </h2>
-
-                          <p
-                            className="
-                              mt-2
-                              text-sm
-                              leading-6
-                              text-white/45
-                            "
-                          >
-                            {business.description ||
-                              'Business description unavailable.'}
-                          </p>
-                        </div>
-
-                        <div
-                          className="
-                            shrink-0
-                            rounded-full
-                            border
-                            border-[#72ddda]/15
-                            bg-[#72ddda]/[0.06]
-                            px-3
-                            py-1.5
-                            text-xs
-                            font-semibold
-                            text-[#72ddda]
-                          "
-                        >
-                          Match{' '}
-                          {Number(
-                            business.similarity ||
-                              0,
-                          ).toFixed(3)}
-                        </div>
+                {results.map((result) => (
+                  <article key={result.id} className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-5">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/30">{result.document_title}</div>
+                        <p className="mt-2 text-sm leading-7 text-white/70">{result.content}</p>
+                        <div className="mt-4 text-xs text-white/35">Source: {result.source_title}</div>
                       </div>
-                    </article>
-                  ),
-                )}
+                      <div className="shrink-0 rounded-full border border-[#72ddda]/15 bg-[#72ddda]/[0.06] px-3 py-1.5 text-xs font-semibold text-[#72ddda]">
+                        Match {Number(result.similarity || 0).toFixed(3)}
+                      </div>
+                    </div>
+                  </article>
+                ))}
               </div>
             )}
           </div>

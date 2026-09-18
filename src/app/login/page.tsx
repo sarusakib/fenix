@@ -1,7 +1,7 @@
 'use client'
 
 import type { FormEvent } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { createClient } from '../../utils/supabase/client'
@@ -45,9 +45,42 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] =
     useState<OAuthProvider | null>(null)
+  const [checkingSession, setCheckingSession] = useState(true)
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  useEffect(() => {
+    let mounted = true
+
+    const checkExistingSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!mounted) return
+
+      if (session) {
+        setAuth(session)
+        router.replace('/')
+        return
+      }
+
+      const callbackError = new URLSearchParams(window.location.search).get('error')
+
+      if (callbackError) {
+        setError(callbackError)
+      }
+
+      setCheckingSession(false)
+    }
+
+    void checkExistingSession()
+
+    return () => {
+      mounted = false
+    }
+  }, [router, setAuth, supabase])
 
   const clearMessages = () => {
     setError('')
@@ -219,7 +252,21 @@ export default function LoginPage() {
   }
 
   const interactionDisabled =
-    loading || oauthLoading !== null
+    checkingSession ||
+    loading ||
+    oauthLoading !== null
+
+  if (checkingSession) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#05070b] text-white">
+        <div
+          className="h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#008080]"
+          aria-label="Checking session"
+          role="status"
+        />
+      </main>
+    )
+  }
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-[#05070b] text-white">
@@ -296,4 +343,4 @@ export default function LoginPage() {
       </div>
     </main>
   )
-        }
+}

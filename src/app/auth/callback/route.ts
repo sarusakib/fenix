@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const requestedNext = requestUrl.searchParams.get('next')
 
-  const code = searchParams.get('code')
-  const requestedNext = searchParams.get('next')
-
-  // Only allow internal relative redirects.
+  // Keep the callback redirect on the exact host that received
+  // the OAuth callback. Do not rebuild the host from proxy headers.
+  // This prevents OAuth from being redirected to an invalid or
+  // deployment-specific Vercel hostname.
   const next =
     requestedNext &&
     requestedNext.startsWith('/') &&
@@ -22,11 +24,17 @@ export async function GET(request: Request) {
       await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      return NextResponse.redirect(
+        new URL(next, requestUrl.origin),
+      )
     }
   }
 
-  return NextResponse.redirect(
-    `${origin}/login?error=Could+not+authenticate+user`
+  const errorUrl = new URL('/login', requestUrl.origin)
+  errorUrl.searchParams.set(
+    'error',
+    'Could not authenticate user',
   )
+
+  return NextResponse.redirect(errorUrl)
 }
