@@ -32,8 +32,12 @@ export default function InvestPage() {
         .order('created_at', { ascending: false })
 
       if (!active) return
-      if (listError) setError('Investment opportunities load করা যায়নি।')
-      else setOpportunities((data ?? []) as InvestmentOpportunity[])
+      const opportunityRows = (data ?? []) as InvestmentOpportunity[]
+      if (listError) {
+        setError('Investment opportunities load করা যায়নি।')
+      } else {
+        setOpportunities(opportunityRows)
+      }
 
       const { data: auth } = await supabase.auth.getUser()
       if (auth.user) {
@@ -41,9 +45,14 @@ export default function InvestPage() {
         if (profile) {
           setHasProfile(true)
           const { data: matched } = await supabase.rpc('match_investment_opportunities', { p_limit: 12 })
-          if (matched?.length) {
-            const mapped = matched.map((item) => (data ?? []).find((opportunity) => opportunity.id === item.opportunity_id)).filter(Boolean) as InvestmentOpportunity[]
+          const matchedRows = (matched ?? []) as Array<{ opportunity_id: string }>
+          if (matchedRows.length) {
+            const mapped = matchedRows
+              .map((item) => opportunityRows.find((opportunity) => opportunity.id === item.opportunity_id))
+              .filter((item): item is InvestmentOpportunity => Boolean(item))
             setMatches(mapped)
+          } else {
+            setMatches([])
           }
         }
       }
