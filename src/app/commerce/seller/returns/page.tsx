@@ -15,8 +15,8 @@ export default function SellerReturnsPage(){
   if(!a.user){window.location.replace('/login?next=/commerce/seller/returns');return}
   const {data:v}=await s.from('vendor_profiles').select('id,status').eq('user_id',a.user.id).maybeSingle()
   if(!v||v.status!=='approved'){window.location.replace('/commerce/seller');return}
-  const {data,e}=await s.from('commerce_return_requests').select('id,order_id,order_item_id,reason,details,status,resolution_note,refund_amount,created_at,order_items!inner(vendor_id,product_name)').eq('order_items.vendor_id',v.id).order('created_at',{ascending:false})
-  if(e){setError('Return requests load করা যায়নি.');setLoading(false);return}
+  const {data,error}=await s.from('commerce_return_requests').select('id,order_id,order_item_id,reason,details,status,resolution_note,refund_amount,created_at,order_items!inner(vendor_id,product_name)').eq('order_items.vendor_id',v.id).order('created_at',{ascending:false})
+  if(error){setError('Return requests load করা যায়নি.');setLoading(false);return}
   setRows((data??[]) as unknown as ReturnReq[]);setLoading(false)
  }
  useEffect(()=>{void load()},[])
