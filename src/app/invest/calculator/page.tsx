@@ -12,14 +12,14 @@ export default function InvestmentCalculatorPage() {
   const [years, setYears] = useState('3')
 
   const scenarios = useMemo(() => {
-    const principal = Math.max(0, Number(amount) || 0)
-    const rate = Math.max(-100, Number(annualReturn) || 0) / 100
-    const term = Math.max(1, Number(years) || 1)
+    const principal = Math.min(10_000_000_000, Math.max(0, Number(amount) || 0))
+    const rate = Math.min(2, Math.max(-1, Number(annualReturn) || 0) / 100)
+    const term = Math.min(50, Math.max(1, Number(years) || 1))
 
     return [
       { label: 'Conservative example', rate: rate * 0.5 },
       { label: 'Base example', rate },
-      { label: 'Higher example', rate: rate * 1.5 },
+      { label: 'Higher example', rate: Math.min(2, Math.max(-1, rate * 1.5)) },
     ].map((scenario) => {
       const ending = principal * Math.pow(1 + scenario.rate, term)
       return {
