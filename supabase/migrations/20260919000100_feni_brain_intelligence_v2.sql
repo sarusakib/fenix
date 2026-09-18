@@ -14,7 +14,9 @@ create index if not exists idx_fenix_brain_update_candidates_reviewed_by
 create index if not exists idx_fenix_brain_update_candidates_published_document
   on public.fenix_brain_update_candidates(published_document_id);
 
-create or replace function public.search_feni_brain_facts(
+drop function if exists public.search_feni_brain_facts(text,integer);
+
+create function public.search_feni_brain_facts(
   query_text text,
   match_count integer default 6
 )
@@ -94,8 +96,6 @@ facts as (
     coalesce(lb.labels,'') as labels,
     q.term,
     (
-      (case when q.term like '%' || lower(coalesce(l.name_bn,'')) || '%' then 3 else 0 end) +
-      (case when q.term like '%' || lower(coalesce(l.name_en,'')) || '%' then 3 else 0 end) +
       (select count(*)::double precision * 1.0 from tokens t
         where lower(coalesce(l.name_bn,'')) like '%' || t.token || '%'
            or lower(coalesce(l.name_en,'')) like '%' || t.token || '%') +
@@ -173,6 +173,7 @@ select
 from facts f
 order by f.score desc, f.trust_tier asc, f.confidence desc, f.subject_key
 limit least(greatest(match_count,1),50);
+$function$;
 
 revoke all on function public.search_feni_brain_facts(text,integer) from public;
 grant execute on function public.search_feni_brain_facts(text,integer) to anon,authenticated;
