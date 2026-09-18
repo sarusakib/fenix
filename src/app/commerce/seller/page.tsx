@@ -10,6 +10,7 @@ import {
   Plus,
   ShieldCheck,
   ShoppingBag,
+  ArrowCounterClockwise,
   Storefront,
   WarningCircle,
 } from '@phosphor-icons/react'
