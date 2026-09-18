@@ -51,7 +51,7 @@ export default function LoginPage() {
     }
     void checkSession()
     return () => { mounted = false }
-  }, [router, setAuth, supabase])
+  }, [router, setAuth])
 
   const clear = () => { setError(''); setMessage('') }
   const busy = loading || oauthLoading !== null
