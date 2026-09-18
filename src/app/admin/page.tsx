@@ -129,10 +129,16 @@ export default async function AdminPage() {
             description="Review the public business discovery experience and local ecosystem records."
           />
           <AdminLink
+            href="/admin/investment"
+            icon={<ChartLineUp size={24} />}
+            title="Investment control"
+            description={`Investment opportunities, investor verification, documents, reports and deal-review controls. Live offers: ${investmentOpportunities} · Interests: ${investmentInterests}.`}
+          />
+          <AdminLink
             href="/invest"
             icon={<ChartLineUp size={24} />}
-            title="Investment"
-            description={`Investment opportunities, investor verification, documents, reports and deal-review controls. Live offers: ${investmentOpportunities} · Interests: ${investmentInterests}.`}
+            title="Investment marketplace"
+            description="Open the public Invest in Feni experience exactly as users see it."
           />
         </div>
 
