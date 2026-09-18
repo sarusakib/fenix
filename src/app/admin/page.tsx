@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { ArrowRight, Brain, Buildings, ChartLineUp, GearSix, ShieldCheck, ShoppingBag, Storefront, UsersThree } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
@@ -139,7 +140,7 @@ export default async function AdminPage() {
   )
 }
 
-function AdminLink({ href, icon, title, description }: { href: string; icon: React.ReactNode; title: string; description: string }) {
+function AdminLink({ href, icon, title, description }: { href: string; icon: ReactNode; title: string; description: string }) {
   return (
     <Link
       href={href}
