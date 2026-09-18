@@ -37,6 +37,8 @@ export default async function AdminPage() {
     reviewsResult,
     brainSourcesResult,
     brainCandidatesResult,
+    investmentOpportunitiesResult,
+    investmentInterestsResult,
   ] = await Promise.all([
     supabase.from('profiles').select('id', { count: 'exact', head: true }),
     supabase.from('businesses').select('id', { count: 'exact', head: true }),
@@ -47,6 +49,8 @@ export default async function AdminPage() {
     supabase.from('product_reviews').select('id', { count: 'exact', head: true }),
     supabase.from('fenix_brain_sources').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     supabase.from('fenix_brain_update_candidates').select('id', { count: 'exact', head: true }),
+    supabase.from('investment_opportunities').select('id', { count: 'exact', head: true }).in('status', ['approved','fully_funded','closed']),
+    supabase.from('investment_interests').select('id', { count: 'exact', head: true }),
   ])
 
   const users = usersResult.count ?? 0
@@ -58,6 +62,8 @@ export default async function AdminPage() {
   const reviews = reviewsResult.count ?? 0
   const brainSources = brainSourcesResult.count ?? 0
   const brainCandidates = brainCandidatesResult.count ?? 0
+  const investmentOpportunities = investmentOpportunitiesResult.count ?? 0
+  const investmentInterests = investmentInterestsResult.count ?? 0
 
   const stats = [
     { label: 'Users', value: users, icon: UsersThree },
@@ -68,6 +74,8 @@ export default async function AdminPage() {
     { label: 'Returns', value: returns, icon: ShieldCheck },
     { label: 'Reviews', value: reviews, icon: GearSix },
     { label: 'Brain queue', value: brainCandidates, icon: Brain },
+    { label: 'Invest offers', value: investmentOpportunities, icon: ChartLineUp },
+    { label: 'Invest interest', value: investmentInterests, icon: UsersThree },
   ] as const
 
   return (
@@ -124,7 +132,7 @@ export default async function AdminPage() {
             href="/invest"
             icon={<ChartLineUp size={24} />}
             title="Investment"
-            description="Review the investment-facing experience while deeper verification controls are built."
+            description={`Investment opportunities, investor verification, documents, reports and deal-review controls. Live offers: ${investmentOpportunities} · Interests: ${investmentInterests}.`}
           />
         </div>
 
