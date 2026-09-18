@@ -75,7 +75,7 @@ function extractText(html) {
 
   return decodeEntities(
     text
-      .replace(/<br\\s*\\/?[>]/gi, '\n')
+      .replace(/<br\s*\/?\s*>/gi, '\n')
       .replace(/<[^>]+>/g, ' ')
       .replace(/[\t\r]+/g, ' ')
       .replace(/\n{3,}/g, '\n\n')
