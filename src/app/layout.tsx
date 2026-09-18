@@ -6,8 +6,8 @@ import HomeThemeProvider from '../components/theme/HomeThemeProvider'
 import SiteBackground from '../components/layout/SiteBackground'
 
 export const metadata = {
-  title: 'FeniX | Business Ecosystem',
-  description: 'One Account. One Ecosystem.',
+  title: 'FeniX | Feni Business Ecosystem',
+  description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
   manifest: '/manifest.json',
 }
 
@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen w-full overflow-x-clip bg-[#eef3f5] text-[#111827] antialiased dark:bg-[#030506] dark:text-white">
+      <body className="min-h-screen w-full overflow-x-clip antialiased">
         <AuthSync />
 
         <FenixFlow>
