@@ -2,6 +2,8 @@ begin;
 
 -- Feni Brain v2: exact fact retrieval, supporting indexes and faster source rotation.
 
+drop function if exists public.search_feni_brain_facts(text, integer);
+
 create index if not exists idx_fenix_brain_facts_source_id
   on public.fenix_brain_facts(source_id);
 
@@ -180,6 +182,12 @@ grant execute on function public.search_feni_brain_facts(text,integer) to anon,a
 
 select cron.unschedule('fenix-brain-source-refresh-daily')
 where exists (select 1 from cron.job where jobname='fenix-brain-source-refresh-daily');
+
+select cron.unschedule('fenix-brain-source-refresh-2hour')
+where exists (
+  select 1 from cron.job
+  where jobname = 'fenix-brain-source-refresh-2hour'
+);
 
 select cron.schedule(
   'fenix-brain-source-refresh-2hour',
