@@ -10,6 +10,7 @@ import {
   MagnifyingGlass,
   Moon,
   ShoppingBag,
+  Rocket,
   SignIn,
   SignOut,
   Storefront,
@@ -21,6 +22,7 @@ import { useAuthStore } from '../store/useAuthStore'
 import { useHomeTheme } from './theme/HomeThemeProvider'
 
 const navItems = [
+  ['/start', 'Start', Rocket],
   ['/directory', 'Directory', Storefront],
   ['/invest', 'Investment', TrendUp],
   ['/guide', 'Guide', Lightbulb],
