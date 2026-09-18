@@ -201,6 +201,11 @@ export default function InvestmentOpportunityPage() {
   const remaining = Math.max(0, Number(opportunity.target_amount) - Number(opportunity.raised_amount))
   const isOwner = Boolean(userId && userId === opportunity.owner_id)
   const canMessage = Boolean(userId && interest && !['declined', 'withdrawn'].includes(interest.status))
+  const canViewSharedDocuments = Boolean(
+    userId &&
+    interest &&
+    ['due_diligence', 'terms', 'agreed'].includes(interest.status),
+  )
   const investorDocuments = documents.filter((document) => document.status === 'approved' && document.visibility === 'private_shared')
 
   return (
@@ -272,7 +277,7 @@ export default function InvestmentOpportunityPage() {
               </div>
               <div className="mt-5 space-y-2">
                 {documents.length ? documents.map((document) => {
-                  const canView = isOwner || (document.status === 'approved' && document.visibility === 'private_shared' && canMessage)
+                  const canView = isOwner || (document.status === 'approved' && document.visibility === 'private_shared' && canViewSharedDocuments)
                   return (
                     <div key={document.id} className="flex flex-col gap-3 rounded-xl bg-black/[.025] p-3 dark:bg-white/[.03] sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0">
