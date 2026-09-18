@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import {
   House,
+  ShieldCheck,
   Lightbulb,
   List,
   MagnifyingGlass,
@@ -90,6 +91,15 @@ export default function Navbar() {
 
             {user ? (
               <>
+                {role === 'admin' && (
+                  <Link
+                    href="/admin"
+                    className="flex min-h-[44px] items-center gap-2 rounded-xl bg-teal-600/[0.07] px-3.5 text-sm font-semibold text-teal-800 dark:bg-teal-300/[0.08] dark:text-teal-100"
+                  >
+                    <ShieldCheck size={17} />
+                    Admin
+                  </Link>
+                )}
                 <span className="max-w-[140px] truncate rounded-full bg-amber-500/[.07] px-3 py-1.5 text-xs font-medium text-amber-800 dark:bg-amber-300/[.07] dark:text-amber-200">
                   {role}
                 </span>
@@ -157,6 +167,16 @@ export default function Navbar() {
                 <div className="rounded-xl bg-black/[.025] p-3 dark:bg-white/[.03]">
                   <div className="text-xs text-slate-400 dark:text-white/35">Signed in as</div>
                   <div className="mt-1 truncate text-sm">{user.email}</div>
+                  {role === 'admin' && (
+                    <Link
+                      href="/admin"
+                      onClick={close}
+                      className="mt-2 flex min-h-[44px] items-center gap-2 rounded-xl bg-teal-600/[0.07] px-3 text-xs font-semibold text-teal-800 dark:bg-teal-300/[0.08] dark:text-teal-100"
+                    >
+                      <ShieldCheck size={17} />
+                      Admin control center
+                    </Link>
+                  )}
                   <div className="mt-2 inline-flex rounded-full bg-amber-500/[.07] px-2 py-1 text-[10px] uppercase tracking-wider text-amber-800 dark:bg-amber-300/[.07] dark:text-amber-200">
                     {role}
                   </div>
