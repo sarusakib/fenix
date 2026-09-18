@@ -43,7 +43,10 @@ const TIMEOUT_MS = 6500;
 function isAllowedSourceUrl(raw) {
   try {
     const url = new URL(raw);
-    return url.protocol === 'https:' && ALLOWED_HOSTS.has(url.hostname.toLowerCase());
+    return (
+      url.protocol === 'https:' &&
+      ALLOWED_HOSTS.has(url.hostname.toLowerCase())
+    );
   } catch {
     return false;
   }
@@ -63,7 +66,10 @@ function extractText(html) {
   let text = html;
 
   for (const tag of ['script', 'style', 'noscript', 'svg', 'template']) {
-    const re = new RegExp('<' + tag + '[^>]*>[\\s\\S]*?<\\/' + tag + '>', 'gi');
+    const re = new RegExp(
+      '<' + tag + '[^>]*>[\\s\\S]*?<\\/' + tag + '>',
+      'gi',
+    );
     text = text.replace(re, ' ');
   }
 
@@ -71,8 +77,8 @@ function extractText(html) {
     text
       .replace(/<br\\s*\\/?[>]/gi, '\n')
       .replace(/<[^>]+>/g, ' ')
-      .replace(/[\\t\\r]+/g, ' ')
-      .replace(/\\n{3,}/g, '\n\n')
+      .replace(/[\t\r]+/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
       .replace(/[ ]{2,}/g, ' ')
       .trim(),
   ).slice(0, MAX_TEXT);
@@ -81,14 +87,19 @@ function extractText(html) {
 export function shouldUseLiveWeb(query) {
   if (typeof query !== 'string') return false;
   const lower = query.toLowerCase();
-  return CURRENTNESS_TERMS.some((term) => lower.includes(term));
+  return CURRENTNESS_TERMS.some((term) =>
+    lower.includes(term.toLowerCase()),
+  );
 }
 
 async function fetchOne(url, sourceTitle) {
   if (!isAllowedSourceUrl(url)) return null;
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timeout = setTimeout(
+    () => controller.abort(),
+    TIMEOUT_MS,
+  );
 
   try {
     const response = await fetch(url, {
@@ -104,8 +115,11 @@ async function fetchOne(url, sourceTitle) {
 
     if (!response.ok) return null;
 
-    const contentType = response.headers.get('content-type') ?? '';
-    if (!contentType.includes('text/html') && !contentType.includes('application/xhtml+xml')) {
+    const contentType = response.headers.get('content-type') || '';
+    if (
+      !contentType.includes('text/html') &&
+      !contentType.includes('application/xhtml+xml')
+    ) {
       return null;
     }
 
@@ -122,10 +136,22 @@ async function fetchOne(url, sourceTitle) {
       http_status: response.status,
     };
   } catch (error) {
+    const details =
+      error && typeof error === 'object'
+        ? error
+        : { message: String(error) };
+
     console.error('Feni Brain live source failed:', {
-      name: error?.name,
-      message: error?.message,
+      name:
+        typeof details.name === 'string'
+          ? details.name
+          : 'unknown',
+      message:
+        typeof details.message === 'string'
+          ? details.message
+          : 'unknown',
     });
+
     return null;
   } finally {
     clearTimeout(timeout);
@@ -142,8 +168,15 @@ export async function fetchLiveFeniSources(sources) {
   ];
 
   for (const source of candidates) {
-    if (!source?.source_url || !isAllowedSourceUrl(source.source_url)) continue;
-    if (Number(source.trust_tier ?? 99) !== 1) continue;
+    if (
+      !source ||
+      !source.source_url ||
+      !isAllowedSourceUrl(source.source_url)
+    ) {
+      continue;
+    }
+
+    if (Number(source.trust_tier || 99) !== 1) continue;
     if (seen.has(source.source_url)) continue;
 
     seen.add(source.source_url);
@@ -153,7 +186,12 @@ export async function fetchLiveFeniSources(sources) {
   }
 
   const results = await Promise.all(
-    usable.map((source) => fetchOne(source.source_url, source.source_title || 'Official source')),
+    usable.map((source) =>
+      fetchOne(
+        source.source_url,
+        source.source_title || 'Official source',
+      ),
+    ),
   );
 
   return results.filter(Boolean);
