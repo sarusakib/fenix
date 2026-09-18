@@ -12,13 +12,13 @@ export default function UltraAqueousBackground() {
     const ctx = canvas.getContext('2d', { alpha: true })
     if (!ctx) return
 
-    let frame = 0
     let raf = 0
+    let stopped = false
     let width = 1
     let height = 1
     let dpr = 1
-    let last = performance.now()
-    let stopped = false
+    let phase = 0
+    let previous = performance.now()
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect()
@@ -30,80 +30,76 @@ export default function UltraAqueousBackground() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
-    const render = (now: number) => {
+    const draw = (now: number) => {
       if (stopped) return
-      const dt = Math.min(40, now - last)
-      last = now
-      frame += dt * 0.000055
+
+      const delta = Math.min(48, now - previous)
+      previous = now
+      phase += delta * 0.000035
 
       ctx.clearRect(0, 0, width, height)
 
       const wash = ctx.createRadialGradient(
-        width * 0.5,
-        height * 0.18,
-        0,
-        width * 0.5,
-        height * 0.5,
-        Math.max(width, height) * 0.85,
+        width * 0.48, height * 0.2, 0,
+        width * 0.48, height * 0.62, Math.max(width, height) * 0.9,
       )
-      wash.addColorStop(0, 'rgba(0, 150, 175, 0.10)')
-      wash.addColorStop(0.45, 'rgba(0, 72, 110, 0.045)')
+      wash.addColorStop(0, 'rgba(0, 146, 170, 0.10)')
+      wash.addColorStop(0.42, 'rgba(0, 76, 112, 0.045)')
       wash.addColorStop(1, 'rgba(0, 0, 0, 0)')
       ctx.fillStyle = wash
       ctx.fillRect(0, 0, width, height)
 
       ctx.save()
       ctx.globalCompositeOperation = 'screen'
-      ctx.lineWidth = 1
 
-      for (let layer = 0; layer < 5; layer += 1) {
+      for (let layer = 0; layer < 7; layer += 1) {
         ctx.beginPath()
-        const yBase = height * (0.28 + layer * 0.16)
 
-        for (let x = -40; x <= width + 40; x += 18) {
+        const yBase = height * (0.22 + layer * 0.115)
+        const amplitude = 8 + layer * 2.2
+        const opacity = Math.max(0.009, 0.032 - layer * 0.0028)
+
+        for (let x = -48; x <= width + 48; x += 18) {
           const nx = x / Math.max(1, width)
-          const wave =
-            Math.sin(nx * 8.0 + frame * (0.75 + layer * 0.08)) *
-              (12 + layer * 3) +
-            Math.sin(nx * 17.0 - frame * 0.42 + layer) *
-              (4 + layer)
+          const y =
+            yBase +
+            Math.sin(nx * 8 + phase * (0.65 + layer * 0.06)) * amplitude +
+            Math.sin(nx * 19 - phase * 0.34 + layer) * (3 + layer * 0.5)
 
-          const y = yBase + wave
-
-          if (x === -40) ctx.moveTo(x, y)
+          if (x === -48) ctx.moveTo(x, y)
           else ctx.lineTo(x, y)
         }
 
-        ctx.strokeStyle = `rgba(0, 190, 220, ${0.026 - layer * 0.003})`
+        ctx.strokeStyle = `rgba(0, 210, 255, ${opacity})`
+        ctx.lineWidth = 1
         ctx.stroke()
       }
 
       ctx.restore()
 
-      const glowX = width * (0.52 + Math.sin(frame * 0.22) * 0.09)
-      const glowY = height * (0.42 + Math.cos(frame * 0.17) * 0.08)
+      const glowX = width * (0.52 + Math.sin(phase * 0.22) * 0.08)
+      const glowY = height * (0.42 + Math.cos(phase * 0.18) * 0.07)
       const glow = ctx.createRadialGradient(
-        glowX,
-        glowY,
-        0,
-        glowX,
-        glowY,
-        Math.min(width, height) * 0.5,
+        glowX, glowY, 0,
+        glowX, glowY, Math.min(width, height) * 0.58,
       )
       glow.addColorStop(0, 'rgba(0, 210, 255, 0.055)')
-      glow.addColorStop(0.55, 'rgba(0, 100, 160, 0.018)')
+      glow.addColorStop(0.52, 'rgba(0, 102, 158, 0.018)')
       glow.addColorStop(1, 'rgba(0, 0, 0, 0)')
       ctx.fillStyle = glow
       ctx.fillRect(0, 0, width, height)
 
-      raf = requestAnimationFrame(render)
+      raf = requestAnimationFrame(draw)
     }
 
     resize()
     window.addEventListener('resize', resize, { passive: true })
 
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!reduce) raf = requestAnimationFrame(render)
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (!reducedMotion) {
+      raf = requestAnimationFrame(draw)
+    }
 
     return () => {
       stopped = true
@@ -113,16 +109,9 @@ export default function UltraAqueousBackground() {
   }, [])
 
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-[#06080c]"
-    >
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 h-full w-full opacity-90"
-      />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(0,210,255,0.07),transparent_42%),linear-gradient(180deg,#06080c_0%,#071018_48%,#06080c_100%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.42)_100%)]" />
+    <div className="fenix-ultra-aqueous" aria-hidden="true">
+      <canvas ref={canvasRef} className="fenix-ultra-aqueous-canvas" />
+      <div className="fenix-ultra-aqueous-vignette" />
     </div>
   )
 }
