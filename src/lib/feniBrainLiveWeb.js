@@ -18,7 +18,25 @@ const CURRENTNESS_TERMS = [
   'notice', 'notices', 'news', 'new', 'recent', 'tender',
 ];
 
-const MAX_SOURCES = 2;
+const FALLBACK_SOURCES = [
+  {
+    source_title: 'Feni District Administration',
+    source_url: 'https://feni.gov.bd/',
+    trust_tier: 1,
+  },
+  {
+    source_title: 'District Statistics Office, Feni',
+    source_url: 'https://bbs.feni.gov.bd/',
+    trust_tier: 1,
+  },
+  {
+    source_title: 'Bangladesh National Portal',
+    source_url: 'https://bangladesh.gov.bd/',
+    trust_tier: 1,
+  },
+];
+
+const MAX_SOURCES = 3;
 const MAX_TEXT = 7000;
 const TIMEOUT_MS = 6500;
 
@@ -118,7 +136,12 @@ export async function fetchLiveFeniSources(sources) {
   const usable = [];
   const seen = new Set();
 
-  for (const source of Array.isArray(sources) ? sources : []) {
+  const candidates = [
+    ...(Array.isArray(sources) ? sources : []),
+    ...FALLBACK_SOURCES,
+  ];
+
+  for (const source of candidates) {
     if (!source?.source_url || !isAllowedSourceUrl(source.source_url)) continue;
     if (Number(source.trust_tier ?? 99) !== 1) continue;
     if (seen.has(source.source_url)) continue;
