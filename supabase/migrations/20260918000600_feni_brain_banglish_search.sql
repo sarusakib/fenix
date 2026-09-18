@@ -110,9 +110,9 @@ select cron.schedule(
  'fenix-brain-embedding-backfill','*/10 * * * *',
  $job$
  select net.http_post(
-   url := 'https://lawdsvplbxfziihvmmva.supabase.co/functions/v1/feni-brain-embed-backfill',
+   url := 'https://lawdsvplbxfziihvmmva.supabase.co/functions/v1/fenix-brain-source-refresh',
    headers := jsonb_build_object('Content-Type','application/json','x-fenix-refresh-secret',(select decrypted_secret from vault.decrypted_secrets where name='fenix_brain_refresh_secret')),
-   body := '{"limit":5}'::jsonb,
+   body := '{"action":"backfill_embeddings","limit":5}'::jsonb,
    timeout_milliseconds := 120000
  ) as request_id;
  $job$
