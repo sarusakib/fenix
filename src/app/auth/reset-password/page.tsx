@@ -1,13 +1,13 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
-  const supabase = createClient()
-
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -20,8 +20,8 @@ export default function ResetPasswordPage() {
     setError('')
     setMessage('')
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.')
       return
     }
 
@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
     setLoading(true)
 
     const { error: updateError } =
-      await supabase.auth.updateUser({
+      await createClient().auth.updateUser({
         password,
       })
 

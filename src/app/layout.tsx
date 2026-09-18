@@ -1,13 +1,11 @@
 import './globals.css'
 
 import AuthSync from '../components/AuthSync'
-import FenixFlow from './FenixFlow'
 import HomeThemeProvider from '../components/theme/HomeThemeProvider'
-import SiteBackground from '../components/layout/SiteBackground'
 
 export const metadata = {
-  title: 'FeniX | Business Ecosystem',
-  description: 'One Account. One Ecosystem.',
+  title: 'FeniX | Feni Business Ecosystem',
+  description: 'Build. Connect. Grow.',
   manifest: '/manifest.json',
 }
 
@@ -18,18 +16,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen w-full overflow-x-clip bg-[#eef3f5] text-[#111827] antialiased dark:bg-[#030506] dark:text-white">
+      <body className="min-h-screen w-full overflow-x-clip bg-[#06080c] text-white antialiased">
         <AuthSync />
-
-        <FenixFlow>
-          <HomeThemeProvider>
-            <SiteBackground />
-
-            <div className="relative z-10 min-h-screen">
-              {children}
-            </div>
-          </HomeThemeProvider>
-        </FenixFlow>
+        <HomeThemeProvider>
+          <div className="relative min-h-screen">
+            {children}
+          </div>
+        </HomeThemeProvider>
       </body>
     </html>
   )
