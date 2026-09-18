@@ -14,33 +14,21 @@ export async function generateEmbedding(text) {
     throw new Error('Feni Brain service is not configured.')
   }
 
-  if (typeof text !== 'string') {
-    throw new Error('Invalid embedding input.')
-  }
-
+  if (typeof text !== 'string') throw new Error('Invalid embedding input.')
   const cleanText = text.trim().slice(0, MAX_TEXT_LENGTH)
-
-  if (!cleanText) {
-    throw new Error('Embedding text is required.')
-  }
+  if (!cleanText) throw new Error('Embedding text is required.')
 
   try {
     const hf = new HfInference(hfToken)
-
     const result = await hf.featureExtraction({
       model: MODEL,
       inputs: cleanText,
-      provider: 'hf-inference',
+      provider: 'auto',
     })
 
     const embedding = Array.isArray(result?.[0]) ? result[0] : result
-
-    if (!Array.isArray(embedding)) {
+    if (!Array.isArray(embedding) || embedding.length !== EMBEDDING_DIMENSION) {
       throw new Error('Invalid embedding response.')
-    }
-
-    if (embedding.length !== EMBEDDING_DIMENSION) {
-      throw new Error('Invalid embedding dimension.')
     }
 
     return embedding
@@ -49,7 +37,6 @@ export async function generateEmbedding(text) {
       name: error?.name,
       status: error?.status,
     })
-
     throw new Error('Feni Brain is temporarily unavailable.')
   }
 }
