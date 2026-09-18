@@ -1,9 +1,57 @@
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle, ShoppingCart, ShieldCheck, Storefront } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, ShoppingCart, ShieldCheck, Storefront } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import AddToCartButton from '@/components/commerce/AddToCartButton'
 import { createClient } from '@/utils/supabase/server'
 
-export const dynamic='force-dynamic'
-type ProductPageProps={params:Promise<{slug:string}>}
-export default async function ProductPage({params}:ProductPageProps){const{slug}=await params;const supabase=await createClient();const{data:product,error}=await supabase.from('products').select(`id, vendor_id, name_bn, name_en, slug, description_bn, description_en, sku, price, compare_at_price, currency, allow_guest_purchase, vendor_profiles(display_name, is_verified), product_images(id, storage_bucket, storage_path, alt_text_bn, alt_text_en, sort_order, is_primary)`).eq('slug',slug).eq('status','published').eq('is_active',true).maybeSingle();if(error||!product)return <main className="min-h-screen bg-[#f7faf9] text-[#0b1736] dark:bg-[#030506] dark:text-white"><Navbar/><section className="mx-auto max-w-3xl px-4 py-24 text-center"><h1 className="text-3xl font-black">Product not found</h1><p className="mt-3 text-sm opacity-55">এই productটি আর available নেই বা প্রকাশিত হয়নি।</p><Link href="/commerce" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-[#008080] px-5 py-3 text-sm font-bold text-white"><ArrowLeft size={17}/> Back to Commerce</Link></section></main>;const vendor=Array.isArray(product.vendor_profiles)?product.vendor_profiles[0]:product.vendor_profiles;const title=product.name_bn||product.name_en;const images=Array.isArray(product.product_images)?[...product.product_images].sort((a,b)=>Number(b.is_primary)-Number(a.is_primary)||a.sort_order-b.sort_order):[];return <main className="min-h-screen bg-[#f7faf9] text-[#0b1736] dark:bg-[#030506] dark:text-white"><Navbar/><section className="mx-auto max-w-6xl px-4 pb-20 pt-8 sm:px-6 lg:px-8"><Link href="/commerce" className="inline-flex items-center gap-2 rounded-xl border border-[#0b1736]/10 bg-white/70 px-3.5 py-2 text-sm dark:border-white/10 dark:bg-white/[0.045]"><ArrowLeft size={17}/> Commerce</Link><div className="mt-8 grid gap-8 lg:grid-cols-2"><div className="grid gap-3 sm:grid-cols-2">{images.length?images.map(image=>{const url=supabase.storage.from(image.storage_bucket).getPublicUrl(image.storage_path).data.publicUrl;return <div key={image.id} className="aspect-square overflow-hidden rounded-[1.5rem] border border-[#0b1736]/10 bg-white/70 dark:border-white/10 dark:bg-white/[.045]"><img src={url} alt={image.alt_text_en||image.alt_text_bn||title} className="h-full w-full object-cover"/></div>}):<div className="aspect-square overflow-hidden rounded-[2rem] border border-[#0b1736]/10 bg-white/70 dark:border-white/10 dark:bg-white/[.045] sm:col-span-2"><div className="flex h-full items-center justify-center opacity-30"><ShoppingCart size={80} weight="duotone"/></div></div>}</div><div className="self-center"><div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#008080]"><CheckCircle size={15} weight="fill"/> Approved seller{vendor?.is_verified&&<><span className="opacity-30">•</span><ShieldCheck size={15} weight="fill"/> Verified</>}</div><h1 className="mt-4 text-4xl font-black leading-tight sm:text-5xl">{title}</h1>{product.name_bn&&product.name_en&&<p className="mt-2 text-sm opacity-45">{product.name_en}</p>}<p className="mt-7 text-3xl font-black">{product.currency} {Number(product.price).toLocaleString('en-BD')}</p>{product.compare_at_price&&product.compare_at_price>product.price&&<p className="mt-1 text-sm opacity-40 line-through">{product.currency} {Number(product.compare_at_price).toLocaleString('en-BD')}</p>}{(product.description_bn||product.description_en)&&<div className="mt-7 rounded-2xl border border-[#0b1736]/10 bg-white/70 p-5 text-sm leading-7 dark:border-white/10 dark:bg-white/[0.045]">{product.description_bn||product.description_en}</div>}{vendor?.display_name&&<p className="mt-5 inline-flex items-center gap-2 text-sm opacity-55"><Storefront size={17}/> {vendor.display_name}</p>}<div className="mt-7 flex flex-wrap items-center gap-3"><AddToCartButton product={{productId:product.id,slug:product.slug,name:title,price:Number(product.price),currency:product.currency,allowGuestPurchase:product.allow_guest_purchase,imageUrl:images[0]?supabase.storage.from(images[0].storage_bucket).getPublicUrl(images[0].storage_path).data.publicUrl:null}}/><Link href="/commerce/cart" className="inline-flex items-center gap-2 rounded-xl border border-[#0b1736]/10 px-5 py-3 text-sm font-bold dark:border-white/10">View cart <ShoppingCart size={17}/></Link></div>{!product.allow_guest_purchase&&<p className="mt-3 text-xs text-[#8c6a0e]">Guest checkout is disabled for this product. Sign in to continue.</p>}</div></div></section></main>}
+export const dynamic = 'force-dynamic'
+
+type Props = { params: Promise<{ slug: string }> }
+type ProductRow = {
+  id: string; vendor_id: string; name_bn: string | null; name_en: string | null; slug: string
+  description_bn: string | null; description_en: string | null; sku: string | null
+  price: number; compare_at_price: number | null; currency: string; allow_guest_purchase: boolean
+  vendor_display_name: string | null; vendor_is_verified: boolean | null; shop_slug: string | null
+  image_id: string | null; image_bucket: string | null; image_path: string | null
+  image_alt_bn: string | null; image_alt_en: string | null
+}
+
+export default async function CommerceProductPage({ params }: Props) {
+  const { slug } = await params
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('commerce_public_products').select('*').eq('slug', slug).limit(1)
+  if (error || !data?.length) return (
+    <main className="min-h-screen bg-[#f7faf9] text-[#0b1736] dark:bg-[#030506] dark:text-white"><Navbar />
+      <section className="mx-auto max-w-xl px-4 py-24 text-center"><ShoppingCart size={48} className="mx-auto opacity-25" />
+        <h1 className="mt-5 text-3xl font-black">Product not found</h1><p className="mt-3 text-sm opacity-55">এই productটি আর public listing-এ নেই।</p>
+        <Link href="/commerce" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-[#008080] px-5 py-3 text-sm font-bold text-white"><ArrowLeft size={17} /> Back to Commerce</Link>
+      </section>
+    </main>
+  )
+  const product = data[0] as unknown as ProductRow
+  const imageUrl = product.image_bucket && product.image_path ? supabase.storage.from(product.image_bucket).getPublicUrl(product.image_path).data.publicUrl : null
+  const title = product.name_bn || product.name_en || 'Product'
+  const hasDiscount = product.compare_at_price !== null && product.compare_at_price > product.price
+  return (
+    <main className="min-h-screen bg-[#f7faf9] text-[#0b1736] dark:bg-[#030506] dark:text-white"><Navbar />
+      <section className="mx-auto max-w-5xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+        <Link href="/commerce" className="inline-flex items-center gap-2 rounded-xl border border-[#0b1736]/10 bg-white/70 px-3.5 py-2 text-sm dark:border-white/10 dark:bg-white/[0.045]"><ArrowLeft size={17} /> Commerce</Link>
+        <div className="mt-8 grid gap-8 lg:grid-cols-2">
+          <div className="overflow-hidden rounded-[2rem] border border-[#0b1736]/10 bg-white/70 dark:border-white/10 dark:bg-white/[0.045]"><div className="aspect-square bg-black/[0.035] dark:bg-white/[0.04]">
+            {imageUrl ? <img src={imageUrl} alt={product.image_alt_bn || product.image_alt_en || title} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-[#008080]/50"><ShoppingCart size={72} weight="duotone" /></div>}
+          </div></div>
+          <article className="flex flex-col justify-center">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#008080]/[0.07] px-3 py-1.5 text-xs font-bold text-[#007373] dark:text-teal-200"><ShieldCheck size={15} /> {product.vendor_is_verified ? 'Verified seller' : 'Approved seller'}</div>
+            <h1 className="mt-5 text-4xl font-black leading-tight sm:text-5xl">{title}</h1>
+            {product.name_bn && product.name_en && <p className="mt-2 text-sm opacity-50">{product.name_en}</p>}
+            <div className="mt-6"><p className="text-3xl font-black">{product.currency} {Number(product.price).toLocaleString('en-BD')}</p>{hasDiscount && <p className="mt-1 text-sm opacity-40 line-through">{product.currency} {Number(product.compare_at_price).toLocaleString('en-BD')}</p>}</div>
+            {product.vendor_display_name && <Link href={product.shop_slug ? '/shop/' + encodeURIComponent(product.shop_slug) : '/commerce'} className="mt-5 inline-flex w-fit items-center gap-2 text-sm font-bold text-[#008080]"><Storefront size={17} /> {product.vendor_display_name}</Link>}
+            {(product.description_bn || product.description_en) && <div className="mt-7 rounded-2xl border border-[#0b1736]/10 bg-white/60 p-5 text-sm leading-7 dark:border-white/10 dark:bg-white/[0.035]">{product.description_bn && <p>{product.description_bn}</p>}{product.description_en && product.description_bn && <p className="mt-4 opacity-60">{product.description_en}</p>}{!product.description_bn && product.description_en && <p>{product.description_en}</p>}</div>}
+            <div className="mt-7 flex flex-wrap items-center gap-3"><AddToCartButton product={{ productId: product.id, slug: product.slug, name: title, price: Number(product.price), currency: product.currency, allowGuestPurchase: product.allow_guest_purchase, imageUrl }} /><Link href="/commerce/cart" className="inline-flex items-center gap-2 rounded-xl border border-[#0b1736]/10 px-4 py-3 text-sm font-bold dark:border-white/10"><ShoppingCart size={18} /> View cart</Link></div>
+            <p className="mt-4 text-xs opacity-45">Final price and stock are checked again securely when the order is placed.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  )
+}
