@@ -24,7 +24,7 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
-          {nav.map(([href,label,Icon])=><Link key={href} href={href} className="group flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-black/[.035] hover:text-[#0b1736] dark:text-white/55 dark:hover:bg-white/[.045] dark:hover:text-white">{label}</Link>)}
+          {nav.map(([href,label])=><Link key={href} href={href} className="group flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-black/[.035] hover:text-[#0b1736] dark:text-white/55 dark:hover:bg-white/[.045] dark:hover:text-white">{label}</Link>)}
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
