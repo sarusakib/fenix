@@ -162,9 +162,15 @@ export default function InvestmentDashboardPage() {
                       <p className="font-black">{opportunity ? opportunityTitle(opportunity) : 'Investment deal'}</p>
                       <p className="mt-1 text-sm opacity-55">{formatBDT(deal.agreed_amount)} · {statusLabel(deal.structure)}</p>
                     </div>
-                    <button type="button" disabled={busy === deal.id} onClick={() => void confirmFunding(deal.id)} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#008080] px-4 text-xs font-bold text-white disabled:opacity-50">
-                      <CheckCircle size={16} />{busy === deal.id ? 'Confirming...' : 'Confirm funding'}
-                    </button>
+                    {profile?.verification_status === 'verified' ? (
+                      <button type="button" disabled={busy === deal.id} onClick={() => void confirmFunding(deal.id)} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#008080] px-4 text-xs font-bold text-white disabled:opacity-50">
+                        <CheckCircle size={16} />{busy === deal.id ? 'Confirming...' : 'Confirm funding'}
+                      </button>
+                    ) : (
+                      <Link href="/invest/profile" className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[#d4b879]/30 bg-[#d4b879]/[.08] px-4 text-xs font-bold text-[#826516] dark:text-[#e8cf82]">
+                        Complete verification first
+                      </Link>
+                    )}
                   </div>
                 )
               })}
