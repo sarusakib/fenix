@@ -11,6 +11,7 @@ import {
   type AuthMode,
   type OAuthProvider,
   getSafeAuthMessage,
+  isPasswordCompromised,
   sendPasswordReset,
   signInWithEmail,
   signInWithOAuth,
@@ -110,6 +111,14 @@ export default function LoginPage() {
 
     try {
       if (mode === 'signup') {
+        const compromised = await isPasswordCompromised(password)
+
+        if (compromised) {
+          setError(
+            'এই password আগে data breach-এ পাওয়া গেছে। অন্য একটি নতুন password ব্যবহার করুন।',
+          )
+          return
+        }
         const { data, error: signUpError } =
           await signUpWithEmail({
             supabase,
