@@ -1,5 +1,5 @@
 import StartWorkspace from '@/components/start/StartWorkspace'
 
 export default function Page() {
-  return <StartWorkspace step="home" />
+  return <StartWorkspace step="idea" />
 }
