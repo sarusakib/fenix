@@ -25,6 +25,7 @@ export const ROUTES = {
     join: '/directory/join',
     manage: '/directory/manage',
     claim: '/directory/claim',
+    qr: (slugOrId: string) => '/directory/' + encodeURIComponent(slugOrId) + '/qr',
   },
   start: {
     root: '/start',
@@ -69,6 +70,7 @@ export const ROUTES = {
     productBySlug: (slug: string) => '/product/' + encodeURIComponent(slug),
   },
   ecosystem: {
+    radar: '/radar',
     deals: '/deals',
     jobs: '/jobs',
     requests: '/requests',
