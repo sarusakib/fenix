@@ -6,10 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import {
-  usePathname,
-  useRouter,
-} from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import FenixIntro from './FenixIntro'
 
@@ -41,14 +38,18 @@ export default function FenixFlow({
   const pathname = usePathname()
   const router = useRouter()
 
-  const [introState, setIntroState] = useState<boolean | null>(null)
+  // Only the home route can ever need the intro. Initializing every other
+  // route to "not showing" avoids a full-screen black flash during hydration.
+  const [introState, setIntroState] = useState<boolean | null>(
+    pathname === '/' ? null : false,
+  )
 
   useEffect(() => {
     /*
      * The cinematic intro belongs only to the home route.
      *
-     * Every other route must immediately become available,
-     * regardless of sessionStorage availability.
+     * Every other route must immediately become available, regardless of
+     * sessionStorage availability.
      */
     if (pathname !== '/') {
       setIntroState(false)
@@ -63,10 +64,6 @@ export default function FenixFlow({
     router.replace('/login')
   }, [router])
 
-  /*
-   * Prevent hydration mismatch while browser-only storage
-   * state is being resolved.
-   */
   if (introState === null) {
     return (
       <div
@@ -76,14 +73,9 @@ export default function FenixFlow({
     )
   }
 
-  /*
-   * Show the cinematic intro only on "/".
-   */
   if (pathname === '/' && introState) {
     return (
-      <div
-        className="fixed inset-0 z-[999999] min-h-screen overflow-hidden bg-[#030506]"
-      >
+      <div className="fixed inset-0 z-[999999] min-h-screen overflow-hidden bg-[#030506]">
         <FenixIntro onComplete={handleIntroComplete} />
       </div>
     )

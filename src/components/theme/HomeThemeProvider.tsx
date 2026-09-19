@@ -7,13 +7,10 @@ import {
   useEffect,
   useMemo,
   useState,
+  type ReactNode,
 } from 'react'
 
-export type HomeTheme =
-  | 'light'
-  | 'dark'
-  | 'system'
-
+export type HomeTheme = 'light' | 'dark' | 'system'
 type ResolvedTheme = 'light' | 'dark'
 
 type ThemeContextValue = {
@@ -24,34 +21,31 @@ type ThemeContextValue = {
 
 const STORAGE_KEY = 'fenix-home-theme'
 
-const ThemeContext =
-  createContext<ThemeContextValue | null>(null)
+const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 function getSystemTheme(): ResolvedTheme {
   if (typeof window === 'undefined') {
-    return 'dark'
+    return 'light'
   }
 
-  return window.matchMedia(
-    '(prefers-color-scheme: dark)',
-  ).matches
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light'
 }
 
 function getSavedTheme(): HomeTheme {
+  if (typeof window === 'undefined') {
+    return 'system'
+  }
+
   try {
     const saved = window.localStorage.getItem(STORAGE_KEY)
 
-    if (
-      saved === 'light' ||
-      saved === 'dark' ||
-      saved === 'system'
-    ) {
+    if (saved === 'light' || saved === 'dark' || saved === 'system') {
       return saved
     }
   } catch {
-    // Ignore storage errors.
+    // Ignore unavailable storage.
   }
 
   return 'system'
@@ -67,23 +61,18 @@ function applyTheme(theme: ResolvedTheme) {
 export default function HomeThemeProvider({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
   const [theme, setThemeState] = useState<HomeTheme>('system')
-  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>('dark')
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>('light')
 
-  const resolvedTheme =
-    theme === 'system'
-      ? systemTheme
-      : theme
+  const resolvedTheme = theme === 'system' ? systemTheme : theme
 
   const setTheme = useCallback((nextTheme: HomeTheme) => {
     setThemeState(nextTheme)
 
     const nextResolved =
-      nextTheme === 'system'
-        ? getSystemTheme()
-        : nextTheme
+      nextTheme === 'system' ? getSystemTheme() : nextTheme
 
     applyTheme(nextResolved)
 
@@ -101,23 +90,16 @@ export default function HomeThemeProvider({
     setThemeState(savedTheme)
     setSystemTheme(nextSystemTheme)
 
-    applyTheme(
-      savedTheme === 'system'
-        ? nextSystemTheme
-        : savedTheme,
-    )
+    applyTheme(savedTheme === 'system' ? nextSystemTheme : savedTheme)
   }, [])
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    )
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
     const handleChange = () => {
-      const nextSystemTheme: ResolvedTheme =
-        mediaQuery.matches
-          ? 'dark'
-          : 'light'
+      const nextSystemTheme: ResolvedTheme = mediaQuery.matches
+        ? 'dark'
+        : 'light'
 
       setSystemTheme(nextSystemTheme)
 
@@ -126,18 +108,10 @@ export default function HomeThemeProvider({
       }
     }
 
-    handleChange()
-
-    mediaQuery.addEventListener(
-      'change',
-      handleChange,
-    )
+    mediaQuery.addEventListener('change', handleChange)
 
     return () => {
-      mediaQuery.removeEventListener(
-        'change',
-        handleChange,
-      )
+      mediaQuery.removeEventListener('change', handleChange)
     }
   }, [])
 
@@ -145,7 +119,7 @@ export default function HomeThemeProvider({
     applyTheme(resolvedTheme)
   }, [resolvedTheme])
 
-  const value = useMemo(
+  const value = useMemo<ThemeContextValue>(
     () => ({
       theme,
       resolvedTheme,
@@ -165,9 +139,7 @@ export function useHomeTheme() {
   const context = useContext(ThemeContext)
 
   if (!context) {
-    throw new Error(
-      'useHomeTheme must be used inside HomeThemeProvider',
-    )
+    throw new Error('useHomeTheme must be used inside HomeThemeProvider')
   }
 
   return context
