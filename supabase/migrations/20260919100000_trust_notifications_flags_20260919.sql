@@ -466,3 +466,149 @@ $$;
 
 revoke execute on function public.save_business_embedding(uuid, extensions.vector) from public, anon, authenticated;
 grant execute on function public.save_business_embedding(uuid, extensions.vector) to authenticated;
+
+
+create table if not exists public.business_verification_requests (
+  id uuid primary key default gen_random_uuid(),
+  business_id uuid not null references public.businesses(id) on delete cascade,
+  requester_id uuid not null references public.profiles(id) on delete cascade,
+  verification_type text not null check (verification_type in ('identity','phone','location','business')),
+  evidence_note text not null default '',
+  status text not null default 'pending' check (status in ('pending','reviewing','approved','rejected','cancelled')),
+  reviewed_by uuid references public.profiles(id) on delete set null,
+  reviewed_at timestamptz,
+  review_note text,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create unique index if not exists business_verification_requests_pending_uidx
+  on public.business_verification_requests (business_id, requester_id, verification_type)
+  where status in ('pending','reviewing');
+
+create index if not exists business_verification_requests_business_idx
+  on public.business_verification_requests (business_id, created_at desc);
+create index if not exists business_verification_requests_requester_idx
+  on public.business_verification_requests (requester_id, created_at desc);
+create index if not exists business_verification_requests_reviewer_idx
+  on public.business_verification_requests (reviewed_by, reviewed_at desc);
+
+alter table public.business_verification_requests enable row level security;
+
+drop policy if exists business_verification_requests_select on public.business_verification_requests;
+drop policy if exists business_verification_requests_insert on public.business_verification_requests;
+drop policy if exists business_verification_requests_update on public.business_verification_requests;
+
+create policy business_verification_requests_select
+  on public.business_verification_requests
+  for select to authenticated
+  using ((select auth.uid()) = requester_id or public.is_fenix_admin());
+
+create policy business_verification_requests_insert
+  on public.business_verification_requests
+  for insert to authenticated
+  with check (
+    (select auth.uid()) = requester_id
+    and exists (
+      select 1 from public.businesses b
+      where b.id = business_id and b.owner_id = (select auth.uid())
+    )
+    and status = 'pending'
+  );
+
+create policy business_verification_requests_update
+  on public.business_verification_requests
+  for update to authenticated
+  using (public.is_fenix_admin())
+  with check (public.is_fenix_admin());
+
+revoke all on public.business_verification_requests from public, anon, authenticated;
+grant select, insert, update on public.business_verification_requests to authenticated;
+
+create or replace function public.apply_business_verification_decision()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $$
+begin
+  if new.status = 'approved' and old.status is distinct from new.status then
+    update public.business_directory_profiles
+    set
+      owner_claimed = true,
+      phone_verified = case when new.verification_type = 'phone' then true else phone_verified end,
+      location_verified = case when new.verification_type = 'location' then true else location_verified end,
+      verification_level = case
+        when new.verification_type = 'identity' then
+          case when verification_level = 'fenix_verified' then verification_level else 'identity_reviewed' end
+        when new.verification_type = 'business' then 'business_reviewed'
+        when verification_level = 'fenix_verified' then verification_level
+        else verification_level
+      end,
+      last_verified_at = timezone('utc', now()),
+      updated_at = timezone('utc', now())
+    where business_id = new.business_id;
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function public.apply_business_verification_decision() from public, anon, authenticated;
+
+drop trigger if exists business_verification_requests_apply on public.business_verification_requests;
+create trigger business_verification_requests_apply
+after update of status on public.business_verification_requests
+for each row execute function public.apply_business_verification_decision();
+
+create or replace function private.notify_verification_status_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $$
+begin
+  if new.status <> old.status then
+    insert into public.fenix_notifications (user_id, kind, title, body, href)
+    values (
+      new.requester_id,
+      'verification',
+      case new.status
+        when 'approved' then 'Business verification approved'
+        when 'rejected' then 'Business verification needs attention'
+        else 'Business verification updated'
+      end,
+      case new.status
+        when 'approved' then 'Your business verification request was approved by a FeniX reviewer.'
+        when 'rejected' then 'Your business verification request was rejected or needs changes.'
+        else 'Your business verification request status changed to ' || new.status || '.'
+      end,
+      '/directory/manage'
+    );
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function private.notify_verification_status_change() from public, anon, authenticated;
+
+drop trigger if exists business_verification_requests_notify on public.business_verification_requests;
+create trigger business_verification_requests_notify
+after update of status on public.business_verification_requests
+for each row execute function private.notify_verification_status_change();
+
+drop trigger if exists business_verification_requests_touch on public.business_verification_requests;
+create trigger business_verification_requests_touch
+before update on public.business_verification_requests
+for each row execute function public.touch_trust_updated_at();
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'business_verification_requests_evidence_len_check') then
+    alter table public.business_verification_requests
+      add constraint business_verification_requests_evidence_len_check check (length(evidence_note) <= 3000);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'business_verification_requests_review_note_len_check') then
+    alter table public.business_verification_requests
+      add constraint business_verification_requests_review_note_len_check check (review_note is null or length(review_note) <= 2000);
+  end if;
+end $$;
