@@ -27,8 +27,8 @@ html {
 
 html.dark {
   --fx-bg: #030506;
-  --fx-surface: rgba(10, 18, 25, 0.72);
-  --fx-surface-strong: rgba(10, 18, 25, 0.9);
+  --fx-surface: rgba(10, 18, 25, 0.74);
+  --fx-surface-strong: rgba(10, 18, 25, 0.92);
   --fx-border: rgba(255, 255, 255, 0.08);
   --fx-text: #f7fbfa;
   --fx-muted: #9aaab2;
@@ -51,10 +51,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-img, svg, video, canvas {
-  display: block;
-  max-width: 100%;
-}
+img, svg, video, canvas { display: block; max-width: 100%; }
 
 button, input, textarea, select { font: inherit; }
 input, textarea, select { font-size: 16px; }
@@ -62,10 +59,7 @@ button, a { touch-action: manipulation; }
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; }
 
-::selection {
-  background: rgba(0, 128, 128, 0.2);
-  color: var(--fx-text);
-}
+::selection { background: rgba(0, 128, 128, 0.2); color: var(--fx-text); }
 
 :focus-visible {
   outline: 2px solid var(--fx-primary);
@@ -77,10 +71,7 @@ button { cursor: pointer; }
 .safe-top { padding-top: env(safe-area-inset-top); }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
-.fenix-shell {
-  position: relative;
-  isolation: isolate;
-}
+.fenix-shell { position: relative; isolation: isolate; }
 
 .fenix-grid {
   background-image:
@@ -140,6 +131,28 @@ html.dark .fenix-surface-strong {
     box-shadow 220ms ease;
 }
 
+.fenix-reveal { animation: fenix-fade-up .52s cubic-bezier(.22,1,.36,1) both; }
+.fenix-float { animation: fenix-float 6s ease-in-out infinite; }
+
+@keyframes fenix-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fenix-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+html[data-reduce-motion="true"] *,
+html[data-reduce-motion="true"] *::before,
+html[data-reduce-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
 @media (hover: hover) {
   .fenix-interactive:hover {
     transform: translateY(-3px);
@@ -162,6 +175,10 @@ html.dark .fenix-surface-strong {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+@media (max-width: 767px) {
+  body { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
