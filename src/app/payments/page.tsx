@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Info, ShoppingBag, ShieldCheck } from '@phosphor-icons/react'
+import { ArrowLeft, ArrowRight, Info, ShoppingBag, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 
 export default function PaymentsPage(){
