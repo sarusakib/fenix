@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, CheckCircle, FileArrowUp, FileText, Handshake, Plus, UploadSimple } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
@@ -52,7 +52,7 @@ export default function InvestmentManagerPage() {
   })
   const [busy, setBusy] = useState('')
 
-  async function load() {
+  const load = useCallback(async () => {
     const s = createClient()
     const { data: auth } = await s.auth.getUser()
 
@@ -99,9 +99,11 @@ export default function InvestmentManagerPage() {
     }
   }
 
+  }, [selected])
+
   useEffect(() => {
     void load()
-  }, [])
+  }, [load])
 
   const current = useMemo(
     () => opportunities.find((item) => item.id === selected) ?? opportunities[0] ?? null,
