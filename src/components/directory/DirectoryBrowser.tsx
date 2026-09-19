@@ -329,11 +329,15 @@ export default function DirectoryBrowser() {
             value={category}
             options={[
               { value: '', label: 'All categories' },
-              ...categories.map((item) => ({
-                value: item.category,
-                label: item.category,
-                count: item.business_count,
-              })),
+              ...categories.flatMap((item) =>
+                item.category
+                  ? [{
+                      value: item.category,
+                      label: item.category,
+                      count: item.business_count,
+                    }]
+                  : [],
+              ),
             ]}
             onChange={(value) => applyFilters(urlQuery, value, upazila)}
           />
@@ -342,11 +346,15 @@ export default function DirectoryBrowser() {
             value={upazila}
             options={[
               { value: '', label: 'All upazilas' },
-              ...upazilas.map((item) => ({
-                value: item.upazila,
-                label: item.upazila,
-                count: item.business_count,
-              })),
+              ...upazilas.flatMap((item) =>
+                item.upazila
+                  ? [{
+                      value: item.upazila,
+                      label: item.upazila,
+                      count: item.business_count,
+                    }]
+                  : [],
+              ),
             ]}
             onChange={(value) => applyFilters(urlQuery, category, value)}
           />
