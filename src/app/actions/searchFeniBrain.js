@@ -2,7 +2,7 @@
 
 import { generateEmbedding } from './generateEmbedding'
 import { createClient } from '../../utils/supabase/server'
-import { buildKeywordQuery, normalizeFeniBrainQuery } from '../../lib/feniBrainQuery'
+import { buildKeywordQuery, normalizeFeniBrainQuery, classifyFeniBrainQuestion } from '../../lib/feniBrainQuery'
 
 const MAX_QUERY_LENGTH = 120
 const MAX_RESULTS = 8
@@ -97,6 +97,7 @@ export async function searchFeniBrain(query) {
 
   const parsed = normalizeFeniBrainQuery(query)
   const cleanQuery = parsed.original.trim().slice(0, MAX_QUERY_LENGTH)
+  const questionClass = classifyFeniBrainQuestion(cleanQuery)
   const normalizedQuery = parsed.normalized
 
   if (cleanQuery.length < 2 || normalizedQuery.length < 2) {
@@ -291,11 +292,16 @@ export async function searchFeniBrain(query) {
       normalizedQuery,
       keywordQuery,
       intent,
+      intentKey: questionClass.intentKey,
+      language: questionClass.language,
+      budget: questionClass.budgetBDT,
+      entities: questionClass.entities,
       locations: Array.isArray(locations) ? locations : [],
       childLocations,
       results: ranked,
       sources: [...sourcesMap.values()],
       retrievalConfidence: Number(ranked[0]?.similarity ?? 0),
+      queryClass: questionClass,
     }
   } catch (error) {
     console.error('Feni Brain search failed:', { name: error?.name })

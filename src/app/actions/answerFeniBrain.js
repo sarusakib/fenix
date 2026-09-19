@@ -4,12 +4,13 @@ import { HfInference } from '@huggingface/inference'
 import { searchFeniBrain } from './searchFeniBrain'
 import { fetchLiveFeniSources, shouldUseLiveWeb } from '../../lib/feniBrainLiveWeb'
 import { buildFeniBrainPlan, buildFeniXPolicyPrompt } from '../../lib/fenixNetwork'
-import { classifyFeniBrainQuestion } from '../../lib/feniBrainQuery'
+import { classifyFeniBrainQuestion, detectLanguage, detectFeniBrainIntent, extractBudgetBDT, extractEntities } from '../../lib/feniBrainQuery'
 
 const MODEL = process.env.FENI_BRAIN_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
 const MAX_QUERY_LENGTH = 120
 const MAX_CONTEXT_LENGTH = 12000
 const MAX_ANSWER_TOKENS = 900
+const MAX_EVIDENCE_ITEMS = 8
 
 function clean(value) {
   return typeof value === 'string' ? value.trim().slice(0, MAX_QUERY_LENGTH) : ''
@@ -66,6 +67,28 @@ function childLocationAnswer(locations) {
   return (labels[locations[0].level] || 'স্থানগুলো') + ': ' + names.join(', ') + '।'
 }
 
+function buildEvidence(results) {
+  return (Array.isArray(results) ? results : []).slice(0, MAX_EVIDENCE_ITEMS).map((row) => ({
+    id: row.id,
+    title: row.document_title || row.source_title || 'Feni Brain source',
+    source: row.source_title || null,
+    source_url: row.source_url || null,
+    retrieval_method: row.retrieval_method || 'matched',
+    similarity: Number(row.similarity || 0),
+    trust_tier: Number(row.trust_tier || 99),
+    content: String(row.content || '').slice(0, 800),
+  }))
+}
+
+function publicLiveSources(sources) {
+  return (Array.isArray(sources) ? sources : []).map((source) => ({
+    title: source.title,
+    url: source.url,
+    fetched_at: source.fetched_at,
+    http_status: source.http_status,
+  }))
+}
+
 function safeFallbackAnswer(retrieval) {
   const child = childLocationAnswer(retrieval.childLocations)
   if (child) return child
@@ -86,10 +109,16 @@ export async function answerFeniBrain(query) {
   const liveSources = liveWebChecked ? await fetchLiveFeniSources(retrieval.sources) : []
   const questionClass = classifyFeniBrainQuestion(cleanQuery)
   const plan = buildFeniBrainPlan(cleanQuery, retrieval.intent)
+  const language = detectLanguage(cleanQuery)
+  const intentKey = detectFeniBrainIntent(cleanQuery)
+  const budgetBDT = extractBudgetBDT(cleanQuery)
+  const entities = extractEntities(cleanQuery)
 
   if (!retrieval.results?.length && !retrieval.childLocations?.length && !liveSources.length && questionClass.local) {
     return {
       success: true,
+      language, intentKey, budget: budgetBDT, entities,
+      evidence: [], recommendations: plan.actions, risks: [], actions: plan.actions,
       answer: 'এই Feni-সংক্রান্ত প্রশ্নের জন্য বর্তমানে যথেষ্ট verified local তথ্য পাওয়া যায়নি। অনুমান করে ভুল তথ্য না দিয়ে নতুন verified source/data প্রয়োজন।',
       intent: retrieval.intent, locations: retrieval.locations, childLocations: retrieval.childLocations,
       sources: [], grounded: false, aiGenerated: false, liveWebChecked, liveSources: [], confidence: 0,
@@ -101,9 +130,9 @@ export async function answerFeniBrain(query) {
   const token = process.env.HUGGINGFACE_API_KEY
   if (!token) {
     return {
-      success: true, answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
+      success: true, language, intentKey, budget: budgetBDT, entities, evidence: buildEvidence(retrieval.results), recommendations: plan.actions, risks: [], actions: plan.actions, answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
-      grounded: true, aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources,
+      grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0), aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0), guidance: plan.actions,
       guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
@@ -127,7 +156,7 @@ export async function answerFeniBrain(query) {
             '\n\nDETECTED INTENT:\n' + retrieval.intent +
             '\n\nMATCHED LOCATIONS:\n' + (retrieval.locations || []).slice(0, 8).map((x) => x.name_bn || x.name_en).join(', ') +
             '\n\nCHILD LOCATIONS:\n' + (retrieval.childLocations || []).slice(0, 12).map((x) => x.name_bn || x.name_en).join(', ') +
-            '\n\nVERIFIED SOURCE CONTEXT:\n' + context,
+            '\n\nLANGUAGE: ' + language + '\nBUDGET_BDT: ' + String(budgetBDT ?? '') + '\nENTITY_CONTEXT: ' + JSON.stringify(entities) + '\n\nVERIFIED SOURCE CONTEXT:\n' + context,
         },
       ],
       max_tokens: MAX_ANSWER_TOKENS,
@@ -140,8 +169,8 @@ export async function answerFeniBrain(query) {
     return {
       success: true, answer, intent: retrieval.intent, locations: retrieval.locations,
       childLocations: retrieval.childLocations, sources: retrieval.sources,
-      grounded: Boolean((retrieval.results?.length || 0) > 0 || liveSources.length > 0),
-      aiGenerated: true, model: MODEL, liveWebChecked, liveSources,
+      grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0),
+      aiGenerated: true, model: MODEL, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0), results: retrieval.results,
       guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
@@ -151,7 +180,7 @@ export async function answerFeniBrain(query) {
     return {
       success: true, answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
-      grounded: true, aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources,
+      grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0), aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0),
       guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
