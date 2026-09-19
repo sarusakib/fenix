@@ -1,0 +1,6 @@
+-- FeniX Business Directory foundation.
+-- Applied to Supabase project lawdsvplbxfziihvmmva as migration business_directory_foundation_20260919.
+-- The database migration creates:
+-- business_directory_profiles, business_directory_locations,
+-- business_directory_contacts, business_directory_aliases,
+-- public search RPC, owner-scoped RLS, and automatic profile seeding.
