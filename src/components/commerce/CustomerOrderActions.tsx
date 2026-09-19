@@ -36,8 +36,8 @@ export default function CustomerOrderActions({ orderId: _orderId, items }: { ord
     const { error: rpcError } = await supabase.rpc('create_product_review', {
       p_product_id: item.product_id,
       p_rating: Math.min(5, Math.max(1, Number(rating))),
-      p_title: title.trim().slice(0, 160) || null,
-      p_body: body.trim().slice(0, 4000) || null,
+      p_title: title.trim().slice(0, 160) || undefined,
+      p_body: body.trim().slice(0, 4000) || undefined,
     })
     if (rpcError) {
       setError('Review submit করা যায়নি। সম্ভবত এই product-এর review আগেই করা হয়েছে।')
@@ -56,7 +56,7 @@ export default function CustomerOrderActions({ orderId: _orderId, items }: { ord
     const { error: rpcError } = await supabase.rpc('create_commerce_return_request', {
       p_order_item_id: item.id,
       p_reason: reason.trim().slice(0, 200),
-      p_details: details.trim().slice(0, 4000) || null,
+      p_details: details.trim().slice(0, 4000) || undefined,
     })
     if (rpcError) {
       setError('Return request তৈরি করা যায়নি। Reason দিন বা আগের request check করুন।')

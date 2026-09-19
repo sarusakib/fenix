@@ -10,7 +10,7 @@ export type DirectoryCategory =
 export type DirectoryUpazila =
   Database['public']['Functions']['list_directory_upazilas']['Returns'][number]
 
-export type DirectoryDetail = DirectoryBusiness & {
+export type DirectoryDetail = Omit<DirectoryBusiness, 'district' | 'upazila' | 'area'> & {
   slug: string | null
   about_bn: string | null
   about_en: string | null

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowLeft, Receipt, ShieldCheck, Star, Storefront, Truck, ArrowCounterClockwise } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
+import type { Database } from '@/types/database'
 
 type Vendor={id:string;display_name:string;status:string;is_verified:boolean;created_at:string}
 type Rule={id:string;district:string|null;upazila:string|null;fee:number;free_shipping_minimum:number|null;is_active:boolean;sort_order:number}
@@ -38,7 +39,7 @@ export default function CommerceAdminPage(){
  }
  useEffect(()=>{void load()},[])
 
- async function call(fn:string,args:Record<string,unknown>,key:string){
+ async function call(fn: keyof Database['public']['Functions'],args:Record<string,unknown>,key:string){
   setBusy(key);setError('');const s=createClient();const {error:e}=await s.rpc(fn,args)
   if(e)setError(e.message||'Operation failed.');else await load();setBusy('')
  }

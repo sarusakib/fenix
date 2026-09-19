@@ -52,8 +52,8 @@ export default function CommerceCheckoutPage() {
       setFeeLoading(true)
       const supabase = createClient()
       const { data, error: feeError } = await supabase.rpc('calculate_commerce_delivery_fee', {
-        p_district: district.trim() || null,
-        p_upazila: upazila.trim() || null,
+        p_district: district.trim() || undefined,
+        p_upazila: upazila.trim() || undefined,
         p_subtotal: subtotal,
       })
       if (active) {
@@ -84,17 +84,17 @@ export default function CommerceCheckoutPage() {
       const items = cart.map((item) => ({ product_id: item.productId, quantity: item.quantity }))
       const { data, error: rpcError } = await supabase.rpc('create_commerce_order', {
         p_items: items,
-        p_customer_id: currentUserId,
-        p_guest_name: currentUserId ? null : cleanName,
-        p_guest_phone: currentUserId ? null : cleanPhone,
-        p_guest_email: currentUserId ? null : (email.trim().slice(0, 254) || null),
+        p_customer_id: currentUserId ?? undefined,
+        p_guest_name: currentUserId ? undefined : cleanName,
+        p_guest_phone: currentUserId ? undefined : cleanPhone,
+        p_guest_email: currentUserId ? undefined : (email.trim().slice(0, 254) || undefined),
         p_shipping_name: cleanName,
         p_shipping_phone: cleanPhone,
         p_shipping_address: cleanAddress,
-        p_shipping_area: area.trim().slice(0, 120) || null,
-        p_shipping_upazila: upazila.trim().slice(0, 120) || null,
-        p_shipping_district: district.trim().slice(0, 120) || null,
-        p_customer_note: note.trim().slice(0, 1000) || null,
+        p_shipping_area: area.trim().slice(0, 120) || undefined,
+        p_shipping_upazila: upazila.trim().slice(0, 120) || undefined,
+        p_shipping_district: district.trim().slice(0, 120) || undefined,
+        p_customer_note: note.trim().slice(0, 1000) || undefined,
       })
       if (rpcError || !data) {
         console.error('Commerce checkout failed:', { code: rpcError?.code })

@@ -131,7 +131,7 @@ export default function InvestmentManagerPage() {
     const { error: updateError } = await s.rpc('owner_update_investment_interest', {
       p_interest_id: id,
       p_status: status,
-      p_owner_note: null,
+      p_owner_note: undefined,
     })
 
     if (updateError) setError(updateError.message)
@@ -190,9 +190,9 @@ export default function InvestmentManagerPage() {
     const { error: updateError } = await s.rpc('owner_progress_investment_deal', {
       p_deal_id: deal.id,
       p_status: status,
-      p_agreed_amount: deal.agreed_amount,
-      p_ownership_percentage: deal.ownership_percentage,
-      p_terms_note: deal.terms_note,
+      p_agreed_amount: deal.agreed_amount ?? undefined,
+      p_ownership_percentage: deal.ownership_percentage ?? undefined,
+      p_terms_note: deal.terms_note ?? undefined,
     })
 
     if (updateError) setError(updateError.message)
