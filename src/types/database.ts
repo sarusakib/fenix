@@ -3313,6 +3313,22 @@ export type Database = {
         Args: { p_opportunity_id: string }
         Returns: boolean
       }
+      set_vendor_product_inventory: {
+        Args: {
+          p_product_id: string
+          p_quantity: number
+          p_low_stock_threshold?: number
+        }
+        Returns: boolean
+      }
+      publish_vendor_product: {
+        Args: { p_product_id: string }
+        Returns: boolean
+      }
+      archive_vendor_product: {
+        Args: { p_product_id: string }
+        Returns: boolean
+      }
       update_vendor_product: {
         Args: {
           p_allow_guest_purchase?: boolean
@@ -3473,3 +3489,31 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+// Stable named aliases used by the application layer.
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
+export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"]
+export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
+
+export type Business = Database["public"]["Tables"]["businesses"]["Row"]
+export type BusinessInsert = Database["public"]["Tables"]["businesses"]["Insert"]
+export type BusinessUpdate = Database["public"]["Tables"]["businesses"]["Update"]
+
+export type VendorProfile = Database["public"]["Tables"]["vendor_profiles"]["Row"]
+export type VendorProfileInsert = Database["public"]["Tables"]["vendor_profiles"]["Insert"]
+export type VendorProfileUpdate = Database["public"]["Tables"]["vendor_profiles"]["Update"]
+
+export type InvestmentProfile = Database["public"]["Tables"]["investment_profiles"]["Row"]
+export type InvestmentProfileInsert = Database["public"]["Tables"]["investment_profiles"]["Insert"]
+export type InvestmentProfileUpdate = Database["public"]["Tables"]["investment_profiles"]["Update"]
+
+export type InvestmentOpportunity = Database["public"]["Tables"]["investment_opportunities"]["Row"]
+export type InvestmentOpportunityInsert = Database["public"]["Tables"]["investment_opportunities"]["Insert"]
+export type InvestmentOpportunityUpdate = Database["public"]["Tables"]["investment_opportunities"]["Update"]
+
+export type InvestmentDocument = Database["public"]["Tables"]["investment_documents"]["Row"]
+export type InvestmentInterest = Database["public"]["Tables"]["investment_interests"]["Row"]
+export type InvestmentDeal = Database["public"]["Tables"]["investment_deals"]["Row"]
+export type InvestmentUpdate = Database["public"]["Tables"]["investment_updates"]["Row"]
+export type InvestmentReport = Database["public"]["Tables"]["investment_reports"]["Row"]
+export type InvestmentMessage = Database["public"]["Tables"]["investment_messages"]["Row"]
