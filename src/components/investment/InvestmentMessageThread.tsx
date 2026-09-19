@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ChatCircleDots, PaperPlaneTilt } from '@phosphor-icons/react'
 import { createClient } from '@/utils/supabase/client'
 import type { InvestmentMessage } from '@/types/database'
@@ -26,7 +26,7 @@ export default function InvestmentMessageThread({
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
 
-  async function load() {
+  const load = useCallback(async () => {
     if (!userId || !recipientId) {
       setMessages([])
       setLoading(false)
@@ -64,9 +64,11 @@ export default function InvestmentMessageThread({
     setLoading(false)
   }
 
+  }, [opportunityId, userId, recipientId])
+
   useEffect(() => {
     void load()
-  }, [opportunityId, userId, recipientId, dealId])
+  }, [load])
 
   const canSend = useMemo(() => Boolean(userId && recipientId && body.trim()), [userId, recipientId, body])
 
