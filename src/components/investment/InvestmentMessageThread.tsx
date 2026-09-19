@@ -62,7 +62,6 @@ export default function InvestmentMessageThread({
     )
 
     setLoading(false)
-  }
   }, [opportunityId, userId, recipientId])
 
   useEffect(() => {
