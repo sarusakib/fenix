@@ -100,41 +100,70 @@ async function fetchOne(url, sourceTitle) {
     () => controller.abort(),
     TIMEOUT_MS,
   );
+  const visited = new Set();
+  let currentUrl = url;
 
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      redirect: 'follow',
-      headers: {
-        Accept: 'text/html,application/xhtml+xml',
-        'User-Agent': 'FeniX-Feni-Brain-Live/1.0',
-      },
-      signal: controller.signal,
-      cache: 'no-store',
-    });
+    for (let redirectCount = 0; redirectCount <= 3; redirectCount += 1) {
+      if (!isAllowedSourceUrl(currentUrl) || visited.has(currentUrl)) {
+        return null;
+      }
 
-    if (!response.ok) return null;
+      visited.add(currentUrl);
 
-    const contentType = response.headers.get('content-type') || '';
-    if (
-      !contentType.includes('text/html') &&
-      !contentType.includes('application/xhtml+xml')
-    ) {
-      return null;
+      const response = await fetch(currentUrl, {
+        method: 'GET',
+        redirect: 'manual',
+        headers: {
+          Accept: 'text/html,application/xhtml+xml',
+          'User-Agent': 'FeniX-Feni-Brain-Live/1.0',
+        },
+        signal: controller.signal,
+        cache: 'no-store',
+      });
+
+      if ([301, 302, 303, 307, 308].includes(response.status)) {
+        const location = response.headers.get('location');
+        if (!location) return null;
+
+        const nextUrl = new URL(location, currentUrl).toString();
+        if (!isAllowedSourceUrl(nextUrl)) {
+          console.warn('Feni Brain blocked non-allowlisted redirect:', {
+            source: sourceTitle,
+            from: currentUrl,
+          });
+          return null;
+        }
+
+        currentUrl = nextUrl;
+        continue;
+      }
+
+      if (!response.ok) return null;
+
+      const contentType = response.headers.get('content-type') || '';
+      if (
+        !contentType.includes('text/html') &&
+        !contentType.includes('application/xhtml+xml')
+      ) {
+        return null;
+      }
+
+      const raw = await response.text();
+      const content = extractText(raw);
+
+      if (content.length < 100) return null;
+
+      return {
+        title: sourceTitle,
+        url: currentUrl,
+        content,
+        fetched_at: new Date().toISOString(),
+        http_status: response.status,
+      };
     }
 
-    const raw = await response.text();
-    const content = extractText(raw);
-
-    if (content.length < 100) return null;
-
-    return {
-      title: sourceTitle,
-      url,
-      content,
-      fetched_at: new Date().toISOString(),
-      http_status: response.status,
-    };
+    return null;
   } catch (error) {
     const details =
       error && typeof error === 'object'
