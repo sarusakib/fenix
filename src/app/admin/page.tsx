@@ -129,6 +129,12 @@ export default async function AdminPage() {
             description="Review the public business discovery experience and local ecosystem records."
           />
           <AdminLink
+            href="/admin/trust"
+            icon={<ShieldCheck size={24} />}
+            title="Trust center"
+            description="Review ownership claims, business reviews and local abuse reports."
+          />
+          <AdminLink
             href="/admin/investment"
             icon={<ChartLineUp size={24} />}
             title="Investment control"
