@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "FeniX — Feni Business Ecosystem",
   "short_name": "FeniX",
   "description": "Build. Connect. Grow. Discover local businesses, products, guidance and opportunities in Feni.",
@@ -6,8 +7,14 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#F3F7F7",
   "theme_color": "#0B1736",
+  "categories": [
+    "business",
+    "productivity",
+    "shopping"
+  ],
   "icons": [
     {
       "src": "/icon.png",
