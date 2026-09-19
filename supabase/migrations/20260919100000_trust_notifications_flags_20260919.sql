@@ -441,3 +441,28 @@ create policy fenix_feature_flags_admin_delete
   on public.fenix_feature_flags
   for delete to authenticated
   using (public.is_fenix_admin());
+
+
+create or replace function public.save_business_embedding(p_business_id uuid, p_embedding extensions.vector)
+returns boolean
+language plpgsql
+security invoker
+set search_path = pg_catalog, public, extensions
+as $$
+begin
+  if (select auth.uid()) is null then
+    return false;
+  end if;
+
+  update public.businesses
+  set feni_brain_embedding = p_embedding,
+      updated_at = timezone('utc', now())
+  where id = p_business_id
+    and owner_id = (select auth.uid());
+
+  return found;
+end;
+$$;
+
+revoke execute on function public.save_business_embedding(uuid, extensions.vector) from public, anon, authenticated;
+grant execute on function public.save_business_embedding(uuid, extensions.vector) to authenticated;
