@@ -370,3 +370,40 @@ drop trigger if exists business_claim_requests_guard_approval on public.business
 create trigger business_claim_requests_guard_approval
 before update of status on public.business_claim_requests
 for each row execute function private.guard_business_claim_approval();
+
+
+create index if not exists business_claim_requests_reviewed_by_idx on public.business_claim_requests (reviewed_by, reviewed_at desc);
+create index if not exists business_reviews_reviewed_by_idx on public.business_reviews (reviewed_by, reviewed_at desc);
+create index if not exists business_reports_reviewer_idx on public.business_reports (reviewer_id, resolved_at desc);
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'business_claim_requests_note_len_check') then
+    alter table public.business_claim_requests add constraint business_claim_requests_note_len_check check (length(note) <= 2000);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'business_reviews_title_len_check') then
+    alter table public.business_reviews add constraint business_reviews_title_len_check check (title is null or length(title) <= 160);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'business_reviews_body_len_check') then
+    alter table public.business_reviews add constraint business_reviews_body_len_check check (length(body) between 10 and 2500);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'business_reports_reason_len_check') then
+    alter table public.business_reports add constraint business_reports_reason_len_check check (length(reason) between 2 and 80);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'business_reports_details_len_check') then
+    alter table public.business_reports add constraint business_reports_details_len_check check (length(details) between 10 and 3000);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'fenix_notifications_kind_len_check') then
+    alter table public.fenix_notifications add constraint fenix_notifications_kind_len_check check (length(kind) between 1 and 40);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'fenix_notifications_title_len_check') then
+    alter table public.fenix_notifications add constraint fenix_notifications_title_len_check check (length(title) between 1 and 200);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'fenix_notifications_body_len_check') then
+    alter table public.fenix_notifications add constraint fenix_notifications_body_len_check check (length(body) between 1 and 1000);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'fenix_notifications_href_len_check') then
+    alter table public.fenix_notifications add constraint fenix_notifications_href_len_check check (href is null or length(href) <= 500);
+  end if;
+end
+$$;
