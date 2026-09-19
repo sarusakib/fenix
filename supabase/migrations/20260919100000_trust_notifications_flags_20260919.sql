@@ -286,3 +286,60 @@ drop trigger if exists business_claim_requests_sync_approved on public.business_
 create trigger business_claim_requests_sync_approved
 after update of status on public.business_claim_requests
 for each row execute function public.sync_approved_business_claim();
+
+
+create or replace function private.notify_trust_status_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $$
+declare
+  recipient_id uuid;
+  title_text text;
+  body_text text;
+  link_text text;
+begin
+  if new.status = old.status then return new; end if;
+
+  if tg_table_name = 'business_claim_requests' then
+    recipient_id := new.claimant_id;
+    title_text := case new.status when 'approved' then 'Business claim approved' when 'rejected' then 'Business claim needs attention' else 'Business claim updated' end;
+    body_text := case new.status when 'approved' then 'Your business ownership claim was approved by a FeniX reviewer.' when 'rejected' then 'Your business ownership claim was rejected or needs changes.' else 'Your business ownership claim status changed to ' || new.status || '.' end;
+    link_text := '/directory/manage';
+  elsif tg_table_name = 'business_reviews' then
+    recipient_id := new.author_id;
+    title_text := case new.status when 'published' then 'Business review published' when 'rejected' then 'Business review not published' else 'Business review updated' end;
+    body_text := case new.status when 'published' then 'Your business review is now visible on the FeniX business profile.' when 'rejected' then 'Your business review was not published.' else 'Your business review status changed to ' || new.status || '.' end;
+    link_text := '/directory/' || new.business_id::text;
+  elsif tg_table_name = 'business_reports' then
+    recipient_id := new.reporter_id;
+    title_text := case new.status when 'resolved' then 'Trust report reviewed' when 'dismissed' then 'Trust report reviewed' else 'Trust report updated' end;
+    body_text := 'Your business listing report status changed to ' || new.status || '.';
+    link_text := '/directory/' || new.business_id::text;
+  else
+    return new;
+  end if;
+
+  insert into public.fenix_notifications (user_id, kind, title, body, href)
+  values (recipient_id, 'trust', title_text, body_text, link_text);
+  return new;
+end;
+$$;
+
+revoke all on function private.notify_trust_status_change() from public, anon, authenticated;
+
+drop trigger if exists business_claim_requests_notify_status on public.business_claim_requests;
+create trigger business_claim_requests_notify_status
+after update of status on public.business_claim_requests
+for each row execute function private.notify_trust_status_change();
+
+drop trigger if exists business_reviews_notify_status on public.business_reviews;
+create trigger business_reviews_notify_status
+after update of status on public.business_reviews
+for each row execute function private.notify_trust_status_change();
+
+drop trigger if exists business_reports_notify_status on public.business_reports;
+create trigger business_reports_notify_status
+after update of status on public.business_reports
+for each row execute function private.notify_trust_status_change();
