@@ -8,6 +8,7 @@ import {
   Lightbulb,
   List,
   MagnifyingGlass,
+  Bell,
   Moon,
   ShoppingBag,
   Rocket,
@@ -91,6 +92,12 @@ export default function Navbar() {
               {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
+            {user && (
+              <Link href="/notifications" aria-label="Notifications" className="flex h-11 w-11 items-center justify-center rounded-xl bg-black/[.03] text-slate-600 transition hover:bg-black/[.06] dark:bg-white/[.04] dark:text-white/70 dark:hover:bg-white/[.07]">
+                <Bell size={18} />
+              </Link>
+            )}
+
             {user ? (
               <>
                 {role === 'admin' && (
@@ -161,6 +168,13 @@ export default function Navbar() {
               <MagnifyingGlass size={18} />
               Ask FeniX
             </Link>
+
+            {user && (
+              <Link href="/notifications" onClick={close} className="flex min-h-[48px] items-center gap-3 rounded-xl px-3 text-sm font-medium text-slate-700 dark:text-white/70">
+                <Bell size={19} />
+                Notifications
+              </Link>
+            )}
 
             <div className="my-2 h-px bg-black/[.06] dark:bg-white/[.06]" />
 
