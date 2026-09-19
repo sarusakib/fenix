@@ -35,9 +35,9 @@ export async function searchDirectoryBusinesses(
   args: SearchArgs = {},
 ): Promise<{ data: DirectoryBusiness[]; error: Error | null }> {
   const supabase = createClient()
-  const query = args.query?.trim().slice(0, 120) || null
-  const category = args.category?.trim().slice(0, 80) || null
-  const upazila = args.upazila?.trim().slice(0, 80) || null
+  const query = args.query?.trim().slice(0, 120) || undefined
+  const category = args.category?.trim().slice(0, 80) || undefined
+  const upazila = args.upazila?.trim().slice(0, 80) || undefined
 
   const { data, error } = await supabase.rpc('search_directory_businesses', {
     p_query: query,
