@@ -52,8 +52,8 @@ export default function CommerceCheckoutPage() {
       setFeeLoading(true)
       const supabase = createClient()
       const { data, error: feeError } = await supabase.rpc('calculate_commerce_delivery_fee', {
-        p_district: district.trim() || undefined,
-        p_upazila: upazila.trim() || undefined,
+        p_district: district.trim(),
+        p_upazila: upazila.trim(),
         p_subtotal: subtotal,
       })
       if (active) {
