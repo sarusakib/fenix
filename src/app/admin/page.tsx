@@ -76,42 +76,36 @@ export default async function AdminPage() {
       body: 'Ownership claims, reviews, reports and verification review.',
       href: '/admin/trust',
       icon: ShieldCheck,
-      tone: 'teal',
     },
     {
       title: 'Commerce Operations',
       body: 'Seller approval, delivery rules, returns, reviews and order payment status.',
       href: '/commerce/admin',
       icon: ShoppingBag,
-      tone: 'navy',
     },
     {
       title: 'Investment Operations',
       body: 'Opportunity review, investor verification, documents, interests and reports.',
       href: '/admin/investment',
       icon: ChartLineUp,
-      tone: 'gold',
     },
     {
       title: 'Brain & Knowledge',
       body: 'Open Feni Brain and monitor the current source-aware experience.',
       href: '/guide',
       icon: Brain,
-      tone: 'teal',
     },
     {
       title: 'Public Experience',
       body: 'Check Directory and Invest exactly as members see them.',
       href: '/directory',
       icon: Storefront,
-      tone: 'navy',
     },
     {
-      title: 'Policy & Settings',
-      body: 'Keep public trust rules, privacy guidance and admin-facing notes visible.',
-      href: '/policy',
+      title: 'Platform Settings',
+      body: 'Central operating rules, release-safe configuration links and member settings.',
+      href: '/admin/settings',
       icon: GearSix,
-      tone: 'gold',
     },
   ] as const
 
@@ -147,16 +141,14 @@ export default async function AdminPage() {
         </div>
 
         <div className="mt-8">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[.18em] text-teal-700 dark:text-teal-300">Admin modules</p>
-              <h2 className="mt-2 text-2xl font-black sm:text-3xl">Operate by domain, not by scattered pages.</h2>
-            </div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.18em] text-teal-700 dark:text-teal-300">Admin modules</p>
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">Operate by domain, not by scattered pages.</h2>
           </div>
 
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {modules.map(({ title, body, href, icon: Icon, tone }) => (
-              <AdminLink key={title} href={href} title={title} description={body} icon={<Icon size={23} />} tone={tone} />
+            {modules.map(({ title, body, href, icon: Icon }) => (
+              <AdminLink key={title} href={href} title={title} description={body} icon={<Icon size={23} />} />
             ))}
           </div>
         </div>
@@ -185,25 +177,16 @@ function AdminLink({
   icon,
   title,
   description,
-  tone,
 }: {
   href: string
   icon: ReactNode
   title: string
   description: string
-  tone: 'teal' | 'navy' | 'gold'
 }) {
-  const toneClass =
-    tone === 'gold'
-      ? 'bg-amber-500/[.08] text-amber-700 dark:bg-amber-300/[.08] dark:text-amber-200'
-      : tone === 'navy'
-        ? 'bg-[#0b1736]/[.06] text-[#0b1736] dark:bg-white/[.05] dark:text-white'
-        : 'bg-teal-600/[.08] text-teal-700 dark:bg-teal-300/[.08] dark:text-teal-200'
-
   return (
     <Link href={href} className="fenix-interactive group rounded-[1.7rem] border border-black/[.07] bg-white/70 p-5 dark:border-white/[.07] dark:bg-white/[.03]">
       <div className="flex items-start justify-between gap-4">
-        <div className={'grid h-11 w-11 place-items-center rounded-2xl ' + toneClass}>{icon}</div>
+        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-teal-600/[.08] text-teal-700 dark:bg-teal-300/[.08] dark:text-teal-200">{icon}</div>
         <ArrowRight size={18} className="mt-2 opacity-25 transition group-hover:translate-x-1 group-hover:opacity-70" />
       </div>
       <h3 className="mt-5 text-lg font-black">{title}</h3>
