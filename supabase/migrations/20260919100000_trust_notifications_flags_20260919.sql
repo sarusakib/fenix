@@ -250,3 +250,39 @@ drop trigger if exists fenix_feature_flags_touch on public.fenix_feature_flags;
 create trigger fenix_feature_flags_touch
 before update on public.fenix_feature_flags
 for each row execute function public.touch_trust_updated_at();
+
+
+create or replace function public.sync_approved_business_claim()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $$
+begin
+  if new.status = 'approved' and (old.status is distinct from new.status) then
+    update public.businesses
+      set owner_id = new.claimant_id,
+          updated_at = timezone('utc', now())
+    where id = new.business_id
+      and (owner_id is null or owner_id = new.claimant_id);
+
+    update public.business_directory_profiles
+      set owner_claimed = true,
+          verification_level = case
+            when verification_level = 'fenix_verified' then verification_level
+            when verification_level in ('business_reviewed','identity_reviewed') then verification_level
+            else 'owner_claimed'
+          end,
+          updated_at = timezone('utc', now())
+    where business_id = new.business_id;
+  end if;
+  return new;
+end;
+$$;
+
+revoke execute on function public.sync_approved_business_claim() from public, anon, authenticated;
+
+drop trigger if exists business_claim_requests_sync_approved on public.business_claim_requests;
+create trigger business_claim_requests_sync_approved
+after update of status on public.business_claim_requests
+for each row execute function public.sync_approved_business_claim();
