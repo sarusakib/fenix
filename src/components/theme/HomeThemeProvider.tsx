@@ -41,8 +41,7 @@ function getSystemTheme(): ResolvedTheme {
 
 function getSavedTheme(): HomeTheme {
   try {
-    const saved =
-      window.localStorage.getItem(STORAGE_KEY)
+    const saved = window.localStorage.getItem(STORAGE_KEY)
 
     if (
       saved === 'light' ||
@@ -58,47 +57,55 @@ function getSavedTheme(): HomeTheme {
   return 'system'
 }
 
+function applyTheme(theme: ResolvedTheme) {
+  const root = document.documentElement
+  root.classList.toggle('dark', theme === 'dark')
+  root.dataset.homeTheme = theme
+  root.style.colorScheme = theme
+}
+
 export default function HomeThemeProvider({
   children,
 }: {
   children: React.ReactNode
 }) {
-  /*
-   * Keep the first render deterministic.
-   * The saved preference is restored after mount.
-   */
-  const [theme, setThemeState] =
-    useState<HomeTheme>('system')
-
-  const [systemTheme, setSystemTheme] =
-    useState<ResolvedTheme>('dark')
+  const [theme, setThemeState] = useState<HomeTheme>('system')
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>('dark')
 
   const resolvedTheme =
     theme === 'system'
       ? systemTheme
       : theme
 
-  const setTheme = useCallback(
-    (nextTheme: HomeTheme) => {
-      setThemeState(nextTheme)
+  const setTheme = useCallback((nextTheme: HomeTheme) => {
+    setThemeState(nextTheme)
 
-      try {
-        window.localStorage.setItem(
-          STORAGE_KEY,
-          nextTheme,
-        )
-      } catch {
-        // Ignore storage errors.
-      }
-    },
-    [],
-  )
+    const nextResolved =
+      nextTheme === 'system'
+        ? getSystemTheme()
+        : nextTheme
+
+    applyTheme(nextResolved)
+
+    try {
+      window.localStorage.setItem(STORAGE_KEY, nextTheme)
+    } catch {
+      // Preferences should never block navigation.
+    }
+  }, [])
 
   useEffect(() => {
     const savedTheme = getSavedTheme()
+    const nextSystemTheme = getSystemTheme()
 
     setThemeState(savedTheme)
-    setSystemTheme(getSystemTheme())
+    setSystemTheme(nextSystemTheme)
+
+    applyTheme(
+      savedTheme === 'system'
+        ? nextSystemTheme
+        : savedTheme,
+    )
   }, [])
 
   useEffect(() => {
@@ -107,11 +114,16 @@ export default function HomeThemeProvider({
     )
 
     const handleChange = () => {
-      setSystemTheme(
+      const nextSystemTheme: ResolvedTheme =
         mediaQuery.matches
           ? 'dark'
-          : 'light',
-      )
+          : 'light'
+
+      setSystemTheme(nextSystemTheme)
+
+      if (getSavedTheme() === 'system') {
+        applyTheme(nextSystemTheme)
+      }
     }
 
     handleChange()
@@ -130,19 +142,7 @@ export default function HomeThemeProvider({
   }, [])
 
   useEffect(() => {
-    const root =
-      document.documentElement
-
-    root.classList.toggle(
-      'dark',
-      resolvedTheme === 'dark',
-    )
-
-    root.dataset.homeTheme =
-      resolvedTheme
-
-    root.style.colorScheme =
-      resolvedTheme
+    applyTheme(resolvedTheme)
   }, [resolvedTheme])
 
   const value = useMemo(
@@ -162,8 +162,7 @@ export default function HomeThemeProvider({
 }
 
 export function useHomeTheme() {
-  const context =
-    useContext(ThemeContext)
+  const context = useContext(ThemeContext)
 
   if (!context) {
     throw new Error(
