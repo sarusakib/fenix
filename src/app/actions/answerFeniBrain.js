@@ -139,7 +139,8 @@ export async function answerFeniBrain(query) {
 
     return {
       success: true, answer, intent: retrieval.intent, locations: retrieval.locations,
-      childLocations: retrieval.childLocations, sources: retrieval.sources, grounded: true,
+      childLocations: retrieval.childLocations, sources: retrieval.sources,
+      grounded: Boolean((retrieval.results?.length || 0) > 0 || liveSources.length > 0),
       aiGenerated: true, model: MODEL, liveWebChecked, liveSources,
       confidence: Number(retrieval.retrievalConfidence ?? 0), results: retrieval.results,
       guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
