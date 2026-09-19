@@ -26,19 +26,22 @@ export default function BusinessTrustPanel({ businessId, businessPath }: { busin
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
 
-  async function load() {
-    const s = createClient()
-    const { data } = await s
-      .from('business_reviews')
-      .select('id,rating,title,body,status,created_at')
-      .eq('business_id', businessId)
-      .in('status', ['published'])
-      .order('created_at', { ascending: false })
-      .limit(20)
-    setReviews((data ?? []) as Review[])
-  }
-
-  useEffect(() => { void load() }, [businessId])
+  useEffect(() => {
+    let active = true
+    async function loadReviews() {
+      const s = createClient()
+      const { data } = await s
+        .from('business_reviews')
+        .select('id,rating,title,body,status,created_at')
+        .eq('business_id', businessId)
+        .in('status', ['published'])
+        .order('created_at', { ascending: false })
+        .limit(20)
+      if (active) setReviews((data ?? []) as Review[])
+    }
+    void loadReviews()
+    return () => { active = false }
+  }, [businessId])
 
   async function submitReview(event: FormEvent) {
     event.preventDefault()
@@ -67,7 +70,8 @@ export default function BusinessTrustPanel({ businessId, businessPath }: { busin
       setBody('')
       setRating(5)
       setShowReview(false)
-      await load()
+      const { data } = await createClient().from('business_reviews').select('id,rating,title,body,status,created_at').eq('business_id', businessId).in('status', ['published']).order('created_at', { ascending: false }).limit(20)
+      setReviews((data ?? []) as Review[])
     }
     setBusy(false)
   }
