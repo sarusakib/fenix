@@ -89,6 +89,20 @@ function publicLiveSources(sources) {
   }))
 }
 
+
+function brainMeta(cleanQuery, retrieval, plan) {
+  return {
+    language: detectLanguage(cleanQuery),
+    intentKey: detectFeniBrainIntent(cleanQuery),
+    budget: extractBudgetBDT(cleanQuery),
+    entities: extractEntities(cleanQuery),
+    evidence: buildEvidence(retrieval?.results),
+    recommendations: plan?.actions || [],
+    risks: [],
+    actions: plan?.actions || [],
+  }
+}
+
 function safeFallbackAnswer(retrieval) {
   const child = childLocationAnswer(retrieval.childLocations)
   if (child) return child
@@ -117,8 +131,7 @@ export async function answerFeniBrain(query) {
   if (!retrieval.results?.length && !retrieval.childLocations?.length && !liveSources.length && questionClass.local) {
     return {
       success: true,
-      language, intentKey, budget: budgetBDT, entities,
-      evidence: [], recommendations: plan.actions, risks: [], actions: plan.actions,
+      ...brainMeta(cleanQuery, retrieval, plan),
       answer: 'এই Feni-সংক্রান্ত প্রশ্নের জন্য বর্তমানে যথেষ্ট verified local তথ্য পাওয়া যায়নি। অনুমান করে ভুল তথ্য না দিয়ে নতুন verified source/data প্রয়োজন।',
       intent: retrieval.intent, locations: retrieval.locations, childLocations: retrieval.childLocations,
       sources: [], grounded: false, aiGenerated: false, liveWebChecked, liveSources: [], confidence: 0,
@@ -130,7 +143,7 @@ export async function answerFeniBrain(query) {
   const token = process.env.HUGGINGFACE_API_KEY
   if (!token) {
     return {
-      success: true, language, intentKey, budget: budgetBDT, entities, evidence: buildEvidence(retrieval.results), recommendations: plan.actions, risks: [], actions: plan.actions, answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
+      success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
       grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0), aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0), guidance: plan.actions,
@@ -167,7 +180,7 @@ export async function answerFeniBrain(query) {
     if (!answer) throw new Error('Empty Feni Brain response.')
 
     return {
-      success: true, answer, intent: retrieval.intent, locations: retrieval.locations,
+      success: true, ...brainMeta(cleanQuery, retrieval, plan), answer, intent: retrieval.intent, locations: retrieval.locations,
       childLocations: retrieval.childLocations, sources: retrieval.sources,
       grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0),
       aiGenerated: true, model: MODEL, liveWebChecked, liveSources: publicLiveSources(liveSources),
