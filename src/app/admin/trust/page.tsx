@@ -31,7 +31,7 @@ export default function AdminTrustPage() {
       if (!active) return
       if (adminError || !admin) { setAllowed(false); return }
       setAllowed(true)
-      const [c, r, b] = await Promise.all([
+      const [c, r, b, v] = await Promise.all([
         s.from(tables.claim).select('*').order('created_at', { ascending: false }).limit(50),
         s.from(tables.review).select('*').order('created_at', { ascending: false }).limit(50),
         s.from(tables.report).select('*').order('created_at', { ascending: false }).limit(50),
