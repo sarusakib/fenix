@@ -4,11 +4,25 @@ import AuthSync from '../components/AuthSync'
 import FenixFlow from './FenixFlow'
 import HomeThemeProvider from '../components/theme/HomeThemeProvider'
 import SiteBackground from '../components/layout/SiteBackground'
+import MobileDock from '../components/MobileDock'
 
 export const metadata = {
   title: 'FeniX | Feni Business Ecosystem',
   description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
+  applicationName: 'FeniX',
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#0B1736',
 }
 
 export default function RootLayout({
@@ -28,6 +42,8 @@ export default function RootLayout({
             <div className="relative z-10 min-h-screen">
               {children}
             </div>
+
+            <MobileDock />
           </HomeThemeProvider>
         </FenixFlow>
       </body>
