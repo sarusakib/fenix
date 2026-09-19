@@ -255,9 +255,9 @@ for each row execute function public.touch_trust_updated_at();
 create or replace function public.sync_approved_business_claim()
 returns trigger
 language plpgsql
-security invoker
+security definer
 set search_path = pg_catalog, public
-as $$
+as $
 begin
   if new.status = 'approved' and (old.status is distinct from new.status) then
     update public.businesses
