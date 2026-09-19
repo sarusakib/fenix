@@ -16,6 +16,15 @@ export const ROUTES = {
     start: '/start',
     invest: '/invest',
   },
+  directory: {
+    root: '/directory',
+    business: (slugOrId: string) => '/directory/' + encodeURIComponent(slugOrId),
+    map: '/directory/map',
+    suppliers: '/directory/suppliers',
+    join: '/directory/join',
+    manage: '/directory/manage',
+    claim: '/directory/claim',
+  },
   start: {
     root: '/start',
     idea: '/start/idea',
