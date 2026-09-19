@@ -343,3 +343,30 @@ drop trigger if exists business_reports_notify_status on public.business_reports
 create trigger business_reports_notify_status
 after update of status on public.business_reports
 for each row execute function private.notify_trust_status_change();
+
+
+create or replace function private.guard_business_claim_approval()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $$
+declare
+  current_owner uuid;
+begin
+  if new.status = 'approved' and old.status is distinct from new.status then
+    select owner_id into current_owner from public.businesses where id = new.business_id;
+    if current_owner is not null and current_owner <> new.claimant_id then
+      raise exception 'BUSINESS_ALREADY_OWNED';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function private.guard_business_claim_approval() from public, anon, authenticated;
+
+drop trigger if exists business_claim_requests_guard_approval on public.business_claim_requests;
+create trigger business_claim_requests_guard_approval
+before update of status on public.business_claim_requests
+for each row execute function private.guard_business_claim_approval();
