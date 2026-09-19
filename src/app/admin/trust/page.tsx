@@ -55,11 +55,14 @@ export default function AdminTrustPage() {
     setBusy(kind + id)
     setError('')
     const s = createClient()
+    const { data: auth } = await s.auth.getUser()
+    if (!auth.user) { setError('Admin session expired.'); setBusy(''); return }
+    const now = new Date().toISOString()
     const patch = kind === 'claim'
-      ? { status, reviewed_at: new Date().toISOString() }
+      ? { status, reviewed_by: auth.user.id, reviewed_at: now }
       : kind === 'review'
-        ? { status, reviewed_at: new Date().toISOString() }
-        : { status, resolved_at: ['resolved', 'dismissed'].includes(status) ? new Date().toISOString() : null }
+        ? { status, reviewed_by: auth.user.id, reviewed_at: now }
+        : { status, reviewer_id: auth.user.id, resolved_at: ['resolved', 'dismissed'].includes(status) ? now : null }
     const { error: e } = await s.from(tables[kind]).update(patch).eq('id', id)
     if (e) { setError('Update failed.'); setBusy(''); return }
     if (kind === 'claim') setClaims(v => v.map(x => x.id === id ? { ...x, ...patch } : x))
