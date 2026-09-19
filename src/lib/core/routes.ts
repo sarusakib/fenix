@@ -4,6 +4,8 @@
  */
 export const ROUTES = {
   home: '/',
+  services: '/services',
+  help: '/help',
   admin: '/admin',
   policy: '/policy',
   auth: {
