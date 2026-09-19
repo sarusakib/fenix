@@ -121,7 +121,7 @@ Deno.serve(async(req)=>{
   const report={
     checked:0,changed:0,unchanged:0,failed:0,published:0,embedded:0,
     embed_pending:0,embedding_backfill_embedded:0,embedding_backfill_failed:0,
-    embedding_backfill_blocked:false,embedding_backfill_remaining:0,
+    embedding_backfill_blocked:false,embedding_backfill_remaining:0,quarantined_sources:0,
   };
 
   for(const source of sources??[]) {
@@ -323,6 +323,43 @@ Deno.serve(async(req)=>{
       await db.from("fenix_brain_update_runs").update({
         completed_at:now,status:"failed",error:message,
       }).eq("id",runId);
+
+      const certificateFailure =
+        /unknownissuer|certificate|tls|ssl/i.test(message);
+
+      if (certificateFailure) {
+        const recent = await db
+          .from("fenix_brain_update_runs")
+          .select("status,error")
+          .eq("source_id", source.source_id)
+          .order("started_at", { ascending: false })
+          .limit(3);
+
+        const consecutiveCertificateFailures =
+          Array.isArray(recent.data) &&
+          recent.data.length >= 3 &&
+          recent.data.every(
+            (row) =>
+              row.status === "failed" &&
+              /unknownissuer|certificate|tls|ssl/i.test(String(row.error ?? "")),
+          );
+
+        if (consecutiveCertificateFailures) {
+          await db
+            .from("fenix_brain_source_refresh")
+            .update({
+              enabled: false,
+              next_refresh_at: new Date(Date.now() + 7 * 86400000).toISOString(),
+              last_checked_at: now,
+              last_error: "Automatic refresh quarantined after repeated TLS/certificate failures. Manual review required.",
+              updated_at: now,
+            })
+            .eq("source_id", source.source_id);
+
+          report.quarantined_sources++;
+          continue;
+        }
+      }
 
       await db.from("fenix_brain_source_refresh").update({
         next_refresh_at:retryAt(source.refresh_interval_hours),
