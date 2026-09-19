@@ -280,6 +280,8 @@ export default function LoginPage() {
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-[#05070b] text-white">
       <div className="pointer-events-none absolute inset-0 overflow-hidden lg:hidden">
+        {/* Intentional public responsive asset; keep existing rendering behavior. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/IMG_20260907_032431.png"
           alt=""
