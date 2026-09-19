@@ -1,6 +1,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+const MAX_EMBEDDING_BACKFILL = 12;
+
 const ALLOWED_HOSTS = new Set([
   "bangladesh.gov.bd","feni.gov.bd","bbs.feni.gov.bd","sadar.feni.gov.bd",
   "chhagalnaiya.feni.gov.bd","daganbhuiyan.feni.gov.bd","fulgazi.feni.gov.bd",
@@ -118,7 +120,8 @@ Deno.serve(async(req)=>{
 
   const report={
     checked:0,changed:0,unchanged:0,failed:0,published:0,embedded:0,
-    embed_pending:0,
+    embed_pending:0,embedding_backfill_embedded:0,embedding_backfill_failed:0,
+    embedding_backfill_blocked:false,embedding_backfill_remaining:0,
   };
 
   for(const source of sources??[]) {
@@ -327,6 +330,61 @@ Deno.serve(async(req)=>{
       }).eq("source_id",source.source_id);
     }
   }
+
+  if (!hf) {
+    report.embedding_backfill_blocked = true;
+  } else {
+    const activeDocs = await db
+      .from("fenix_brain_documents")
+      .select("id")
+      .eq("status", "active")
+      .limit(1000);
+
+    const activeDocumentIds = (activeDocs.data ?? []).map((row) => row.id).filter(Boolean);
+
+    if (activeDocumentIds.length) {
+      const pending = await db
+        .from("fenix_brain_chunks")
+        .select("id,content")
+        .eq("status", "active")
+        .is("embedding", null)
+        .in("document_id", activeDocumentIds)
+        .order("updated_at", { ascending: true })
+        .limit(MAX_EMBEDDING_BACKFILL);
+
+      for (const chunk of pending.data ?? []) {
+        try {
+          const vector = await embed(String(chunk.content ?? "").slice(0, 1200), hf);
+          const saved = await db
+            .from("fenix_brain_chunks")
+            .update({
+              embedding: vector,
+              embedding_model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", chunk.id)
+            .is("embedding", null);
+
+          if (saved.error) throw new Error(saved.error.message);
+          report.embedding_backfill_embedded++;
+        } catch (e) {
+          report.embedding_backfill_failed++;
+          console.error("Feni Brain embedding backfill failed:", {
+            chunk_id: chunk.id,
+            error: e instanceof Error ? e.message : "unknown",
+          });
+        }
+      }
+    }
+  }
+
+  const remaining = await db
+    .from("fenix_brain_chunks")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "active")
+    .is("embedding", null);
+
+  report.embedding_backfill_remaining = Number(remaining.count ?? 0);
 
   return Response.json(report);
 });
