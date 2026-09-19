@@ -97,8 +97,6 @@ export default function InvestmentManagerPage() {
       setMessage('Opportunity submitted for FeniX review.')
       window.history.replaceState({}, '', window.location.pathname)
     }
-  }
-
   }, [selected])
 
   useEffect(() => {
