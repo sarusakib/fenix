@@ -976,6 +976,70 @@ export type Database = {
           },
         ]
       }
+      business_verification_requests: {
+        Row: {
+          business_id: string
+          created_at: string
+          evidence_note: string
+          id: string
+          requester_id: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          verification_type: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          evidence_note?: string
+          id?: string
+          requester_id: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          verification_type: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          evidence_note?: string
+          id?: string
+          requester_id?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          verification_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_verification_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           category: string | null
