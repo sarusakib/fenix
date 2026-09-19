@@ -25,6 +25,7 @@ import {
   getDirectionsUrl,
   type DirectoryDetail,
 } from '@/lib/directory'
+import BusinessTrustPanel from '@/components/directory/BusinessTrustPanel'
 
 type ProductPreview = {
   id: string
@@ -379,6 +380,10 @@ export default function DirectoryBusinessPage() {
             </aside>
           </div>
         </section>
+        <BusinessTrustPanel
+          businessId={business.id}
+          businessPath={'/directory/' + encodeURIComponent(business.slug || business.id)}
+        />
       </div>
     </main>
   )
