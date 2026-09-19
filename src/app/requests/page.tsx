@@ -1,0 +1,18 @@
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { ArrowLeft, ArrowRight, ClipboardText } from '@phosphor-icons/react/dist/ssr'
+import Navbar from '@/components/Navbar'
+import { createClient } from '@/utils/supabase/server'
+
+export const dynamic='force-dynamic'
+
+export default async function RequestsPage(){
+  const s=await createClient()
+  const {data:auth}=await s.auth.getUser()
+  if(!auth.user) redirect('/login?next=/requests')
+  const {data:items}=await s.from('investment_interests').select('id,opportunity_id,offered_amount,message,status,owner_note,created_at,updated_at').eq('investor_id',auth.user.id).order('updated_at',{ascending:false}).limit(100)
+  const ids=[...(items??[])].map(i=>i.opportunity_id)
+  let names:Record<string,string>={}
+  if(ids.length){const {data:ops}=await s.from('investment_opportunities').select('id,title_bn,title_en').in('id',ids);names=Object.fromEntries((ops??[]).map(o=>[o.id,o.title_bn||o.title_en||'Investment opportunity']))}
+  return <main className="min-h-dvh bg-[#f7faf9] text-[#0b1736] dark:bg-[#030506] dark:text-white"><Navbar/><section className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8"><Link href="/dashboard" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-black/10 bg-white/80 px-4 text-sm font-bold dark:border-white/10 dark:bg-white/[.04]"><ArrowLeft size={17}/> Account</Link><div className="mt-7"><p className="text-xs font-bold uppercase tracking-[.16em] text-[#008080]">Requests</p><h1 className="mt-2 text-3xl font-black sm:text-5xl">Your investment requests</h1><p className="mt-3 text-sm leading-7 opacity-60">Track interest you submitted to investment opportunities. This is a negotiation/workflow record, not a completed financial transaction.</p></div><div className="mt-7 space-y-3">{items?.length?items.map(item=><article key={item.id} className="rounded-3xl border border-black/10 bg-white/85 p-5 dark:border-white/10 dark:bg-white/[.045]"><div className="flex items-start justify-between gap-3"><div className="flex gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#008080]/[.08] text-[#008080]"><ClipboardText size={20}/></div><div><h2 className="font-black">{names[item.opportunity_id]}</h2><p className="mt-1 text-xs opacity-45">{item.status} · Updated {new Date(item.updated_at).toLocaleDateString('en-BD')}</p></div></div></div><div className="mt-4 grid gap-3 sm:grid-cols-3"><div><p className="text-xs opacity-45">Offered amount</p><p className="mt-1 font-black">BDT {Number(item.offered_amount||0).toLocaleString('en-BD')}</p></div><div className="sm:col-span-2"><p className="text-xs opacity-45">Message</p><p className="mt-1 text-sm leading-6 opacity-65">{item.message||'No message provided.'}</p></div></div>{item.owner_note&&<div className="mt-4 rounded-xl bg-black/[.025] p-3 text-sm leading-6 dark:bg-white/[.03]"><b>Owner note:</b> {item.owner_note}</div>}<Link href={'/invest/'+item.opportunity_id} className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl border border-black/10 px-3 text-xs font-bold dark:border-white/10">Open opportunity <ArrowRight size={15}/></Link></article>):<div className="rounded-3xl border border-dashed border-black/15 bg-white/70 p-10 text-center dark:border-white/10 dark:bg-white/[.03]"><ClipboardText size={30} className="mx-auto opacity-35"/><h2 className="mt-4 text-xl font-black">No requests yet</h2><p className="mt-2 text-sm opacity-50">Investment interests you submit will appear here.</p><Link href="/invest" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#008080] px-4 text-sm font-bold text-white">Browse Invest <ArrowRight size={16}/></Link></div>}</div></section></main>
+}
