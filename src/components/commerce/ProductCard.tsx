@@ -37,7 +37,6 @@ export default function ProductCard({
       <Link href={`/product/${encodeURIComponent(product.slug)}`} className="block">
         <div className="aspect-[4/3] overflow-hidden bg-black/[0.035] dark:bg-white/[0.04]">
           {product.imageUrl ? (
-            {/* Image URLs are public product media; keep card rendering lightweight. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={product.imageUrl}
