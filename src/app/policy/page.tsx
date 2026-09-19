@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
-import { ShieldCheck, ArrowLeft, CheckCircle } from '@phosphor-icons/react'
+import { ShieldCheck, ArrowLeft, CheckCircle } from '@phosphor-icons/react/dist/ssr'
 import { getFeniXNetworkPolicySummary } from '../../lib/fenixNetwork'
 
 export const metadata = {
