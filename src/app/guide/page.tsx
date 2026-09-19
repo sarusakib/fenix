@@ -10,7 +10,7 @@ import {
   GlobeHemisphereWest,
   ShieldCheck,
 } from '@phosphor-icons/react'
-import Link from 'next/link'
+import Link from 'next/link'\nimport { ROUTES } from '../../lib/core/routes'
 
 import { answerFeniBrain } from '../actions/answerFeniBrain'
 
@@ -76,7 +76,7 @@ function FeniBrainGuide() {
   const [liveSources, setLiveSources] = useState<LiveSource[]>([])
   const [intent, setIntent] = useState('')
   const [answer, setAnswer] = useState('')
-  const [confidence, setConfidence] = useState(0)
+  const [confidence, setConfidence] = useState(0)\n  const [guidance, setGuidance] = useState<BrainAnswer['guidance']>([])\n  const [guidanceTitle, setGuidanceTitle] = useState('পরের ধাপ')\n  const [guidanceText, setGuidanceText] = useState('')\n  const [safetyNote, setSafetyNote] = useState<string | null>(null)
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -103,7 +103,7 @@ function FeniBrainGuide() {
     setLiveSources([])
     setIntent('')
     setAnswer('')
-    setConfidence(0)
+    setConfidence(0)\n    setGuidance([])\n    setGuidanceTitle('পরের ধাপ')\n    setGuidanceText('')\n    setSafetyNote(null)
 
     try {
       const result = (await answerFeniBrain(nextQuery)) as BrainAnswer
@@ -125,7 +125,7 @@ function FeniBrainGuide() {
       setLiveSources(nextLiveSources)
       setAnswer(result.answer || '')
       setIntent(result.intent || 'general_feni')
-      setConfidence(nextConfidence)
+      setConfidence(nextConfidence)\n      setGuidance(result.guidance || [])\n      setGuidanceTitle(result.guidanceTitle || 'পরের ধাপ')\n      setGuidanceText(result.guidanceText || '')\n      setSafetyNote(result.safetyNote || null)
 
       if (result.liveWebChecked && nextLiveSources.length) {
         setStatus('Stored Feni data + official live web data মিলিয়ে উত্তর তৈরি হয়েছে।')
@@ -231,7 +231,41 @@ function FeniBrainGuide() {
                     </span>
                   )}
 
-                  {liveSources.length > 0 && (
+                  {safetyNote && (
+              <div className="mt-5 rounded-2xl border border-amber-300/20 bg-amber-500/[0.07] p-4 text-sm leading-6 text-amber-800 dark:text-amber-100">
+                <strong className="font-bold">Safety note:</strong> {safetyNote}
+              </div>
+            )}
+
+            {guidance && guidance.length > 0 && (
+              <div className="mt-6 rounded-3xl border border-white/[0.07] bg-white/[0.025] p-5">
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#72ddda]">
+                  {guidanceTitle}
+                </div>
+                {guidanceText && (
+                  <p className="mt-2 text-sm leading-6 text-white/55">{guidanceText}</p>
+                )}
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {guidance.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="rounded-2xl border border-white/[0.08] bg-black/20 p-4 transition hover:bg-white/[0.06]"
+                    >
+                      <div className="text-sm font-bold text-white">{item.label}</div>
+                      <div className="mt-1 text-xs leading-5 text-white/45">{item.reason}</div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-white/35">
+              <span>FeniX follows a source-first, privacy-aware AI policy.</span>
+              <Link href={ROUTES.policy} className="text-[#72ddda] hover:underline">Read FeniX Policy</Link>
+            </div>
+
+            {liveSources.length > 0 && (
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-[#72ddda]/15 bg-[#72ddda]/[0.06] px-2.5 py-1 text-[11px] font-semibold text-[#72ddda]">
                       <GlobeHemisphereWest size={13} />
                       Live checked

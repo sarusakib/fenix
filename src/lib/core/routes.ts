@@ -82,7 +82,7 @@ export const ROUTES = {
   },
 } as const
 
-export type RouteRegistry = typeof ROUTES
+export type RouteRegistry = typeof ROUTES\nexport type FeniXNetworkNodeKey = keyof typeof ROUTES
 export type CoreRoute = keyof RouteRegistry['core']
 export type StartRoute = keyof RouteRegistry['start']
 export type InvestmentRoute = keyof RouteRegistry['investment']
