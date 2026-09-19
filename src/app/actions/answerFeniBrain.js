@@ -191,7 +191,7 @@ export async function answerFeniBrain(query) {
   } catch (error) {
     console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status })
     return {
-      success: true, answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
+      success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
       grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0), aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0),
