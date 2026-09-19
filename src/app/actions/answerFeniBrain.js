@@ -2,11 +2,14 @@
 
 import { HfInference } from '@huggingface/inference'
 import { searchFeniBrain } from './searchFeniBrain'
-import { fetchLiveFeniSources, shouldUseLiveWeb } from '../../lib/feniBrainLiveWeb'\nimport { buildFeniBrainPlan, buildFeniXPolicyPrompt } from '../../lib/fenixNetwork'\nimport { classifyFeniBrainQuestion } from '../../lib/feniBrainQuery'
+import { fetchLiveFeniSources, shouldUseLiveWeb } from '../../lib/feniBrainLiveWeb'
+import { buildFeniBrainPlan, buildFeniXPolicyPrompt } from '../../lib/fenixNetwork'
+import { classifyFeniBrainQuestion } from '../../lib/feniBrainQuery'
 
 const MODEL = process.env.FENI_BRAIN_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
 const MAX_QUERY_LENGTH = 120
-const MAX_CONTEXT_LENGTH = 12000\nconst MAX_ANSWER_TOKENS = 900
+const MAX_CONTEXT_LENGTH = 12000
+const MAX_ANSWER_TOKENS = 900
 
 function clean(value) {
   return typeof value === 'string' ? value.trim().slice(0, MAX_QUERY_LENGTH) : ''
@@ -81,13 +84,17 @@ export async function answerFeniBrain(query) {
 
   const liveWebChecked = shouldUseLiveWeb(cleanQuery)
   const liveSources = liveWebChecked ? await fetchLiveFeniSources(retrieval.sources) : []
+  const questionClass = classifyFeniBrainQuestion(cleanQuery)
+  const plan = buildFeniBrainPlan(cleanQuery, retrieval.intent)
 
-  if (!retrieval.results?.length && !retrieval.childLocations?.length && !liveSources.length) {
+  if (!retrieval.results?.length && !retrieval.childLocations?.length && !liveSources.length && questionClass.local) {
     return {
       success: true,
-      answer: 'এই প্রশ্নের জন্য Feni Brain-এর verified knowledge base-এ যথেষ্ট তথ্য পাওয়া যায়নি। প্রয়োজন হলে নতুন verified source যোগ করতে হবে।',
+      answer: 'এই Feni-সংক্রান্ত প্রশ্নের জন্য বর্তমানে যথেষ্ট verified local তথ্য পাওয়া যায়নি। অনুমান করে ভুল তথ্য না দিয়ে নতুন verified source/data প্রয়োজন।',
       intent: retrieval.intent, locations: retrieval.locations, childLocations: retrieval.childLocations,
-      sources: [], grounded: false, liveWebChecked, liveSources: [], confidence: 0,
+      sources: [], grounded: false, aiGenerated: false, liveWebChecked, liveSources: [], confidence: 0,
+      guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
+      safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
     }
   }
 
@@ -97,7 +104,9 @@ export async function answerFeniBrain(query) {
       success: true, answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
       grounded: true, aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources,
-      confidence: Number(retrieval.retrievalConfidence ?? 0),
+      confidence: Number(retrieval.retrievalConfidence ?? 0), guidance: plan.actions,
+      guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
+      safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
     }
   }
 
@@ -132,7 +141,9 @@ export async function answerFeniBrain(query) {
       success: true, answer, intent: retrieval.intent, locations: retrieval.locations,
       childLocations: retrieval.childLocations, sources: retrieval.sources, grounded: true,
       aiGenerated: true, model: MODEL, liveWebChecked, liveSources,
-      confidence: Number(retrieval.retrievalConfidence ?? 0), results: retrieval.results,\n      guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,\n      safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
+      confidence: Number(retrieval.retrievalConfidence ?? 0), results: retrieval.results,
+      guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
+      safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
     }
   } catch (error) {
     console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status })
@@ -141,6 +152,8 @@ export async function answerFeniBrain(query) {
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
       grounded: true, aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources,
       confidence: Number(retrieval.retrievalConfidence ?? 0),
+      guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
+      safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
     }
   }
 }
