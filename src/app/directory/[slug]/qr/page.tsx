@@ -35,6 +35,8 @@ export default function BusinessQrPage() {
           <p className="mt-5 text-xs font-bold uppercase tracking-[.18em] text-[#008080]">FeniX Business Identity</p>
           <h1 className="mt-2 text-3xl font-black">{getBusinessDisplayName(business)}</h1>
           <div className="mx-auto mt-6 max-w-xs rounded-2xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[.04]">
+            {/* Intentional third-party QR renderer; only the public profile URL is sent. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=' + encodeURIComponent(url)} alt="QR code for this public FeniX business identity" className="mx-auto h-64 w-64 max-w-full rounded-xl" referrerPolicy="no-referrer" />
           </div>
           <div className="mt-5 flex items-center justify-center gap-2 text-xs opacity-50"><ShieldCheck size={16} /> The QR encodes only this public profile URL.</div>
