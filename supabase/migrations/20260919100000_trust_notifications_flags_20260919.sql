@@ -407,3 +407,37 @@ begin
   end if;
 end
 $$;
+
+
+drop policy if exists business_reviews_own_update_pending on public.business_reviews;
+drop policy if exists business_reviews_admin_update on public.business_reviews;
+
+create policy business_reviews_update
+  on public.business_reviews
+  for update to authenticated
+  using (
+    public.is_fenix_admin()
+    or ((select auth.uid()) = author_id and status = 'pending')
+  )
+  with check (
+    public.is_fenix_admin()
+    or ((select auth.uid()) = author_id and status = 'pending')
+  );
+
+drop policy if exists fenix_feature_flags_admin_write on public.fenix_feature_flags;
+
+create policy fenix_feature_flags_admin_insert
+  on public.fenix_feature_flags
+  for insert to authenticated
+  with check (public.is_fenix_admin());
+
+create policy fenix_feature_flags_admin_update
+  on public.fenix_feature_flags
+  for update to authenticated
+  using (public.is_fenix_admin())
+  with check (public.is_fenix_admin());
+
+create policy fenix_feature_flags_admin_delete
+  on public.fenix_feature_flags
+  for delete to authenticated
+  using (public.is_fenix_admin());
