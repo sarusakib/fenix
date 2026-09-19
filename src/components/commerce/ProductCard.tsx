@@ -37,13 +37,15 @@ export default function ProductCard({
       <Link href={`/product/${encodeURIComponent(product.slug)}`} className="block">
         <div className="aspect-[4/3] overflow-hidden bg-black/[0.035] dark:bg-white/[0.04]">
           {product.imageUrl ? (
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
               src={product.imageUrl}
               alt={title}
               className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
               loading="lazy"
-            />
+              />
+            </>
           ) : (
             <div className="flex h-full items-center justify-center text-[#008080]/60 dark:text-teal-200/50">
               <ShoppingCart size={48} weight="duotone" />
