@@ -38,7 +38,11 @@ export default async function CommerceProductPage({ params }: Props) {
         <Link href="/commerce" className="inline-flex items-center gap-2 rounded-xl border border-[#0b1736]/10 bg-white/70 px-3.5 py-2 text-sm dark:border-white/10 dark:bg-white/[0.045]"><ArrowLeft size={17} /> Commerce</Link>
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <div className="overflow-hidden rounded-[2rem] border border-[#0b1736]/10 bg-white/70 dark:border-white/10 dark:bg-white/[0.045]"><div className="aspect-square bg-black/[0.035] dark:bg-white/[0.04]">
-            {imageUrl ? <>\n            {/* Intentional public commerce image URL. */}\n            {/* eslint-disable-next-line @next/next/no-img-element */}\n            <img src={imageUrl} alt={product.image_alt_bn || product.image_alt_en || title} className="h-full w-full object-cover" />\n          </> : <div className="flex h-full items-center justify-center text-[#008080]/50"><ShoppingCart size={72} weight="duotone" /></div>}
+            {imageUrl ? <>
+            {/* Intentional public commerce image URL. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imageUrl} alt={product.image_alt_bn || product.image_alt_en || title} className="h-full w-full object-cover" />
+          </> : <div className="flex h-full items-center justify-center text-[#008080]/50"><ShoppingCart size={72} weight="duotone" /></div>}
           </div></div>
           <article className="flex flex-col justify-center">
             <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#008080]/[0.07] px-3 py-1.5 text-xs font-bold text-[#007373] dark:text-teal-200"><ShieldCheck size={15} /> {product.vendor_is_verified ? 'Verified seller' : 'Approved seller'}</div>
