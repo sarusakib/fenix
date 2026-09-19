@@ -25,6 +25,7 @@ export const ROUTES = {
     join: '/directory/join',
     manage: '/directory/manage',
     claim: '/directory/claim',
+    verify: '/directory/verify',
     qr: (slugOrId: string) => '/directory/' + encodeURIComponent(slugOrId) + '/qr',
   },
   start: {
