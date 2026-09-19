@@ -14,8 +14,6 @@ const tables = {
   report: 'business_reports',
 } as const
 
-actionButton
-
 export default function AdminTrustPage() {
   const [allowed, setAllowed] = useState<boolean | null>(null)
   const [claims, setClaims] = useState<Row[]>([])
