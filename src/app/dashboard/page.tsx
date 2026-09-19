@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowRight, Bell, Buildings, ChartLineUp, GearSix, Rocket, ShieldCheck, Storefront } from '@phosphor-icons/react/dist/ssr'
+import { ArrowRight, Bell, Buildings, ChartLineUp, ChatCircleText, ClipboardText, Handshake, GearSix, Rocket, ShieldCheck, Storefront } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
 
@@ -56,6 +56,9 @@ export default async function DashboardPage() {
             ['/invest/dashboard','Investment dashboard','Track your investment interests and deal workflow.',ChartLineUp],
             ['/commerce/orders','Commerce orders','Review your local commerce orders.',Storefront],
             ['/notifications','Notifications','See trust, account and ecosystem activity.',Bell],
+            ['/requests','Investment requests','Track your investment interests and review status.',ClipboardText],
+            ['/messages','Messages','Open your protected investment conversations.',ChatCircleText],
+            ['/deals','Deals','View recorded investment deal workflow.',Handshake],
             ['/dashboard/settings','Account settings','Review account and privacy guidance.',GearSix],
           ].map(([href,title,body,Icon]) => (
             <Link key={String(href)} href={String(href)} className="group rounded-3xl border border-black/10 bg-white/75 p-5 dark:border-white/10 dark:bg-white/[.04]">
