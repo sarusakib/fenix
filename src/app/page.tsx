@@ -1,22 +1,23 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import Link from 'next/link'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
   Brain,
-  Buildings,
   CheckCircle,
   Compass,
   Lightbulb,
   MagnifyingGlass,
+  MapPin,
   Rocket,
   ShieldCheck,
   ShoppingBag,
   Sparkle,
   Storefront,
   TrendUp,
-  Users,
+  UsersThree,
 } from '@phosphor-icons/react'
 import Navbar from '../components/Navbar'
 import ServiceHub from '../components/ServiceHub'
@@ -29,220 +30,153 @@ const prompts = [
 ]
 
 const quickMoves = [
-  {
-    title: 'Start',
-    body: 'Turn an idea into a practical local business journey.',
-    href: '/start',
-    icon: Rocket,
-    eyebrow: 'BUILD',
-  },
-  {
-    title: 'Invest',
-    body: 'Explore opportunities with context and due-diligence workflow.',
-    href: '/invest',
-    icon: TrendUp,
-    eyebrow: 'INVEST',
-  },
-  {
-    title: 'Connect',
-    body: 'Find local businesses, suppliers and useful services.',
-    href: '/directory',
-    icon: Storefront,
-    eyebrow: 'CONNECT',
-  },
-  {
-    title: 'Shop',
-    body: 'Discover published products from approved local sellers.',
-    href: '/commerce',
-    icon: ShoppingBag,
-    eyebrow: 'COMMERCE',
-  },
+  { title: 'Start', body: 'Turn an idea into a practical local business journey.', href: '/start', icon: Rocket, eyebrow: 'BUILD' },
+  { title: 'Invest', body: 'Explore opportunities with context and due-diligence workflow.', href: '/invest', icon: TrendUp, eyebrow: 'INVEST' },
+  { title: 'Connect', body: 'Find local businesses, suppliers and useful services.', href: '/directory', icon: Storefront, eyebrow: 'CONNECT' },
+  { title: 'Shop', body: 'Discover published products from local sellers.', href: '/commerce', icon: ShoppingBag, eyebrow: 'SHOP' },
 ]
 
 export default function HomePage() {
   const router = useRouter()
   const [search, setSearch] = useState('')
-  const query = useMemo(() => search.trim().slice(0, 120), [search])
 
-  const runSearch = () => {
+  const goBrain = () => {
+    const query = search.trim().slice(0, 120)
     router.push(query ? '/guide?q=' + encodeURIComponent(query) : '/guide')
   }
 
-  const runPrompt = (value: string) => {
+  const choosePrompt = (value: string) => {
     setSearch(value)
     router.push('/guide?q=' + encodeURIComponent(value))
   }
 
   return (
-    <main className="fenix-shell min-h-screen overflow-x-clip">
-      <div className="fenix-orb left-[3%] top-32 h-72 w-72 bg-teal-400/[.08]" />
-      <div className="fenix-orb right-[4%] top-[28%] h-80 w-80 bg-amber-300/[.06]" />
-
+    <main className="fenix-shell min-h-dvh overflow-x-clip">
+      <div className="fenix-orb left-[3%] top-32 h-64 w-64 bg-teal-400/[.07]" />
+      <div className="fenix-orb right-[4%] top-[28%] h-72 w-72 bg-amber-300/[.055]" />
       <Navbar />
 
-      <section className="mx-auto w-full max-w-7xl px-4 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8 lg:pt-20">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.04fr_.96fr]">
-          <div className="animate-[fenix-fade-up_.6s_ease-out]">
-            <div className="inline-flex items-center gap-2 rounded-full bg-teal-600/[.07] px-3.5 py-2 text-[10px] font-bold uppercase tracking-[.19em] text-teal-800 dark:bg-teal-300/[.07] dark:text-teal-100">
-              <Sparkle size={13} weight="fill" />
-              Feni Business Ecosystem
+      <section className="mx-auto w-full max-w-7xl px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8 lg:pt-20">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_.95fr]">
+          <div className="fenix-reveal">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--fx-primary-soft)] px-3.5 py-2 text-[10px] font-black uppercase tracking-[.19em] text-[var(--fx-primary-strong)]">
+              <Sparkle size={13} weight="fill" /> Feni Business Ecosystem
             </div>
 
-            <h1 className="mt-6 max-w-3xl text-balance text-[3.35rem] font-semibold leading-[.95] tracking-[-.07em] text-[#0b1736] sm:text-6xl lg:text-[5.35rem] dark:text-white">
-              Build.
-              <br />
-              Connect.
-              <br />
-              <span className="text-teal-700 dark:text-teal-300">Grow.</span>
+            <h1 className="mt-6 max-w-3xl text-balance text-[3.2rem] font-black leading-[.94] tracking-[-.075em] sm:text-6xl lg:text-[5.35rem]">
+              Build.<br />Connect.<br /><span className="text-[var(--fx-primary-strong)]">Grow.</span>
             </h1>
 
-            <p className="mt-6 max-w-xl text-base leading-8 text-slate-600 dark:text-white/55">
-              One calm place for Feni business discovery, local commerce, investment,
-              practical guidance and the people behind them.
+            <p className="mt-6 max-w-xl text-base leading-8 text-[var(--fx-muted)] sm:text-lg">
+              One calm place for Feni business discovery, local commerce, investment and practical guidance.
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-2">
-              {[
-                ['01', 'DISCOVER'],
-                ['02', 'CONNECT'],
-                ['03', 'ACT'],
-              ].map(([n, label]) => (
-                <span key={n} className="rounded-full bg-black/[.025] px-3 py-2 text-[10px] font-bold tracking-[.15em] text-slate-500 dark:bg-white/[.035] dark:text-white/40">
-                  {n} · {label}
+            <div className="mt-6 flex flex-wrap gap-2">
+              {['DISCOVER', 'UNDERSTAND', 'VERIFY', 'ACT'].map((step, index) => (
+                <span key={step} className="rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-2 text-[9px] font-black uppercase tracking-[.14em] text-[var(--fx-muted)]">
+                  {String(index + 1).padStart(2, '0')} · {step}
                 </span>
               ))}
             </div>
           </div>
 
-          <div className="animate-[fenix-fade-up_.75s_ease-out]">
-            <div className="fenix-surface-strong fenix-glow rounded-[2.1rem] p-3 sm:p-4">
-              <div className="rounded-[1.7rem] bg-[#0b1736] p-5 text-white shadow-2xl sm:p-7 dark:bg-[#071019]">
-                <div className="flex items-start justify-between gap-4">
+          <div className="fenix-reveal lg:pl-3" style={{ animationDelay: '100ms' }}>
+            <div className="fenix-surface-strong rounded-[2.1rem] p-3 sm:p-4">
+              <div className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-bg)] p-5 sm:p-6">
+                <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[.2em] text-teal-300/80">FeniX Brain Search</p>
-                    <h2 className="mt-2 text-2xl font-semibold tracking-[-.03em]">What do you want to do?</h2>
-                    <p className="mt-2 text-xs leading-5 text-white/40">Bangla · English · Banglish · local names</p>
+                    <p className="text-[10px] font-black uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">Feni Brain</p>
+                    <h2 className="mt-2 text-2xl font-black tracking-[-.04em]">What do you want to do?</h2>
                   </div>
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-teal-300/10 text-teal-200">
-                    <Brain size={22} weight="duotone" />
-                  </div>
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><Brain size={21} weight="duotone" /></span>
                 </div>
 
-                <div className="mt-6 rounded-2xl bg-white/[.07] p-2 ring-1 ring-white/[.09]">
-                  <div className="flex items-center gap-2 rounded-xl bg-white/[.045] px-3">
-                    <MagnifyingGlass size={18} className="shrink-0 text-white/40" />
-                    <input
-                      value={search}
-                      onChange={(event) => setSearch(event.target.value.slice(0, 120))}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') runSearch()
-                      }}
-                      aria-label="Search FeniX"
-                      placeholder="Search or ask anything about Feni…"
-                      className="min-w-0 flex-1 bg-transparent py-4 text-sm text-white outline-none placeholder:text-white/28"
-                    />
-                    <button
-                      type="button"
-                      onClick={runSearch}
-                      className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-teal-400 text-[#062324] transition hover:bg-teal-300 active:scale-[.98]"
-                      aria-label="Search"
-                    >
-                      <ArrowRight size={18} weight="bold" />
-                    </button>
-                  </div>
+                <div className="mt-5 flex items-center gap-2 rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-2">
+                  <MagnifyingGlass size={20} className="ml-2 shrink-0 text-[var(--fx-muted)]" />
+                  <input
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    onKeyDown={(event) => { if (event.key === 'Enter') goBrain() }}
+                    className="min-w-0 flex-1 bg-transparent px-1 py-3 text-sm outline-none placeholder:text-[var(--fx-muted)]"
+                    placeholder="Ask in Bangla, English or Banglish…"
+                    aria-label="Ask Feni Brain"
+                    maxLength={120}
+                  />
+                  <button type="button" onClick={goBrain} className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[var(--fx-primary-strong)] text-white" aria-label="Search Feni Brain">
+                    <ArrowRight size={18} />
+                  </button>
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap gap-2">
                   {prompts.map((prompt) => (
-                    <button
-                      key={prompt}
-                      type="button"
-                      onClick={() => runPrompt(prompt)}
-                      className="rounded-full bg-white/[.055] px-3 py-2 text-left text-[11px] text-white/65 transition hover:bg-white/[.11] hover:text-white"
-                    >
+                    <button key={prompt} type="button" onClick={() => choosePrompt(prompt)} className="rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-2 text-[10px] font-semibold text-[var(--fx-muted)] transition hover:border-[var(--fx-primary)]/25 hover:text-[var(--fx-text)]">
                       {prompt}
                     </button>
                   ))}
                 </div>
               </div>
-            </div>
 
-            <div className="mt-4 flex items-center gap-2 px-2 text-xs text-slate-500 dark:text-white/35">
-              <ShieldCheck size={16} className="text-teal-700 dark:text-teal-300" />
-              Source-aware guidance · clear uncertainty · safer defaults
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-teal-700 dark:text-teal-300">Quick moves</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#0b1736] sm:text-3xl dark:text-white">Start without a giant menu.</h2>
-          </div>
-          <button type="button" onClick={() => router.push('/services')} className="hidden min-h-10 items-center gap-2 rounded-xl bg-black/[.035] px-3.5 text-xs font-bold sm:inline-flex dark:bg-white/[.04]">
-            All services <ArrowRight size={15} />
-          </button>
-        </div>
-
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {quickMoves.map(({ title, body, href, icon: Icon, eyebrow }) => (
-            <button
-              key={title}
-              type="button"
-              onClick={() => router.push(href)}
-              className="fenix-surface fenix-interactive group rounded-[1.55rem] p-5 text-left"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600/[.08] text-teal-700 dark:bg-teal-300/[.08] dark:text-teal-200">
-                  <Icon size={20} weight="duotone" />
-                </span>
-                <span className="text-[9px] font-bold tracking-[.16em] text-slate-400 dark:text-white/30">{eyebrow}</span>
+              <div className="grid gap-2 p-1 pt-3 sm:grid-cols-3 sm:p-2">
+                <TrustMini icon={<CheckCircle size={18} />} title="Clear trust" body="Verification has a defined meaning." />
+                <TrustMini icon={<MapPin size={18} />} title="Local context" body="Place matters in Feni." />
+                <TrustMini icon={<UsersThree size={18} />} title="Connected" body="One account, many paths." />
               </div>
-              <h3 className="mt-6 text-lg font-black text-[#0b1736] dark:text-white">{title}</h3>
-              <p className="mt-2 min-h-12 text-sm leading-6 text-slate-600 dark:text-white/45">{body}</p>
-              <span className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-teal-700 dark:text-teal-200">Open <ArrowRight size={14} className="transition group-hover:translate-x-1" /></span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="fenix-surface rounded-[2rem] p-6 sm:p-8">
-          <ServiceHub compact />
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            [Users, 'One account', 'A connected identity across your FeniX activity.'],
-            [Buildings, 'One local graph', 'Businesses, people, places and opportunities can connect over time.'],
-            [Compass, 'One smart layer', 'Feni Brain turns questions into clearer next steps without hiding uncertainty.'],
-          ].map(([Icon, title, body]) => {
-            const ItemIcon = Icon as typeof Users
-            return (
-              <div key={String(title)} className="rounded-[1.7rem] bg-black/[.025] p-6 dark:bg-white/[.025]">
-                <ItemIcon size={23} weight="duotone" className="text-teal-700 dark:text-teal-200" />
-                <h3 className="mt-4 text-lg font-black text-[#0b1736] dark:text-white">{String(title)}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/45">{String(body)}</p>
-              </div>
-            )
-          })}
-        </div>
-      </section>
-
-      <footer className="mx-auto w-full max-w-7xl px-4 pb-28 pt-6 text-center sm:px-6 lg:px-8">
-        <div className="border-t border-black/[.07] pt-8 text-xs text-slate-500 dark:border-white/[.07] dark:text-white/35">
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-            <span>FeniX · Build. Connect. Grow.</span>
-            <a href="/policy" className="hover:text-teal-700 dark:hover:text-teal-200">Policy</a>
-            <a href="/help" className="hover:text-teal-700 dark:hover:text-teal-200">Help</a>
-            <a href="/services" className="hover:text-teal-700 dark:hover:text-teal-200">Services</a>
+            </div>
           </div>
         </div>
-      </footer>
+
+        <section className="mt-12 sm:mt-16">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">Quick moves</p>
+              <h2 className="mt-2 text-2xl font-black tracking-[-.04em] sm:text-3xl">Start where you are.</h2>
+            </div>
+            <Compass size={26} className="text-[var(--fx-muted)] opacity-35" />
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {quickMoves.map(({ title, body, href, icon: Icon, eyebrow }) => (
+              <Link key={href} href={href} className="fenix-interactive group rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><Icon size={22} weight="duotone" /></div>
+                  <span className="text-[9px] font-black uppercase tracking-[.14em] text-[var(--fx-muted)]">{eyebrow}</span>
+                </div>
+                <h3 className="mt-5 text-lg font-black">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-[var(--fx-muted)]">{body}</p>
+                <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-[var(--fx-primary-strong)]">Open <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" /></span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-12 sm:mt-16">
+          <div className="rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-7">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">Service layer</p>
+                <h2 className="mt-2 text-2xl font-black tracking-[-.04em] sm:text-3xl">Tap one path. The next layer appears.</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">Build, Connect, Invest, Shop, Discover, Trust and Account stay in one consistent interaction model.</p>
+              </div>
+              <Link href="/services" className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--fx-primary-soft)] px-3.5 text-xs font-bold text-[var(--fx-primary-strong)]">Open Services <ArrowRight size={14} /></Link>
+            </div>
+            <div className="mt-6"><ServiceHub compact showHeader={false} /></div>
+          </div>
+        </section>
+
+        <section className="mt-12 grid gap-3 pb-8 sm:mt-16 sm:grid-cols-3">
+          <InfoCard icon={<Lightbulb size={19} />} title="Think with Brain" body="Use natural language to find the next practical step." />
+          <InfoCard icon={<ShieldCheck size={19} />} title="Verify before acting" body="Important claims should have visible evidence and context." />
+          <InfoCard icon={<Storefront size={19} />} title="Stay local" body="Find Feni businesses, products, suppliers and opportunities in one ecosystem." />
+        </section>
+      </section>
     </main>
   )
+}
+
+function TrustMini({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+  return <div className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-3.5"><div className="flex items-center gap-2 text-[var(--fx-primary-strong)]">{icon}<span className="text-xs font-black">{title}</span></div><p className="mt-1 text-[10px] leading-5 text-[var(--fx-muted)]">{body}</p></div>
+}
+
+function InfoCard({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+  return <div className="rounded-[1.6rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5"><div className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]">{icon}</div><h3 className="mt-4 text-base font-black">{title}</h3><p className="mt-2 text-sm leading-6 text-[var(--fx-muted)]">{body}</p></div>
 }

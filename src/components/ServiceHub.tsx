@@ -7,15 +7,19 @@ import {
   Brain,
   Briefcase,
   CaretDown,
+  CheckCircle,
+  MapPin,
   Rocket,
   ShieldCheck,
   ShoppingBag,
   Storefront,
   TrendUp,
   UserCircle,
+  UsersThree,
 } from '@phosphor-icons/react'
 import {
   FENIX_SERVICE_GROUPS,
+  getFeniXServiceGroup,
   type FeniXServiceGroup,
   type FeniXServiceIcon,
 } from '../lib/fenixServices'
@@ -29,6 +33,8 @@ const ICONS: Record<FeniXServiceIcon, ElementType> = {
   briefcase: Briefcase,
   shield: ShieldCheck,
   account: UserCircle,
+  map: MapPin,
+  users: UsersThree,
 }
 
 export default function ServiceHub({
@@ -40,208 +46,121 @@ export default function ServiceHub({
   showHeader?: boolean
   onNavigate?: () => void
 }) {
-  const [activeId, setActiveId] = useState<string>(FENIX_SERVICE_GROUPS[0]?.id || 'build')
-  const activeGroup =
-    FENIX_SERVICE_GROUPS.find((group) => group.id === activeId) ||
-    FENIX_SERVICE_GROUPS[0]
-
-  if (!activeGroup) return null
-
-  if (compact) {
-    return (
-      <div className="w-full">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-          {FENIX_SERVICE_GROUPS.map((group) => (
-            <CategoryButton
-              key={group.id}
-              group={group}
-              active={group.id === activeGroup.id}
-              onClick={() => setActiveId(group.id)}
-            />
-          ))}
-        </div>
-
-        <div className="fenix-surface mt-3 rounded-3xl p-3">
-          <ServiceList
-            group={activeGroup}
-            compact
-            onNavigate={onNavigate}
-          />
-        </div>
-      </div>
-    )
-  }
+  const [activeId, setActiveId] = useState('build')
+  const activeGroup = getFeniXServiceGroup(activeId)
 
   return (
-    <div className="w-full">
+    <section aria-label="FeniX service navigation" className="w-full">
       {showHeader && (
-        <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-teal-700 dark:text-teal-300">
-              FeniX Services
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-[-.03em] text-[#0b1736] sm:text-5xl dark:text-white">
-              Choose your next move.
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-white/48">
-              Tap a path first. The relevant tools appear next—no giant menu, no hunting through pages.
-            </p>
+            <p className="text-[10px] font-black uppercase tracking-[.2em] text-[var(--fx-primary-strong)]">Service Hub</p>
+            <h2 className="mt-2 text-2xl font-black tracking-[-.04em] sm:text-4xl">Choose a path. Then choose an action.</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">FeniX keeps the first screen calm. One tap reveals only the tools for that path.</p>
           </div>
-          <div className="rounded-2xl bg-black/[.025] px-4 py-3 text-xs leading-5 text-slate-500 dark:bg-white/[.035] dark:text-white/40">
-            One account · one search · one ecosystem
-          </div>
+          <div className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 py-2.5 text-[10px] font-bold uppercase tracking-[.13em] text-[var(--fx-muted)]">One layer at a time</div>
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[.72fr_1.28fr]">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-          {FENIX_SERVICE_GROUPS.map((group) => (
-            <CategoryButton
-              key={group.id}
-              group={group}
-              active={group.id === activeGroup.id}
-              onClick={() => setActiveId(group.id)}
-            />
-          ))}
+      <div className="overflow-hidden rounded-[1.8rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] shadow-[0_20px_70px_rgba(15,23,42,.06)]">
+        <div className="border-b border-[var(--fx-border)] p-2.5 sm:p-3">
+          <div role="tablist" aria-label="FeniX service categories" className="flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {FENIX_SERVICE_GROUPS.map((group) => (
+              <CategoryTab key={group.id} group={group} active={group.id === activeGroup.id} onClick={() => setActiveId(group.id)} />
+            ))}
+          </div>
         </div>
 
-        <div className="fenix-surface min-h-[320px] rounded-[2rem] p-4 sm:p-6">
-          <div className="flex items-start justify-between gap-4 border-b border-black/[.06] pb-4 dark:border-white/[.07]">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[.18em] text-teal-700 dark:text-teal-300">
+        <div id="fenix-service-panel" role="tabpanel" aria-labelledby={`fenix-service-tab-${activeGroup.id}`} className="fenix-reveal p-4 sm:p-6">
+          <div className="grid gap-5 lg:grid-cols-[.34fr_1fr]">
+            <div className="rounded-3xl bg-[linear-gradient(145deg,rgba(0,128,128,.10),rgba(184,138,43,.06))] p-5 dark:bg-[linear-gradient(145deg,rgba(99,216,212,.09),rgba(215,188,127,.045))]">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">
+                <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/70 dark:bg-white/[.06]">
+                  {(() => {
+                    const Icon = ICONS[activeGroup.icon]
+                    return <Icon size={17} weight="duotone" />
+                  })()}
+                </span>
                 {activeGroup.label}
-              </p>
-              <h2 className="mt-1 text-xl font-black text-[#0b1736] sm:text-2xl dark:text-white">
-                {activeGroup.labelBn}
-              </h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600 dark:text-white/45">
-                {activeGroup.description}
-              </p>
+              </div>
+              <h3 className="mt-5 text-2xl font-black tracking-[-.04em] sm:text-3xl">{activeGroup.labelBn}</h3>
+              <p className="mt-3 text-sm leading-6 text-[var(--fx-muted)]">{activeGroup.description}</p>
+              <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-[var(--fx-muted)]">
+                <CheckCircle size={16} className="text-[var(--fx-primary)]" />
+                {activeGroup.services.filter((item) => item.status === 'live').length} live tools
+              </div>
             </div>
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-teal-600/[.08] text-teal-700 dark:bg-teal-300/[.08] dark:text-teal-200">
-              {(() => {
-                const Icon = ICONS[activeGroup.icon]
-                return <Icon size={22} weight="duotone" />
-              })()}
+
+            <div>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold">Available now</p>
+                  <p className="mt-0.5 text-[11px] text-[var(--fx-muted)]">{activeGroup.label} · {activeGroup.labelBn}</p>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-[.12em] text-[var(--fx-muted)]">Tap to open</span>
+              </div>
+
+              <div className={compact ? 'grid gap-2' : 'grid gap-2.5 sm:grid-cols-2'}>
+                {activeGroup.services.map((service) => {
+                  const Icon = ICONS[service.icon]
+                  const content = (
+                    <>
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><Icon size={19} weight="duotone" /></span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-bold text-[var(--fx-text)]">{service.label}</span>
+                          {service.tag && <span className="rounded-full bg-black/[.035] px-2 py-0.5 text-[9px] font-black uppercase tracking-[.1em] text-[var(--fx-muted)] dark:bg-white/[.05]">{service.tag}</span>}
+                        </span>
+                        <span className="mt-1 block text-[11px] leading-5 text-[var(--fx-muted)]">{service.labelBn} · {service.description}</span>
+                      </span>
+                      {service.status === 'live'
+                        ? <ArrowRight size={17} className="shrink-0 opacity-30 transition-transform group-hover:translate-x-1 group-hover:opacity-75" />
+                        : <span className="shrink-0 rounded-full bg-amber-500/[.08] px-2 py-1 text-[9px] font-black uppercase tracking-[.1em] text-amber-700 dark:text-amber-200">Planned</span>}
+                    </>
+                  )
+
+                  if (service.status === 'live' && service.href) {
+                    return <Link key={service.id} href={service.href} onClick={onNavigate} className="fenix-interactive group flex min-h-16 items-center gap-3 rounded-2xl border border-[var(--fx-border)] bg-white/[.5] px-3.5 py-3 dark:bg-white/[.025]">{content}</Link>
+                  }
+
+                  return <div key={service.id} aria-label={service.label + ' — planned'} className="flex min-h-16 items-center gap-3 rounded-2xl border border-[var(--fx-border)] bg-black/[.018] px-3.5 py-3 opacity-70 dark:bg-white/[.018]">{content}</div>
+                })}
+              </div>
             </div>
           </div>
-
-          <ServiceList
-            group={activeGroup}
-            onNavigate={onNavigate}
-          />
         </div>
       </div>
-    </div>
+
+      {!compact && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-1">
+          <p className="text-xs leading-5 text-[var(--fx-muted)]">Discover → Understand → Verify → Act</p>
+          <Link href="/help" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3.5 text-xs font-bold">Need help <ArrowRight size={14} /></Link>
+        </div>
+      )}
+    </section>
   )
 }
 
-function CategoryButton({
-  group,
-  active,
-  onClick,
-}: {
-  group: FeniXServiceGroup
-  active: boolean
-  onClick: () => void
-}) {
+function CategoryTab({ group, active, onClick }: { group: FeniXServiceGroup; active: boolean; onClick: () => void }) {
   const Icon = ICONS[group.icon]
   return (
     <button
       type="button"
+      role="tab"
+      id={`fenix-service-tab-${group.id}`}
+      aria-controls="fenix-service-panel"
+      aria-selected={active}
       onClick={onClick}
-      aria-pressed={active}
       className={
-        'group flex min-h-14 items-center gap-3 rounded-2xl border px-4 text-left transition ' +
+        'flex min-h-12 shrink-0 items-center gap-2 rounded-xl border px-3.5 text-left transition ' +
         (active
-          ? 'border-teal-600/[.18] bg-teal-600/[.075] text-[#0b1736] shadow-sm dark:border-teal-300/[.18] dark:bg-teal-300/[.07] dark:text-white'
-          : 'border-black/[.06] bg-white/35 text-slate-600 hover:bg-white/70 dark:border-white/[.07] dark:bg-white/[.02] dark:text-white/55 dark:hover:bg-white/[.05]')
+          ? 'border-[var(--fx-primary)]/20 bg-[var(--fx-primary-soft)] text-[var(--fx-text)] shadow-sm'
+          : 'border-transparent text-[var(--fx-muted)] hover:border-[var(--fx-border)] hover:bg-black/[.02] dark:hover:bg-white/[.035]')
       }
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-black/[.025] text-teal-700 dark:bg-white/[.04] dark:text-teal-200">
-        <Icon size={20} weight="duotone" />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-bold">{group.label}</span>
-        <span className="mt-0.5 block truncate text-[11px] opacity-50">{group.labelBn}</span>
-      </span>
-      <CaretDown
-        size={16}
-        className={
-          'shrink-0 transition-transform ' +
-          (active ? 'rotate-180 opacity-70' : 'opacity-25')
-        }
-      />
+      <Icon size={18} weight={active ? 'duotone' : 'regular'} />
+      <span><span className="block text-xs font-black">{group.label}</span><span className="block text-[9px] opacity-60">{group.labelBn}</span></span>
+      <CaretDown size={13} className={active ? 'rotate-180 opacity-50' : 'opacity-20'} />
     </button>
-  )
-}
-
-function ServiceList({
-  group,
-  compact = false,
-  onNavigate,
-}: {
-  group: FeniXServiceGroup
-  compact?: boolean
-  onNavigate?: () => void
-}) {
-  return (
-    <div className={compact ? 'grid gap-2 p-1' : 'mt-5 grid gap-3 sm:grid-cols-2'}>
-      {group.services.map((service) => {
-        const Icon = ICONS[service.icon]
-        const inner = (
-          <>
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-black/[.025] text-teal-700 dark:bg-white/[.04] dark:text-teal-200">
-              <Icon size={19} weight="duotone" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-bold text-[#0b1736] dark:text-white">{service.label}</span>
-                {service.tag && (
-                  <span className="rounded-full bg-black/[.035] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[.12em] text-slate-400 dark:bg-white/[.05] dark:text-white/35">
-                    {service.tag}
-                  </span>
-                )}
-              </span>
-              <span className="mt-1 block text-[11px] leading-5 text-slate-500 dark:text-white/40">
-                {service.labelBn} · {service.description}
-              </span>
-            </span>
-            {service.status === 'live' ? (
-              <ArrowRight size={17} className="shrink-0 opacity-25 transition group-hover:translate-x-1 group-hover:opacity-70" />
-            ) : (
-              <span className="shrink-0 rounded-full bg-amber-500/[.08] px-2 py-1 text-[9px] font-bold uppercase tracking-[.1em] text-amber-700 dark:text-amber-200">
-                Soon
-              </span>
-            )}
-          </>
-        )
-
-        if (service.status === 'live' && service.href) {
-          return (
-            <Link
-              key={service.id}
-              href={service.href}
-              onClick={onNavigate}
-              className="fenix-interactive group flex min-h-14 items-center gap-3 rounded-2xl border border-black/[.06] bg-white/45 px-3.5 py-3 dark:border-white/[.07] dark:bg-white/[.02]"
-            >
-              {inner}
-            </Link>
-          )
-        }
-
-        return (
-          <button
-            key={service.id}
-            type="button"
-            disabled
-            aria-disabled="true"
-            className="flex min-h-14 cursor-not-allowed items-center gap-3 rounded-2xl border border-black/[.05] bg-black/[.018] px-3.5 py-3 opacity-65 dark:border-white/[.06] dark:bg-white/[.02]"
-          >
-            {inner}
-          </button>
-        )
-      })}
-    </div>
   )
 }
