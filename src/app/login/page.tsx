@@ -30,7 +30,6 @@ import SecurityNotice from './components/SecurityNotice'
 
 export default function LoginPage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const setAuth = useAuthStore((state) => state.setAuth)
   const resetFailedAttempts = useAuthStore(
@@ -55,6 +54,8 @@ export default function LoginPage() {
     let mounted = true
 
     const checkExistingSession = async () => {
+      const supabase = createClient()
+
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -81,7 +82,7 @@ export default function LoginPage() {
     return () => {
       mounted = false
     }
-  }, [router, setAuth, supabase])
+  }, [router, setAuth])
 
   const clearMessages = () => {
     setError('')
@@ -108,6 +109,8 @@ export default function LoginPage() {
     }
 
     setLoading(true)
+
+    const supabase = createClient()
 
     try {
       if (mode === 'signup') {
@@ -189,6 +192,8 @@ export default function LoginPage() {
     clearMessages()
     setOauthLoading(provider)
 
+    const supabase = createClient()
+
     try {
       const { error: oauthError } =
         await signInWithOAuth({
@@ -222,6 +227,8 @@ export default function LoginPage() {
     }
 
     setLoading(true)
+
+    const supabase = createClient()
 
     try {
       const { error: resetError } =

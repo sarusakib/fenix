@@ -20,17 +20,26 @@ type ThemeContextValue = {
 }
 
 const STORAGE_KEY = 'fenix-home-theme'
+const MEDIA_QUERY = '(prefers-color-scheme: dark)'
+const LIGHT_THEME_COLOR = '#F3F7F7'
+const DARK_THEME_COLOR = '#030506'
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 function getSystemTheme(): ResolvedTheme {
-  if (typeof window === 'undefined') {
+  if (typeof window === 'undefined' || !window.matchMedia) {
     return 'light'
   }
 
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light'
+  return window.matchMedia(MEDIA_QUERY).matches ? 'dark' : 'light'
+}
+
+function normalizeTheme(value: string | null): HomeTheme {
+  if (value === 'light' || value === 'dark' || value === 'system') {
+    return value
+  }
+
+  return 'system'
 }
 
 function getSavedTheme(): HomeTheme {
@@ -39,23 +48,31 @@ function getSavedTheme(): HomeTheme {
   }
 
   try {
-    const saved = window.localStorage.getItem(STORAGE_KEY)
-
-    if (saved === 'light' || saved === 'dark' || saved === 'system') {
-      return saved
-    }
+    return normalizeTheme(window.localStorage.getItem(STORAGE_KEY))
   } catch {
-    // Ignore unavailable storage.
+    return 'system'
   }
-
-  return 'system'
 }
 
 function applyTheme(theme: ResolvedTheme) {
   const root = document.documentElement
+
   root.classList.toggle('dark', theme === 'dark')
   root.dataset.homeTheme = theme
   root.style.colorScheme = theme
+
+  const themeColor = document.querySelector<HTMLMetaElement>(
+    'meta[name="theme-color"]',
+  )
+
+  themeColor?.setAttribute(
+    'content',
+    theme === 'dark' ? DARK_THEME_COLOR : LIGHT_THEME_COLOR,
+  )
+}
+
+function resolveTheme(theme: HomeTheme): ResolvedTheme {
+  return theme === 'system' ? getSystemTheme() : theme
 }
 
 export default function HomeThemeProvider({
@@ -69,10 +86,16 @@ export default function HomeThemeProvider({
   const resolvedTheme = theme === 'system' ? systemTheme : theme
 
   const setTheme = useCallback((nextTheme: HomeTheme) => {
+    const nextSystemTheme =
+      nextTheme === 'system' ? getSystemTheme() : undefined
+    const nextResolved =
+      nextTheme === 'system' ? nextSystemTheme ?? 'light' : nextTheme
+
     setThemeState(nextTheme)
 
-    const nextResolved =
-      nextTheme === 'system' ? getSystemTheme() : nextTheme
+    if (nextSystemTheme) {
+      setSystemTheme(nextSystemTheme)
+    }
 
     applyTheme(nextResolved)
 
@@ -89,12 +112,11 @@ export default function HomeThemeProvider({
 
     setThemeState(savedTheme)
     setSystemTheme(nextSystemTheme)
-
     applyTheme(savedTheme === 'system' ? nextSystemTheme : savedTheme)
   }, [])
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const mediaQuery = window.matchMedia(MEDIA_QUERY)
 
     const handleChange = () => {
       const nextSystemTheme: ResolvedTheme = mediaQuery.matches
@@ -108,16 +130,34 @@ export default function HomeThemeProvider({
       }
     }
 
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== STORAGE_KEY) {
+        return
+      }
+
+      const nextTheme = normalizeTheme(event.newValue)
+      const nextSystemTheme =
+        nextTheme === 'system' ? getSystemTheme() : systemTheme
+      const nextResolved =
+        nextTheme === 'system' ? nextSystemTheme : nextTheme
+
+      setThemeState(nextTheme)
+
+      if (nextTheme === 'system') {
+        setSystemTheme(nextSystemTheme)
+      }
+
+      applyTheme(nextResolved)
+    }
+
     mediaQuery.addEventListener('change', handleChange)
+    window.addEventListener('storage', handleStorage)
 
     return () => {
       mediaQuery.removeEventListener('change', handleChange)
+      window.removeEventListener('storage', handleStorage)
     }
-  }, [])
-
-  useEffect(() => {
-    applyTheme(resolvedTheme)
-  }, [resolvedTheme])
+  }, [systemTheme])
 
   const value = useMemo<ThemeContextValue>(
     () => ({
