@@ -129,7 +129,7 @@ export default function MessagesPage() {
     const { data } = await s.from('fenix_public_profiles').select('id,full_name,username,avatar_url').eq('username', username).maybeSingle()
     if (data?.id) {
       setTo(data.id)
-      setPeople((p) => ({ ...p, [data.id]: data as Person }))
+      setPeople((p) => { const next = { ...p }; next[String(data.id)] = data as Person; return next })
       return data.id
     }
     return ''
