@@ -66,7 +66,7 @@ export function FenixLocaleProvider({ children }: { children: React.ReactNode })
     document.documentElement.lang = locale === 'bn' ? 'bn' : 'en'
   }, [locale])
 
-  const value = useMemo(() => ({ locale, setLocale, isReady }), [locale, isReady])
+  const value = useMemo(() => ({ locale, setLocale, isReady }), [locale, setLocale, isReady])
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
 }
 
