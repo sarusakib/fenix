@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { normalizeFeniBrainQuery } from '../../../lib/feniBrainQuery'
-import { buildBrainSuggestions } from '../../../lib/feniBrainEngine'
+import { normalizeFeniBrainQuery } from '../../../../lib/feniBrainQuery'
+import { buildBrainSuggestions } from '../../../../lib/feniBrainEngine'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
