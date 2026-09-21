@@ -12,6 +12,7 @@ WarningCircle,
 } from '@phosphor-icons/react'
 
 import Navbar from '../../../components/Navbar'
+import { GuidedFormProgress } from '../../../components/forms/GuidedFormProgress'
 import { createClient } from '../../../utils/supabase/client'
 import type { VendorProfileInsert } from '../../../types/database'
 
@@ -57,6 +58,7 @@ useState<VendorProfile | null>(null)
 
 const [error, setError] = useState('')
 const [success, setSuccess] = useState('')
+const [step, setStep] = useState(1)
 
 const [displayName, setDisplayName] = useState('')
 const [displayNameBn, setDisplayNameBn] = useState('')
@@ -609,7 +611,23 @@ return (
           </div>
         ) : (
           <form
-            onSubmit={handleSubmit}
+            onSubmit={(event) => {
+              if (step < 3) {
+                event.preventDefault()
+                setError('')
+                if (step === 1 && (!displayName.trim() || phone.trim().length < 7)) {
+                  setError('Seller name ও valid phone number দিন।')
+                  return
+                }
+                if (step === 2 && !displayNameEn.trim() && !displayNameBn.trim()) {
+                  setError('বাংলা বা English seller/store name-এর অন্তত একটি দিন।')
+                  return
+                }
+                setStep((value) => Math.min(3, value + 1))
+                return
+              }
+              void handleSubmit(event)
+            }}
             noValidate
           >
             <div>
@@ -664,256 +682,28 @@ return (
               </div>
             )}
 
-            <div className="mt-7 space-y-5">
-              <div>
-                <label
-                  htmlFor="display-name"
-                  className="text-sm font-medium"
-                >
-                  Store / Seller name
-                </label>
-
-                <input
-                  id="display-name"
-                  type="text"
-                  value={displayName}
-                  onChange={(event) =>
-                    setDisplayName(
-                      event.target.value.slice(
-                        0,
-                        200,
-                      ),
-                    )
-                  }
-                  placeholder="যেমন: Feni Fashion House"
-                  maxLength={200}
-                  required
-                  className="
-                    mt-2 h-12 w-full rounded-xl
-                    border border-[#0b1736]/10
-                    bg-white px-4 text-sm
-                    text-[#0b1736]
-                    outline-none transition
-                    placeholder:text-[#0b1736]/30
-                    focus:border-[#008080]/40
-                    focus:ring-4 focus:ring-[#008080]/10
-                    dark:border-white/10
-                    dark:bg-white/[0.045]
-                    dark:text-white
-                    dark:placeholder:text-white/25
-                    dark:focus:border-teal-300/30
-                    dark:focus:ring-teal-300/10
-                  "
-                />
-              </div>
-
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="display-name-bn"
-                    className="text-sm font-medium"
-                  >
-                    বাংলা নাম
-                  </label>
-
-                  <input
-                    id="display-name-bn"
-                    type="text"
-                    value={displayNameBn}
-                    onChange={(event) =>
-                      setDisplayNameBn(
-                        event.target.value.slice(
-                          0,
-                          200,
-                        ),
-                      )
-                    }
-                    placeholder="ফেনী ফ্যাশন হাউস"
-                    maxLength={200}
-                    className="
-                      mt-2 h-12 w-full rounded-xl
-                      border border-[#0b1736]/10
-                      bg-white px-4 text-sm
-                      text-[#0b1736]
-                      outline-none transition
-                      placeholder:text-[#0b1736]/30
-                      focus:border-[#008080]/40
-                      focus:ring-4 focus:ring-[#008080]/10
-                      dark:border-white/10
-                      dark:bg-white/[0.045]
-                      dark:text-white
-                      dark:placeholder:text-white/25
-                      dark:focus:border-teal-300/30
-                      dark:focus:ring-teal-300/10
-                    "
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="display-name-en"
-                    className="text-sm font-medium"
-                  >
-                    English name
-                  </label>
-
-                  <input
-                    id="display-name-en"
-                    type="text"
-                    value={displayNameEn}
-                    onChange={(event) =>
-                      setDisplayNameEn(
-                        event.target.value.slice(
-                          0,
-                          200,
-                        ),
-                      )
-                    }
-                    placeholder="Feni Fashion House"
-                    maxLength={200}
-                    className="
-                      mt-2 h-12 w-full rounded-xl
-                      border border-[#0b1736]/10
-                      bg-white px-4 text-sm
-                      text-[#0b1736]
-                      outline-none transition
-                      placeholder:text-[#0b1736]/30
-                      focus:border-[#008080]/40
-                      focus:ring-4 focus:ring-[#008080]/10
-                      dark:border-white/10
-                      dark:bg-white/[0.045]
-                      dark:text-white
-                      dark:placeholder:text-white/25
-                      dark:focus:border-teal-300/30
-                    "
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="text-sm font-medium"
-                >
-                  Seller phone
-                </label>
-
-                <input
-                  id="phone"
-                  type="tel"
-                  inputMode="tel"
-                  value={phone}
-                  onChange={(event) =>
-                    setPhone(
-                      event.target.value.slice(
-                        0,
-                        40,
-                      ),
-                    )
-                  }
-                  placeholder="01XXXXXXXXX"
-                  maxLength={40}
-                  required
-                  className="
-                    mt-2 h-12 w-full rounded-xl
-                    border border-[#0b1736]/10
-                    bg-white px-4 text-sm
-                    text-[#0b1736]
-                    outline-none transition
-                    placeholder:text-[#0b1736]/30
-                    focus:border-[#008080]/40
-                    focus:ring-4 focus:ring-[#008080]/10
-                    dark:border-white/10
-                    dark:bg-white/[0.045]
-                    dark:text-white
-                    dark:placeholder:text-white/25
-                    dark:focus:border-teal-300/30
-                  "
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="description-bn"
-                  className="text-sm font-medium"
-                >
-                  দোকান সম্পর্কে সংক্ষেপে
-                </label>
-
-                <textarea
-                  id="description-bn"
-                  value={descriptionBn}
-                  onChange={(event) =>
-                    setDescriptionBn(
-                      event.target.value.slice(
-                        0,
-                        2000,
-                      ),
-                    )
-                  }
-                  placeholder="আপনার দোকান বা business সম্পর্কে লিখুন..."
-                  maxLength={2000}
-                  rows={4}
-                  className="
-                    mt-2 w-full resize-y rounded-xl
-                    border border-[#0b1736]/10
-                    bg-white px-4 py-3 text-sm
-                    leading-6 text-[#0b1736]
-                    outline-none transition
-                    placeholder:text-[#0b1736]/30
-                    focus:border-[#008080]/40
-                    focus:ring-4 focus:ring-[#008080]/10
-                    dark:border-white/10
-                    dark:bg-white/[0.045]
-                    dark:text-white
-                    dark:placeholder:text-white/25
-                    dark:focus:border-teal-300/30
-                  "
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="description-en"
-                  className="text-sm font-medium"
-                >
-                  English description
-                </label>
-
-                <textarea
-                  id="description-en"
-                  value={descriptionEn}
-                  onChange={(event) =>
-                    setDescriptionEn(
-                      event.target.value.slice(
-                        0,
-                        2000,
-                      ),
-                    )
-                  }
-                  placeholder="Tell customers about your store..."
-                  maxLength={2000}
-                  rows={4}
-                  className="
-                    mt-2 w-full resize-y rounded-xl
-                    border border-[#0b1736]/10
-                    bg-white px-4 py-3 text-sm
-                    leading-6 text-[#0b1736]
-                    outline-none transition
-                    placeholder:text-[#0b1736]/30
-                    focus:border-[#008080]/40
-                    focus:ring-4 focus:ring-[#008080]/10
-                    dark:border-white/10
-                    dark:bg-white/[0.045]
-                    dark:text-white
-                    dark:placeholder:text-white/25
-                    dark:focus:border-teal-300/30
-                    dark:focus:focus:border-teal-300/30
-                  "
-                />
-              </div>
+            <GuidedFormProgress
+              step={step}
+              total={3}
+              title={step===1?'Store identity':step===2?'Names & language':'Business description'}
+              subtitle={step===1?'Tell us the basic seller identity.':step===2?'Add Bangla or English store names.':'Add short descriptions before sending for review.'}
+              onBack={()=>{setError('');setStep((value)=>Math.max(1,value-1))}}
+              onNext={()=>{setError(''); if(step===1 && (!displayName.trim() || phone.trim().length<7)){setError('Seller name ও valid phone number দিন।');return} if(step===2 && !displayNameBn.trim() && !displayNameEn.trim()){setError('বাংলা বা English seller/store name-এর অন্তত একটি দিন।');return} setStep((value)=>Math.min(3,value+1))}}
+              nextLabel="Continue"
+              submit
+            />
+            {step===1&&<div className="space-y-5">
+              <div><label htmlFor="display-name" className="text-sm font-medium">Store / Seller name</label><input autoFocus id="display-name" type="text" value={displayName} onChange={(event)=>setDisplayName(event.target.value.slice(0,200))} placeholder="যেমন: Feni Fashion House" maxLength={200} required className="mt-2 h-12 w-full rounded-xl border border-[#0b1736]/10 bg-white px-4 text-sm text-[#0b1736] outline-none transition focus:border-[#008080]/40 focus:ring-4 focus:ring-[#008080]/10 dark:border-white/10 dark:bg-white/[0.045] dark:text-white" /></div>
+              <div><label htmlFor="phone" className="text-sm font-medium">Seller phone</label><input id="phone" type="tel" inputMode="tel" value={phone} onChange={(event)=>setPhone(event.target.value.slice(0,40))} placeholder="01XXXXXXXXX" maxLength={40} required className="mt-2 h-12 w-full rounded-xl border border-[#0b1736]/10 bg-white px-4 text-sm text-[#0b1736] outline-none transition focus:border-[#008080]/40 focus:ring-4 focus:ring-[#008080]/10 dark:border-white/10 dark:bg-white/[0.045] dark:text-white" /></div>
+            </div>}
+            {step===2&&<div className="grid gap-5 sm:grid-cols-2">
+              <div><label htmlFor="display-name-bn" className="text-sm font-medium">বাংলা নাম</label><input autoFocus id="display-name-bn" type="text" value={displayNameBn} onChange={(event)=>setDisplayNameBn(event.target.value.slice(0,200))} placeholder="ফেনী ফ্যাশন হাউস" maxLength={200} className="mt-2 h-12 w-full rounded-xl border border-[#0b1736]/10 bg-white px-4 text-sm text-[#0b1736] outline-none focus:border-[#008080]/40 dark:border-white/10 dark:bg-white/[0.045] dark:text-white" /></div>
+              <div><label htmlFor="display-name-en" className="text-sm font-medium">English name</label><input id="display-name-en" type="text" value={displayNameEn} onChange={(event)=>setDisplayNameEn(event.target.value.slice(0,200))} placeholder="Feni Fashion House" maxLength={200} className="mt-2 h-12 w-full rounded-xl border border-[#0b1736]/10 bg-white px-4 text-sm text-[#0b1736] outline-none focus:border-[#008080]/40 dark:border-white/10 dark:bg-white/[0.045] dark:text-white" /></div>
+            </div>}
+            {step===3&&<div className="space-y-5">
+              <div><label htmlFor="description-bn" className="text-sm font-medium">দোকান সম্পর্কে সংক্ষেপে</label><textarea autoFocus id="description-bn" value={descriptionBn} onChange={(event)=>setDescriptionBn(event.target.value.slice(0,2000))} placeholder="আপনার দোকান বা business সম্পর্কে লিখুন..." maxLength={2000} rows={5} className="mt-2 w-full resize-y rounded-xl border border-[#0b1736]/10 bg-white px-4 py-3 text-sm leading-6 text-[#0b1736] outline-none focus:border-[#008080]/40 dark:border-white/10 dark:bg-white/[0.045] dark:text-white" /></div>
+              <div><label htmlFor="description-en" className="text-sm font-medium">English description</label><textarea id="description-en" value={descriptionEn} onChange={(event)=>setDescriptionEn(event.target.value.slice(0,2000))} placeholder="Tell customers about your store..." maxLength={2000} rows={5} className="mt-2 w-full resize-y rounded-xl border border-[#0b1736]/10 bg-white px-4 py-3 text-sm leading-6 text-[#0b1736] outline-none focus:border-[#008080]/40 dark:border-white/10 dark:bg-white/[0.045] dark:text-white" /></div>
             </div>
-
             <div
               className="
                 mt-6 rounded-xl
