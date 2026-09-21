@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ChatCircleText, Globe, MapPin, UserCircle } from '@phosphor-icons/react/dist/ssr'
-import Navbar from '@/components/Navbar'\nimport ProfileReportButton from '@/components/profile/ProfileReportButton'
+import Navbar from '@/components/Navbar'
+import ProfileReportButton from '@/components/profile/ProfileReportButton'
 import { createClient } from '@/utils/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -50,6 +51,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                 {profile.location_text && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><MapPin size={14}/>{profile.location_text}</span>}
                 {website && <a href={website} target="_blank" rel="noreferrer noopener" className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 hover:underline dark:bg-white/[.04]"><Globe size={14}/>Website</a>}
               </div>
+              <ProfileReportButton profileId={profile.id} locale="bn" />
               <p className="mt-5 text-[11px] text-[var(--fx-muted)]">Profile joined FeniX on {new Date(profile.created_at).toLocaleDateString('en-BD')}</p>
             </div>
           </div>
