@@ -3,6 +3,7 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { File as FileIcon } from '@phosphor-icons/react'
 import {
   ArrowBendUpLeft, ArrowLeft, Check, ChatCircleText, File as FileIcon, Flag, MagnifyingGlass, Microphone,
   Paperclip, PencilSimple, PaperPlaneRight, Smiley, Stop, Trash, UserCircle, X
@@ -180,7 +181,7 @@ export default function MessagesPage() {
           setStatus(bn ? 'Voice message 10MB-এর বেশি হয়েছে।' : 'Voice message exceeded 10MB.')
           return
         }
-        setAttachment(new File([blob], 'voice-' + Date.now() + '.webm', { type: blob.type }))
+        setAttachment(new globalThis.File([blob], 'voice-' + Date.now() + '.webm', { type: blob.type }))
       }
 
       recorderRef.current = recorder
