@@ -4,6 +4,7 @@ import { HfInference } from '@huggingface/inference'
 import { searchFeniBrain } from './searchFeniBrain'
 import { fetchLiveFeniSources, shouldUseLiveWeb } from '../../lib/feniBrainLiveWeb'
 import { buildFeniBrainPlan, buildFeniXPolicyPrompt } from '../../lib/fenixNetwork'
+import { canonicalBrainIntent, buildZeroResultHints } from '../../lib/feniBrainEngine'
 import { classifyFeniBrainQuestion, detectLanguage, detectFeniBrainIntent, detectRequestedFactSubject, extractBudgetBDT, extractEntities } from '../../lib/feniBrainQuery'
 
 const MODEL = process.env.FENI_BRAIN_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
@@ -95,7 +96,7 @@ function publicLiveSources(sources) {
 function brainMeta(cleanQuery, retrieval, plan) {
   return {
     language: detectLanguage(cleanQuery),
-    intentKey: detectFeniBrainIntent(cleanQuery),
+    intentKey: canonicalBrainIntent(detectFeniBrainIntent(cleanQuery)),
     budget: extractBudgetBDT(cleanQuery),
     entities: extractEntities(cleanQuery),
     evidence: buildEvidence(retrieval?.results),
