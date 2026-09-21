@@ -1,3 +1,4 @@
+import { createHash } from 'crypto'
 'use server'
 
 import { generateEmbedding } from './generateEmbedding'
@@ -20,7 +21,27 @@ const MAX_QUERY_LENGTH = 120
 const MAX_RESULTS = 10
 const MAX_CHILD_LOCATIONS = 20
 
-async function safeStructuredLocationSearch(supabase, normalizedQuery) {
+async async function recordBrainSignal(supabase, parsed, intentKey, resultCount) {
+  try {
+    const normalized = String(parsed?.normalized || '').trim().slice(0, 120)
+    const day = new Date().toISOString().slice(0, 10)
+    const queryHash = createHash('sha256').update(normalized + '|' + day).digest('hex')
+    const terms = queryTokens(parsed).slice(0, 8)
+    if (!terms.length) return
+
+    await supabase.rpc('record_feni_brain_events', {
+      p_query_hash: queryHash,
+      p_intent_key: intentKey || 'GENERAL_GUIDANCE',
+      p_language_code: 'unknown',
+      p_terms: terms,
+      p_result_count: Math.min(resultCount, 100),
+    })
+  } catch (error) {
+    console.error('Feni Brain signal logging failed:', { name: error?.name })
+  }
+}
+
+function safeStructuredLocationSearch(supabase, normalizedQuery) {
   try {
     const [{ data: rows, error }, { data: aliases, error: aliasError }] = await Promise.all([
       supabase.from('fenix_brain_locations')
