@@ -89,7 +89,7 @@ export async function getOwnProfile(
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, full_name, role, phone, created_at, updated_at')
+    .select('id, full_name, role, phone, username, bio, avatar_url, cover_url, location_text, website_url, created_at, updated_at')
     .eq('id', id)
     .maybeSingle()
 
@@ -140,7 +140,7 @@ export async function createProfile(
   const { data, error } = await supabase
     .from('profiles')
     .insert(payload)
-    .select('id, full_name, role, phone, created_at, updated_at')
+    .select('id, full_name, role, phone, username, bio, avatar_url, cover_url, location_text, website_url, created_at, updated_at')
     .single()
 
   if (error) {
@@ -196,7 +196,7 @@ export async function updateProfile(
     .from('profiles')
     .update(payload)
     .eq('id', id)
-    .select('id, full_name, role, phone, created_at, updated_at')
+    .select('id, full_name, role, phone, username, bio, avatar_url, cover_url, location_text, website_url, created_at, updated_at')
     .single()
 
   if (error) {
