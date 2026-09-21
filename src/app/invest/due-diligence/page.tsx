@@ -82,8 +82,8 @@ export default function DueDiligencePage(){
     const {data:auth}=await s.auth.getUser()
     if(!auth.user){setSaving('');return}
     const payload={opportunity_id:opportunityId,investor_id:auth.user.id,check_key:key,status:selectedStatus[key]||'not_started',note:notes[key]?.trim().slice(0,1200)||null,updated_at:new Date().toISOString()}
-    const {error}=await s.from('investment_due_diligence_checks').upsert(payload,{onConflict:'opportunity_id,investor_id,check_key'}).select('id,check_key,status,note,updated_at').single()
-    if(error){setNotice(error.message||'Check save হয়নি.')}else{
+    const {data,error}=await s.from('investment_due_diligence_checks').upsert(payload,{onConflict:'opportunity_id,investor_id,check_key'}).select('id,check_key,status,note,updated_at').single()
+    if(error){setNotice(error.message||'Check save হয়নি.')}else if(data){
       setChecks((items)=>[...items.filter(x=>x.check_key!==key),data as Check])
       setNotice('Due-diligence check saved.')
     }
