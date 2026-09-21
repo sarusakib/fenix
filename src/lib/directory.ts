@@ -47,6 +47,37 @@ export async function searchDirectoryBusinesses(
     p_offset: Math.max(args.offset ?? 0, 0),
   })
 
+  // The map needs coordinates even when the primary directory RPC has a
+  // smaller/legacy projection. Hydrate only the missing public coordinates.
+  if (!error && data?.length) {
+    const ids = (data as DirectoryBusiness[]).map((item) => item.id).filter(Boolean)
+    const { data: locations } = await supabase
+      .from('business_directory_locations')
+      .select('business_id, latitude, longitude, map_label, address, district, upazila, area, market, is_public')
+      .in('business_id', ids)
+      .eq('is_public', true)
+
+    const byId = new Map((locations ?? []).map((location) => [location.business_id, location]))
+    return {
+      data: (data as DirectoryBusiness[]).map((item) => {
+        const location = byId.get(item.id)
+        return location ? {
+          ...item,
+          latitude: item.latitude ?? location.latitude,
+          longitude: item.longitude ?? location.longitude,
+          map_label: item.map_label ?? location.map_label,
+          address: item.address ?? location.address,
+          district: item.district ?? location.district,
+          upazila: item.upazila ?? location.upazila,
+          area: item.area ?? location.area,
+          market: item.market ?? location.market,
+          location_verified: item.location_verified || false,
+        } : item
+      }),
+      error: null,
+    }
+  }
+
   if (error) return { data: [], error }
   return { data: (data ?? []) as DirectoryBusiness[], error: null }
 }
