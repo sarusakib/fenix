@@ -54,7 +54,7 @@ export default function MessagesPage() {
     if(!username) return ''
     const s=createClient()
     const {data}=await s.from('fenix_public_profiles').select('id,full_name,username,avatar_url').eq('username',username).maybeSingle()
-    if(data){setTo(data.id);setPeople(p=>({...p,[data.id]:data as Person}));return data.id}
+    if(data?.id){setTo(data.id);setPeople(p=>({...p,[data.id as string]:data as Person}));return data.id}
     return ''
   }
 

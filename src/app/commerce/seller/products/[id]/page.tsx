@@ -51,7 +51,7 @@ export default function SellerProductPage({ params }: { params: Promise<{ id: st
   async function inventorySave() {
     setSaving(true); setError('')
     const supabase = createClient()
-    const { error: rpcError } = await supabase.rpc('set_vendor_product_inventory', { p_product_id: id, p_quantity: Number(quantity), p_low_stock_threshold: Number(threshold) })
+    const { error: rpcError } = await ( supabase as any).rpc('set_vendor_product_inventory', { p_product_id: id, p_quantity: Number(quantity), p_low_stock_threshold: Number(threshold) })
     if (rpcError) setError('Inventory update করা যায়নি।')
     setSaving(false)
   }
@@ -60,7 +60,7 @@ export default function SellerProductPage({ params }: { params: Promise<{ id: st
     setSaving(true); setError('')
     const supabase = createClient()
     const functionName = action === 'publish' ? 'publish_vendor_product' : 'archive_vendor_product'
-    const { error: rpcError } = await supabase.rpc(functionName, { p_product_id: id })
+    const { error: rpcError } = await ( supabase as any).rpc(functionName, { p_product_id: id })
     if (rpcError) setError(action === 'publish' ? 'Product publish করা যায়নি। Required information ও seller approval check করুন।' : 'Product archive করা যায়নি।')
     else setProduct((current) => current ? { ...current, status: action === 'publish' ? 'published' : 'archived', is_active: action === 'publish' } : current)
     setSaving(false)
