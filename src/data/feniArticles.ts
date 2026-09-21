@@ -119,5 +119,20 @@ export const FENI_ARTICLES: readonly FeniArticle[] = [
   },
 ]
 
+  {
+    slug:'feni-sadar-city-guide',
+    titleBn:'ফেনী সদর শহর: বাজার, সেবা ও ব্যবসা খোঁজার local guide',
+    titleEn:'Feni Sadar City: A Local Guide to Markets, Services and Business',
+    descriptionBn:'ফেনী সদর শহরের বাজার, local services, business discovery ও গুরুত্বপূর্ণ context বোঝার public FeniX guide।',
+    descriptionEn:'A public FeniX guide to markets, local services, business discovery and useful context around Feni Sadar.',
+    updated:'2026-09-21',
+    tags:['Feni Sadar','ফেনী সদর','Feni city','ফেনী শহর','Feni town'],
+    sections:[
+      {headingBn:'শহরভিত্তিকভাবে খুঁজুন',headingEn:'Search by city context',bodyBn:'“ফেনী শহরে কাপড়ের supplier”, “ফেনী সদরে restaurant”, “ফেনী শহরে business service”—এভাবে area + service লিখলে search ও directory result আরও নির্দিষ্ট করা যায়।',bodyEn:'Queries such as “clothing supplier in Feni city” or “business service in Feni Sadar” add city context and can make discovery more specific.'},
+      {headingBn:'সেবা ও ব্যবসা আলাদা করে দেখুন',headingEn:'Keep services and businesses separate',bodyBn:'FeniX-এ Directory business discovery-এর জন্য, Feni Brain প্রশ্নের উত্তর ও guidance-এর জন্য, আর Feed community conversation-এর জন্য। একটার তথ্যকে আরেকটার official confirmation হিসেবে ধরা উচিত নয়।',bodyEn:'FeniX uses Directory for business discovery, Feni Brain for answers and guidance, and Feed for community conversation. One surface should not be treated as official confirmation of another.'},
+      {headingBn:'Public তথ্যের দায়িত্বশীল ব্যবহার',headingEn:'Use public information responsibly',bodyBn:'কোনো ব্যক্তি বা ব্যবসার public profile থাকলেও ব্যক্তিগত বা সংবেদনশীল তথ্য অপ্রয়োজনে সংগ্রহ/শেয়ার করবেন না। সন্দেহজনক তথ্য Report করুন।',bodyEn:'A public profile does not make private or sensitive information appropriate to collect or share. Report suspicious information through FeniX controls.'},
+    ],
+  },
+
 export const FENI_ARTICLE_SOURCES = { officialDistrictSource, bbsSource }
 export function getFeniArticle(slug:string){ return FENI_ARTICLES.find(article=>article.slug===slug) ?? null }
