@@ -2062,6 +2062,45 @@ export type Database = {
           },
         ]
       }
+      fenix_brain_pulse_intents_public: {
+        Row: {
+          intent_key: string
+          searches_30d: number
+          searches_7d: number
+        }
+        Insert: {
+          intent_key: string
+          searches_30d?: number
+          searches_7d?: number
+        }
+        Update: {
+          intent_key?: string
+          searches_30d?: number
+          searches_7d?: number
+        }
+        Relationships: []
+      }
+      fenix_brain_pulse_terms_public: {
+        Row: {
+          searches_30d: number
+          searches_7d: number
+          term: string
+          unique_queries_7d: number
+        }
+        Insert: {
+          searches_30d?: number
+          searches_7d?: number
+          term: string
+          unique_queries_7d?: number
+        }
+        Update: {
+          searches_30d?: number
+          searches_7d?: number
+          term?: string
+          unique_queries_7d?: number
+        }
+        Relationships: []
+      }
       fenix_brain_query_events: {
         Row: {
           created_at: string
@@ -2997,6 +3036,68 @@ export type Database = {
           },
         ]
       }
+      investment_due_diligence_checks: {
+        Row: {
+          check_key: string
+          created_at: string
+          id: string
+          investor_id: string
+          note: string | null
+          opportunity_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          check_key: string
+          created_at?: string
+          id?: string
+          investor_id: string
+          note?: string | null
+          opportunity_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          check_key?: string
+          created_at?: string
+          id?: string
+          investor_id?: string
+          note?: string | null
+          opportunity_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investment_interests: {
         Row: {
           created_at: string
@@ -3817,6 +3918,11 @@ export type Database = {
           linkedin_public: boolean
           linkedin_url: string | null
           phone_public: boolean
+          public_facebook_url: string | null
+          public_instagram_url: string | null
+          public_linkedin_url: string | null
+          public_whatsapp: string | null
+          public_youtube_url: string | null
           updated_at: string
           user_id: string
           whatsapp: string | null
@@ -3833,6 +3939,11 @@ export type Database = {
           linkedin_public?: boolean
           linkedin_url?: string | null
           phone_public?: boolean
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_whatsapp?: string | null
+          public_youtube_url?: string | null
           updated_at?: string
           user_id: string
           whatsapp?: string | null
@@ -3849,6 +3960,11 @@ export type Database = {
           linkedin_public?: boolean
           linkedin_url?: string | null
           phone_public?: boolean
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_whatsapp?: string | null
+          public_youtube_url?: string | null
           updated_at?: string
           user_id?: string
           whatsapp?: string | null
