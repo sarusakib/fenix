@@ -28,9 +28,9 @@ export default function FeniPulsePage() {
         s.from('business_directory_profiles').select('business_id',{count:'exact',head:true}).eq('listing_status','published'),
         s.from('products').select('id',{count:'exact',head:true}).eq('status','published').eq('is_active',true),
         s.from('investment_opportunities').select('id',{count:'exact',head:true}).in('status',['approved','fully_funded']).eq('verification_status','verified'),
-        s.from('fenix_blood_requests').select('id',{count:'exact',head:true}).eq('status','open'),
+        s.from('fenix_public_blood_requests').select('id',{count:'exact',head:true}),
         s.from('fenix_ambulance_providers').select('id',{count:'exact',head:true}).eq('status','active'),
-        s.from('fenix_posts').select('id',{count:'exact',head:true}).is('deleted_at',null).gte('created_at',new Date(Date.now()-7*86400000).toISOString()),
+        s.from('fenix_public_feed').select('id',{count:'exact',head:true}),
       ])
       if (!active) return
       setTerms((termsResult.data ?? []) as PulseTerm[])
