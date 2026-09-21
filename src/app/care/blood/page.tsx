@@ -25,7 +25,6 @@ type RequestRow = {
 }
 
 type DonorRow = {
-  user_id: string
   full_name: string | null
   username: string | null
   avatar_url: string | null
@@ -249,7 +248,7 @@ export default function BloodHelpPage() {
               <div className="flex items-center gap-2"><CheckCircle size={18} className="text-[var(--fx-primary-strong)]"/><h2 className="font-black">Available public donors</h2></div>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {donors.map((donor) => (
-                  <Link key={donor.user_id} href={donor.username ? ('/profile/' + donor.username) : '/profile'} className="rounded-2xl border border-[var(--fx-border)] p-4">
+                  <Link key={donor.username || donor.full_name || donor.blood_group} href={donor.username ? ('/profile/' + donor.username) : '/profile'} className="rounded-2xl border border-[var(--fx-border)] p-4">
                     <div className="flex items-center gap-3">
                       {donor.avatar_url ? <img src={donor.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover"/> : <UserCircle size={40} className="opacity-35"/>}
                       <div><div className="text-sm font-bold">{donor.full_name || donor.username || 'FeniX donor'}</div><div className="text-xs text-[var(--fx-muted)]">{donor.blood_group} · {[donor.upazila_bn||donor.upazila_en,donor.area_text].filter(Boolean).join(' · ')}</div></div>
