@@ -4,7 +4,7 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowLeft, Check, ChatCircleText, File, Flag, Heart, MagnifyingGlass,
+  ArrowLeft, Check, ChatCircleText, File, Flag, MagnifyingGlass,
   Paperclip, PencilSimple, Reply, Smiley, Trash, UserCircle, X
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
@@ -111,7 +111,12 @@ export default function MessagesPage() {
   useEffect(() => {
     void load()
     const timer = window.setInterval(() => { void load() }, 8000)
-    return () => window.clearInterval(timer)
+    return () => {
+      window.clearInterval(timer)
+      if (recordTimerRef.current) window.clearTimeout(recordTimerRef.current)
+      recorderRef.current?.stop()
+      streamRef.current?.getTracks().forEach((track) => track.stop())
+    }
     // load intentionally stays stable as a page-level network operation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bn])
@@ -157,7 +162,11 @@ export default function MessagesPage() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+      const preferredType = 'audio/webm'
+      const options = typeof MediaRecorder.isTypeSupported === 'function' && MediaRecorder.isTypeSupported(preferredType)
+        ? { mimeType: preferredType }
+        : undefined
+      const recorder = new MediaRecorder(stream, options)
       const chunks: BlobPart[] = []
       recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data) }
       recorder.onstop = () => {
@@ -366,10 +375,24 @@ export default function MessagesPage() {
                         {replied && <div className="mt-2 rounded-xl border-l-2 border-[var(--fx-primary-strong)] bg-black/[.03] px-3 py-2 text-[10px] dark:bg-white/[.03]">{replied.body.slice(0, 160)}</div>}
                         <p className="mt-3 whitespace-pre-wrap text-sm leading-7">{m.body}</p>
                         {m.attachment_path && (
-                          <a href={'/api/messages/media?message='+encodeURIComponent(m.id)} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold">
-                            {m.attachment_type?.startsWith('image/') ? <img src={'/api/messages/media?message='+encodeURIComponent(m.id)} alt="" className="max-h-40 max-w-full rounded-lg object-contain"/> : <File size={17}/>}
-                            <span className="max-w-[16rem] truncate">{m.attachment_name}</span>
-                          </a>
+                          <div className="mt-3 rounded-xl border border-[var(--fx-border)] p-3">
+                            {m.attachment_type?.startsWith('image/') ? (
+                              <img src={'/api/messages/media?message='+encodeURIComponent(m.id)} alt="" className="max-h-64 max-w-full rounded-lg object-contain" />
+                            ) : m.attachment_type?.startsWith('audio/') ? (
+                              <audio controls preload="metadata" className="w-full" src={'/api/messages/media?message='+encodeURIComponent(m.id)} />
+                            ) : m.attachment_type?.startsWith('video/') ? (
+                              <video controls preload="metadata" className="max-h-64 w-full rounded-lg" src={'/api/messages/media?message='+encodeURIComponent(m.id)} />
+                            ) : (
+                              <a href={'/api/messages/media?message='+encodeURIComponent(m.id)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-xs font-bold">
+                                <File size={17} /> <span className="max-w-[16rem] truncate">{m.attachment_name}</span>
+                              </a>
+                            )}
+                            {m.attachment_type?.startsWith('image/') || m.attachment_type?.startsWith('audio/') || m.attachment_type?.startsWith('video/') ? (
+                              <a href={'/api/messages/media?message='+encodeURIComponent(m.id)} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-2 text-[10px] font-bold text-[var(--fx-muted)]">
+                                <File size={13} /> {m.attachment_name}
+                              </a>
+                            ) : null}
+                          </div>
                         )}
                         <div className="mt-3 flex flex-wrap items-center gap-1.5">
                           <button type="button" onClick={() => setReplyTo(m)} className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-[var(--fx-border)] px-2.5 text-[10px] font-bold"><Reply size={13}/> Reply</button>
