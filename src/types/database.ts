@@ -4125,32 +4125,9 @@ export type Database = {
           preferred_contact: string | null
           upazila_bn: string | null
           upazila_en: string | null
-          user_id: string | null
           username: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_blood_donors_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_donors_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_donors_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       fenix_public_blood_requests: {
         Row: {
@@ -4687,6 +4664,7 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
 
 /** FeniX compatibility aliases used by the application layer. */
 export type Business = Database['public']['Tables']['businesses']['Row']
