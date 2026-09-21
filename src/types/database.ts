@@ -2062,6 +2062,36 @@ export type Database = {
           },
         ]
       }
+      fenix_brain_query_events: {
+        Row: {
+          created_at: string
+          id: string
+          intent_key: string
+          language_code: string
+          query_hash: string
+          result_count: number
+          term: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intent_key?: string
+          language_code?: string
+          query_hash: string
+          result_count?: number
+          term: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intent_key?: string
+          language_code?: string
+          query_hash?: string
+          result_count?: number
+          term?: string
+        }
+        Relationships: []
+      }
       fenix_brain_query_terms: {
         Row: {
           created_at: string
@@ -4147,6 +4177,23 @@ export type Database = {
           },
         ]
       }
+      fenix_brain_pulse_intents: {
+        Row: {
+          intent_key: string | null
+          searches_30d: number | null
+          searches_7d: number | null
+        }
+        Relationships: []
+      }
+      fenix_brain_pulse_terms: {
+        Row: {
+          searches_30d: number | null
+          searches_7d: number | null
+          term: string | null
+          unique_queries_7d: number | null
+        }
+        Relationships: []
+      }
       fenix_public_ambulance_providers: {
         Row: {
           ac_available: boolean | null
@@ -4477,6 +4524,16 @@ export type Database = {
       owner_update_investment_interest: {
         Args: { p_interest_id: string; p_owner_note?: string; p_status: string }
         Returns: boolean
+      }
+      record_feni_brain_events: {
+        Args: {
+          p_intent_key: string
+          p_language_code: string
+          p_query_hash: string
+          p_result_count?: number
+          p_terms: string[]
+        }
+        Returns: number
       }
       save_business_embedding: {
         Args: { p_business_id: string; p_embedding: string }
