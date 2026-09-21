@@ -39,7 +39,7 @@ export default async function FeniArticlePage({params}:{params:Promise<{slug:str
     <p className="mt-2 text-sm leading-6 text-[var(--fx-muted)]">Public factual claims should be checked against the underlying official source, especially when information can change.</p>
     <div className="mt-4 flex flex-wrap gap-2">
       <a href={FENI_ARTICLE_SOURCES.officialDistrictSource} target="_blank" rel="noreferrer noopener" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold">Feni District official source <ArrowSquareOut size={14}/></a>
-      <a href={FENI_ARTICLE_SOURCES.bbsSource} target="_blank" rel="noreferrer noopener" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold">BBS Feni source <ExternalLink size={14}/></a>
+      <a href={FENI_ARTICLE_SOURCES.bbsSource} target="_blank" rel="noreferrer noopener" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold">BBS Feni source <ArrowSquareOut size={14}/></a>
     </div>
    </section>
    <div className="mt-5 rounded-[1.8rem] border border-[var(--fx-primary)]/15 bg-[var(--fx-primary-soft)] p-6">
