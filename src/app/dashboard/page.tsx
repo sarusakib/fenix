@@ -72,6 +72,7 @@ export default async function DashboardPage() {
             ['/requests','Investment requests','Track your investment interests and review status.',ClipboardText],
             ['/messages','Messages','Open your protected direct messages.',ChatCircleText],
             ['/feed','Community Feed','Post and read text-only community updates.',UsersThree],
+            ['/dashboard/business-health','Business Health','Check your business profile readiness and next actions.',ShieldCheck],
             ['/profile','My Profile','Edit your public-safe profile, bio and visibility.',UserCircle],
             ['/deals','Deals','View recorded investment deal workflow.',Handshake],
             ['/dashboard/settings','Account settings','Review account and privacy guidance.',GearSix],
