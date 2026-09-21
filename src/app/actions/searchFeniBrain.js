@@ -121,10 +121,15 @@ function mergeRows(groups, parsed) {
 }
 
 async function safeDirectorySearch(supabase, parsed, locations) {
+  const genericTerms = new Set(['ব্যবসা', 'business', 'দোকান', 'shop', 'সেবা', 'service', 'supplier', 'সরবরাহকারী', 'পণ্য', 'product'])
+  const tokenQueries = queryTokens(parsed)
+    .filter((token) => token.length >= 3 && !genericTerms.has(token))
+    .slice(0, 6)
+
   const queries = [
     String(parsed?.original || '').trim().slice(0, MAX_QUERY_LENGTH),
     buildKeywordQuery(parsed?.normalized || ''),
-    queryTokens(parsed).slice(0, 6).join(' '),
+    ...tokenQueries,
   ]
     .map((value) => value.trim().slice(0, MAX_QUERY_LENGTH))
     .filter(Boolean)
