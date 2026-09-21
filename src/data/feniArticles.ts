@@ -117,7 +117,6 @@ export const FENI_ARTICLES: readonly FeniArticle[] = [
       {headingBn:'Community safety',headingEn:'Community safety',bodyBn:'Text-only feed, report system, moderation queue এবং user ban/suspend control রাখা হয়েছে যাতে public discussion আরও দায়িত্বশীল থাকে।',bodyEn:'The text-only feed, reporting system, moderation queue and user suspension/ban controls provide a structured foundation for responsible public discussion.'},
     ],
   },
-,
   {
     slug:'feni-sadar-city-guide',
     titleBn:'ফেনী সদর শহর: বাজার, সেবা ও ব্যবসা খোঁজার local guide',
