@@ -255,9 +255,11 @@ export function classifyFeniBrainQuestion(input) {
   const hasAny = (terms) => terms.some((term) => text.includes(term));
   const current=hasAny(currentTerms), local=hasAny(localTerms), business=hasAny(businessTerms), commerce=hasAny(commerceTerms);
   const investment=hasAny(investmentTerms), start=hasAny(startTerms), highStakes=hasAny(highStakesTerms);
+  const emergency = hasAny(['জরুরি','জরুরী','emergency','ambulance','অ্যাম্বুলেন্স','blood','রক্ত','oxygen','অক্সিজেন','fire service','পুলিশ জরুরি']);
 
   let scope='general';
-  if(start) scope='start';
+  if(emergency) scope='emergency';
+  else if(start) scope='start';
   else if(investment) scope='investment';
   else if(commerce) scope='commerce';
   else if(business) scope='business';
@@ -265,7 +267,7 @@ export function classifyFeniBrainQuestion(input) {
 
   return {
     ...parsed,
-    scope, local, current, highStakes, business, commerce, investment, start,
+    scope, local, current, highStakes, business, commerce, investment, start, emergency,
     language: detectLanguage(input),
     intentKey: detectFeniBrainIntent(input),
     budgetBDT: extractBudgetBDT(input),
