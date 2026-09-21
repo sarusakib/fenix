@@ -4687,3 +4687,22 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+/** FeniX compatibility aliases used by the application layer. */
+export type Business = Database['public']['Tables']['businesses']['Row']
+export type BusinessInsert = Database['public']['Tables']['businesses']['Insert']
+export type BusinessUpdate = Database['public']['Tables']['businesses']['Update']
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
+export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
+export type VendorProfile = Database['public']['Tables']['vendor_profiles']['Row']
+export type VendorProfileInsert = Database['public']['Tables']['vendor_profiles']['Insert']
+export type VendorProfileUpdate = Database['public']['Tables']['vendor_profiles']['Update']
+export type InvestmentDocument = Database['public']['Tables']['investment_documents']['Row']
+export type InvestmentInterest = Database['public']['Tables']['investment_interests']['Row']
+export type InvestmentOpportunity = Database['public']['Tables']['investment_opportunities']['Row']
+export type InvestmentProfile = Database['public']['Tables']['investment_profiles']['Row']
+export type InvestmentReport = Database['public']['Tables']['investment_reports']['Row']
+export type InvestmentDeal = Database['public']['Tables']['investment_deals']['Row']
+export type InvestmentUpdate = Database['public']['Tables']['investment_updates']['Row']
+export type InvestmentMessage = Database['public']['Tables']['investment_messages']['Row']
