@@ -3584,11 +3584,18 @@ export type Database = {
           bio: string | null
           cover_url: string | null
           created_at: string | null
+          facebook_url: string | null
           full_name: string | null
           id: string | null
+          instagram_url: string | null
+          linkedin_url: string | null
           location_text: string | null
+          phone: string | null
+          public_location: string | null
           username: string | null
+          whatsapp: string | null
           website_url: string | null
+          youtube_url: string | null
         }
         Relationships: []
       }
