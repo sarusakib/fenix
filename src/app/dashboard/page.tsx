@@ -12,7 +12,8 @@ export default async function DashboardPage() {
   if (!auth.user) redirect('/login?next=/dashboard')
 
   const [profile, settings, businesses, starts, interests, orders, notifications] = await Promise.all([
-    s.from('profiles').select('full_name,role').eq('id', auth.user.id).maybeSingle(),
+    s.from('profiles').select('full_name,role,username,avatar_url').eq('id', auth.user.id).maybeSingle(),
+    s.from('profile_settings').select('onboarding_completed,onboarding_dismissed').eq('user_id', auth.user.id).maybeSingle(),
     s.from('businesses').select('id',{count:'exact',head:true}).eq('owner_id',auth.user.id),
     s.from('business_start_projects').select('id',{count:'exact',head:true}).eq('user_id',auth.user.id),
     s.from('investment_interests').select('id',{count:'exact',head:true}).eq('investor_id',auth.user.id),
