@@ -211,6 +211,35 @@ export function extractEntities(input) {
   };
 }
 
+
+export function detectRequestedFactSubject(input) {
+  const text = normalizeFeniBrainQuery(input).normalized.toLowerCase();
+  const checks = [
+    ['upazila_count', ['উপজেলা', 'upazila', 'upajila', 'upojela']],
+    ['municipality_count', ['পৌরসভা', 'municipality', 'pourashava']],
+    ['union_count', ['ইউনিয়ন', 'ইউনিয়ন', 'union']],
+    ['village_count', ['গ্রাম', 'village', 'gram']],
+    ['mouza_count', ['মৌজা', 'mouza']],
+    ['market_count', ['বাজার', 'হাট', 'market', 'bazar', 'bazaar']],
+    ['ward_count', ['ওয়ার্ড', 'ওয়ার্ড', 'ward']],
+    ['population_density', ['জনঘনত্ব', 'population density', 'density']],
+    ['population', ['জনসংখ্যা', 'population', 'মানুষ', 'লোকসংখ্যা']],
+    ['male_population', ['পুরুষ জনসংখ্যা', 'male population']],
+    ['female_population', ['নারী জনসংখ্যা', 'মহিলা জনসংখ্যা', 'female population']],
+    ['hijra_population', ['হিজড়া জনসংখ্যা', 'হিজড়া', 'hijra population']],
+    ['area', ['আয়তন', 'আয়তন', 'area', 'square kilometer', 'sq km']],
+    ['cultivable_land', ['চাষযোগ্য', 'আবাদযোগ্য', 'cultivable land']],
+    ['irrigated_land', ['সেচযুক্ত', 'সেচের জমি', 'irrigated land']],
+    ['forest_land', ['বনভূমি', 'forest land']],
+    ['heavy_industry_count', ['ভারী শিল্প', 'heavy industry']],
+    ['medium_industry_count', ['মাঝারি শিল্প', 'medium industry']],
+    ['small_industry_count', ['ক্ষুদ্র শিল্প', 'small industry']],
+    ['cottage_industry_count', ['কুটির শিল্প', 'cottage industry']],
+    ['union_land_office_count', ['ভূমি অফিস', 'land office']],
+  ];
+  return checks.find(([, terms]) => terms.some((term) => text.includes(term)))?.[0] ?? null;
+}
+
 export function classifyFeniBrainQuestion(input) {
   const parsed = normalizeFeniBrainQuery(input);
   const text = (parsed.normalized + ' ' + parsed.original).toLowerCase();
