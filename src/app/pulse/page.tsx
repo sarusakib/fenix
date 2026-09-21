@@ -26,10 +26,10 @@ export default function FeniPulsePage() {
         s.from('fenix_brain_pulse_terms_public').select('term,searches_7d,searches_30d,unique_queries_7d').order('searches_7d', { ascending: false }).limit(20),
         s.from('fenix_brain_pulse_intents_public').select('intent_key,searches_7d,searches_30d').order('searches_7d', { ascending: false }).limit(12),
         s.from('business_directory_profiles').select('business_id',{count:'exact',head:true}).eq('listing_status','published'),
-        s.from('products').select('id',{count:'exact',head:true}).eq('status','published').eq('is_active',true),
+        s.from('commerce_public_products').select('id',{count:'exact',head:true}),
         s.from('investment_opportunities').select('id',{count:'exact',head:true}).in('status',['approved','fully_funded']).eq('verification_status','verified'),
         s.from('fenix_public_blood_requests').select('id',{count:'exact',head:true}),
-        s.from('fenix_ambulance_providers').select('id',{count:'exact',head:true}).eq('status','active'),
+        s.from('fenix_public_ambulance_providers').select('id',{count:'exact',head:true}).eq('status','active'),
         s.from('fenix_public_feed').select('id',{count:'exact',head:true}),
       ])
       if (!active) return
