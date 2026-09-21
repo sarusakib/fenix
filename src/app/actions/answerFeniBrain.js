@@ -104,6 +104,9 @@ function brainMeta(cleanQuery, retrieval, plan) {
 }
 
 function directQuestionAnswer(cleanQuery, retrieval) {
+  const normalized = cleanQuery.toLowerCase()
+  const isCountQuestion = ['কত','কয়টি','কয়টি','কয়টা','কয়টা','কতো','কয়জন','কয়জন','how many','number of','count','koyta','koita','koto'].some((term) => normalized.includes(term))
+  if (!isCountQuestion) return ''
   const subject = retrieval.requestedFactSubject || detectRequestedFactSubject(cleanQuery)
   if (!subject) return ''
   const exact = (retrieval.results || []).find((row) => row.retrieval_method === 'fact' && row.subject_key === subject)
@@ -227,7 +230,7 @@ export async function answerFeniBrain(query) {
   } catch (error) {
     console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status })
     return {
-      success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
+      success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(cleanQuery, retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
       grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0), aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0),
