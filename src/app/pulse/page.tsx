@@ -23,8 +23,8 @@ export default function FeniPulsePage() {
     async function load() {
       const s = createClient()
       const [termsResult, intentsResult, b, p, o, blood, amb, posts] = await Promise.all([
-        s.from('fenix_brain_pulse_terms').select('term,searches_7d,searches_30d,unique_queries_7d').order('searches_7d', { ascending: false }).limit(20),
-        s.from('fenix_brain_pulse_intents').select('intent_key,searches_7d,searches_30d').order('searches_7d', { ascending: false }).limit(12),
+        s.from('fenix_brain_pulse_terms_public').select('term,searches_7d,searches_30d,unique_queries_7d').order('searches_7d', { ascending: false }).limit(20),
+        s.from('fenix_brain_pulse_intents_public').select('intent_key,searches_7d,searches_30d').order('searches_7d', { ascending: false }).limit(12),
         s.from('business_directory_profiles').select('business_id',{count:'exact',head:true}).eq('listing_status','published'),
         s.from('products').select('id',{count:'exact',head:true}).eq('status','published').eq('is_active',true),
         s.from('investment_opportunities').select('id',{count:'exact',head:true}).in('status',['approved','fully_funded']).eq('verification_status','verified'),
