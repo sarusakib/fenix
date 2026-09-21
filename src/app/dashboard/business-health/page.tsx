@@ -57,10 +57,10 @@ export default function BusinessHealthPage(){
         s.from('investment_opportunities').select('business_id').in('business_id',ids).in('status',['approved','fully_funded']).eq('verification_status','verified'),
       ])
       if(!active)return
-      const dm=new Map<string,Directory>((d.data??[] as Directory[]).map(x=>[x.business_id,x]))
-      const lm=new Map<string,Location>((l.data??[] as Location[]).map(x=>[x.business_id,x]))
-      const pc=new Map<string,number>(); for(const x of p.data??[]){pc.set(x.business_id,(pc.get(x.business_id)||0)+1)}
-      const oc=new Map<string,number>(); for(const x of o.data??[]){oc.set(x.business_id,(oc.get(x.business_id)||0)+1)}
+      const dm=new Map<string,Directory>(((d.data ?? []) as Directory[]).filter((x) => Boolean(x.business_id)).map(x=>[x.business_id,x]))
+      const lm=new Map<string,Location>(((l.data ?? []) as Location[]).filter((x) => Boolean(x.business_id)).map(x=>[x.business_id,x]))
+      const pc=new Map<string,number>(); for(const x of p.data ?? []){ if (!x.business_id) continue; pc.set(x.business_id,(pc.get(x.business_id)||0)+1) }
+      const oc=new Map<string,number>(); for(const x of o.data ?? []){ if (!x.business_id) continue; oc.set(x.business_id,(oc.get(x.business_id)||0)+1) }
       setRows(bs.map(b=>{const r=readiness(b,dm.get(b.id),lm.get(b.id),pc.get(b.id)||0,oc.get(b.id)||0);return {...b,directory:dm.get(b.id),location:lm.get(b.id),products:pc.get(b.id)||0,opportunities:oc.get(b.id)||0,score:r.score,actions:r.actions}}))
       setLoading(false)
     }
