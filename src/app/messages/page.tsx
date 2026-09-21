@@ -2,7 +2,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowLeft, Check, ChatCircleText, File, Flag, Heart, MagnifyingGlass,
   Paperclip, PencilSimple, Reply, Smiley, Trash, UserCircle, X
@@ -56,6 +56,10 @@ export default function MessagesPage() {
   const [attachment, setAttachment] = useState<File | null>(null)
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState('')
+  const [recording, setRecording] = useState(false)
+  const recorderRef = useRef<MediaRecorder | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const recordTimerRef = useRef<number | null>(null)
 
   async function load() {
     const s = createClient()
@@ -138,6 +142,46 @@ export default function MessagesPage() {
     })
     if (error) throw error
     return { path, name: attachment.name.slice(0, 180), type: attachment.type, size: attachment.size }
+  }
+
+  async function toggleRecording() {
+    if (recording) {
+      recorderRef.current?.stop()
+      return
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      setStatus(bn ? 'এই browser-এ voice recording support নেই। Audio file attach করুন।' : 'Voice recording is not supported here. Attach an audio file instead.')
+      return
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+      const chunks: BlobPart[] = []
+      recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data) }
+      recorder.onstop = () => {
+        if (recordTimerRef.current) window.clearTimeout(recordTimerRef.current)
+        stream.getTracks().forEach((track) => track.stop())
+        streamRef.current = null
+        recorderRef.current = null
+        setRecording(false)
+        const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' })
+        if (blob.size > MAX_FILE) {
+          setStatus(bn ? 'Voice message 10MB-এর বেশি হয়েছে।' : 'Voice message exceeded 10MB.')
+          return
+        }
+        setAttachment(new File([blob], 'voice-' + Date.now() + '.webm', { type: blob.type }))
+      }
+
+      recorderRef.current = recorder
+      streamRef.current = stream
+      setRecording(true)
+      recorder.start()
+      recordTimerRef.current = window.setTimeout(() => recorder.stop(), 60000)
+    } catch {
+      setStatus(bn ? 'Microphone permission পাওয়া যায়নি।' : 'Microphone permission was not granted.')
+    }
   }
 
   async function send() {
@@ -280,7 +324,11 @@ export default function MessagesPage() {
             <div className="mt-2 space-y-1">
               {conversations.map(([id, latest]) => {
                 const p = people[id]
-                return <button type="button" key={id} onClick={() => setActivePersonId(id)} className={'flex w-full items-center gap-2 rounded-xl p-2 text-left '+(activePersonId===id?'bg-[var(--fx-primary-soft)]':'hover:bg-black/[.03] dark:hover:bg-white/[.04]')}>
+                return <button type="button" key={id} onClick={() => {
+                  setActivePersonId(id)
+                  setTo(id)
+                  setRecipientName(p?.username ? '@' + p.username : p?.full_name || '')
+                }} className={'flex w-full items-center gap-2 rounded-xl p-2 text-left '+(activePersonId===id?'bg-[var(--fx-primary-soft)]':'hover:bg-black/[.03] dark:hover:bg-white/[.04]')}>
                   {p?.avatar_url ? <img src={p.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover"/> : <UserCircle size={36} className="opacity-35"/>}
                   <span className="min-w-0 flex-1"><span className="block truncate text-xs font-bold">{p?.full_name || p?.username || 'FeniX user'}</span><span className="block truncate text-[10px] text-[var(--fx-muted)]">{latest.body.slice(0, 36)}</span></span>
                 </button>
@@ -350,6 +398,9 @@ export default function MessagesPage() {
               {editing && <div className="mb-3 flex items-center justify-between rounded-xl bg-amber-500/[.08] p-3 text-xs"><span>Editing message</span><button type="button" onClick={() => {setEditing(null);setBody('')}}><X size={16}/></button></div>}
               {attachment && <div className="mb-3 flex items-center justify-between rounded-xl border border-[var(--fx-border)] p-3"><span className="truncate text-xs font-bold">{attachment.name}</span><button type="button" onClick={() => setAttachment(null)}><X size={16}/></button></div>}
               <div className="flex items-end gap-2">
+                <button type="button" onClick={() => void toggleRecording()} disabled={Boolean(attachment)} className={'grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-[var(--fx-border)] '+(recording?'bg-rose-500 text-white':'') } title={recording ? 'Stop voice recording' : 'Record voice'}>
+                  {recording ? <Stop size={18}/> : <Microphone size={18}/>}
+                </button>
                 <label className="grid h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-xl border border-[var(--fx-border)]" title="Attach">
                   <Paperclip size={18}/>
                   <input type="file" className="hidden" onChange={(e) => {
