@@ -104,6 +104,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'jobs', label: 'Jobs & Work', labelBn: 'চাকরি ও কাজ', description: 'Explore the work and opportunity direction.', href: '/jobs', status: 'live', icon: 'briefcase' },
       { id: 'radar', label: 'Opportunity Radar', labelBn: 'অপর্চুনিটি রাডার', description: 'Surface local opportunity signals by place and intent.', href: '/radar', status: 'live', icon: 'trend' },
       { id: 'map', label: 'Feni Map', labelBn: 'ফেনি ম্যাপ', description: 'Map-first local discovery and business context.', href: '/directory/map', status: 'live', icon: 'map' },
+      { id: 'pulse', label: 'Feni Pulse', labelBn: 'ফেনি পালস', description: 'See privacy-safe observed local activity signals.', href: '/pulse', status: 'live', icon: 'trend', tag: 'Signals' },
     ],
   },
   {
