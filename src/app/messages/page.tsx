@@ -4,12 +4,14 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowLeft, Check, ChatCircleText, File, Flag, MagnifyingGlass, Microphone,
-  Paperclip, PencilSimple, PaperPlaneRight, Reply, Smiley, Stop, Trash, UserCircle, X
+  ArrowBendUpLeft, ArrowLeft, Check, ChatCircleText, FileIcon, Flag, MagnifyingGlass, Microphone,
+  Paperclip, PencilSimple, PaperPlaneRight, Smiley, Stop, Trash, UserCircle, X
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
+
+type AttachmentFile = File
 
 type Message = {
   id: string
@@ -53,7 +55,7 @@ export default function MessagesPage() {
   const [activePersonId, setActivePersonId] = useState('')
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [editing, setEditing] = useState<Message | null>(null)
-  const [attachment, setAttachment] = useState<File | null>(null)
+  const [attachment, setAttachment] = useState<AttachmentFile | null>(null)
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState('')
   const [recording, setRecording] = useState(false)
@@ -384,7 +386,7 @@ export default function MessagesPage() {
                               <video controls preload="metadata" className="max-h-64 w-full rounded-lg" src={'/api/messages/media?message='+encodeURIComponent(m.id)} />
                             ) : (
                               <a href={'/api/messages/media?message='+encodeURIComponent(m.id)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-xs font-bold">
-                                <File size={17} /> <span className="max-w-[16rem] truncate">{m.attachment_name}</span>
+                                <FileIcon size={17} /> <span className="max-w-[16rem] truncate">{m.attachment_name}</span>
                               </a>
                             )}
                             {m.attachment_type?.startsWith('image/') || m.attachment_type?.startsWith('audio/') || m.attachment_type?.startsWith('video/') ? (
@@ -395,7 +397,7 @@ export default function MessagesPage() {
                           </div>
                         )}
                         <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                          <button type="button" onClick={() => setReplyTo(m)} className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-[var(--fx-border)] px-2.5 text-[10px] font-bold"><Reply size={13}/> Reply</button>
+                          <button type="button" onClick={() => setReplyTo(m)} className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-[var(--fx-border)] px-2.5 text-[10px] font-bold"><ArrowBendUpLeft size={13}/> Reply</button>
                           <details className="relative">
                             <summary className="flex min-h-8 cursor-pointer list-none items-center gap-1.5 rounded-lg border border-[var(--fx-border)] px-2.5 text-[10px] font-bold"><Smiley size={13}/> React</summary>
                             <div className="absolute bottom-10 left-0 z-20 flex gap-1 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-2 shadow-xl">
