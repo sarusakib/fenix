@@ -36,7 +36,7 @@ export default function ProfileEditorPage() {
       setBio(profile?.bio ?? ''); setLocationText(profile?.location_text ?? ''); setWebsiteUrl(profile?.website_url ?? '')
       if (settings?.locale === 'bn' || settings?.locale === 'en') setLocale(settings.locale)
       if (settings?.profile_visibility === 'private') setVisibility('private')
-      if (['everyone','authenticated','nobody'].includes(settings?.message_permissions)) setMessagePermissions(settings.message_permissions)
+      if (settings?.message_permissions === 'everyone' || settings?.message_permissions === 'authenticated' || settings?.message_permissions === 'nobody') setMessagePermissions(settings.message_permissions)
       if (settings?.feed_visibility === 'authenticated') setFeedVisibility('authenticated')
     }
     void load()
