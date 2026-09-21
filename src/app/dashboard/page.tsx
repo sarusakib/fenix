@@ -21,6 +21,7 @@ export default async function DashboardPage() {
   ])
 
   const cards = [
+    ['Profile', 'Open', UserCircle, '/profile'],
     ['Businesses', businesses.count ?? 0, Buildings, '/dashboard/business'],
     ['Start journeys', starts.count ?? 0, Rocket, '/start/dashboard'],
     ['Investment interests', interests.count ?? 0, ChartLineUp, '/invest/dashboard'],
@@ -35,7 +36,7 @@ export default async function DashboardPage() {
         <div className="rounded-[2rem] border border-black/10 bg-white/85 p-7 dark:border-white/10 dark:bg-white/[.045] sm:p-9">
           <p className="text-xs font-bold uppercase tracking-[.16em] text-[#008080]">One account</p>
           <h1 className="mt-2 text-3xl font-black sm:text-5xl">Your FeniX workspace</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-7 opacity-60">A single account connects your business identity, Business Journey, investment activity, local commerce and trusted notifications.</p>
+          <p className="mt-3 max-w-3xl text-sm leading-7 opacity-60">One account connects your profile, community, business journey, local commerce, investment activity and trusted notifications.</p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-black/[.035] px-3 py-1.5 text-xs font-semibold dark:bg-white/[.05]"><ShieldCheck size={15} className="text-[#008080]"/> {profile.data?.role || 'user'} · {profile.data?.full_name || auth.user.email}</div>
         </div>
 
@@ -57,7 +58,9 @@ export default async function DashboardPage() {
             ['/commerce/orders','Commerce orders','Review your local commerce orders.',Storefront],
             ['/notifications','Notifications','See trust, account and ecosystem activity.',Bell],
             ['/requests','Investment requests','Track your investment interests and review status.',ClipboardText],
-            ['/messages','Messages','Open your protected investment conversations.',ChatCircleText],
+            ['/messages','Messages','Open your protected direct messages.',ChatCircleText],
+            ['/feed','Community Feed','Post and read text-only community updates.',UsersThree],
+            ['/profile','My Profile','Edit your public-safe profile, bio and visibility.',UserCircle],
             ['/deals','Deals','View recorded investment deal workflow.',Handshake],
             ['/dashboard/settings','Account settings','Review account and privacy guidance.',GearSix],
           ].map(([href,title,body,Icon]) => (
