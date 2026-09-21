@@ -238,6 +238,7 @@ select
   p.bio,
   p.avatar_url,
   p.cover_url,
+  p.location_text,
   p.website_url,
   p.created_at,
   case
