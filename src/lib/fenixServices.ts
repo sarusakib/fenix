@@ -107,6 +107,18 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
     ],
   },
   {
+    id: 'care',
+    label: 'Care',
+    labelBn: 'জরুরি সেবা',
+    description: 'Blood, ambulance and urgent local help with privacy and verification.',
+    icon: 'shield',
+    services: [
+      { id: 'blood-help', label: 'Blood Help', labelBn: 'রক্ত সহায়তা', description: 'Find open blood requests or register as a donor.', href: '/care/blood', status: 'live', icon: 'shield', tag: 'Emergency' },
+      { id: 'ambulance', label: 'Ambulance', labelBn: 'অ্যাম্বুলেন্স', description: 'Find ambulance providers or request a ride.', href: '/care/ambulance', status: 'live', icon: 'shield', tag: 'Emergency' },
+      { id: 'health-directory', label: 'Hospitals & Pharmacy', labelBn: 'হাসপাতাল ও ফার্মেসি', description: 'Open local health and emergency discovery.', href: '/directory', status: 'live', icon: 'shield' },
+    ],
+  },
+  {
     id: 'trust',
     label: 'Trust',
     labelBn: 'ট্রাস্ট',
