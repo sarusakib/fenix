@@ -6,6 +6,7 @@ import FenixFlow from './FenixFlow'
 import HomeThemeProvider from '../components/theme/HomeThemeProvider'
 import SiteBackground from '../components/layout/SiteBackground'
 import MobileDock from '../components/MobileDock'
+import { FenixLocaleProvider } from '../components/i18n/FenixLocaleProvider'
 
 export const metadata = {
   title: 'FeniX | Feni Business Ecosystem',
@@ -61,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="bn" suppressHydrationWarning>
       <body className="min-h-screen w-full overflow-x-clip antialiased">
         <Script
           id="fenix-theme-bootstrap"
@@ -72,7 +73,8 @@ export default function RootLayout({
 
         <AuthSync />
 
-        <HomeThemeProvider>
+        <FenixLocaleProvider>
+          <HomeThemeProvider>
           <FenixFlow>
             <SiteBackground />
 
@@ -82,7 +84,8 @@ export default function RootLayout({
 
             <MobileDock />
           </FenixFlow>
-        </HomeThemeProvider>
+          </HomeThemeProvider>
+        </FenixLocaleProvider>
       </body>
     </html>
   )
