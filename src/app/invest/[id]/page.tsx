@@ -268,12 +268,15 @@ export default function InvestmentOpportunityPage() {
             )}
 
             <section className="mt-7 rounded-2xl border border-[#0b1736]/10 p-5 dark:border-white/10">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h2 className="text-xl font-black">Due-diligence documents</h2>
                   <p className="mt-1 text-xs opacity-50">Approved shared documents can be viewed with a temporary secure link.</p>
                 </div>
-                <FileText size={22} className="opacity-35" />
+                <div className="flex items-center gap-2">
+                  <FileText size={22} className="opacity-35" />
+                  {userId && !isOwner && <Link href={'/invest/due-diligence?opportunity='+encodeURIComponent(opportunity.id)} className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[#008080]/20 px-3 text-[10px] font-bold text-[#007171] dark:text-[#8ee6e0]">Open checklist <ArrowRight size={13}/></Link>}
+                </div>
               </div>
               <div className="mt-5 space-y-2">
                 {documents.length ? documents.map((document) => {
@@ -389,6 +392,15 @@ export default function InvestmentOpportunityPage() {
                 </div>
               )}
             </section>
+
+            {!isOwner && userId && (
+              <Link href={'/invest/due-diligence?opportunity='+encodeURIComponent(opportunity.id)} className="block rounded-[2rem] border border-[#008080]/15 bg-[#008080]/[.05] p-6 transition hover:bg-[#008080]/[.08]">
+                <p className="text-xs font-bold uppercase tracking-[.14em] text-[#007171] dark:text-[#8ee6e0]">Due diligence</p>
+                <h2 className="mt-2 text-xl font-black">Work through your private checklist</h2>
+                <p className="mt-2 text-sm leading-6 opacity-60">Save review status and private notes for this opportunity.</p>
+                <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold">Open checklist <ArrowRight size={17}/></span>
+              </Link>
+            )}
 
             <section className="rounded-[2rem] border border-[#0b1736]/10 bg-white/70 p-6 dark:border-white/10 dark:bg-white/[.035]">
               <div className="flex items-center gap-3">
