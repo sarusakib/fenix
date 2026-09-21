@@ -1,5 +1,3 @@
-'use server'
-
 import { NextResponse } from 'next/server'
 import { normalizeFeniBrainQuery } from '../../../lib/feniBrainQuery'
 import { buildBrainSuggestions } from '../../../lib/feniBrainEngine'
