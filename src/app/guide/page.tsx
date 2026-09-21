@@ -68,6 +68,7 @@ type BrainAnswer = {
   guidanceTitle?: string
   guidanceText?: string
   safetyNote?: string | null
+  zeroResultHints?: { label: string; href: string; reason: string }[]
 }
 
 function FeniBrainGuide() {
@@ -89,6 +90,7 @@ function FeniBrainGuide() {
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
   const [suggestions, setSuggestions] = useState<string[]>([])
+  const [zeroResultHints, setZeroResultHints] = useState<NonNullable<BrainAnswer['zeroResultHints']>>([])
 
   const runSearch = async (value?: string) => {
     const nextQuery = (value ?? query).trim().slice(0, 120)
@@ -119,6 +121,7 @@ function FeniBrainGuide() {
     setGuidanceText('')
     setSafetyNote(null)
     setSuggestions([])
+    setZeroResultHints([])
 
     try {
       const result = (await answerFeniBrain(nextQuery)) as BrainAnswer
@@ -145,6 +148,7 @@ function FeniBrainGuide() {
       setGuidanceTitle(result.guidanceTitle || 'পরের ধাপ')
       setGuidanceText(result.guidanceText || '')
       setSafetyNote(result.safetyNote || null)
+      setZeroResultHints(result.zeroResultHints || [])
 
       if (result.liveWebChecked && nextLiveSources.length) {
         setStatus('Stored Feni data + official live web data মিলিয়ে উত্তর তৈরি হয়েছে।')
@@ -414,6 +418,26 @@ function FeniBrainGuide() {
                     >
                       {location.name_bn}
                     </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {results.length === 0 && !loading && zeroResultHints.length > 0 && (
+              <div className="mt-8 rounded-3xl border border-white/[0.07] bg-white/[0.025] p-5">
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#72ddda]">
+                  Try a useful next step
+                </div>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {zeroResultHints.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="rounded-2xl border border-white/[0.08] bg-black/20 p-4 transition hover:bg-white/[0.06]"
+                    >
+                      <div className="text-sm font-bold text-white">{item.label}</div>
+                      <div className="mt-1 text-xs leading-5 text-white/45">{item.reason}</div>
+                    </Link>
                   ))}
                 </div>
               </div>
