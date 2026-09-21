@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
@@ -39,16 +39,40 @@ const quickMoves = [
 export default function HomePage() {
   const router = useRouter()
   const [search, setSearch] = useState('')
+  const [suggestions, setSuggestions] = useState<string[]>([])
 
-  const goBrain = () => {
-    const query = search.trim().slice(0, 120)
-    router.push(query ? '/guide?q=' + encodeURIComponent(query) : '/guide')
-  }
+  const goBrain = () => { setSuggestions([]); const query = search.trim().slice(0, 120); router.push(query ? '/guide?q=' + encodeURIComponent(query) : '/guide') }
 
   const choosePrompt = (value: string) => {
     setSearch(value)
+    setSuggestions([])
     router.push('/guide?q=' + encodeURIComponent(value))
   }
+
+  useEffect(() => {
+    const value = search.trim().slice(0, 80)
+    if (value.length < 2) {
+      setSuggestions([])
+      return
+    }
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch('/api/brain/suggestions?q=' + encodeURIComponent(value), {
+          cache: 'no-store',
+        })
+        if (!response.ok) return
+        const data = await response.json()
+        if (Array.isArray(data.suggestions)) {
+          setSuggestions(data.suggestions.slice(0, 5))
+        }
+      } catch {
+        // Search remains available when suggestion fetch fails.
+      }
+    }, 180)
+
+    return () => window.clearTimeout(timer)
+  }, [search])
 
   return (
     <main className="fenix-shell min-h-dvh overflow-x-clip">
@@ -91,7 +115,7 @@ export default function HomePage() {
                   <span className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><Brain size={21} weight="duotone" /></span>
                 </div>
 
-                <div className="mt-5 flex items-center gap-2 rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-2">
+                <div className="relative mt-5 flex items-center gap-2 rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-2">
                   <MagnifyingGlass size={20} className="ml-2 shrink-0 text-[var(--fx-muted)]" />
                   <input
                     value={search}
@@ -99,12 +123,30 @@ export default function HomePage() {
                     onKeyDown={(event) => { if (event.key === 'Enter') goBrain() }}
                     className="min-w-0 flex-1 bg-transparent px-1 py-3 text-sm outline-none placeholder:text-[var(--fx-muted)]"
                     placeholder="Ask in Bangla, English or Banglish…"
-                    aria-label="Ask Feni Brain"
+                    aria-label="Search Feni Brain"
                     maxLength={120}
                   />
                   <button type="button" onClick={goBrain} className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[var(--fx-primary-strong)] text-white" aria-label="Search Feni Brain">
                     <ArrowRight size={18} />
                   </button>
+
+                  {suggestions.length > 0 && (
+                    <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-2 shadow-2xl">
+                      <div className="px-2 pb-1 pt-1 text-[10px] font-black uppercase tracking-[.16em] text-[var(--fx-muted)]">
+                        Suggested
+                      </div>
+                      {suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          onClick={() => choosePrompt(suggestion)}
+                          className="block w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium text-[var(--fx-muted)] transition hover:bg-[var(--fx-primary-soft)] hover:text-[var(--fx-text)]"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
