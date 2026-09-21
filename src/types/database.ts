@@ -2416,33 +2416,51 @@ export type Database = {
       }
       fenix_direct_messages: {
         Row: {
+          attachment_name: string | null
+          attachment_path: string | null
+          attachment_size: number | null
+          attachment_type: string | null
           body: string
           created_at: string
           deleted_for_recipient_at: string | null
           deleted_for_sender_at: string | null
+          edited_at: string | null
           id: string
           read_at: string | null
           recipient_id: string
+          reply_to_id: string | null
           sender_id: string
         }
         Insert: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
           body: string
           created_at?: string
           deleted_for_recipient_at?: string | null
           deleted_for_sender_at?: string | null
+          edited_at?: string | null
           id?: string
           read_at?: string | null
           recipient_id: string
+          reply_to_id?: string | null
           sender_id: string
         }
         Update: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
           body?: string
           created_at?: string
           deleted_for_recipient_at?: string | null
           deleted_for_sender_at?: string | null
+          edited_at?: string | null
           id?: string
           read_at?: string | null
           recipient_id?: string
+          reply_to_id?: string | null
           sender_id?: string
         }
         Relationships: [
@@ -2465,6 +2483,13 @@ export type Database = {
             columns: ["recipient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_direct_messages"
             referencedColumns: ["id"]
           },
           {
@@ -2510,6 +2535,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      fenix_message_reactions: {
+        Row: {
+          created_at: string
+          message_id: string
+          reaction: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          message_id: string
+          reaction: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          message_id?: string
+          reaction?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_direct_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fenix_notifications: {
         Row: {
