@@ -4,14 +4,12 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowBendUpLeft, ArrowLeft, Check, ChatCircleText, FileIcon, Flag, MagnifyingGlass, Microphone,
+  ArrowBendUpLeft, ArrowLeft, Check, ChatCircleText, File as FileIcon, Flag, MagnifyingGlass, Microphone,
   Paperclip, PencilSimple, PaperPlaneRight, Smiley, Stop, Trash, UserCircle, X
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
-
-type AttachmentFile = File
 
 type Message = {
   id: string
@@ -55,7 +53,7 @@ export default function MessagesPage() {
   const [activePersonId, setActivePersonId] = useState('')
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [editing, setEditing] = useState<Message | null>(null)
-  const [attachment, setAttachment] = useState<AttachmentFile | null>(null)
+  const [attachment, setAttachment] = useState<File | null>(null)
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState('')
   const [recording, setRecording] = useState(false)
