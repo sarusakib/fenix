@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ChatCircleText, Check, PaperPlaneRight, UserCircle } from '@phosphor-icons/react'
+import { ArrowLeft, ChatCircleText, Check, Flag, PaperPlaneRight, UserCircle } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
@@ -71,6 +71,19 @@ export default function MessagesPage() {
     setBusy(false)
   }
 
+  async function reportMessage(messageId:string) {
+    const reason = window.prompt(locale==='bn' ? 'Message-এ কী সমস্যা হয়েছে? সংক্ষেপে লিখুন:' : 'What is the problem with this message?')
+    if (!reason?.trim()) return
+    const s=createClient()
+    const {data:auth}=await s.auth.getUser()
+    if(!auth.user) return
+    const {error}=await s.from('fenix_content_reports').insert({
+      reporter_id:auth.user.id, content_type:'message', content_id:messageId,
+      reason:reason.trim().slice(0,120), details:reason.trim().slice(0,2000),
+    })
+    setStatus(error ? (locale==='bn'?'Message report পাঠানো যায়নি।':'Could not report the message.') : (locale==='bn'?'Message report admin review queue-তে গেছে।':'Message report sent to the admin review queue.'))
+  }
+
   const counterpart=(m:Message)=>m.sender_id===userId?people[m.recipient_id]:people[m.sender_id]
   const title=locale==='bn'?'মেসেজ':'Messages'
 
@@ -100,6 +113,7 @@ export default function MessagesPage() {
                 <p className="mt-1 text-[11px] text-[var(--fx-muted)]">@{p?.username||'user'}</p>
                 <p className="mt-3 whitespace-pre-wrap text-sm leading-7">{m.body}</p>
                 {m.recipient_id===userId&&<span className="mt-3 inline-flex items-center gap-1 text-[10px] text-[var(--fx-muted)]"><Check size={13}/> Read</span>}
+                <button type="button" onClick={()=>void reportMessage(m.id)} className="mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--fx-border)] px-3 text-[10px] font-bold text-red-700 dark:text-red-300"><Flag size={13}/> {locale==='bn'?'Report':'Report'}</button>
               </div>
             </div>
           </article>
