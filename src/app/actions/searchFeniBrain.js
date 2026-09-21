@@ -43,7 +43,7 @@ async function recordBrainSignal(supabase, parsed, intentKey, resultCount) {
   }
 }
 
-function safeStructuredLocationSearch(supabase, normalizedQuery) {
+async function safeStructuredLocationSearch(supabase, normalizedQuery) {
   try {
     const [{ data: rows, error }, { data: aliases, error: aliasError }] = await Promise.all([
       supabase.from('fenix_brain_locations')
