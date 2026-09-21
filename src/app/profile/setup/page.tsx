@@ -79,6 +79,7 @@ export default function ProfileSetupPage() {
   })
   const [selectedInterests, setSelectedInterests] = useState<string[]>([])
   const [locations, setLocations] = useState<LocationRow[]>([])
+  const [publicAreaNames, setPublicAreaNames] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [usernameStatus, setUsernameStatus] = useState('')
@@ -95,11 +96,12 @@ export default function ProfileSetupPage() {
         return
       }
 
-      const [{ data: profile }, { data: settings }, { data: contactRows }, { data: locationRows }] = await Promise.all([
+      const [{ data: profile }, { data: settings }, { data: contactRows }, { data: locationRows }, { data: publicLocations }] = await Promise.all([
         supabase.from('profiles').select('id,full_name,username,bio,avatar_url,country_code,district_id,upazila_id,locality_id,area_text,road_text,house_details,holding_no,location_public_level').eq('id', auth.user.id).maybeSingle(),
         supabase.from('profile_settings').select('onboarding_step,onboarding_completed,onboarding_dismissed,interests').eq('user_id', auth.user.id).maybeSingle(),
         supabase.from('profile_contacts').select('whatsapp,facebook_url,instagram_url,linkedin_url,youtube_url,phone_public,whatsapp_public,facebook_public,instagram_public,linkedin_public,youtube_public').eq('user_id', auth.user.id).maybeSingle(),
         supabase.from('fenix_brain_locations').select('id,level,name_bn,name_en,slug,parent_id').eq('is_active', true).order('name_bn', { ascending: true }).limit(300),
+        supabase.from('business_directory_locations').select('area,market,upazila,district,is_public').eq('is_public', true).limit(500),
       ])
 
       if (!active) return
@@ -139,6 +141,15 @@ export default function ProfileSetupPage() {
       })
       setSelectedInterests(Array.isArray(settings?.interests) ? settings.interests : [])
       setLocations(Array.isArray(locationRows) ? locationRows : [])
+      const selectedUpazilaName = (locationRows ?? []).find((item) => item.id === (profile?.upazila_id ?? ''))?.name_bn
+      const areaNames = new Set<string>()
+      for (const row of (publicLocations ?? [])) {
+        if (selectedUpazilaName && row.upazila && String(row.upazila).toLowerCase() !== selectedUpazilaName.toLowerCase()) continue
+        for (const value of [row.area, row.market]) {
+          if (value && String(value).trim().length >= 2) areaNames.add(String(value).trim())
+        }
+      }
+      setPublicAreaNames([...areaNames].sort((a,b) => a.localeCompare(b, 'bn')).slice(0, 160))
       setLoading(false)
     }
     void load()
@@ -155,8 +166,14 @@ export default function ProfileSetupPage() {
     [locations, upazilaId],
   )
   const areaOptions = useMemo(
-    () => locations.filter((item) => item.parent_id === localityId || item.parent_id === upazilaId).filter((item) => ['area', 'village', 'mouza', 'market'].includes(item.level)).slice(0, 120),
-    [locations, localityId, upazilaId],
+    () => {
+      const named = locations
+        .filter((item) => item.parent_id === localityId || item.parent_id === upazilaId)
+        .filter((item) => ['area', 'village', 'mouza', 'market'].includes(item.level))
+        .flatMap((item) => [item.name_bn, item.name_en].filter(Boolean) as string[])
+      return [...new Set([...named, ...publicAreaNames])].slice(0, 160)
+    },
+    [locations, localityId, upazilaId, publicAreaNames],
   )
 
   async function saveStep(next: StepKey, options?: { dismissed?: boolean }) {
@@ -456,7 +473,7 @@ export default function ProfileSetupPage() {
                 <span className="text-xs font-bold">{locale === 'bn' ? 'Area / Para / Mohalla' : 'Area / Para / Mohalla'}</span>
                 <input list="fenix-area-options" value={areaText} onChange={(e) => setAreaText(e.target.value)} maxLength={200} placeholder="Search local area, para or bazaar…" className="mt-2 h-12 w-full rounded-xl border border-[var(--fx-border)] bg-transparent px-3 text-sm outline-none" />
                 <datalist id="fenix-area-options">
-                  {areaOptions.map((item) => <option key={item.id} value={item.name_en || item.name_bn}>{item.name_bn}{item.name_en ? ' · ' + item.name_en : ''}</option>)}
+                  {areaOptions.map((item) => <option key={item} value={item} />)}
                 </datalist>
               </label>
 
