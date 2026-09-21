@@ -3,7 +3,6 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { File as FileIcon } from '@phosphor-icons/react'
 import {
   ArrowBendUpLeft, ArrowLeft, Check, ChatCircleText, File as FileIcon, Flag, MagnifyingGlass, Microphone,
   Paperclip, PencilSimple, PaperPlaneRight, Smiley, Stop, Trash, UserCircle, X
