@@ -117,8 +117,7 @@ export const FENI_ARTICLES: readonly FeniArticle[] = [
       {headingBn:'Community safety',headingEn:'Community safety',bodyBn:'Text-only feed, report system, moderation queue এবং user ban/suspend control রাখা হয়েছে যাতে public discussion আরও দায়িত্বশীল থাকে।',bodyEn:'The text-only feed, reporting system, moderation queue and user suspension/ban controls provide a structured foundation for responsible public discussion.'},
     ],
   },
-]
-
+,
   {
     slug:'feni-sadar-city-guide',
     titleBn:'ফেনী সদর শহর: বাজার, সেবা ও ব্যবসা খোঁজার local guide',
@@ -133,6 +132,7 @@ export const FENI_ARTICLES: readonly FeniArticle[] = [
       {headingBn:'Public তথ্যের দায়িত্বশীল ব্যবহার',headingEn:'Use public information responsibly',bodyBn:'কোনো ব্যক্তি বা ব্যবসার public profile থাকলেও ব্যক্তিগত বা সংবেদনশীল তথ্য অপ্রয়োজনে সংগ্রহ/শেয়ার করবেন না। সন্দেহজনক তথ্য Report করুন।',bodyEn:'A public profile does not make private or sensitive information appropriate to collect or share. Report suspicious information through FeniX controls.'},
     ],
   },
+]
 
 export const FENI_ARTICLE_SOURCES = { officialDistrictSource, bbsSource }
 export function getFeniArticle(slug:string){ return FENI_ARTICLES.find(article=>article.slug===slug) ?? null }
