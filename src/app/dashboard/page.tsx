@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   const { data: auth } = await s.auth.getUser()
   if (!auth.user) redirect('/login?next=/dashboard')
 
-  const [profile, businesses, starts, interests, orders, notifications] = await Promise.all([
+  const [profile, settings, businesses, starts, interests, orders, notifications] = await Promise.all([
     s.from('profiles').select('full_name,role').eq('id', auth.user.id).maybeSingle(),
     s.from('businesses').select('id',{count:'exact',head:true}).eq('owner_id',auth.user.id),
     s.from('business_start_projects').select('id',{count:'exact',head:true}).eq('user_id',auth.user.id),
@@ -39,6 +39,17 @@ export default async function DashboardPage() {
           <p className="mt-3 max-w-3xl text-sm leading-7 opacity-60">One account connects your profile, community, business journey, local commerce, investment activity and trusted notifications.</p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-black/[.035] px-3 py-1.5 text-xs font-semibold dark:bg-white/[.05]"><ShieldCheck size={15} className="text-[#008080]"/> {profile.data?.role || 'user'} · {profile.data?.full_name || auth.user.email}</div>
         </div>
+
+        {settings.data?.onboarding_completed !== true && settings.data?.onboarding_dismissed !== true && (
+          <Link href="/profile/setup" className="mt-6 flex items-center justify-between gap-4 rounded-3xl border border-[var(--fx-border)] bg-white/80 p-5 dark:bg-white/[.04]">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[.14em] text-[#008080]">Profile setup</p>
+              <h2 className="mt-1 text-lg font-black">Complete your FeniX identity</h2>
+              <p className="mt-1 text-sm opacity-55">Add photo, username, Feni location and optional interests. Every step can be skipped.</p>
+            </div>
+            <ArrowRight size={20} className="shrink-0" />
+          </Link>
+        )}
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {cards.map(([label,value,Icon,href]) => (
