@@ -3384,6 +3384,16 @@ export type Database = {
           location_text: string | null
           phone: string | null
           role: string | null
+          country_code: string
+          district_id: string | null
+          upazila_id: string | null
+          locality_id: string | null
+          area_text: string | null
+          road_text: string | null
+          house_details: string | null
+          holding_no: string | null
+          location_public_level: string
+          exact_location_visibility: string
           updated_at: string
           username: string | null
           website_url: string | null
@@ -3398,6 +3408,16 @@ export type Database = {
           location_text?: string | null
           phone?: string | null
           role?: string | null
+          country_code?: string
+          district_id?: string | null
+          upazila_id?: string | null
+          locality_id?: string | null
+          area_text?: string | null
+          road_text?: string | null
+          house_details?: string | null
+          holding_no?: string | null
+          location_public_level?: string
+          exact_location_visibility?: string
           updated_at?: string
           username?: string | null
           website_url?: string | null
