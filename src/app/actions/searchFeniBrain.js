@@ -2,7 +2,7 @@
 
 import { generateEmbedding } from './generateEmbedding'
 import { createClient } from '../../utils/supabase/server'
-import { buildKeywordQuery, normalizeFeniBrainQuery, classifyFeniBrainQuestion } from '../../lib/feniBrainQuery'
+import { buildKeywordQuery, normalizeFeniBrainQuery, classifyFeniBrainQuestion, detectRequestedFactSubject } from '../../lib/feniBrainQuery'
 
 const MAX_QUERY_LENGTH = 120
 const MAX_RESULTS = 8
@@ -98,6 +98,7 @@ export async function searchFeniBrain(query) {
   const parsed = normalizeFeniBrainQuery(query)
   const cleanQuery = parsed.original.trim().slice(0, MAX_QUERY_LENGTH)
   const questionClass = classifyFeniBrainQuestion(cleanQuery)
+  const requestedFactSubject = detectRequestedFactSubject(cleanQuery)
   const normalizedQuery = parsed.normalized
 
   if (cleanQuery.length < 2 || normalizedQuery.length < 2) {
@@ -227,6 +228,9 @@ export async function searchFeniBrain(query) {
 
     const ranked = mergeRows([facts, semantic, keyword])
       .sort((a, b) => {
+        const af = requestedFactSubject && a.retrieval_method === 'fact' && a.subject_key === requestedFactSubject ? 1 : 0
+        const bf = requestedFactSubject && b.retrieval_method === 'fact' && b.subject_key === requestedFactSubject ? 1 : 0
+        if (af !== bf) return bf - af
         const scoreDiff =
           Number(b.similarity ?? 0) -
           Number(a.similarity ?? 0)
@@ -301,6 +305,7 @@ export async function searchFeniBrain(query) {
       results: ranked,
       sources: [...sourcesMap.values()],
       retrievalConfidence: Number(ranked[0]?.similarity ?? 0),
+      requestedFactSubject,
       queryClass: questionClass,
     }
   } catch (error) {
