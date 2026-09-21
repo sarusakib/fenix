@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, CheckCircle, FileText, Rocket } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
+import { GuidedFormProgress } from '@/components/forms/GuidedFormProgress'
 import { createClient } from '@/utils/supabase/client'
 import { INVESTMENT_CATEGORIES, OFFER_TYPES, RISK_LEVELS, UPZILAS, moneyInput } from '@/lib/investment'
 
@@ -22,6 +23,7 @@ export default function InvestmentCreatePage() {
   })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [step, setStep] = useState(1)
 
   useEffect(() => {
     async function load() {
@@ -132,30 +134,57 @@ export default function InvestmentCreatePage() {
 
           {error && <div className="mt-6 rounded-2xl border border-red-500/20 bg-red-500/[.06] p-4 text-sm text-red-600">{error}</div>}
 
-          <div className="mt-8 grid gap-5 md:grid-cols-2">
-            <Field label="Title (Bangla)" value={form.title_bn} onChange={(v) => set('title_bn', v)} />
-            <Field label="Title (English)" value={form.title_en} onChange={(v) => set('title_en', v)} />
-            <TextArea label="Description (Bangla)" value={form.description_bn} onChange={(v) => set('description_bn', v)} />
-            <TextArea label="Description (English)" value={form.description_en} onChange={(v) => set('description_en', v)} />
-            <Select label="Sector" value={form.category} onChange={(v) => set('category', v)} options={[...INVESTMENT_CATEGORIES]} />
-            <Select label="Upazila" value={form.upazila} onChange={(v) => set('upazila', v)} options={['', ...UPZILAS]} />
-            <Field label="Area / location details" value={form.location_details} onChange={(v) => set('location_details', v)} />
-            <Select label="Link my business (optional)" value={form.business_id} onChange={(v) => set('business_id', v)} options={['', ...businesses.map((b) => b.id)]} optionLabels={['None', ...businesses.map((b) => b.name)]} />
-            <MoneyField label="Total funding target (BDT)" value={form.target_amount} onChange={(v) => set('target_amount', v)} />
-            <MoneyField label="Minimum investment (BDT)" value={form.min_investment} onChange={(v) => set('min_investment', v)} />
-            <Select label="Offer structure" value={form.offer_type} onChange={(v) => set('offer_type', v)} options={[...OFFER_TYPES]} />
-            <Select label="Risk level" value={form.risk_level} onChange={(v) => set('risk_level', v)} options={[...RISK_LEVELS]} />
-            <Field label="Ownership offered % (optional)" value={form.ownership_percentage} onChange={(v) => set('ownership_percentage', moneyInput(v))} inputMode="decimal" />
-            <Field label="Expected return % (optional)" value={form.expected_return_pct} onChange={(v) => set('expected_return_pct', moneyInput(v))} inputMode="decimal" />
-            <Field label="Term in months (optional)" value={form.expected_term_months} onChange={(v) => set('expected_term_months', moneyInput(v))} inputMode="numeric" />
-            <label className="block"><span className="mb-2 block text-xs font-semibold opacity-60">Funding deadline</span><input value={form.funding_deadline} onChange={(e) => set('funding_deadline', e.target.value)} type="date" className={inputClass} /></label>
-            <Select label="Shariah preference" value={form.shariah_preference} onChange={(v) => set('shariah_preference', v)} options={['not_specified','preferred','not_required']} />
-            <TextArea label="Risk disclosure (required)" value={form.risk_disclosure} onChange={(v) => set('risk_disclosure', v)} />
+          <GuidedFormProgress
+            step={step}
+            total={4}
+            title={step===1?'Opportunity basics':step===2?'Location & business':step===3?'Funding terms':'Risk & final review'}
+            subtitle={step===1?'Start with the opportunity name and clear description.':step===2?'Choose the sector, place and linked business.':step===3?'Add the funding target and structure.': 'State optional returns carefully and add material risks.'}
+            onBack={()=>{setError('');setStep((s)=>Math.max(1,s-1))}}
+            onNext={()=>{
+              setError('')
+              if(step===1 && (!form.title_bn.trim() || !form.title_en.trim() || form.description_bn.trim().length<30 || form.description_en.trim().length<30)){setError('Bangla/English title এবং description পূর্ণ করুন।');return}
+              if(step===3){
+                const target=Number(form.target_amount), minimum=Number(form.min_investment)
+                if(!Number.isFinite(target)||target<=0||!Number.isFinite(minimum)||minimum<=0||minimum>target){setError('Target এবং minimum investment সঠিকভাবে দিন।');return}
+              }
+              setStep((s)=>Math.min(4,s+1))
+            }}
+            nextLabel="Continue"
+            nextDisabled={false}
+            submit
+          />
+          <div className="grid gap-5">
+            {step===1 && <div className="grid gap-5 md:grid-cols-2">
+              <Field label="Title (Bangla)" value={form.title_bn} onChange={(v) => set('title_bn', v)} />
+              <Field label="Title (English)" value={form.title_en} onChange={(v) => set('title_en', v)} />
+              <TextArea label="Description (Bangla)" value={form.description_bn} onChange={(v) => set('description_bn', v)} />
+              <TextArea label="Description (English)" value={form.description_en} onChange={(v) => set('description_en', v)} />
+            </div>}
+            {step===2 && <div className="grid gap-5 md:grid-cols-2">
+              <Select label="Sector" value={form.category} onChange={(v) => set('category', v)} options={[...INVESTMENT_CATEGORIES]} />
+              <Select label="Upazila" value={form.upazila} onChange={(v) => set('upazila', v)} options={['', ...UPZILAS]} />
+              <Field label="Area / location details" value={form.location_details} onChange={(v) => set('location_details', v)} />
+              <Select label="Link my business (optional)" value={form.business_id} onChange={(v) => set('business_id', v)} options={['', ...businesses.map((b) => b.id)]} optionLabels={['None', ...businesses.map((b) => b.name)]} />
+            </div>}
+            {step===3 && <div className="grid gap-5 md:grid-cols-2">
+              <MoneyField label="Total funding target (BDT)" value={form.target_amount} onChange={(v) => set('target_amount', v)} />
+              <MoneyField label="Minimum investment (BDT)" value={form.min_investment} onChange={(v) => set('min_investment', v)} />
+              <Select label="Offer structure" value={form.offer_type} onChange={(v) => set('offer_type', v)} options={[...OFFER_TYPES]} />
+              <label className="block"><span className="mb-2 block text-xs font-semibold opacity-60">Funding deadline</span><input value={form.funding_deadline} onChange={(e) => set('funding_deadline', e.target.value)} type="date" className={inputClass} /></label>
+            </div>}
+            {step===4 && <div className="grid gap-5 md:grid-cols-2">
+              <Select label="Risk level" value={form.risk_level} onChange={(v) => set('risk_level', v)} options={[...RISK_LEVELS]} />
+              <Select label="Shariah preference" value={form.shariah_preference} onChange={(v) => set('shariah_preference', v)} options={['not_specified','preferred','not_required']} />
+              <Field label="Ownership offered % (optional)" value={form.ownership_percentage} onChange={(v) => set('ownership_percentage', moneyInput(v))} inputMode="decimal" />
+              <Field label="Expected return % (optional)" value={form.expected_return_pct} onChange={(v) => set('expected_return_pct', moneyInput(v))} inputMode="decimal" />
+              <Field label="Term in months (optional)" value={form.expected_term_months} onChange={(v) => set('expected_term_months', moneyInput(v))} inputMode="numeric" />
+              <TextArea label="Risk disclosure (required)" value={form.risk_disclosure} onChange={(v) => set('risk_disclosure', v)} />
+            </div>}
           </div>
 
           <div className="mt-6 rounded-2xl border border-[#008080]/15 bg-[#008080]/[.05] p-4 text-sm leading-6"><strong>Before publishing:</strong> Do not promise guaranteed profit. State material risks and use accurate figures. FeniX verification indicates information review, not investment endorsement or a guarantee of outcomes.</div>
 
-          <button disabled={busy} onClick={() => void submit()} type="button" className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#008080] px-5 text-sm font-bold text-white disabled:opacity-50"><CheckCircle size={18} />{busy ? 'Submitting...' : 'Submit for review'}</button>
+          <button disabled={busy || step!==4} onClick={() => void submit()} type="button" className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#008080] px-5 text-sm font-bold text-white disabled:opacity-50"><CheckCircle size={18} />{busy ? 'Submitting...' : 'Submit for review'}</button>
           <div className="mt-4 flex items-center gap-2 text-xs opacity-45"><FileText size={15} />Documents can be added from your Investment Manager after submission.</div>
         </div>
       </section>
