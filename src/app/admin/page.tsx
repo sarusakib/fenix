@@ -18,6 +18,7 @@ export const dynamic = 'force-dynamic'
 
 const modules = [
   { title: 'Trust & Safety', body: 'Verification, ownership, reviews and reports.', href: '/admin/trust', icon: ShieldCheck },
+  { title: 'Community Moderation', body: 'Review reports and manage user suspension or bans.', href: '/admin/community', icon: ShieldCheck },
   { title: 'Commerce Operations', body: 'Seller, product, order and return operations.', href: '/commerce/admin', icon: ShoppingBag },
   { title: 'Investment Operations', body: 'Opportunities, investors, documents and interests.', href: '/admin/investment', icon: ChartLineUp },
   { title: 'Brain & Knowledge', body: 'Open the public Feni Brain experience.', href: '/guide', icon: Brain },
