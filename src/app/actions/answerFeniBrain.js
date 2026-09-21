@@ -53,9 +53,11 @@ function factAnswer(result) {
   const label = labels[result.subject_key] || result.subject_key || 'তথ্য'
   const unit = result.value_unit || ''
   if (!number && !result.value_text) return ''
-  if (result.subject_key === 'area') return location + ' জেলার আয়তন ' + number + ' বর্গকিলোমিটার।'
-  if (result.subject_key === 'population') return location + ' জেলার জনসংখ্যা ' + number + ' জন।'
-  if (result.value_unit === 'count') return location + ' জেলায় ' + number + 'টি ' + label + ' আছে।'
+  if (result.subject_key === 'area') return location + ' এর আয়তন ' + number + ' বর্গকিলোমিটার।'
+  if (result.subject_key === 'population') return location + ' এর জনসংখ্যা ' + number + ' জন।'
+  if (result.value_unit === 'people_per_square_km') return location + ' এ জনঘনত্ব প্রতি বর্গকিলোমিটারে ' + number + ' জন।'
+  if (result.value_unit === 'count') return location + ' এ ' + number + 'টি ' + label + ' আছে।'
+  if (result.value_text) return location + ' — ' + label + ': ' + result.value_text + '।'
   return location + ' — ' + label + ': ' + number + (unit ? ' ' + unit : '') + '।'
 }
 
