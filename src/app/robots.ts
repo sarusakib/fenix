@@ -8,6 +8,6 @@ export default function robots():MetadataRoute.Robots{
    {userAgent:'*',allow:['/','/feni','/guide','/directory','/invest','/commerce','/services','/policy','/help','/feed'],disallow:['/admin/','/dashboard/','/messages/','/auth/','/api/']},
    {userAgent:'OAI-SearchBot',allow:['/','/feni','/guide','/directory','/invest','/commerce','/services','/policy','/help','/feed']},
   ],
-  sitemap:`${base}/sitemap.xml',
+  sitemap:`${base}/sitemap.xml`,
  }
 }
