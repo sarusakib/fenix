@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
   const s = await createClient()
-  const { data } = await s.from('fenix_public_profiles').select('full_name,username,bio,location_text').eq('username', decodeURIComponent(username).toLowerCase()).maybeSingle()
+  const { data } = await s.from('fenix_public_profiles').select('full_name,username,bio,public_location').eq('username', decodeURIComponent(username).toLowerCase()).maybeSingle()
   return {
     title: data?.full_name ? `${data.full_name} | FeniX` : 'FeniX Profile',
     description: data?.bio || 'Public profile on FeniX — Feni Business Ecosystem.',
@@ -22,7 +22,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const s = await createClient()
   const { data: profile } = await s
     .from('fenix_public_profiles')
-    .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,created_at')
+    .select('id,full_name,username,bio,avatar_url,cover_url,public_location,website_url,facebook_url,instagram_url,linkedin_url,youtube_url,whatsapp,phone,created_at')
     .eq('username', decodeURIComponent(username).toLowerCase())
     .maybeSingle()
 
@@ -34,6 +34,12 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   if (!profileId || !profileUsername || !createdAt) notFound()
   const safeName = profile.full_name || `@${profileUsername}`
   const website = profile.website_url && /^https?:\/\//i.test(profile.website_url) ? profile.website_url : null
+  const socialLinks = [
+    profile.facebook_url && ['Facebook', profile.facebook_url],
+    profile.instagram_url && ['Instagram', profile.instagram_url],
+    profile.linkedin_url && ['LinkedIn', profile.linkedin_url],
+    profile.youtube_url && ['YouTube', profile.youtube_url],
+  ].filter(Boolean) as [string, string][]
 
   return (
     <main className="min-h-dvh">
@@ -52,8 +58,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               <p className="mt-1 text-sm text-[var(--fx-muted)]">@{profileUsername}</p>
               {profile.bio && <p className="mt-4 whitespace-pre-wrap text-sm leading-7">{profile.bio}</p>}
               <div className="mt-5 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">
-                {profile.location_text && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><MapPin size={14}/>{profile.location_text}</span>}
+                {profile.public_location && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><MapPin size={14}/>{profile.public_location}</span>}
                 {website && <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 hover:underline dark:bg-white/[.04]"><Globe size={14}/>Website</a>}
+                {socialLinks.map(([label, href]) => <a key={label} href={/^https?:\/\//i.test(href) ? href : 'https://' + href} target="_blank" rel="noopener noreferrer" className="rounded-full bg-black/[.03] px-3 py-1.5 hover:underline dark:bg-white/[.04]">{label}</a>)}
               </div>
               <ProfileReportButton profileId={profileId} locale="bn" />
               <p className="mt-5 text-[11px] text-[var(--fx-muted)]">Profile joined FeniX on {new Date(createdAt).toLocaleDateString('en-BD')}</p>
