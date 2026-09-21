@@ -389,7 +389,7 @@ export default function MessagesPage() {
                             )}
                             {m.attachment_type?.startsWith('image/') || m.attachment_type?.startsWith('audio/') || m.attachment_type?.startsWith('video/') ? (
                               <a href={'/api/messages/media?message='+encodeURIComponent(m.id)} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-2 text-[10px] font-bold text-[var(--fx-muted)]">
-                                <File size={13} /> {m.attachment_name}
+                                <Paperclip size={13} /> {m.attachment_name}
                               </a>
                             ) : null}
                           </div>
