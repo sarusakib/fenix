@@ -4,8 +4,8 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowLeft, Check, ChatCircleText, File, Flag, MagnifyingGlass,
-  Paperclip, PencilSimple, Reply, Smiley, Trash, UserCircle, X
+  ArrowLeft, Check, ChatCircleText, File, Flag, MagnifyingGlass, Microphone,
+  Paperclip, PencilSimple, PaperPlaneRight, Reply, Smiley, Stop, Trash, UserCircle, X
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
