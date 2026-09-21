@@ -11,6 +11,7 @@ import { useAuthStore } from '../store/useAuthStore'
 import { useHomeTheme } from './theme/HomeThemeProvider'
 import { useFenixLocale } from './i18n/FenixLocaleProvider'
 import ServiceHub from './ServiceHub'
+import FenixMark from './brand/FenixMark'
 
 export default function Navbar() {
  const {user,role,logout}=useAuthStore(); const {resolvedTheme,setTheme}=useHomeTheme(); const {locale}=useFenixLocale(); const pathname=usePathname()
@@ -23,7 +24,7 @@ export default function Navbar() {
  return <header className="sticky top-0 z-[80] border-b border-[var(--fx-border)] bg-[var(--fx-bg)]/82 text-[var(--fx-text)] backdrop-blur-2xl">
   <nav aria-label="Primary navigation" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
    <div className="flex min-h-[68px] items-center justify-between gap-3">
-    <Link href="/" onClick={closeMenus} className="group flex min-h-11 items-center gap-2.5" aria-label="FeniX home"><span className="text-[23px] font-black tracking-[-.07em]">Feni<span className="text-[var(--fx-primary-strong)]">X</span></span><span className="hidden rounded-full border border-[var(--fx-border)] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.13em] text-[var(--fx-muted)] sm:inline">Feni ecosystem</span></Link>
+    <Link href="/" onClick={closeMenus} className="group flex min-h-11 items-center gap-2.5" aria-label="FeniX home"><span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--fx-primary-strong)] text-white shadow-sm transition-transform group-hover:scale-[1.03]"><FenixMark size={24}/></span><span><span className="block text-[21px] font-black tracking-[-.06em]">Feni<span className="text-[var(--fx-primary-strong)]">X</span></span><span className="hidden text-[8px] font-bold uppercase tracking-[.16em] text-[var(--fx-muted)] sm:block">Feni ecosystem</span></span></Link>
 
     <div className="hidden items-center gap-1 md:flex">
       <NavLink href="/" active={pathname==='/' }><House size={17}/> {bn?'হোম':'Home'}</NavLink>
