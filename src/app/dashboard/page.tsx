@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowRight, Bell, Buildings, ChartLineUp, ChatCircleText, ClipboardText, Handshake, GearSix, Rocket, ShieldCheck, Storefront } from '@phosphor-icons/react/dist/ssr'
+import { ArrowRight, Bell, Buildings, ChartLineUp, ChatCircleText, ClipboardText, Handshake, GearSix, Rocket, ShieldCheck, Storefront, UserCircle, UsersThree } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
 
