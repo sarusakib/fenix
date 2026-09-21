@@ -38,7 +38,7 @@ export default function DashboardSettingsPage(){
    if(data.locale==='bn'||data.locale==='en')setLocale(data.locale)
   }
   void load(); return ()=>{active=false}
- },[])
+ },[setLocale,setTheme])
 
  const update=async(patch:Record<string,unknown>,success?:string)=>{
   if(!userId)return
