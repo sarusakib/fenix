@@ -20,6 +20,92 @@ const MAX_QUERY_LENGTH = 120
 const MAX_RESULTS = 10
 const MAX_CHILD_LOCATIONS = 20
 
+async function safeStructuredLocationSearch(supabase, normalizedQuery) {
+  try {
+    const [{ data: rows, error }, { data: aliases, error: aliasError }] = await Promise.all([
+      supabase.from('fenix_brain_locations')
+        .select('id,parent_id,level,name_bn,name_en,slug,official_code,metadata')
+        .eq('is_active', true)
+        .limit(500),
+      supabase.from('fenix_brain_location_aliases')
+        .select('location_id,alias,normalized_alias,language_code')
+        .limit(1000),
+    ])
+
+    if (error || aliasError) return []
+    const tokens = String(normalizedQuery || '').toLowerCase().split(/\s+/).filter((token) => token.length >= 2)
+    const aliasMap = new Map()
+    for (const alias of aliases || []) {
+      const values = [alias.alias, alias.normalized_alias].filter(Boolean).map((x) => String(x).toLowerCase())
+      aliasMap.set(alias.location_id, [...(aliasMap.get(alias.location_id) || []), ...values])
+    }
+
+    return (rows || [])
+      .map((row) => {
+        const values = [row.name_bn, row.name_en, row.slug, ...(aliasMap.get(row.id) || [])].filter(Boolean).map((x) => String(x).toLowerCase())
+        const haystack = values.join(' ')
+        const hits = tokens.reduce((n, token) => n + (haystack.includes(token) ? 1 : 0), 0)
+        const exact = values.some((value) => value === String(normalizedQuery || '').toLowerCase())
+        const score = exact ? 1 : (tokens.length ? hits / tokens.length : 0)
+        return { ...row, similarity: score }
+      })
+      .filter((row) => row.similarity >= 0.25)
+      .sort((a, b) => b.similarity - a.similarity || String(a.name_bn || '').localeCompare(String(b.name_bn || '')))
+      .slice(0, 16)
+  } catch (error) {
+    console.error('Feni Brain structured location fallback failed:', { name: error?.name })
+    return []
+  }
+}
+
+async function safeFactFallback(supabase, parsed) {
+  try {
+    const { data: rows, error } = await supabase
+      .from('fenix_brain_facts')
+      .select('id,subject_key,subject_location_id,value_number,value_text,value_unit,confidence,valid_from,valid_until,status')
+      .eq('status', 'active')
+      .order('confidence', { ascending: false })
+      .limit(100)
+
+    if (error || !Array.isArray(rows)) return []
+
+    const tokens = queryTokens(parsed)
+    const requested = detectRequestedFactSubject(String(parsed?.original || ''))
+    const currentTime = Date.now()
+
+    return rows
+      .filter((row) => {
+        const from = row.valid_from ? Date.parse(row.valid_from) : -Infinity
+        const until = row.valid_until ? Date.parse(row.valid_until) : Infinity
+        return from <= currentTime && until >= currentTime
+      })
+      .map((row) => {
+        const key = String(row.subject_key || '').toLowerCase()
+        const subjectHit = requested && key === String(requested).toLowerCase()
+        const tokenHit = tokens.some((token) => key.includes(token))
+        const similarity = subjectHit ? 1 : tokenHit ? 0.72 : 0
+        return {
+          ...row,
+          similarity,
+          semanticSimilarity: 0,
+          keywordSimilarity: similarity,
+          retrieval_method: 'fact',
+          source_title: 'FeniX Structured Facts',
+          source_url: '/feni',
+          trust_tier: 1,
+          document_title: key,
+          content: row.value_text || (row.value_number != null ? String(row.value_number) + (row.value_unit ? ' ' + row.value_unit : '') : ''),
+          name_bn: 'ফেনী',
+        }
+      })
+      .filter((row) => row.similarity > 0)
+      .slice(0, 10)
+  } catch (error) {
+    console.error('Feni Brain fact fallback failed:', { name: error?.name })
+    return []
+  }
+}
+
 function requestedChildLevel(normalizedQuery) {
   const query = normalizedQuery.toLowerCase()
   if (query.includes('উপজেলা')) return 'upazila'
@@ -228,22 +314,10 @@ export async function searchFeniBrain(query) {
     const canonicalIntent = canonicalBrainIntent(questionClass.intentKey)
 
     const [locationResult, factResult, keywordNormalized, keywordOriginal] = await Promise.all([
-      supabase.rpc('search_feni_brain_locations', {
-        query_text: normalizedQuery,
-        match_count: 16,
-      }),
-      supabase.rpc('search_feni_brain_facts', {
-        query_text: normalizedQuery || cleanQuery,
-        match_count: 10,
-      }),
-      supabase.rpc('keyword_feni_brain_chunks', {
-        query_text: buildKeywordQuery(normalizedQuery) || normalizedQuery,
-        match_count: MAX_RESULTS,
-      }),
-      supabase.rpc('keyword_feni_brain_chunks', {
-        query_text: cleanQuery,
-        match_count: MAX_RESULTS,
-      }),
+      supabase.rpc('search_feni_brain_locations', { query_text: normalizedQuery, match_count: 16 }),
+      supabase.rpc('search_feni_brain_facts', { query_text: normalizedQuery || cleanQuery, match_count: 10 }),
+      supabase.rpc('keyword_feni_brain_chunks', { query_text: buildKeywordQuery(normalizedQuery) || normalizedQuery, match_count: MAX_RESULTS }),
+      supabase.rpc('keyword_feni_brain_chunks', { query_text: cleanQuery, match_count: MAX_RESULTS }),
     ])
 
     if (locationResult.error) console.error('Feni Brain location retrieval failed:', { code: locationResult.error.code })
@@ -251,8 +325,17 @@ export async function searchFeniBrain(query) {
     if (keywordNormalized.error) console.error('Feni Brain keyword retrieval failed:', { code: keywordNormalized.error.code })
     if (keywordOriginal.error) console.error('Feni Brain original keyword retrieval failed:', { code: keywordOriginal.error.code })
 
-    const locations = Array.isArray(locationResult.data) ? locationResult.data : []
-    const facts = (Array.isArray(factResult.data) ? factResult.data : []).map((row) => ({
+    let locations = Array.isArray(locationResult.data) ? locationResult.data : []
+    if (locations.length < 2) {
+      const fallbackLocations = await safeStructuredLocationSearch(supabase, normalizedQuery || cleanQuery)
+      if (fallbackLocations.length > locations.length) locations = fallbackLocations
+    }
+
+    let rawFacts = Array.isArray(factResult.data) ? factResult.data : []
+    if (rawFacts.length === 0) {
+      rawFacts = await safeFactFallback(supabase, parsed)
+    }
+    const facts = rawFacts.map((row) => ({
       ...row,
       retrieval_method: 'fact',
       semanticSimilarity: 0,
