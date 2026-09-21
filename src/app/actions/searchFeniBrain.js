@@ -1,5 +1,6 @@
-import { createHash } from 'crypto'
 'use server'
+
+import { createHash } from 'crypto'
 
 import { generateEmbedding } from './generateEmbedding'
 import { createClient } from '../../utils/supabase/server'
@@ -8,6 +9,7 @@ import {
   normalizeFeniBrainQuery,
   classifyFeniBrainQuestion,
   detectRequestedFactSubject,
+  detectLanguage,
 } from '../../lib/feniBrainQuery'
 import { FENI_ARTICLES } from '../../data/feniArticles'
 import {
@@ -21,7 +23,7 @@ const MAX_QUERY_LENGTH = 120
 const MAX_RESULTS = 10
 const MAX_CHILD_LOCATIONS = 20
 
-async async function recordBrainSignal(supabase, parsed, intentKey, resultCount) {
+async function recordBrainSignal(supabase, parsed, intentKey, resultCount) {
   try {
     const normalized = String(parsed?.normalized || '').trim().slice(0, 120)
     const day = new Date().toISOString().slice(0, 10)
@@ -32,7 +34,7 @@ async async function recordBrainSignal(supabase, parsed, intentKey, resultCount)
     await supabase.rpc('record_feni_brain_events', {
       p_query_hash: queryHash,
       p_intent_key: intentKey || 'GENERAL_GUIDANCE',
-      p_language_code: 'unknown',
+      p_language_code: detectLanguage(String(parsed?.original || '')) || 'unknown',
       p_terms: terms,
       p_result_count: Math.min(resultCount, 100),
     })
