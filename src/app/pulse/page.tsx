@@ -65,9 +65,19 @@ export default function FeniPulsePage() {
 
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {[
-            ['Businesses',stats.businesses,Storefront],['Products',stats.products,Storefront],['Invest offers',stats.opportunities,TrendUp],
-            ['Open blood',stats.blood,Heartbeat],['Ambulance providers',stats.ambulances,Heartbeat],['7d posts',stats.posts,UsersIcon],
-          ].map(([label,value,Icon]) => <article key={String(label)} className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4"><Icon size={18} className="text-[var(--fx-primary-strong)]"/><p className="mt-3 text-[10px] font-black uppercase tracking-[.11em] text-[var(--fx-muted)]">{String(label)}</p><p className="mt-2 text-2xl font-black">{loading?'—':String(value)}</p></article>)}
+            { label: 'Businesses', value: stats.businesses, Icon: Storefront },
+            { label: 'Products', value: stats.products, Icon: Storefront },
+            { label: 'Invest offers', value: stats.opportunities, Icon: TrendUp },
+            { label: 'Open blood', value: stats.blood, Icon: Heartbeat },
+            { label: 'Ambulance providers', value: stats.ambulances, Icon: Heartbeat },
+            { label: '7d posts', value: stats.posts, Icon: UsersIcon },
+          ].map(({ label, value, Icon }) => (
+            <article key={label} className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4">
+              <Icon size={18} className="text-[var(--fx-primary-strong)]" />
+              <p className="mt-3 text-[10px] font-black uppercase tracking-[.11em] text-[var(--fx-muted)]">{label}</p>
+              <p className="mt-2 text-2xl font-black">{loading ? '—' : String(value)}</p>
+            </article>
+          ))}
         </div>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
