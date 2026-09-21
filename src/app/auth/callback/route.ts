@@ -20,12 +20,26 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient()
 
-    const { error } =
+    const { data: sessionData, error } =
       await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
+      let destination = next
+      const userId = sessionData.session?.user?.id
+      if (userId && next === '/') {
+        const { data: settings } = await supabase
+          .from('profile_settings')
+          .select('onboarding_completed,onboarding_dismissed')
+          .eq('user_id', userId)
+          .maybeSingle()
+
+        if (!settings?.onboarding_completed && !settings?.onboarding_dismissed) {
+          destination = '/profile/setup'
+        }
+      }
+
       return NextResponse.redirect(
-        new URL(next, requestUrl.origin),
+        new URL(destination, requestUrl.origin),
       )
     }
   }
