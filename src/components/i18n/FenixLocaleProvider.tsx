@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 
 export type FeniXLocale = 'bn' | 'en'
@@ -49,7 +49,7 @@ export function FenixLocaleProvider({ children }: { children: React.ReactNode })
     return () => { active = false }
   }, [])
 
-  const setLocale = (next: FeniXLocale) => {
+  const setLocale = useCallback((next: FeniXLocale) => {
     setLocaleState(next)
     try { localStorage.setItem('fenix-locale', next) } catch {}
     document.documentElement.lang = next === 'bn' ? 'bn' : 'en'
@@ -60,7 +60,7 @@ export function FenixLocaleProvider({ children }: { children: React.ReactNode })
         if (auth.user) await s.from('profile_settings').upsert({ user_id: auth.user.id, locale: next }, { onConflict: 'user_id' })
       } catch {}
     })()
-  }
+  }, [])
 
   useEffect(() => {
     document.documentElement.lang = locale === 'bn' ? 'bn' : 'en'
