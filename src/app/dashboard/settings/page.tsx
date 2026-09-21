@@ -33,7 +33,7 @@ export default function DashboardSettingsPage(){
    if(['light','dark','system'].includes(data.theme)) setTheme(data.theme as HomeTheme)
    setReducedMotion(Boolean(data.reduced_motion))
    if(data.profile_visibility==='private')setVisibility('private')
-   if(['everyone','authenticated','nobody'].includes(data.message_permissions))setMessagePermissions(data.message_permissions)
+   if(data.message_permissions==='everyone'||data.message_permissions==='authenticated'||data.message_permissions==='nobody')setMessagePermissions(data.message_permissions)
    if(data.feed_visibility==='authenticated')setFeedVisibility('authenticated')
    if(data.locale==='bn'||data.locale==='en')setLocale(data.locale)
   }
