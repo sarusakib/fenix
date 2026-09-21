@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ChatCircleText, Globe, MapPin, UserCircle } from '@phosphor-icons/react/dist/ssr'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/Navbar'\nimport ProfileReportButton from '@/components/profile/ProfileReportButton'
 import { createClient } from '@/utils/supabase/server'
 
 export const dynamic = 'force-dynamic'
