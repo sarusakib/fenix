@@ -64,7 +64,7 @@ export default function DirectoryJoinPage() {
               <p className="mt-2 text-sm leading-6 opacity-60">Create the shared business identity used by Directory, Commerce, Start and future FeniX services.</p>
             </div>
           </div>
-          <form onSubmit={(e)=>{e.preventDefault(); if(step===3) void submit();}} className="mt-8">
+          <form onSubmit={(e)=>{e.preventDefault(); if(step===3) void submit(e);}} className="mt-8">
             <GuidedFormProgress step={step} total={3}
               title={step===1?'Business identity':step===2?'Business type':'Public description'}
               subtitle={step===1?'First tell us the name.':step===2?'Choose the category that fits best.':'Add a short description, then create your business.'}
