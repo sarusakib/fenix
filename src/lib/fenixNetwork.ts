@@ -36,8 +36,20 @@ export function buildFeniBrainPlan(query: string, intent = 'general_feni'): Feni
   if (parsed.investment || intent.includes('invest')) {
     actions.push(makeAction('Explore Investment', ROUTES.investment.root, 'Opportunity, due diligence and interest flow.'))
   }
-  if (parsed.business || intent.includes('business') || intent.includes('supplier')) {
+  if (parsed.business || intent.includes('business')) {
     actions.push(makeAction('Find Local Businesses', ROUTES.directory.root, 'Businesses, suppliers, markets and local services.'))
+  }
+  if (intent.includes('supplier') || normalized.includes('সরবরাহকারী') || normalized.includes('পাইকার')) {
+    actions.push(makeAction('Find Suppliers', ROUTES.directory.suppliers, 'Search local suppliers and wholesale connections.'))
+  }
+  if (intent.includes('service') || intent.includes('emergency')) {
+    actions.push(makeAction('Open Local Services', ROUTES.services, 'Health, emergency and other local service paths.'))
+  }
+  if (intent.includes('location')) {
+    actions.push(makeAction('Explore Feni Map', ROUTES.directory.map, 'Browse Feni places and directory listings by location.'))
+  }
+  if (['education', 'tourism', 'agriculture', 'research'].includes(intent)) {
+    actions.push(makeAction('Explore Feni Knowledge', '/feni', 'Public local guides and knowledge about Feni.'))
   }
   if (parsed.commerce || intent.includes('commerce') || normalized.includes('পণ্য')) {
     actions.push(makeAction('Shop Local', ROUTES.commerce.root, 'Products, sellers, orders and delivery.'))
