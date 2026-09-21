@@ -703,7 +703,7 @@ return (
             {step===3&&<div className="space-y-5">
               <div><label htmlFor="description-bn" className="text-sm font-medium">দোকান সম্পর্কে সংক্ষেপে</label><textarea autoFocus id="description-bn" value={descriptionBn} onChange={(event)=>setDescriptionBn(event.target.value.slice(0,2000))} placeholder="আপনার দোকান বা business সম্পর্কে লিখুন..." maxLength={2000} rows={5} className="mt-2 w-full resize-y rounded-xl border border-[#0b1736]/10 bg-white px-4 py-3 text-sm leading-6 text-[#0b1736] outline-none focus:border-[#008080]/40 dark:border-white/10 dark:bg-white/[0.045] dark:text-white" /></div>
               <div><label htmlFor="description-en" className="text-sm font-medium">English description</label><textarea id="description-en" value={descriptionEn} onChange={(event)=>setDescriptionEn(event.target.value.slice(0,2000))} placeholder="Tell customers about your store..." maxLength={2000} rows={5} className="mt-2 w-full resize-y rounded-xl border border-[#0b1736]/10 bg-white px-4 py-3 text-sm leading-6 text-[#0b1736] outline-none focus:border-[#008080]/40 dark:border-white/10 dark:bg-white/[0.045] dark:text-white" /></div>
-            </div>
+            </div>}
             <div
               className="
                 mt-6 rounded-xl
