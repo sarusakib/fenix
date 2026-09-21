@@ -121,27 +121,43 @@ function mergeRows(groups, parsed) {
 }
 
 async function safeDirectorySearch(supabase, parsed, locations) {
-  try {
-    const query = String(parsed?.original || '').trim().slice(0, MAX_QUERY_LENGTH)
-    const upazila = locationUpazila(locations)
-    const { data, error } = await supabase.rpc('search_directory_businesses', {
-      p_query: query || undefined,
-      p_category: undefined,
-      p_upazila: upazila,
-      p_limit: 12,
-      p_offset: 0,
-    })
+  const queries = [
+    String(parsed?.original || '').trim().slice(0, MAX_QUERY_LENGTH),
+    buildKeywordQuery(parsed?.normalized || ''),
+    queryTokens(parsed).slice(0, 6).join(' '),
+  ]
+    .map((value) => value.trim().slice(0, MAX_QUERY_LENGTH))
+    .filter(Boolean)
 
-    if (error) {
-      console.error('Feni Brain directory retrieval failed:', { code: error.code })
-      return []
+  const upazila = locationUpazila(locations)
+  const merged = new Map()
+
+  for (const query of [...new Set(queries)]) {
+    try {
+      const { data, error } = await supabase.rpc('search_directory_businesses', {
+        p_query: query,
+        p_category: undefined,
+        p_upazila: upazila,
+        p_limit: 12,
+        p_offset: 0,
+      })
+
+      if (error) {
+        console.error('Feni Brain directory retrieval failed:', { code: error.code, query })
+        continue
+      }
+
+      for (const row of data || []) {
+        if (row?.id) merged.set(row.id, row)
+      }
+
+      if (merged.size >= 12) break
+    } catch (error) {
+      console.error('Feni Brain directory retrieval exception:', { name: error?.name, query })
     }
-
-    return Array.isArray(data) ? data : []
-  } catch (error) {
-    console.error('Feni Brain directory retrieval exception:', { name: error?.name })
-    return []
   }
+
+  return [...merged.values()].slice(0, 12)
 }
 
 async function safeCommerceSearch(supabase, parsed) {
