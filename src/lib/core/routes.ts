@@ -90,6 +90,7 @@ export const ROUTES = {
     root: '/dashboard',
     business: '/dashboard/business',
     settings: '/dashboard/settings',
+    businessHealth: '/dashboard/business-health',
   },
 } as const
 
