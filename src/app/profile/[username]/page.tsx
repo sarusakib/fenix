@@ -1,0 +1,62 @@
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { ArrowLeft, ChatCircleText, Globe, MapPin, UserCircle } from '@phosphor-icons/react/dist/ssr'
+import Navbar from '@/components/Navbar'
+import ProfileReportButton from '@/components/profile/ProfileReportButton'
+import { createClient } from '@/utils/supabase/server'
+
+export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params
+  const s = await createClient()
+  const { data } = await s.from('fenix_public_profiles').select('full_name,username,bio,location_text').eq('username', decodeURIComponent(username).toLowerCase()).maybeSingle()
+  return {
+    title: data?.full_name ? `${data.full_name} | FeniX` : 'FeniX Profile',
+    description: data?.bio || 'Public profile on FeniX — Feni Business Ecosystem.',
+  }
+}
+
+export default async function PublicProfilePage({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params
+  const s = await createClient()
+  const { data: profile } = await s
+    .from('fenix_public_profiles')
+    .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,created_at')
+    .eq('username', decodeURIComponent(username).toLowerCase())
+    .maybeSingle()
+
+  if (!profile) notFound()
+
+  const safeName = profile.full_name || `@${profile.username}`
+  const website = profile.website_url && /^https?:\/\//i.test(profile.website_url) ? profile.website_url : null
+
+  return (
+    <main className="min-h-dvh">
+      <Navbar />
+      <section className="mx-auto max-w-3xl px-4 pb-28 pt-7 sm:px-6">
+        <Link href="/feed" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> Feed</Link>
+        <article className="mt-6 overflow-hidden rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)]">
+          <div className="h-32 bg-[var(--fx-primary-soft)] sm:h-44">{profile.cover_url && <img src={profile.cover_url} alt="" className="h-full w-full object-cover" />}</div>
+          <div className="p-5 sm:p-7">
+            <div className="-mt-14 flex items-end justify-between gap-4 sm:-mt-16">
+              {profile.avatar_url ? <img src={profile.avatar_url} alt="" className="h-24 w-24 rounded-full border-4 border-[var(--fx-surface)] object-cover sm:h-28 sm:w-28" /> : <div className="grid h-24 w-24 place-items-center rounded-full border-4 border-[var(--fx-surface)] bg-[var(--fx-primary-soft)] sm:h-28 sm:w-28"><UserCircle size={58} className="text-[var(--fx-primary-strong)]" /></div>}
+              <Link href={`/messages?to=${encodeURIComponent(profile.id)}&name=${encodeURIComponent(safeName)}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-sm font-bold text-white"><ChatCircleText size={17}/> Message</Link>
+            </div>
+            <div className="mt-4">
+              <h1 className="text-3xl font-black tracking-[-.04em]">{safeName}</h1>
+              <p className="mt-1 text-sm text-[var(--fx-muted)]">@{profile.username}</p>
+              {profile.bio && <p className="mt-4 whitespace-pre-wrap text-sm leading-7">{profile.bio}</p>}
+              <div className="mt-5 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">
+                {profile.location_text && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><MapPin size={14}/>{profile.location_text}</span>}
+                {website && <a href={website} target="_blank" rel="noreferrer noopener" className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 hover:underline dark:bg-white/[.04]"><Globe size={14}/>Website</a>}
+              </div>
+              <ProfileReportButton profileId={profile.id} locale="bn" />
+              <p className="mt-5 text-[11px] text-[var(--fx-muted)]">Profile joined FeniX on {new Date(profile.created_at).toLocaleDateString('en-BD')}</p>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  )
+}

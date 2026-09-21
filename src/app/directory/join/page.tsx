@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Buildings, CheckCircle, Storefront } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
+import { GuidedFormProgress } from '@/components/forms/GuidedFormProgress'
 import { createClient } from '@/utils/supabase/client'
 
 const CATEGORIES = ['Retail','Food & Beverage','Services','Manufacturing','Agriculture','Education','Technology','Healthcare','Transport','Online','Other']
@@ -16,6 +17,7 @@ export default function DirectoryJoinPage() {
   const [description,setDescription]=useState('')
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
+  const [step,setStep]=useState(1)
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -62,15 +64,21 @@ export default function DirectoryJoinPage() {
               <p className="mt-2 text-sm leading-6 opacity-60">Create the shared business identity used by Directory, Commerce, Start and future FeniX services.</p>
             </div>
           </div>
-          <form onSubmit={submit} className="mt-8 space-y-5">
-            <label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-[.12em] opacity-50">Business name</span><input required value={name} onChange={e=>setName(e.target.value)} maxLength={180} className="h-12 w-full rounded-xl border border-black/10 bg-transparent px-3 text-sm outline-none focus:border-[#008080]/40 dark:border-white/10"/></label>
-            <label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-[.12em] opacity-50">Category</span><select value={category} onChange={e=>setCategory(e.target.value)} className="h-12 w-full rounded-xl border border-black/10 bg-white px-3 text-sm outline-none dark:border-white/10 dark:bg-white/[.05]"><option value="">Select a category</option>{CATEGORIES.map(item=><option key={item}>{item}</option>)}</select></label>
-            <label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-[.12em] opacity-50">Short description</span><textarea value={description} onChange={e=>setDescription(e.target.value)} maxLength={2000} rows={5} className="w-full rounded-xl border border-black/10 bg-transparent p-3 text-sm leading-6 outline-none focus:border-[#008080]/40 dark:border-white/10"/></label>
+          <form onSubmit={(e)=>{e.preventDefault(); if(step===3) void submit();}} className="mt-8">
+            <GuidedFormProgress step={step} total={3}
+              title={step===1?'Business identity':step===2?'Business type':'Public description'}
+              subtitle={step===1?'First tell us the name.':step===2?'Choose the category that fits best.':'Add a short description, then create your business.'}
+              onBack={()=>setStep(s=>Math.max(1,s-1))}
+              onNext={()=>{if(step===1&&!name.trim()){setError('Business name is required.');return} setError('');setStep(s=>Math.min(3,s+1))}}
+              nextLabel={step===2?'Continue':'Next'}
+              nextDisabled={step===1&&!name.trim()}
+              submit
+            />
+            {step===1&&<div className="space-y-3"><label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-[.12em] opacity-50">Business name</span><input autoFocus required value={name} onChange={e=>setName(e.target.value)} maxLength={180} className="h-12 w-full rounded-xl border border-black/10 bg-transparent px-3 text-sm outline-none focus:border-[#008080]/40 dark:border-white/10"/></label></div>}
+            {step===2&&<div className="space-y-3"><label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-[.12em] opacity-50">Category</span><select autoFocus value={category} onChange={e=>setCategory(e.target.value)} className="h-12 w-full rounded-xl border border-black/10 bg-white px-3 text-sm outline-none dark:border-white/10 dark:bg-white/[.05]"><option value="">Select a category</option>{CATEGORIES.map(item=><option key={item}>{item}</option>)}</select></label></div>}
+            {step===3&&<div className="space-y-3"><label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-[.12em] opacity-50">Short description</span><textarea autoFocus value={description} onChange={e=>setDescription(e.target.value)} maxLength={2000} rows={7} className="w-full rounded-xl border border-black/10 bg-transparent p-3 text-sm leading-6 outline-none focus:border-[#008080]/40 dark:border-white/10"/></label>
             {error && <p className="rounded-xl bg-red-500/[.06] p-3 text-sm text-red-700 dark:text-red-200">{error}</p>}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <button disabled={busy} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#008080] px-5 text-sm font-black text-white disabled:opacity-50">{busy?'Creating...':'Create business'} <Storefront size={18}/></button>
-              <span className="inline-flex items-center gap-2 text-xs opacity-50"><CheckCircle size={16}/> Ownership remains protected by Supabase RLS.</span>
-            </div>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center"><button type="submit" disabled={busy} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#008080] px-5 text-sm font-black text-white disabled:opacity-50">{busy?'Creating...':'Create business'} <Storefront size={18}/></button><span className="inline-flex items-center gap-2 text-xs opacity-50"><CheckCircle size={16}/> Ownership remains protected by Supabase RLS.</span></div></div>}
           </form>
         </div>
       </section>

@@ -4,7 +4,7 @@ import { HfInference } from '@huggingface/inference'
 import { searchFeniBrain } from './searchFeniBrain'
 import { fetchLiveFeniSources, shouldUseLiveWeb } from '../../lib/feniBrainLiveWeb'
 import { buildFeniBrainPlan, buildFeniXPolicyPrompt } from '../../lib/fenixNetwork'
-import { classifyFeniBrainQuestion, detectLanguage, detectFeniBrainIntent, extractBudgetBDT, extractEntities } from '../../lib/feniBrainQuery'
+import { classifyFeniBrainQuestion, detectLanguage, detectFeniBrainIntent, detectRequestedFactSubject, extractBudgetBDT, extractEntities } from '../../lib/feniBrainQuery'
 
 const MODEL = process.env.FENI_BRAIN_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
 const MAX_QUERY_LENGTH = 120
@@ -103,10 +103,23 @@ function brainMeta(cleanQuery, retrieval, plan) {
   }
 }
 
-function safeFallbackAnswer(retrieval) {
+function directQuestionAnswer(cleanQuery, retrieval) {
+  const normalized = cleanQuery.toLowerCase()
+  const isCountQuestion = ['কত','কয়টি','কয়টি','কয়টা','কয়টা','কতো','কয়জন','কয়জন','how many','number of','count','koyta','koita','koto'].some((term) => normalized.includes(term))
+  if (!isCountQuestion) return ''
+  const subject = retrieval.requestedFactSubject || detectRequestedFactSubject(cleanQuery)
+  if (!subject) return ''
+  const exact = (retrieval.results || []).find((row) => row.retrieval_method === 'fact' && row.subject_key === subject)
+  if (!exact) return ''
+  return factAnswer(exact)
+}
+
+function safeFallbackAnswer(cleanQuery, retrieval) {
+  const direct = directQuestionAnswer(cleanQuery, retrieval)
+  if (direct) return direct
   const child = childLocationAnswer(retrieval.childLocations)
   if (child) return child
-  const fact = factAnswer(retrieval.results?.[0])
+  const fact = factAnswer((retrieval.results || []).find((row) => row.retrieval_method === 'fact'))
   if (fact) return fact
   const snippets = (retrieval.results || []).slice(0, 2).map((row) => row.content).filter(Boolean)
   return snippets.length ? 'Verified Feni তথ্য অনুযায়ী:\n\n' + snippets.join('\n\n') : 'এই প্রশ্নের জন্য বর্তমানে পর্যাপ্ত verified Feni তথ্য পাওয়া যায়নি।'
@@ -123,10 +136,36 @@ export async function answerFeniBrain(query) {
   const liveSources = liveWebChecked ? await fetchLiveFeniSources(retrieval.sources) : []
   const questionClass = classifyFeniBrainQuestion(cleanQuery)
   const plan = buildFeniBrainPlan(cleanQuery, retrieval.intent)
+  const directAnswer = directQuestionAnswer(cleanQuery, retrieval)
   const language = detectLanguage(cleanQuery)
   const intentKey = detectFeniBrainIntent(cleanQuery)
+  const requestedFactSubject = detectRequestedFactSubject(cleanQuery)
   const budgetBDT = extractBudgetBDT(cleanQuery)
   const entities = extractEntities(cleanQuery)
+
+  if (directAnswer) {
+    return {
+      success: true,
+      ...brainMeta(cleanQuery, retrieval, plan),
+      answer: directAnswer,
+      intent: retrieval.intent,
+      locations: retrieval.locations,
+      childLocations: retrieval.childLocations,
+      sources: retrieval.sources,
+      grounded: true,
+      aiGenerated: false,
+      results: retrieval.results,
+      liveWebChecked,
+      liveSources: publicLiveSources(liveSources),
+      confidence: Number(retrieval.retrievalConfidence ?? 0),
+      guidance: plan.actions,
+      guidanceTitle: plan.guidanceTitle,
+      guidanceText: plan.guidanceText,
+      safetyNote: plan.safetyNote,
+      knowledgeMode: plan.knowledgeMode,
+      requestedFactSubject,
+    }
+  }
 
   if (!retrieval.results?.length && !retrieval.childLocations?.length && !liveSources.length && questionClass.local) {
     return {
@@ -136,16 +175,16 @@ export async function answerFeniBrain(query) {
       intent: retrieval.intent, locations: retrieval.locations, childLocations: retrieval.childLocations,
       sources: [], grounded: false, aiGenerated: false, liveWebChecked, liveSources: [], confidence: 0,
       guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
-      safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
+      safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode, requestedFactSubject,
     }
   }
 
   const token = process.env.HUGGINGFACE_API_KEY
   if (!token) {
     return {
-      success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
+      success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(cleanQuery, retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
-      grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0), aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources: publicLiveSources(liveSources),
+      grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0), aiGenerated: false, results: retrieval.results, requestedFactSubject, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0), guidance: plan.actions,
       guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
@@ -183,7 +222,7 @@ export async function answerFeniBrain(query) {
       success: true, ...brainMeta(cleanQuery, retrieval, plan), answer, intent: retrieval.intent, locations: retrieval.locations,
       childLocations: retrieval.childLocations, sources: retrieval.sources,
       grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0),
-      aiGenerated: true, model: MODEL, liveWebChecked, liveSources: publicLiveSources(liveSources),
+      aiGenerated: true, requestedFactSubject, model: MODEL, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0), results: retrieval.results,
       guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
@@ -191,12 +230,12 @@ export async function answerFeniBrain(query) {
   } catch (error) {
     console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status })
     return {
-      success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(retrieval), intent: retrieval.intent,
+      success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(cleanQuery, retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
       grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0), aiGenerated: false, results: retrieval.results, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0),
       guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
-      safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
+      safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode, requestedFactSubject,
     }
   }
 }
