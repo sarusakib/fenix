@@ -5,6 +5,7 @@
 export const ROUTES = {
   home: '/',
   services: '/services',
+  pulse: '/pulse',
   help: '/help',
   admin: '/admin',
   policy: '/policy',
@@ -78,6 +79,7 @@ export const ROUTES = {
     jobs: '/jobs',
     requests: '/requests',
     messages: '/messages',
+    pulse: '/pulse',
     notifications: '/notifications',
     payments: '/payments',
   },
