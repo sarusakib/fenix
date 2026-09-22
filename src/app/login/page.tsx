@@ -43,6 +43,18 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
+  const getPostAuthRoute = async (supabase: ReturnType<typeof createClient>, userId: string) => {
+    const { data: settings } = await supabase
+      .from('profile_settings')
+      .select('onboarding_completed,onboarding_dismissed')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    return !settings?.onboarding_completed && !settings?.onboarding_dismissed
+      ? '/profile/setup'
+      : '/'
+  }
+
   useEffect(() => {
     let mounted = true
 
@@ -54,7 +66,8 @@ export default function LoginPage() {
 
       if (session) {
         setAuth(session)
-        router.replace('/')
+        const destination = await getPostAuthRoute(supabase, session.user.id)
+        router.replace(destination)
         return
       }
 
@@ -99,7 +112,8 @@ export default function LoginPage() {
         if (data.session) {
           setAuth(data.session)
           resetFailedAttempts()
-          router.replace('/')
+          const destination = await getPostAuthRoute(supabase, data.session.user.id)
+          router.replace(destination)
           router.refresh()
           return
         }
@@ -116,7 +130,8 @@ export default function LoginPage() {
 
       setAuth(data.session)
       resetFailedAttempts()
-      router.replace('/')
+      const destination = await getPostAuthRoute(supabase, data.session.user.id)
+      router.replace(destination)
       router.refresh()
     } catch (authError: unknown) {
       setError(authError instanceof Error ? getSafeAuthMessage(authError.message) : 'একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।')

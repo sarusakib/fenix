@@ -77,7 +77,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'investor-profile', label: 'Investor Profile', labelBn: 'ইনভেস্টর প্রোফাইল', description: 'Keep investor preferences and verification together.', href: '/invest/profile', status: 'live', icon: 'account' },
       { id: 'investment-workspace', label: 'Investment Workspace', labelBn: 'ইনভেস্টমেন্ট ওয়ার্কস্পেস', description: 'Manage interests, records and workflow.', href: '/invest/dashboard', status: 'live', icon: 'trend' },
       { id: 'scenario-calculator', label: 'Scenario Calculator', labelBn: 'সিনারিও ক্যালকুলেটর', description: 'Explore assumptions without promising returns.', href: '/invest/calculator', status: 'live', icon: 'trend' },
-      { id: 'due-diligence', label: 'Due Diligence Center', labelBn: 'ডিউ ডিলিজেন্স', description: 'Structured evidence review for future investment workflows.', status: 'planned', icon: 'shield' },
+      { id: 'due-diligence', label: 'Due Diligence Center', labelBn: 'ডিউ ডিলিজেন্স', description: 'Structured private evidence review and checklist.', href: '/invest/due-diligence', status: 'live', icon: 'shield' },
     ],
   },
   {
@@ -104,6 +104,19 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'jobs', label: 'Jobs & Work', labelBn: 'চাকরি ও কাজ', description: 'Explore the work and opportunity direction.', href: '/jobs', status: 'live', icon: 'briefcase' },
       { id: 'radar', label: 'Opportunity Radar', labelBn: 'অপর্চুনিটি রাডার', description: 'Surface local opportunity signals by place and intent.', href: '/radar', status: 'live', icon: 'trend' },
       { id: 'map', label: 'Feni Map', labelBn: 'ফেনি ম্যাপ', description: 'Map-first local discovery and business context.', href: '/directory/map', status: 'live', icon: 'map' },
+      { id: 'pulse', label: 'Feni Pulse', labelBn: 'ফেনি পালস', description: 'See privacy-safe observed local activity signals.', href: '/pulse', status: 'live', icon: 'trend', tag: 'Signals' },
+    ],
+  },
+  {
+    id: 'care',
+    label: 'Care',
+    labelBn: 'জরুরি সেবা',
+    description: 'Blood, ambulance and urgent local help with privacy and verification.',
+    icon: 'shield',
+    services: [
+      { id: 'blood-help', label: 'Blood Help', labelBn: 'রক্ত সহায়তা', description: 'Find open blood requests or register as a donor.', href: '/care/blood', status: 'live', icon: 'shield', tag: 'Emergency' },
+      { id: 'ambulance', label: 'Ambulance', labelBn: 'অ্যাম্বুলেন্স', description: 'Find ambulance providers or request a ride.', href: '/care/ambulance', status: 'live', icon: 'shield', tag: 'Emergency' },
+      { id: 'health-directory', label: 'Hospitals & Pharmacy', labelBn: 'হাসপাতাল ও ফার্মেসি', description: 'Open local health and emergency discovery.', href: '/directory', status: 'live', icon: 'shield' },
     ],
   },
   {
@@ -117,7 +130,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'verification', label: 'Verification', labelBn: 'ভেরিফিকেশন', description: 'Understand how public verification labels work.', href: '/directory/verify', status: 'live', icon: 'shield' },
       { id: 'claim', label: 'Claim a Business', labelBn: 'বিজনেস ক্লেইম', description: 'Start an ownership/claim workflow.', href: '/directory/claim', status: 'live', icon: 'shield' },
       { id: 'admin-trust', label: 'Trust Center', labelBn: 'ট্রাস্ট সেন্টার', description: 'Admin moderation and review controls.', href: '/admin/trust', status: 'live', icon: 'shield' },
-      { id: 'qr', label: 'QR Business Identity', labelBn: 'QR বিজনেস আইডি', description: 'Shareable business identity layer is being expanded.', status: 'planned', icon: 'shield' },
+      { id: 'qr', label: 'QR Business Identity', labelBn: 'QR বিজনেস আইডি', description: 'Share a public business identity with a QR code.', status: 'live', icon: 'shield' },
     ],
   },
   {

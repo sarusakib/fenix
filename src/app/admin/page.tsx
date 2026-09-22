@@ -22,6 +22,7 @@ const modules = [
   { title: 'Commerce Operations', body: 'Seller, product, order and return operations.', href: '/commerce/admin', icon: ShoppingBag },
   { title: 'Investment Operations', body: 'Opportunities, investors, documents and interests.', href: '/admin/investment', icon: ChartLineUp },
   { title: 'Brain & Knowledge', body: 'Open the public Feni Brain experience.', href: '/guide', icon: Brain },
+  { title: 'Care Operations', body: 'Review blood requests, ambulance requests and provider verification.', href: '/admin/care', icon: ShieldCheck },
   { title: 'Public Experience', body: 'See Directory, Invest and Commerce as members do.', href: '/directory', icon: Storefront },
   { title: 'Platform Settings', body: 'Governance, member preferences and public policy links.', href: '/admin/settings', icon: GearSix },
 ] as const

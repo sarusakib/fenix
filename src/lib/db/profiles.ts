@@ -89,7 +89,7 @@ export async function getOwnProfile(
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, full_name, role, phone, username, bio, avatar_url, cover_url, location_text, website_url, created_at, updated_at')
+    .select('id, full_name, role, phone, username, bio, avatar_url, cover_url, location_text, website_url, country_code, district_id, upazila_id, locality_id, area_text, road_text, house_details, holding_no, location_public_level, exact_location_visibility, feed_public, is_public, created_at, updated_at')
     .eq('id', id)
     .maybeSingle()
 
@@ -140,7 +140,7 @@ export async function createProfile(
   const { data, error } = await supabase
     .from('profiles')
     .insert(payload)
-    .select('id, full_name, role, phone, username, bio, avatar_url, cover_url, location_text, website_url, created_at, updated_at')
+    .select('id, full_name, role, phone, username, bio, avatar_url, cover_url, location_text, website_url, country_code, district_id, upazila_id, locality_id, area_text, road_text, house_details, holding_no, location_public_level, exact_location_visibility, feed_public, is_public, created_at, updated_at')
     .single()
 
   if (error) {
@@ -196,7 +196,7 @@ export async function updateProfile(
     .from('profiles')
     .update(payload)
     .eq('id', id)
-    .select('id, full_name, role, phone, username, bio, avatar_url, cover_url, location_text, website_url, created_at, updated_at')
+    .select('id, full_name, role, phone, username, bio, avatar_url, cover_url, location_text, website_url, country_code, district_id, upazila_id, locality_id, area_text, road_text, house_details, holding_no, location_public_level, exact_location_visibility, feed_public, is_public, created_at, updated_at')
     .single()
 
   if (error) {

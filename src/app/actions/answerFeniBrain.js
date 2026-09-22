@@ -4,6 +4,7 @@ import { HfInference } from '@huggingface/inference'
 import { searchFeniBrain } from './searchFeniBrain'
 import { fetchLiveFeniSources, shouldUseLiveWeb } from '../../lib/feniBrainLiveWeb'
 import { buildFeniBrainPlan, buildFeniXPolicyPrompt } from '../../lib/fenixNetwork'
+import { canonicalBrainIntent, buildZeroResultHints } from '../../lib/feniBrainEngine'
 import { classifyFeniBrainQuestion, detectLanguage, detectFeniBrainIntent, detectRequestedFactSubject, extractBudgetBDT, extractEntities } from '../../lib/feniBrainQuery'
 
 const MODEL = process.env.FENI_BRAIN_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
@@ -53,9 +54,11 @@ function factAnswer(result) {
   const label = labels[result.subject_key] || result.subject_key || 'তথ্য'
   const unit = result.value_unit || ''
   if (!number && !result.value_text) return ''
-  if (result.subject_key === 'area') return location + ' জেলার আয়তন ' + number + ' বর্গকিলোমিটার।'
-  if (result.subject_key === 'population') return location + ' জেলার জনসংখ্যা ' + number + ' জন।'
-  if (result.value_unit === 'count') return location + ' জেলায় ' + number + 'টি ' + label + ' আছে।'
+  if (result.subject_key === 'area') return location + ' এর আয়তন ' + number + ' বর্গকিলোমিটার।'
+  if (result.subject_key === 'population') return location + ' এর জনসংখ্যা ' + number + ' জন।'
+  if (result.value_unit === 'people_per_square_km') return location + ' এ জনঘনত্ব প্রতি বর্গকিলোমিটারে ' + number + ' জন।'
+  if (result.value_unit === 'count') return location + ' এ ' + number + 'টি ' + label + ' আছে।'
+  if (result.value_text) return location + ' — ' + label + ': ' + result.value_text + '।'
   return location + ' — ' + label + ': ' + number + (unit ? ' ' + unit : '') + '।'
 }
 
@@ -93,7 +96,7 @@ function publicLiveSources(sources) {
 function brainMeta(cleanQuery, retrieval, plan) {
   return {
     language: detectLanguage(cleanQuery),
-    intentKey: detectFeniBrainIntent(cleanQuery),
+    intentKey: canonicalBrainIntent(detectFeniBrainIntent(cleanQuery)),
     budget: extractBudgetBDT(cleanQuery),
     entities: extractEntities(cleanQuery),
     evidence: buildEvidence(retrieval?.results),
@@ -117,12 +120,41 @@ function directQuestionAnswer(cleanQuery, retrieval) {
 function safeFallbackAnswer(cleanQuery, retrieval) {
   const direct = directQuestionAnswer(cleanQuery, retrieval)
   if (direct) return direct
+
   const child = childLocationAnswer(retrieval.childLocations)
   if (child) return child
+
   const fact = factAnswer((retrieval.results || []).find((row) => row.retrieval_method === 'fact'))
   if (fact) return fact
-  const snippets = (retrieval.results || []).slice(0, 2).map((row) => row.content).filter(Boolean)
-  return snippets.length ? 'Verified Feni তথ্য অনুযায়ী:\n\n' + snippets.join('\n\n') : 'এই প্রশ্নের জন্য বর্তমানে পর্যাপ্ত verified Feni তথ্য পাওয়া যায়নি।'
+
+  const businesses = (retrieval.results || [])
+    .filter((row) => row.retrieval_method === 'business')
+    .slice(0, 4)
+
+  if (businesses.length) {
+    const lines = businesses.map((row) => '• ' + String(row.document_title || row.content).slice(0, 220))
+    return 'FeniX Directory-তে matching local listing পাওয়া গেছে:\n\n' + lines.join('\n') +
+      '\n\nযোগাযোগ বা যাওয়ার আগে listing-এর verification ও latest information দেখে নিন।'
+  }
+
+  const products = (retrieval.results || [])
+    .filter((row) => row.retrieval_method === 'product')
+    .slice(0, 4)
+
+  if (products.length) {
+    const lines = products.map((row) => '• ' + String(row.content || row.document_title).slice(0, 220))
+    return 'FeniX Commerce-এ matching published product পাওয়া গেছে:\n\n' + lines.join('\n')
+  }
+
+  const snippets = (retrieval.results || [])
+    .filter((row) => row.retrieval_method !== 'semantic')
+    .slice(0, 2)
+    .map((row) => row.content)
+    .filter(Boolean)
+
+  return snippets.length
+    ? 'Verified Feni তথ্য অনুযায়ী:\n\n' + snippets.join('\n\n')
+    : 'এই প্রশ্নের জন্য বর্তমানে পর্যাপ্ত verified Feni তথ্য পাওয়া যায়নি।' 
 }
 
 export async function answerFeniBrain(query) {

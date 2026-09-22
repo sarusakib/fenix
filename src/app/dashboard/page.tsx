@@ -11,8 +11,9 @@ export default async function DashboardPage() {
   const { data: auth } = await s.auth.getUser()
   if (!auth.user) redirect('/login?next=/dashboard')
 
-  const [profile, businesses, starts, interests, orders, notifications] = await Promise.all([
-    s.from('profiles').select('full_name,role').eq('id', auth.user.id).maybeSingle(),
+  const [profile, settings, businesses, starts, interests, orders, notifications] = await Promise.all([
+    s.from('profiles').select('full_name,role,username,avatar_url').eq('id', auth.user.id).maybeSingle(),
+    s.from('profile_settings').select('onboarding_completed,onboarding_dismissed').eq('user_id', auth.user.id).maybeSingle(),
     s.from('businesses').select('id',{count:'exact',head:true}).eq('owner_id',auth.user.id),
     s.from('business_start_projects').select('id',{count:'exact',head:true}).eq('user_id',auth.user.id),
     s.from('investment_interests').select('id',{count:'exact',head:true}).eq('investor_id',auth.user.id),
@@ -40,6 +41,17 @@ export default async function DashboardPage() {
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-black/[.035] px-3 py-1.5 text-xs font-semibold dark:bg-white/[.05]"><ShieldCheck size={15} className="text-[#008080]"/> {profile.data?.role || 'user'} · {profile.data?.full_name || auth.user.email}</div>
         </div>
 
+        {settings.data?.onboarding_completed !== true && settings.data?.onboarding_dismissed !== true && (
+          <Link href="/profile/setup" className="mt-6 flex items-center justify-between gap-4 rounded-3xl border border-[var(--fx-border)] bg-white/80 p-5 dark:bg-white/[.04]">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[.14em] text-[#008080]">Profile setup</p>
+              <h2 className="mt-1 text-lg font-black">Complete your FeniX identity</h2>
+              <p className="mt-1 text-sm opacity-55">Add photo, username, Feni location and optional interests. Every step can be skipped.</p>
+            </div>
+            <ArrowRight size={20} className="shrink-0" />
+          </Link>
+        )}
+
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {cards.map(([label,value,Icon,href]) => (
             <Link key={label} href={href} className="rounded-2xl border border-black/10 bg-white/80 p-5 transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[.04]">
@@ -60,6 +72,7 @@ export default async function DashboardPage() {
             ['/requests','Investment requests','Track your investment interests and review status.',ClipboardText],
             ['/messages','Messages','Open your protected direct messages.',ChatCircleText],
             ['/feed','Community Feed','Post and read text-only community updates.',UsersThree],
+            ['/dashboard/business-health','Business Health','Check your business profile readiness and next actions.',ShieldCheck],
             ['/profile','My Profile','Edit your public-safe profile, bio and visibility.',UserCircle],
             ['/deals','Deals','View recorded investment deal workflow.',Handshake],
             ['/dashboard/settings','Account settings','Review account and privacy guidance.',GearSix],

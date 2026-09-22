@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       status: result?.success === false ? 400 : 200,
       headers: {
         'Cache-Control': 'no-store',
-        'X-FeniX-Brain': '2.0-foundation',
+        'X-FeniX-Brain': '3.0-live-engine',
       },
     })
   } catch (error) {

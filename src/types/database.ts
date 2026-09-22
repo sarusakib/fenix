@@ -1372,6 +1372,390 @@ export type Database = {
           },
         ]
       }
+      fenix_ambulance_providers: {
+        Row: {
+          ac_available: boolean
+          ambulance_type: string
+          available_24_7: boolean
+          base_area: string | null
+          created_at: string
+          display_name: string
+          id: string
+          is_verified: boolean
+          owner_id: string | null
+          oxygen_available: boolean
+          phone: string | null
+          service_area: string | null
+          status: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          ac_available?: boolean
+          ambulance_type?: string
+          available_24_7?: boolean
+          base_area?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          is_verified?: boolean
+          owner_id?: string | null
+          oxygen_available?: boolean
+          phone?: string | null
+          service_area?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          ac_available?: boolean
+          ambulance_type?: string
+          available_24_7?: boolean
+          base_area?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_verified?: boolean
+          owner_id?: string | null
+          oxygen_available?: boolean
+          phone?: string | null
+          service_area?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_ambulance_requests: {
+        Row: {
+          ambulance_type: string
+          condition_category: string
+          created_at: string
+          destination_hospital: string | null
+          id: string
+          note: string | null
+          oxygen_needed: boolean
+          pickup_area: string
+          pickup_upazila_id: string | null
+          provider_id: string | null
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ambulance_type?: string
+          condition_category?: string
+          created_at?: string
+          destination_hospital?: string | null
+          id?: string
+          note?: string | null
+          oxygen_needed?: boolean
+          pickup_area: string
+          pickup_upazila_id?: string | null
+          provider_id?: string | null
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ambulance_type?: string
+          condition_category?: string
+          created_at?: string
+          destination_hospital?: string | null
+          id?: string
+          note?: string | null
+          oxygen_needed?: boolean
+          pickup_area?: string
+          pickup_upazila_id?: string | null
+          provider_id?: string | null
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_ambulance_requests_pickup_upazila_id_fkey"
+            columns: ["pickup_upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_ambulance_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_ambulance_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_blood_donors: {
+        Row: {
+          area_text: string | null
+          availability: string
+          blood_group: string
+          created_at: string
+          is_public: boolean
+          last_donation_date: string | null
+          note: string | null
+          preferred_contact: string
+          upazila_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area_text?: string | null
+          availability?: string
+          blood_group: string
+          created_at?: string
+          is_public?: boolean
+          last_donation_date?: string | null
+          note?: string | null
+          preferred_contact?: string
+          upazila_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area_text?: string | null
+          availability?: string
+          blood_group?: string
+          created_at?: string
+          is_public?: boolean
+          last_donation_date?: string | null
+          note?: string | null
+          preferred_contact?: string
+          upazila_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_blood_donors_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_blood_requests: {
+        Row: {
+          area_text: string | null
+          blood_group: string
+          contact_method: string
+          created_at: string
+          hospital_area: string | null
+          hospital_name: string
+          id: string
+          needed_at: string | null
+          note: string | null
+          requester_id: string
+          status: string
+          units: number
+          upazila_id: string | null
+          updated_at: string
+          urgency: string
+        }
+        Insert: {
+          area_text?: string | null
+          blood_group: string
+          contact_method?: string
+          created_at?: string
+          hospital_area?: string | null
+          hospital_name: string
+          id?: string
+          needed_at?: string | null
+          note?: string | null
+          requester_id: string
+          status?: string
+          units: number
+          upazila_id?: string | null
+          updated_at?: string
+          urgency?: string
+        }
+        Update: {
+          area_text?: string | null
+          blood_group?: string
+          contact_method?: string
+          created_at?: string
+          hospital_area?: string | null
+          hospital_name?: string
+          id?: string
+          needed_at?: string | null
+          note?: string | null
+          requester_id?: string
+          status?: string
+          units?: number
+          upazila_id?: string | null
+          updated_at?: string
+          urgency?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_blood_responses: {
+        Row: {
+          created_at: string
+          donor_id: string
+          id: string
+          message: string | null
+          request_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          donor_id: string
+          id?: string
+          message?: string | null
+          request_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          donor_id?: string
+          id?: string
+          message?: string | null
+          request_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_blood_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_blood_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fenix_brain_chunks: {
         Row: {
           chunk_index: number
@@ -1677,6 +2061,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      fenix_brain_pulse_intents_public: {
+        Row: {
+          intent_key: string
+          searches_30d: number
+          searches_7d: number
+        }
+        Insert: {
+          intent_key: string
+          searches_30d?: number
+          searches_7d?: number
+        }
+        Update: {
+          intent_key?: string
+          searches_30d?: number
+          searches_7d?: number
+        }
+        Relationships: []
+      }
+      fenix_brain_pulse_terms_public: {
+        Row: {
+          searches_30d: number
+          searches_7d: number
+          term: string
+          unique_queries_7d: number
+        }
+        Insert: {
+          searches_30d?: number
+          searches_7d?: number
+          term: string
+          unique_queries_7d?: number
+        }
+        Update: {
+          searches_30d?: number
+          searches_7d?: number
+          term?: string
+          unique_queries_7d?: number
+        }
+        Relationships: []
+      }
+      fenix_brain_query_events: {
+        Row: {
+          created_at: string
+          id: string
+          intent_key: string
+          language_code: string
+          query_hash: string
+          result_count: number
+          term: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intent_key?: string
+          language_code?: string
+          query_hash: string
+          result_count?: number
+          term: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intent_key?: string
+          language_code?: string
+          query_hash?: string
+          result_count?: number
+          term?: string
+        }
+        Relationships: []
       }
       fenix_brain_query_terms: {
         Row: {
@@ -2032,33 +2485,51 @@ export type Database = {
       }
       fenix_direct_messages: {
         Row: {
+          attachment_name: string | null
+          attachment_path: string | null
+          attachment_size: number | null
+          attachment_type: string | null
           body: string
           created_at: string
           deleted_for_recipient_at: string | null
           deleted_for_sender_at: string | null
+          edited_at: string | null
           id: string
           read_at: string | null
           recipient_id: string
+          reply_to_id: string | null
           sender_id: string
         }
         Insert: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
           body: string
           created_at?: string
           deleted_for_recipient_at?: string | null
           deleted_for_sender_at?: string | null
+          edited_at?: string | null
           id?: string
           read_at?: string | null
           recipient_id: string
+          reply_to_id?: string | null
           sender_id: string
         }
         Update: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
           body?: string
           created_at?: string
           deleted_for_recipient_at?: string | null
           deleted_for_sender_at?: string | null
+          edited_at?: string | null
           id?: string
           read_at?: string | null
           recipient_id?: string
+          reply_to_id?: string | null
           sender_id?: string
         }
         Relationships: [
@@ -2081,6 +2552,13 @@ export type Database = {
             columns: ["recipient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_direct_messages"
             referencedColumns: ["id"]
           },
           {
@@ -2126,6 +2604,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      fenix_message_reactions: {
+        Row: {
+          created_at: string
+          message_id: string
+          reaction: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          message_id: string
+          reaction: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          message_id?: string
+          reaction?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_direct_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fenix_notifications: {
         Row: {
@@ -2501,6 +3029,68 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "investment_documents_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_due_diligence_checks: {
+        Row: {
+          check_key: string
+          created_at: string
+          id: string
+          investor_id: string
+          note: string | null
+          opportunity_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          check_key: string
+          created_at?: string
+          id?: string
+          investor_id: string
+          note?: string | null
+          opportunity_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          check_key?: string
+          created_at?: string
+          id?: string
+          investor_id?: string
+          note?: string | null
+          opportunity_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_opportunity_id_fkey"
             columns: ["opportunity_id"]
             isOneToOne: false
             referencedRelation: "investment_opportunities"
@@ -3318,11 +3908,103 @@ export type Database = {
           },
         ]
       }
+      profile_contacts: {
+        Row: {
+          created_at: string
+          facebook_public: boolean
+          facebook_url: string | null
+          instagram_public: boolean
+          instagram_url: string | null
+          linkedin_public: boolean
+          linkedin_url: string | null
+          phone_public: boolean
+          public_facebook_url: string | null
+          public_instagram_url: string | null
+          public_linkedin_url: string | null
+          public_whatsapp: string | null
+          public_youtube_url: string | null
+          updated_at: string
+          user_id: string
+          whatsapp: string | null
+          whatsapp_public: boolean
+          youtube_public: boolean
+          youtube_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          facebook_public?: boolean
+          facebook_url?: string | null
+          instagram_public?: boolean
+          instagram_url?: string | null
+          linkedin_public?: boolean
+          linkedin_url?: string | null
+          phone_public?: boolean
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_whatsapp?: string | null
+          public_youtube_url?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp?: string | null
+          whatsapp_public?: boolean
+          youtube_public?: boolean
+          youtube_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          facebook_public?: boolean
+          facebook_url?: string | null
+          instagram_public?: boolean
+          instagram_url?: string | null
+          linkedin_public?: boolean
+          linkedin_url?: string | null
+          phone_public?: boolean
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_whatsapp?: string | null
+          public_youtube_url?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string | null
+          whatsapp_public?: boolean
+          youtube_public?: boolean
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_settings: {
         Row: {
           feed_visibility: string
+          interests: string[]
           locale: string
           message_permissions: string
+          onboarding_completed: boolean
+          onboarding_dismissed: boolean
+          onboarding_step: string
           profile_visibility: string
           reduced_motion: boolean
           theme: string
@@ -3331,8 +4013,12 @@ export type Database = {
         }
         Insert: {
           feed_visibility?: string
+          interests?: string[]
           locale?: string
           message_permissions?: string
+          onboarding_completed?: boolean
+          onboarding_dismissed?: boolean
+          onboarding_step?: string
           profile_visibility?: string
           reduced_motion?: boolean
           theme?: string
@@ -3341,8 +4027,12 @@ export type Database = {
         }
         Update: {
           feed_visibility?: string
+          interests?: string[]
           locale?: string
           message_permissions?: string
+          onboarding_completed?: boolean
+          onboarding_dismissed?: boolean
+          onboarding_step?: string
           profile_visibility?: string
           reduced_motion?: boolean
           theme?: string
@@ -3375,48 +4065,106 @@ export type Database = {
       }
       profiles: {
         Row: {
+          area_text: string | null
           avatar_url: string | null
           bio: string | null
+          country_code: string
           cover_url: string | null
           created_at: string
+          district_id: string | null
+          exact_location_visibility: string
+          feed_public: boolean
           full_name: string | null
+          holding_no: string | null
+          house_details: string | null
           id: string
+          is_public: boolean
+          locality_id: string | null
+          location_public_level: string
           location_text: string | null
           phone: string | null
+          road_text: string | null
           role: string | null
+          upazila_id: string | null
           updated_at: string
           username: string | null
           website_url: string | null
         }
         Insert: {
+          area_text?: string | null
           avatar_url?: string | null
           bio?: string | null
+          country_code?: string
           cover_url?: string | null
           created_at?: string
+          district_id?: string | null
+          exact_location_visibility?: string
+          feed_public?: boolean
           full_name?: string | null
+          holding_no?: string | null
+          house_details?: string | null
           id: string
+          is_public?: boolean
+          locality_id?: string | null
+          location_public_level?: string
           location_text?: string | null
           phone?: string | null
+          road_text?: string | null
           role?: string | null
+          upazila_id?: string | null
           updated_at?: string
           username?: string | null
           website_url?: string | null
         }
         Update: {
+          area_text?: string | null
           avatar_url?: string | null
           bio?: string | null
+          country_code?: string
           cover_url?: string | null
           created_at?: string
+          district_id?: string | null
+          exact_location_visibility?: string
+          feed_public?: boolean
           full_name?: string | null
+          holding_no?: string | null
+          house_details?: string | null
           id?: string
+          is_public?: boolean
+          locality_id?: string | null
+          location_public_level?: string
           location_text?: string | null
           phone?: string | null
+          road_text?: string | null
           role?: string | null
+          upazila_id?: string | null
           updated_at?: string
           username?: string | null
           website_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_locality_id_fkey"
+            columns: ["locality_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vendor_profiles: {
         Row: {
@@ -3545,6 +4293,97 @@ export type Database = {
           },
         ]
       }
+      fenix_brain_pulse_intents: {
+        Row: {
+          intent_key: string | null
+          searches_30d: number | null
+          searches_7d: number | null
+        }
+        Relationships: []
+      }
+      fenix_brain_pulse_terms: {
+        Row: {
+          searches_30d: number | null
+          searches_7d: number | null
+          term: string | null
+          unique_queries_7d: number | null
+        }
+        Relationships: []
+      }
+      fenix_public_ambulance_providers: {
+        Row: {
+          ac_available: boolean | null
+          ambulance_type: string | null
+          available_24_7: boolean | null
+          base_area: string | null
+          display_name: string | null
+          id: string | null
+          is_verified: boolean | null
+          oxygen_available: boolean | null
+          phone: string | null
+          service_area: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          ac_available?: boolean | null
+          ambulance_type?: string | null
+          available_24_7?: boolean | null
+          base_area?: string | null
+          display_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          oxygen_available?: boolean | null
+          phone?: string | null
+          service_area?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          ac_available?: boolean | null
+          ambulance_type?: string | null
+          available_24_7?: boolean | null
+          base_area?: string | null
+          display_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          oxygen_available?: boolean | null
+          phone?: string | null
+          service_area?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_blood_donors: {
+        Row: {
+          area_text: string | null
+          availability: string | null
+          avatar_url: string | null
+          blood_group: string | null
+          full_name: string | null
+          last_donation_date: string | null
+          preferred_contact: string | null
+          upazila_bn: string | null
+          upazila_en: string | null
+          username: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_blood_requests: {
+        Row: {
+          area_text: string | null
+          blood_group: string | null
+          created_at: string | null
+          hospital_area: string | null
+          hospital_name: string | null
+          id: string | null
+          needed_at: string | null
+          status: string | null
+          units: number | null
+          upazila_bn: string | null
+          upazila_en: string | null
+          urgency: string | null
+        }
+        Relationships: []
+      }
       fenix_public_feed: {
         Row: {
           author_avatar_url: string | null
@@ -3564,11 +4403,18 @@ export type Database = {
           bio: string | null
           cover_url: string | null
           created_at: string | null
+          facebook_url: string | null
           full_name: string | null
           id: string | null
+          instagram_url: string | null
+          linkedin_url: string | null
           location_text: string | null
+          phone: string | null
+          public_location: string | null
           username: string | null
           website_url: string | null
+          whatsapp: string | null
+          youtube_url: string | null
         }
         Relationships: []
       }
@@ -3692,7 +4538,10 @@ export type Database = {
         Returns: boolean
       }
       is_fenix_admin: { Args: never; Returns: boolean }
-      is_fenix_user_active: { Args: { p_user_id?: string }; Returns: boolean }
+      is_fenix_username_available: {
+        Args: { p_exclude_user_id?: string; p_username: string }
+        Returns: boolean
+      }
       keyword_feni_brain_chunks: {
         Args: { match_count?: number; query_text: string }
         Returns: {
@@ -3791,6 +4640,16 @@ export type Database = {
       owner_update_investment_interest: {
         Args: { p_interest_id: string; p_owner_note?: string; p_status: string }
         Returns: boolean
+      }
+      record_feni_brain_events: {
+        Args: {
+          p_intent_key: string
+          p_language_code: string
+          p_query_hash: string
+          p_result_count?: number
+          p_terms: string[]
+        }
+        Returns: number
       }
       save_business_embedding: {
         Args: { p_business_id: string; p_embedding: string }
@@ -4048,31 +4907,28 @@ export type CompositeTypes<
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
-
-/** FeniX application compatibility aliases. Keep these alongside generated Supabase types. */
-export type Business = Database["public"]["Tables"]["businesses"]["Row"]
-export type BusinessInsert = Database["public"]["Tables"]["businesses"]["Insert"]
-export type BusinessUpdate = Database["public"]["Tables"]["businesses"]["Update"]
-
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
-export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"]
-export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
-
-export type VendorProfile = Database["public"]["Tables"]["vendor_profiles"]["Row"]
-export type VendorProfileInsert = Database["public"]["Tables"]["vendor_profiles"]["Insert"]
-export type VendorProfileUpdate = Database["public"]["Tables"]["vendor_profiles"]["Update"]
-
-export type InvestmentDocument = Database["public"]["Tables"]["investment_documents"]["Row"]
-export type InvestmentInterest = Database["public"]["Tables"]["investment_interests"]["Row"]
-export type InvestmentOpportunity = Database["public"]["Tables"]["investment_opportunities"]["Row"]
-export type InvestmentProfile = Database["public"]["Tables"]["investment_profiles"]["Row"]
-export type InvestmentReport = Database["public"]["Tables"]["investment_reports"]["Row"]
-export type InvestmentDeal = Database["public"]["Tables"]["investment_deals"]["Row"]
-export type InvestmentUpdate = Database["public"]["Tables"]["investment_updates"]["Row"]
-export type InvestmentMessage = Database["public"]["Tables"]["investment_messages"]["Row"]
-
 export const Constants = {
   public: {
     Enums: {},
   },
 } as const
+
+
+/** FeniX compatibility aliases used by the application layer. */
+export type Business = Database['public']['Tables']['businesses']['Row']
+export type BusinessInsert = Database['public']['Tables']['businesses']['Insert']
+export type BusinessUpdate = Database['public']['Tables']['businesses']['Update']
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
+export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
+export type VendorProfile = Database['public']['Tables']['vendor_profiles']['Row']
+export type VendorProfileInsert = Database['public']['Tables']['vendor_profiles']['Insert']
+export type VendorProfileUpdate = Database['public']['Tables']['vendor_profiles']['Update']
+export type InvestmentDocument = Database['public']['Tables']['investment_documents']['Row']
+export type InvestmentInterest = Database['public']['Tables']['investment_interests']['Row']
+export type InvestmentOpportunity = Database['public']['Tables']['investment_opportunities']['Row']
+export type InvestmentProfile = Database['public']['Tables']['investment_profiles']['Row']
+export type InvestmentReport = Database['public']['Tables']['investment_reports']['Row']
+export type InvestmentDeal = Database['public']['Tables']['investment_deals']['Row']
+export type InvestmentUpdate = Database['public']['Tables']['investment_updates']['Row']
+export type InvestmentMessage = Database['public']['Tables']['investment_messages']['Row']

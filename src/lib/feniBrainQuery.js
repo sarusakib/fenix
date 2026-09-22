@@ -173,8 +173,9 @@ export function detectFeniBrainIntent(input) {
     ['START_BUSINESS', ['ব্যবসা শুরু','ব্যবসা করতে চাই','দোকান দিতে চাই','business start','start a business','কিভাবে ব্যবসা']],
     ['INVEST', ['বিনিয়োগ','investment','invest','funding','capital','অর্থায়ন']],
     ['FIND_SUPPLIER', ['সরবরাহকারী','supplier','পাইকার','পাইকারি','wholesale','distributor']],
-    ['FIND_BUSINESS', ['দোকান','business','shop','ব্যবসা কোথায়']],
-    ['FIND_SERVICE', ['সেবা','service','হাসপাতাল','ক্লিনিক','ডাক্তার','school','college','পুলিশ','ফায়ার']],
+    ['FIND_BUSINESS', ['দোকান','business','shop','ব্যবসা কোথায়','রেস্টুরেন্ট','restaurant','হোটেল','hotel','ক্যাফে','cafe','বেকারি','bakery','ফ্যাশন','fashion']],
+    ['EMERGENCY', ['জরুরি','জরুরী','emergency','ambulance','অ্যাম্বুলেন্স','blood','রক্ত','oxygen','অক্সিজেন','fire service','পুলিশ জরুরি']],
+    ['FIND_SERVICE', ['সেবা','service','হাসপাতাল','ক্লিনিক','ডাক্তার','ফার্মেসি','pharmacy','medicine','school','college','পুলিশ','ফায়ার','ডেন্টাল','dental','ল্যাব','lab']],
     ['LOCATION_INFO', ['উপজেলা','ইউনিয়ন','ওয়ার্ড','পৌরসভা','গ্রাম','মৌজা','বাজার','এলাকা','কোথায়','location']],
     ['BUSINESS_REGISTRATION', ['ট্রেড লাইসেন্স','নিবন্ধন','registration','license','licence']],
     ['DUE_DILIGENCE', ['যাচাই','ভেরিফাই','verify','verification','due diligence','মালিকানা','ownership']],
@@ -254,9 +255,11 @@ export function classifyFeniBrainQuestion(input) {
   const hasAny = (terms) => terms.some((term) => text.includes(term));
   const current=hasAny(currentTerms), local=hasAny(localTerms), business=hasAny(businessTerms), commerce=hasAny(commerceTerms);
   const investment=hasAny(investmentTerms), start=hasAny(startTerms), highStakes=hasAny(highStakesTerms);
+  const emergency = hasAny(['জরুরি','জরুরী','emergency','ambulance','অ্যাম্বুলেন্স','blood','রক্ত','oxygen','অক্সিজেন','fire service','পুলিশ জরুরি']);
 
   let scope='general';
-  if(start) scope='start';
+  if(emergency) scope='emergency';
+  else if(start) scope='start';
   else if(investment) scope='investment';
   else if(commerce) scope='commerce';
   else if(business) scope='business';
@@ -264,7 +267,7 @@ export function classifyFeniBrainQuestion(input) {
 
   return {
     ...parsed,
-    scope, local, current, highStakes, business, commerce, investment, start,
+    scope, local, current, highStakes, business, commerce, investment, start, emergency,
     language: detectLanguage(input),
     intentKey: detectFeniBrainIntent(input),
     budgetBDT: extractBudgetBDT(input),

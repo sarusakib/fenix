@@ -68,6 +68,7 @@ type BrainAnswer = {
   guidanceTitle?: string
   guidanceText?: string
   safetyNote?: string | null
+  zeroResultHints?: { label: string; href: string; reason: string }[]
 }
 
 function FeniBrainGuide() {
@@ -88,6 +89,8 @@ function FeniBrainGuide() {
   const [safetyNote, setSafetyNote] = useState<string | null>(null)
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
+  const [suggestions, setSuggestions] = useState<string[]>([])
+  const [zeroResultHints, setZeroResultHints] = useState<NonNullable<BrainAnswer['zeroResultHints']>>([])
 
   const runSearch = async (value?: string) => {
     const nextQuery = (value ?? query).trim().slice(0, 120)
@@ -117,6 +120,8 @@ function FeniBrainGuide() {
     setGuidanceTitle('পরের ধাপ')
     setGuidanceText('')
     setSafetyNote(null)
+    setSuggestions([])
+    setZeroResultHints([])
 
     try {
       const result = (await answerFeniBrain(nextQuery)) as BrainAnswer
@@ -143,6 +148,7 @@ function FeniBrainGuide() {
       setGuidanceTitle(result.guidanceTitle || 'পরের ধাপ')
       setGuidanceText(result.guidanceText || '')
       setSafetyNote(result.safetyNote || null)
+      setZeroResultHints(result.zeroResultHints || [])
 
       if (result.liveWebChecked && nextLiveSources.length) {
         setStatus('Stored Feni data + official live web data মিলিয়ে উত্তর তৈরি হয়েছে।')
@@ -167,6 +173,31 @@ function FeniBrainGuide() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    const value = query.trim().slice(0, 80)
+    if (value.length < 2) {
+      setSuggestions([])
+      return
+    }
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch('/api/brain/suggestions?q=' + encodeURIComponent(value), {
+          cache: 'no-store',
+        })
+        if (!response.ok) return
+        const data = await response.json()
+        if (Array.isArray(data.suggestions)) {
+          setSuggestions(data.suggestions.slice(0, 8))
+        }
+      } catch {
+        // Suggestions are an enhancement; search itself remains available.
+      }
+    }, 180)
+
+    return () => window.clearTimeout(timer)
+  }, [query])
 
   return (
     <main className="relative min-h-dvh overflow-x-clip bg-[#030506] text-white">
@@ -202,11 +233,14 @@ function FeniBrainGuide() {
             </p>
 
             <div className="mt-7 flex flex-col gap-2 sm:flex-row">
-              <div className="flex min-h-[54px] flex-1 items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4">
+              <div className="relative flex min-h-[54px] flex-1 items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4">
                 <MagnifyingGlass size={20} className="shrink-0 text-white/30" />
                 <input
                   value={query}
                   maxLength={120}
+                  onFocus={() => {
+                    if (query.trim().length >= 2) setSuggestions((items) => items)
+                  }}
                   onChange={(event) => setQuery(event.target.value.slice(0, 120))}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' && !loading) {
@@ -216,6 +250,28 @@ function FeniBrainGuide() {
                   placeholder="যেমন: ami feni te koyta upazila ase?"
                   className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/25"
                 />
+
+                {suggestions.length > 0 && !loading && (
+                  <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-white/[0.09] bg-[#0a1014] p-2 shadow-2xl">
+                    <div className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/30">
+                      Suggested
+                    </div>
+                    {suggestions.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => {
+                          setQuery(suggestion)
+                          setSuggestions([])
+                          void runSearch(suggestion)
+                        }}
+                        className="block w-full rounded-xl px-3 py-2.5 text-left text-sm text-white/70 transition hover:bg-white/[0.06] hover:text-white"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button
@@ -362,6 +418,26 @@ function FeniBrainGuide() {
                     >
                       {location.name_bn}
                     </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {results.length === 0 && !loading && zeroResultHints.length > 0 && (
+              <div className="mt-8 rounded-3xl border border-white/[0.07] bg-white/[0.025] p-5">
+                <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#72ddda]">
+                  Try a useful next step
+                </div>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {zeroResultHints.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="rounded-2xl border border-white/[0.08] bg-black/20 p-4 transition hover:bg-white/[0.06]"
+                    >
+                      <div className="text-sm font-bold text-white">{item.label}</div>
+                      <div className="mt-1 text-xs leading-5 text-white/45">{item.reason}</div>
+                    </Link>
                   ))}
                 </div>
               </div>

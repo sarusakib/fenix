@@ -5,6 +5,8 @@
 export const ROUTES = {
   home: '/',
   services: '/services',
+  care: '/care',
+  pulse: '/pulse',
   help: '/help',
   admin: '/admin',
   policy: '/policy',
@@ -50,6 +52,7 @@ export const ROUTES = {
     dashboard: '/invest/dashboard',
     manage: '/invest/manage',
     calculator: '/invest/calculator',
+    dueDiligence: '/invest/due-diligence',
     opportunity: (id: string) => '/invest/' + encodeURIComponent(id),
   },
   commerce: {
@@ -78,6 +81,8 @@ export const ROUTES = {
     jobs: '/jobs',
     requests: '/requests',
     messages: '/messages',
+    pulse: '/pulse',
+    care: '/care',
     notifications: '/notifications',
     payments: '/payments',
   },
@@ -85,6 +90,7 @@ export const ROUTES = {
     root: '/dashboard',
     business: '/dashboard/business',
     settings: '/dashboard/settings',
+    businessHealth: '/dashboard/business-health',
   },
 } as const
 

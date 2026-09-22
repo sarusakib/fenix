@@ -26,6 +26,7 @@ import {
   type DirectoryDetail,
 } from '@/lib/directory'
 import BusinessTrustPanel from '@/components/directory/BusinessTrustPanel'
+import ShareButton from '@/components/ShareButton'
 
 type ProductPreview = {
   id: string
@@ -204,6 +205,7 @@ export default function DirectoryBusinessPage() {
               </div>
 
               <div className="flex flex-wrap gap-2">
+                <ShareButton label="Share" />
                 {business.phone && (
                   <a href={'tel:' + business.phone} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#008080] px-4 text-sm font-black text-white">
                     <Phone size={17} />
