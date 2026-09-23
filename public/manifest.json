@@ -13,9 +13,9 @@
   "theme_color": "#0B1736",
   "categories": ["business","productivity","shopping","social"],
   "shortcuts": [
-    {"name":"Feni Brain","url":"/guide","icons":[{"src":"/icon.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"Feni Feed","url":"/feed","icons":[{"src":"/icon.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"Business Directory","url":"/directory","icons":[{"src":"/icon.png","sizes":"192x192","type":"image/png"}]}
+    {"name":"Feni Brain","url":"/guide","icons":[{"src":"/fenix-mark.svg","sizes":"64x64","type":"image/svg+xml"}]},
+    {"name":"Feni Feed","url":"/feed","icons":[{"src":"/fenix-mark.svg","sizes":"64x64","type":"image/svg+xml"}]},
+    {"name":"Business Directory","url":"/directory","icons":[{"src":"/fenix-mark.svg","sizes":"64x64","type":"image/svg+xml"}]}
   ],
   "icons": [
     {"src":"/fenix-mark.svg","sizes":"64x64","type":"image/svg+xml","purpose":"any"},
