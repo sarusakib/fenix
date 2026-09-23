@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type ElementType } from 'react'
+import { useEffect, useState, type ElementType } from 'react'
 import {
   ArrowRight, Brain, Briefcase, CaretDown, CheckCircle, MapPin, Rocket,
   ShieldCheck, ShoppingBag, Storefront, TrendUp, UserCircle, UsersThree, X,
@@ -25,6 +25,20 @@ export default function ServiceHub({
   const activeGroup = getFeniXServiceGroup(activeId)
   const liveServices = activeGroup.services.filter((item) => item.status === 'live' && item.href)
 
+  useEffect(() => {
+    if (!selectedService) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSelectedService(null)
+    }
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [selectedService])
+
   return (
     <section aria-label="FeniX service navigation" className="w-full">
       {showHeader && (
@@ -47,7 +61,7 @@ export default function ServiceHub({
           </div>
         </div>
 
-        <div role="tabpanel" aria-labelledby={`fenix-service-tab-${activeGroup.id}`} className="p-4 sm:p-6">
+        <div role="tabpanel" id={`fenix-service-panel-${activeGroup.id}`} aria-labelledby={`fenix-service-tab-${activeGroup.id}`} className="p-4 sm:p-6">
           <div className="grid gap-5 lg:grid-cols-[.34fr_1fr]">
             <div className="rounded-3xl bg-[linear-gradient(145deg,rgba(0,128,128,.10),rgba(184,138,43,.06))] p-5 dark:bg-[linear-gradient(145deg,rgba(99,216,212,.09),rgba(215,188,127,.045))]">
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">
@@ -108,7 +122,7 @@ export default function ServiceHub({
       )}
 
       {selectedService && (
-        <div className="fixed inset-0 z-[120] grid place-items-end bg-slate-950/45 p-3 backdrop-blur-sm sm:place-items-center sm:p-6" role="dialog" aria-modal="true" aria-label={selectedService.label}>
+        <div className="fixed inset-0 z-[120] grid place-items-end bg-slate-950/45 p-3 backdrop-blur-sm sm:place-items-center sm:p-6" role="dialog" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedService(null) }} aria-modal="true" aria-label={selectedService.label}>
           <div className="max-h-[88vh] w-full max-w-xl overflow-y-auto rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-bg)] p-5 shadow-2xl sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div><p className="text-[10px] font-black uppercase tracking-[.16em] text-[var(--fx-primary-strong)]">Before you start</p><h3 className="mt-2 text-2xl font-black">{selectedService.label}</h3><p className="text-sm text-[var(--fx-muted)]">{selectedService.labelBn}</p></div>
@@ -138,7 +152,7 @@ export default function ServiceHub({
 function CategoryTab({ group, active, onClick }: { group: FeniXServiceGroup; active: boolean; onClick: () => void }) {
   const Icon = ICONS[group.icon]
   return (
-    <button type="button" role="tab" id={`fenix-service-tab-${group.id}`} aria-selected={active} onClick={onClick}
+    <button type="button" role="tab" id={`fenix-service-tab-${group.id}`} aria-selected={active} aria-controls={`fenix-service-panel-${group.id}`} onClick={onClick}
       className={'flex min-h-12 shrink-0 items-center gap-2 rounded-xl border px-3.5 text-left transition ' + (active ? 'border-[var(--fx-primary)]/20 bg-[var(--fx-primary-soft)] text-[var(--fx-text)] shadow-sm' : 'border-transparent text-[var(--fx-muted)] hover:border-[var(--fx-border)] hover:bg-black/[.02] dark:hover:bg-white/[.035]')}>
       <Icon size={18} weight={active ? 'duotone' : 'regular'} />
       <span><span className="block text-xs font-black">{group.label}</span><span className="block text-[9px] opacity-60">{group.labelBn}</span></span>
