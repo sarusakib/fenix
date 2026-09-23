@@ -20,7 +20,7 @@ export default function ServicesPage() {
                 <ArrowLeft size={16} /> Home
               </Link>
               <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--fx-primary-soft)] px-3 py-1.5 text-[10px] font-black uppercase tracking-[.17em] text-[var(--fx-primary-strong)]">
-                <Sparkle size={13} weight="fill" /> FeniX Service Hub
+                <Sparkle size={13} weight="fill" /> FeniX Network
               </div>
               <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-[-.055em] sm:text-6xl">
                 One calm surface.
@@ -37,7 +37,7 @@ export default function ServicesPage() {
                 <span className="text-xs font-black uppercase tracking-[.16em]">Trust by design</span>
               </div>
               <p className="mt-3 text-sm leading-6 text-white/60">
-                Live routes open normally. Future tools are marked planned instead of pretending to be ready.
+                Live paths open normally. Future tools stay marked as planned instead of pretending to be ready.
               </p>
               <Link href="/policy" className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-white/85">
                 Read Policy <ArrowRight size={14} />
