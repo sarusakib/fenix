@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState, type ElementType } from 'react'
+import { useState, type ElementType } from 'react'
 import {
   ArrowRight, Brain, Briefcase, CaretDown, CheckCircle, MapPin, Rocket,
-  ShieldCheck, ShoppingBag, Storefront, TrendUp, UserCircle, UsersThree, X,
+  ShieldCheck, ShoppingBag, Storefront, TrendUp, UserCircle, UsersThree,
 } from '@phosphor-icons/react'
 import {
   FENIX_SERVICE_GROUPS, getFeniXServiceGroup, type FeniXServiceGroup,
@@ -24,20 +24,6 @@ export default function ServiceHub({
   const [selectedService, setSelectedService] = useState<{id: string; label: string; labelBn: string; href?: string; guide: FeniXServiceGuideline} | null>(null)
   const activeGroup = getFeniXServiceGroup(activeId)
   const liveServices = activeGroup.services.filter((item) => item.status === 'live' && item.href)
-
-  useEffect(() => {
-    if (!selectedService) return
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setSelectedService(null)
-    }
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    window.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.body.style.overflow = previousOverflow
-      window.removeEventListener('keydown', onKeyDown)
-    }
-  }, [selectedService])
 
   return (
     <section aria-label="FeniX service navigation" className="w-full">
