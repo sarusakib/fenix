@@ -30,9 +30,9 @@ export default function ServiceHub({
       {showHeader && (
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[.2em] text-[var(--fx-primary-strong)]">Service Hub</p>
-            <h2 className="mt-2 text-2xl font-black tracking-[-.04em] sm:text-4xl">Choose a path. Then choose an action.</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">প্রথমে service বাছুন, তারপর একটি ছোট guide দেখে পরের ধাপে যান।</p>
+            <p className="text-[10px] font-black uppercase tracking-[.2em] text-[var(--fx-primary-strong)]">FeniX Network</p>
+            <h2 className="mt-2 text-2xl font-black tracking-[-.04em] sm:text-4xl">Everything connected. One connected layer at a time.</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">প্রথমে একটি network path বাছুন, তারপর প্রয়োজনের পরের layer খুলুন।</p>
           </div>
           <div className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 py-2.5 text-[10px] font-bold uppercase tracking-[.13em] text-[var(--fx-muted)]">One layer at a time</div>
         </div>
@@ -66,7 +66,7 @@ export default function ServiceHub({
             <div>
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold">Available now</p>
+                  <p className="text-xs font-bold">Available in this network</p>
                   <p className="mt-0.5 text-[11px] text-[var(--fx-muted)]">{activeGroup.label} · {activeGroup.labelBn}</p>
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-[.12em] text-[var(--fx-muted)]">Tap → guide → continue</span>
