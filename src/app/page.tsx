@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  ArrowRight, Brain, Compass, Feed as FeedIcon, Lightbulb, MagnifyingGlass,
+  ArrowRight, Brain, Compass, UsersThree, Lightbulb, MagnifyingGlass,
   Newspaper, Rocket, ShieldCheck, ShoppingBag, Sparkle, Storefront, TrendUp,
 } from '@phosphor-icons/react'
 import Navbar from '../components/Navbar'
@@ -23,7 +23,7 @@ const paths = [
   { title: 'Invest in Feni', short: 'Invest', body: 'Review published opportunities with verification context.', href: '/invest', icon: TrendUp },
   { title: 'Shop Local', short: 'Shop', body: 'Discover published products from approved local sellers.', href: '/commerce', icon: ShoppingBag },
   { title: 'Read FeniX News', short: 'News', body: 'Read public FeniX news, notices and local updates.', href: '/news', icon: Newspaper },
-  { title: 'Join the Feed', short: 'Community', body: 'Ask questions, learn and follow local conversations.', href: '/feed', icon: FeedIcon },
+  { title: 'Join the Feed', short: 'Community', body: 'Ask questions, learn and follow local conversations.', href: '/feed', icon: UsersThree },
 ]
 
 export default function HomePage() {
