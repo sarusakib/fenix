@@ -12,6 +12,7 @@ import type { InvestmentOpportunity } from '@/types/database'
 export default function InvestPage() {
   const [opportunities, setOpportunities] = useState<InvestmentOpportunity[]>([])
   const [matches, setMatches] = useState<InvestmentOpportunity[]>([])
+  const [matchMeta, setMatchMeta] = useState<Record<string, { score: number; reasons: string[] }>>({})
   const [mode, setMode] = useState<'all' | 'matches'>('all')
   const [category, setCategory] = useState('all')
   const [risk, setRisk] = useState('all')
@@ -45,14 +46,19 @@ export default function InvestPage() {
         if (profile) {
           setHasProfile(true)
           const { data: matched } = await supabase.rpc('match_investment_opportunities', { p_limit: 12 })
-          const matchedRows = (matched ?? []) as Array<{ opportunity_id: string }>
+          const matchedRows = (matched ?? []) as Array<{ opportunity_id: string; match_score?: number; match_reasons?: string[] }>
           if (matchedRows.length) {
             const mapped = matchedRows
               .map((item) => opportunityRows.find((opportunity) => opportunity.id === item.opportunity_id))
               .filter((item): item is InvestmentOpportunity => Boolean(item))
             setMatches(mapped)
+            setMatchMeta(Object.fromEntries(matchedRows.map((item) => [
+              item.opportunity_id,
+              { score: Number(item.match_score ?? 0), reasons: Array.isArray(item.match_reasons) ? item.match_reasons : [] },
+            ])))
           } else {
             setMatches([])
+            setMatchMeta({})
           }
         }
       }
@@ -120,7 +126,7 @@ export default function InvestPage() {
         {loading ? (
           <div className="py-24 text-center"><div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[#008080]/20 border-t-[#008080]" /><p className="mt-4 text-sm opacity-50">Investment marketplace loading...</p></div>
         ) : visible.length ? (
-          <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">{visible.map((opportunity) => <InvestmentCard key={opportunity.id} opportunity={opportunity} />)}</div>
+          <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">{visible.map((opportunity) => <InvestmentCard key={opportunity.id} opportunity={opportunity} matchScore={mode === 'matches' ? matchMeta[opportunity.id]?.score : null} matchReasons={mode === 'matches' ? matchMeta[opportunity.id]?.reasons : undefined} />)}</div>
         ) : (
           <div className="mt-7 rounded-[2rem] border border-dashed border-[#0b1736]/15 p-12 text-center dark:border-white/15">
             <ChartLineUp size={38} className="mx-auto opacity-25" />
