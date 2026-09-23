@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, CheckCircle, FloppyDisk, Newspaper, PencilSimple, Plus, Trash, X } from '@phosphor-icons/react'
+import { ArrowLeft, FloppyDisk, Newspaper, PencilSimple, Plus, Trash, X } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 
