@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import {
   ArrowLeft,
   ArrowRight,
@@ -116,7 +117,7 @@ export default function FenixSearchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuery])
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const value = cleanQuery(query)
     const target = value ? '/search?q=' + encodeURIComponent(value) : '/search'
@@ -330,10 +331,10 @@ function ResultSection({
   count,
   children,
 }: {
-  icon: React.ReactNode
+  icon: ReactNode
   title: string
   count: number
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <section>
@@ -354,7 +355,7 @@ function SearchTip({
   title,
   body,
 }: {
-  icon: React.ReactNode
+  icon: ReactNode
   title: string
   body: string
 }) {
