@@ -17,6 +17,18 @@ export const metadata = {
     shortcut: '/fenix-mark.svg',
     apple: '/fenix-mark.svg',
   },
+  openGraph: {
+    title: 'FeniX | Feni Business Ecosystem',
+    description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
+    type: 'website',
+    images: [{ url: '/og-fenix.svg', width: 1200, height: 630, type: 'image/svg+xml', alt: 'FeniX — Feni Business Ecosystem' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FeniX | Feni Business Ecosystem',
+    description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
+    images: ['/og-fenix.svg'],
+  },
   applicationName: 'FeniX',
 }
 
