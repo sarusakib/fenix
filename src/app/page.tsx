@@ -52,8 +52,6 @@ export default function HomePage() {
 
   return (
     <main className="fenix-shell min-h-dvh overflow-x-clip">
-      <div className="fenix-orb left-[3%] top-32 h-64 w-64 bg-teal-400/[.07]" />
-      <div className="fenix-orb right-[4%] top-[28%] h-72 w-72 bg-amber-300/[.055]" />
       <Navbar />
 
       <section className="mx-auto w-full max-w-7xl px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8 lg:pt-20">
@@ -155,7 +153,7 @@ export default function HomePage() {
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">Service layer</p>
                 <h2 className="mt-2 text-2xl font-black tracking-[-.04em] sm:text-3xl">Tap one path. The next layer appears.</h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">Build, Connect, Invest, Shop, Discover, Trust and Account stay in one consistent interaction model.</p>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">Build, Connect, Invest, Shop, Discover, Trust and Account live inside one calm network. Open one layer at a time.</p>
               </div>
               <Link href="/services" className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--fx-primary-soft)] px-3.5 text-xs font-bold text-[var(--fx-primary-strong)]">Open Services <ArrowRight size={14} /></Link>
             </div>
