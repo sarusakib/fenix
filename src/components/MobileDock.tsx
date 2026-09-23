@@ -13,7 +13,7 @@ export default function MobileDock() {
   const items = [
     { href: '/', label: bn ? 'হোম' : 'Home', icon: House },
     { href: '/feed', label: bn ? 'ফিড' : 'Feed', icon: UsersThree },
-    { href: '/services', label: bn ? 'এক্সপ্লোর' : 'Explore', icon: List },
+    { href: '/services', label: bn ? 'নেটওয়ার্ক' : 'Network', icon: List },
     { href: '/guide', label: bn ? 'ব্রেইন' : 'Brain', icon: Brain },
     { href: '/dashboard', label: bn ? 'অ্যাকাউন্ট' : 'Account', icon: UserCircle },
   ]
