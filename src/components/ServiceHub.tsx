@@ -24,6 +24,8 @@ export default function ServiceHub({
   const [selectedService, setSelectedService] = useState<{id: string; label: string; labelBn: string; href?: string; guide: FeniXServiceGuideline} | null>(null)
   const activeGroup = getFeniXServiceGroup(activeId)
   const liveServices = activeGroup.services.filter((item) => item.status === 'live' && item.href)
+  const plannedServices = activeGroup.services.filter((item) => item.status === 'planned')
+  const visibleServices = activeGroup.services
 
   return (
     <section aria-label="FeniX service navigation" className="w-full">
@@ -59,7 +61,7 @@ export default function ServiceHub({
               <h3 className="mt-5 text-2xl font-black tracking-[-.04em] sm:text-3xl">{activeGroup.labelBn}</h3>
               <p className="mt-3 text-sm leading-6 text-[var(--fx-muted)]">{activeGroup.description}</p>
               <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-[var(--fx-muted)]">
-                <CheckCircle size={16} className="text-[var(--fx-primary)]" /> {liveServices.length} live tools
+                <CheckCircle size={16} className="text-[var(--fx-primary)]" /> {liveServices.length} live · {plannedServices.length} planned
               </div>
             </div>
 
@@ -73,24 +75,26 @@ export default function ServiceHub({
               </div>
 
               <div className={compact ? 'grid gap-2' : 'grid gap-2.5 sm:grid-cols-2'}>
-                {liveServices.map((service) => {
+                {visibleServices.map((service) => {
                   const Icon = ICONS[service.icon]
                   return (
                     <button
                       key={service.id}
                       type="button"
-                      onClick={() => setSelectedService((current) => current?.id === service.id ? null : { id: service.id, label: service.label, labelBn: service.labelBn, href: service.href, guide: getServiceGuideline(service.id) })} aria-expanded={selectedService?.id === service.id}
-                      className="fenix-interactive group flex min-h-16 items-center gap-3 rounded-2xl border border-[var(--fx-border)] bg-white/[.5] px-3.5 py-3 text-left dark:bg-white/[.025]"
+                      disabled={service.status === 'planned'}
+                      onClick={() => service.status === 'live' && setSelectedService((current) => current?.id === service.id ? null : { id: service.id, label: service.label, labelBn: service.labelBn, href: service.href, guide: getServiceGuideline(service.id) })}
+                      aria-expanded={service.status === 'live' ? selectedService?.id === service.id : undefined}
+                      className="fenix-interactive group flex min-h-16 items-center gap-3 rounded-2xl border border-[var(--fx-border)] bg-white/[.5] px-3.5 py-3 text-left disabled:cursor-default disabled:opacity-70 dark:bg-white/[.025]"
                     >
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><Icon size={19} weight="duotone" /></span>
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-center gap-2">
                           <span className="text-sm font-bold text-[var(--fx-text)]">{service.label}</span>
-                          {service.tag && <span className="rounded-full bg-black/[.035] px-2 py-0.5 text-[9px] font-black uppercase tracking-[.1em] text-[var(--fx-muted)] dark:bg-white/[.05]">{service.tag}</span>}
+                          <span className="rounded-full bg-black/[.035] px-2 py-0.5 text-[9px] font-black uppercase tracking-[.1em] text-[var(--fx-muted)] dark:bg-white/[.05]">{service.status === 'planned' ? 'Planned' : (service.tag ?? 'Live')}</span>
                         </span>
                         <span className="mt-1 block text-[11px] leading-5 text-[var(--fx-muted)]">{service.labelBn} · {service.description}</span>
                       </span>
-                      <ArrowRight size={17} className="shrink-0 opacity-30 transition-transform group-hover:translate-x-1 group-hover:opacity-75" />
+                      {service.status === 'planned' ? <span className="shrink-0 text-[9px] font-bold uppercase tracking-[.1em] text-[var(--fx-muted)]">Soon</span> : <ArrowRight size={17} className="shrink-0 opacity-30 transition-transform group-hover:translate-x-1 group-hover:opacity-75" />}
                     </button>
                   )
                 })}
