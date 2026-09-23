@@ -39,7 +39,7 @@ export default function FeedPage(){
     const s=createClient()
     const [{data:auth},{data:q},{data:n},{data:p},{data:t}]=await Promise.all([
       s.auth.getUser(),
-      s.from('fenix_questions').select('id,title,body,created_at,author_id,topic_id,profiles!fenix_questions_author_id_fkey(full_name,username,avatar_url),fenix_topics(id,slug,name_bn,name_en)').is('deleted_at',null).order('created_at',{ascending:false}).limit(50),
+      s.from('fenix_public_question_feed').select('*').order('created_at',{ascending:false}).limit(50),
       s.from('news_posts').select('id,slug,title_bn,title_en,excerpt_bn,excerpt_en,category,verification_status,featured,breaking,published_at,source_name').eq('status','published').order('published_at',{ascending:false}).limit(30),
       s.from('fenix_public_feed').select('*').order('created_at',{ascending:false}).limit(30),
       s.from('fenix_topics').select('id,slug,name_bn,name_en').order('name_en'),
