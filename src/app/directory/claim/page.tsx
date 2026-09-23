@@ -161,7 +161,7 @@ export default function DirectoryClaimPage() {
                 </div>
               </div>
               <Link
-                href={'/login?next=' + encodeURIComponent(window.location.pathname + window.location.search)}
+                href={'/login?next=' + encodeURIComponent('/directory/claim?business=' + businessId)}
                 className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-sm font-bold text-white"
               >
                 Sign in to continue <SignIn size={17} />
