@@ -269,7 +269,7 @@ export default function DirectoryBrowser() {
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base dark:text-white/55">
               Find a business, supplier or local service in Feni by name, category or area.
-              Search works across Bangla and English fields that businesses publish.
+              Search understands Bangla, English and common Banglish spellings across published business fields.
             </p>
           </div>
 
@@ -295,7 +295,7 @@ export default function DirectoryBrowser() {
               <input
                 value={draftQuery}
                 onChange={(event) => setDraftQuery(event.target.value)}
-                placeholder="Business, supplier, pharmacy, restaurant..."
+                placeholder="Business, supplier, pharmacy, restaurant… বাংলা / Banglish / English"
                 maxLength={120}
                 className="min-w-0 flex-1 bg-transparent text-sm font-medium text-[#0b1736] outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-white/30"
               />
