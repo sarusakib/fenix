@@ -34,6 +34,7 @@ const quickMoves = [
   { title: 'Invest', body: 'Explore opportunities with context and due-diligence workflow.', href: '/invest', icon: TrendUp, eyebrow: 'INVEST' },
   { title: 'Connect', body: 'Find local businesses, suppliers and useful services.', href: '/directory', icon: Storefront, eyebrow: 'CONNECT' },
   { title: 'Shop', body: 'Discover published products from local sellers.', href: '/commerce', icon: ShoppingBag, eyebrow: 'SHOP' },
+  { title: 'News', body: 'Read public FeniX news, notices, business and local updates.', href: '/news', icon: Newspaper, eyebrow: 'NEWS' },
 ]
 
 export default function HomePage() {
