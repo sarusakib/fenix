@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/client'
 import type { Database } from '@/types/database'
+import { normalizeFeniBrainQuery } from '@/lib/feniBrainQuery'
 
 export type DirectoryBusiness =
   Database['public']['Functions']['search_directory_businesses']['Returns'][number]
@@ -35,7 +36,9 @@ export async function searchDirectoryBusinesses(
   args: SearchArgs = {},
 ): Promise<{ data: DirectoryBusiness[]; error: Error | null }> {
   const supabase = createClient()
-  const query = args.query?.trim().slice(0, 120) || undefined
+  const rawQuery = args.query?.trim().slice(0, 120) || ''
+  const parsedQuery = rawQuery ? normalizeFeniBrainQuery(rawQuery) : null
+  const query = (parsedQuery?.normalized || rawQuery).trim().slice(0, 120) || undefined
   const category = args.category?.trim().slice(0, 80) || undefined
   const upazila = args.upazila?.trim().slice(0, 80) || undefined
 
