@@ -13,9 +13,9 @@ export const metadata = {
   description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
   manifest: '/manifest.json',
   icons: {
-    icon: '/icon.png',
-    shortcut: '/icon.png',
-    apple: '/icon.png',
+    icon: '/fenix-mark.svg',
+    shortcut: '/fenix-mark.svg',
+    apple: '/fenix-mark.svg',
   },
   applicationName: 'FeniX',
 }
