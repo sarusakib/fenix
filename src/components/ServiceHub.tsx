@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, type ElementType } from 'react'
 import {
   ArrowRight, Brain, Briefcase, CaretDown, CheckCircle, MapPin, Rocket,
-  ShieldCheck, ShoppingBag, Storefront, TrendUp, UserCircle, UsersThree, X,
+  ShieldCheck, ShoppingBag, Storefront, TrendUp, UserCircle, UsersThree, X, Newspaper,
 } from '@phosphor-icons/react'
 import {
   FENIX_SERVICE_GROUPS, getFeniXServiceGroup, type FeniXServiceGroup,
@@ -14,7 +14,7 @@ import { getServiceGuideline, type FeniXServiceGuideline } from '../lib/serviceG
 
 const ICONS: Record<FeniXServiceIcon, ElementType> = {
   rocket: Rocket, storefront: Storefront, trend: TrendUp, brain: Brain, shop: ShoppingBag,
-  briefcase: Briefcase, shield: ShieldCheck, account: UserCircle, map: MapPin, users: UsersThree,
+  briefcase: Briefcase, shield: ShieldCheck, account: UserCircle, map: MapPin, users: UsersThree, newspaper: Newspaper,
 }
 
 export default function ServiceHub({
