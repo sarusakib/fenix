@@ -6,6 +6,8 @@ import FenixFlow from './FenixFlow'
 import HomeThemeProvider from '../components/theme/HomeThemeProvider'
 import SiteBackground from '../components/layout/SiteBackground'
 import MobileDock from '../components/MobileDock'
+import ServiceWorkerRegister from '../components/pwa/ServiceWorkerRegister'
+import VoiceSearchButton from '../components/search/VoiceSearchButton'
 import { FenixLocaleProvider } from '../components/i18n/FenixLocaleProvider'
 
 export const metadata = {
@@ -75,15 +77,17 @@ export default function RootLayout({
 
         <FenixLocaleProvider>
           <HomeThemeProvider>
-          <FenixFlow>
-            <SiteBackground />
+            <FenixFlow>
+              <SiteBackground />
 
-            <div className="relative z-10 min-h-screen">
-              {children}
-            </div>
+              <div className="relative z-10 min-h-screen">
+                {children}
+              </div>
 
-            <MobileDock />
-          </FenixFlow>
+              <MobileDock />
+              <VoiceSearchButton />
+              <ServiceWorkerRegister />
+            </FenixFlow>
           </HomeThemeProvider>
         </FenixLocaleProvider>
       </body>
