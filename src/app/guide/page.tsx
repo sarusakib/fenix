@@ -169,25 +169,25 @@ function FeniBrainGuide() {
   }, [])
 
   return (
-    <main className="relative min-h-dvh overflow-x-clip bg-[#030506] text-white">
+    <main className="fenix-shell min-h-dvh overflow-x-clip bg-[var(--fx-bg)] text-[var(--fx-text)]">
       <div className="relative z-10">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <Link
             href="/"
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm text-white/65 transition hover:bg-white/[0.07] hover:text-white"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-4 text-sm font-bold text-[var(--fx-text)] transition hover:bg-black/[.03] dark:hover:bg-white/[.05]"
           >
             <ArrowLeft size={17} />
             Back
           </Link>
 
-          <div className="mt-8 rounded-3xl border border-white/[0.08] bg-black/35 p-5 backdrop-blur-xl sm:p-8">
+          <div className="fenix-surface-strong mt-8 rounded-3xl p-5 sm:p-8">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#008080]/25 bg-[#008080]/10 text-[#72ddda]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--fx-primary)]/20 bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]">
                 <Brain size={22} weight="duotone" />
               </div>
 
               <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#72ddda]">
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--fx-primary-strong)]">
                   Feni Brain
                 </div>
                 <h1 className="mt-1 text-2xl font-black sm:text-4xl">
@@ -196,14 +196,14 @@ function FeniBrainGuide() {
               </div>
             </div>
 
-            <p className="mt-5 max-w-3xl text-sm leading-7 text-white/55">
+            <p className="mt-5 max-w-3xl text-sm leading-7 text-[var(--fx-muted)]">
               Feni-এর verified local data, location hierarchy, knowledge base এবং প্রয়োজন হলে
               official live web source মিলিয়ে natural-language প্রশ্নের উত্তর দেয়।
             </p>
 
             <div className="mt-7 flex flex-col gap-2 sm:flex-row">
-              <div className="flex min-h-[54px] flex-1 items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4">
-                <MagnifyingGlass size={20} className="shrink-0 text-white/30" />
+              <div className="flex min-h-[54px] flex-1 items-center gap-3 rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-4">
+                <MagnifyingGlass size={20} className="shrink-0 text-[var(--fx-text)]/30" />
                 <input
                   value={query}
                   maxLength={120}
@@ -214,7 +214,7 @@ function FeniBrainGuide() {
                     }
                   }}
                   placeholder="যেমন: ami feni te koyta upazila ase?"
-                  className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/25"
+                  className="w-full bg-transparent text-sm text-[var(--fx-text)] outline-none placeholder:text-[var(--fx-muted)]"
                 />
               </div>
 
@@ -222,34 +222,34 @@ function FeniBrainGuide() {
                 type="button"
                 disabled={loading}
                 onClick={() => void runSearch()}
-                className="min-h-[54px] rounded-2xl bg-[#008080] px-6 text-sm font-bold text-white transition hover:bg-[#079494] disabled:cursor-not-allowed disabled:opacity-50"
+                className="min-h-[54px] rounded-2xl bg-[var(--fx-primary-strong)] px-6 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? 'Thinking…' : 'Ask Feni Brain'}
               </button>
             </div>
 
             {status && (
-              <div className="mt-5 flex items-start gap-2 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 text-sm text-white/60">
-                <CheckCircle size={17} className="mt-0.5 shrink-0 text-[#72ddda]" />
+              <div className="mt-5 flex items-start gap-2 rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4 text-sm text-[var(--fx-muted)]">
+                <CheckCircle size={17} className="mt-0.5 shrink-0 text-[var(--fx-primary-strong)]" />
                 <span>{status}</span>
               </div>
             )}
 
             {answer && (
-              <div className="mt-8 rounded-3xl border border-[#72ddda]/15 bg-[#008080]/[0.06] p-5 sm:p-6">
+              <div className="mt-8 rounded-3xl border border-[var(--fx-primary)]/15 bg-[var(--fx-primary-soft)] p-5 sm:p-6">
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#72ddda]">
                     Feni Brain Answer
                   </div>
 
                   {confidence > 0 && (
-                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] text-white/55">
+                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] text-[var(--fx-muted)]">
                       Source confidence {Math.round(confidence * 100)}%
                     </span>
                   )}
 
                   {liveSources.length > 0 && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#72ddda]/15 bg-[#72ddda]/[0.06] px-2.5 py-1 text-[11px] font-semibold text-[#72ddda]">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-primary)]/15 bg-[var(--fx-primary-soft)] px-2.5 py-1 text-[11px] font-semibold text-[#72ddda]">
                       <GlobeHemisphereWest size={13} />
                       Live checked
                     </span>
@@ -257,7 +257,7 @@ function FeniBrainGuide() {
                 </div>
 
                 {safetyNote && (
-                  <div className="mt-5 rounded-2xl border border-amber-300/20 bg-amber-500/[0.07] p-4 text-sm leading-6 text-amber-100">
+                  <div className="mt-5 rounded-2xl border border-amber-300/25 bg-amber-50 p-4 text-sm leading-6 text-amber-900 dark:border-amber-200/10 dark:bg-amber-500/[.06] dark:text-amber-100">
                     <strong className="font-bold">Safety note:</strong> {safetyNote}
                   </div>
                 )}
@@ -275,22 +275,22 @@ function FeniBrainGuide() {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className="rounded-2xl border border-white/[0.08] bg-black/20 p-4 transition hover:bg-white/[0.06]"
+                          className="rounded-2xl border border-white/[0.08] bg-[var(--fx-bg)] p-4 transition hover:bg-black/[.03] dark:hover:bg-white/[.04]"
                         >
                           <div className="text-sm font-bold text-white">{item.label}</div>
-                          <div className="mt-1 text-xs leading-5 text-white/45">{item.reason}</div>
+                          <div className="mt-1 text-xs leading-5 text-[var(--fx-muted)]">{item.reason}</div>
                         </Link>
                       ))}
                     </div>
                   </div>
                 )}
 
-                <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-white/35">
+                <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-[var(--fx-muted)]">
                   <span>FeniX follows a source-first, privacy-aware AI policy.</span>
                   <Link href={ROUTES.policy} className="text-[#72ddda] hover:underline">Read FeniX Policy</Link>
                 </div>
 
-                <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white/85">
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--fx-text)]">
                   {answer}
                 </p>
               </div>
@@ -314,7 +314,7 @@ function FeniBrainGuide() {
                     >
                       <span className="font-semibold text-white/80">{source.title}</span>
                       <span className="mt-1 block break-all text-white/35">{source.url}</span>
-                      <span className="mt-1 block text-white/25">
+                      <span className="mt-1 block text-[var(--fx-muted)]">
                         Checked {new Date(source.fetched_at).toLocaleString()}
                       </span>
                     </a>
