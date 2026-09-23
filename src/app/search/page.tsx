@@ -253,7 +253,7 @@ export default function FenixSearchPage() {
               {products.length ? products.map((product) => (
                 <Link
                   key={product.id}
-                  href="/commerce"
+                  href={'/commerce?q=' + encodeURIComponent(product.name_bn || product.name_en || '')}
                   className="block rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4 transition hover:-translate-y-0.5"
                 >
                   <div className="flex items-start gap-3">
