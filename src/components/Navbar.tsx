@@ -23,7 +23,7 @@ export default function Navbar() {
  return <header className="sticky top-0 z-[80] border-b border-[var(--fx-border)] bg-[var(--fx-bg)]/82 text-[var(--fx-text)] backdrop-blur-2xl">
   <nav aria-label="Primary navigation" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
    <div className="flex min-h-[68px] items-center justify-between gap-3">
-    <Link href="/" onClick={closeMenus} className="group flex min-h-11 items-center gap-2.5" aria-label="FeniX home"><img src="/fenix-mark.svg" alt="" width="38" height="38" className="h-9 w-9 shrink-0" /><span className="text-[23px] font-black tracking-[-.07em]">Feni<span className="text-[var(--fx-primary-strong)]">X</span></span><span className="hidden rounded-full border border-[var(--fx-border)] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.13em] text-[var(--fx-muted)] sm:inline">Feni ecosystem</span></Link>
+    <Link href="/" onClick={closeMenus} className="group flex min-h-11 items-center" aria-label="FeniX home"><picture><source media="(prefers-color-scheme: dark)" srcSet="/fenix-logo-dark.svg" /><img src="/fenix-logo.svg" alt="FeniX — Feni Business Ecosystem" width="260" height="64" className="h-10 w-auto max-w-[180px] object-contain sm:max-w-none" /></picture></Link>
 
     <div className="hidden items-center gap-1 md:flex">
       <NavLink href="/" active={pathname==='/' }><House size={17}/> {bn?'হোম':'Home'}</NavLink>
