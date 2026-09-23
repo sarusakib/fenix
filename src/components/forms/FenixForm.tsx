@@ -1,6 +1,6 @@
 'use client'
 
-import type {
+import type { ReactNode,
   ButtonHTMLAttributes,
   InputHTMLAttributes,
   SelectHTMLAttributes,
@@ -39,7 +39,7 @@ export function FenixField({
   htmlFor?: string
   hint?: string
   required?: boolean
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <label className="block" htmlFor={htmlFor}>
@@ -58,7 +58,7 @@ export function FenixFormMessage({
   children,
 }: {
   tone: 'error' | 'success'
-  children: React.ReactNode
+  children: ReactNode
 }) {
   const success = tone === 'success'
   return (
