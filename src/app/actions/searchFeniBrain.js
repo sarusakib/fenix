@@ -7,6 +7,7 @@ import { buildKeywordQuery, normalizeFeniBrainQuery, classifyFeniBrainQuestion, 
 const MAX_QUERY_LENGTH = 120
 const MAX_RESULTS = 8
 const MAX_CHILD_LOCATIONS = 12
+const MAX_BUSINESS_MATCHES = 6
 
 function requestedChildLevel(normalizedQuery) {
   const query = normalizedQuery.toLowerCase()
@@ -244,6 +245,22 @@ export async function searchFeniBrain(query) {
       })
       .slice(0, MAX_RESULTS)
 
+    let businessMatches = []
+
+    if (questionClass.business || questionClass.intentKey === 'FIND_BUSINESS' || questionClass.intentKey === 'FIND_SUPPLIER') {
+      const { data: matchedBusinesses, error: businessError } = await supabase.rpc('search_directory_businesses', {
+        p_query: normalizedQuery,
+        p_limit: MAX_BUSINESS_MATCHES,
+        p_offset: 0,
+      })
+
+      if (!businessError && Array.isArray(matchedBusinesses)) {
+        businessMatches = matchedBusinesses.slice(0, MAX_BUSINESS_MATCHES)
+      } else if (businessError) {
+        console.warn('Feni Brain business matching unavailable:', { code: businessError.code })
+      }
+    }
+
     let childLocations = []
     const childLevel = requestedChildLevel(normalizedQuery)
 
@@ -302,6 +319,7 @@ export async function searchFeniBrain(query) {
       entities: questionClass.entities,
       locations: Array.isArray(locations) ? locations : [],
       childLocations,
+      businessMatches,
       results: ranked,
       sources: [...sourcesMap.values()],
       retrievalConfidence: Number(ranked[0]?.similarity ?? 0),
