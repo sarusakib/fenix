@@ -173,6 +173,7 @@ export async function answerFeniBrain(query) {
       ...brainMeta(cleanQuery, retrieval, plan),
       answer: 'এই Feni-সংক্রান্ত প্রশ্নের জন্য বর্তমানে যথেষ্ট verified local তথ্য পাওয়া যায়নি। অনুমান করে ভুল তথ্য না দিয়ে নতুন verified source/data প্রয়োজন।',
       intent: retrieval.intent, locations: retrieval.locations, childLocations: retrieval.childLocations,
+      businessMatches: retrieval.businessMatches || [],
       sources: [], grounded: false, aiGenerated: false, liveWebChecked, liveSources: [], confidence: 0,
       guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode, requestedFactSubject,
