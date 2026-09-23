@@ -151,6 +151,7 @@ export async function answerFeniBrain(query) {
       intent: retrieval.intent,
       locations: retrieval.locations,
       childLocations: retrieval.childLocations,
+      businessMatches: retrieval.businessMatches || [],
       sources: retrieval.sources,
       grounded: true,
       aiGenerated: false,
@@ -184,7 +185,7 @@ export async function answerFeniBrain(query) {
   if (!token) {
     return {
       success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(cleanQuery, retrieval), intent: retrieval.intent,
-      locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
+      locations: retrieval.locations, childLocations: retrieval.childLocations, businessMatches: retrieval.businessMatches || [], sources: retrieval.sources,
       grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0), aiGenerated: false, results: retrieval.results, requestedFactSubject, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0), guidance: plan.actions,
       guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
@@ -221,7 +222,7 @@ export async function answerFeniBrain(query) {
 
     return {
       success: true, ...brainMeta(cleanQuery, retrieval, plan), answer, intent: retrieval.intent, locations: retrieval.locations,
-      childLocations: retrieval.childLocations, sources: retrieval.sources,
+      childLocations: retrieval.childLocations, businessMatches: retrieval.businessMatches || [], sources: retrieval.sources,
       grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0),
       aiGenerated: true, requestedFactSubject, model: MODEL, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0), results: retrieval.results,
