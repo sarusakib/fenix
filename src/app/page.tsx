@@ -180,4 +180,4 @@ function InfoCard({ icon, title, body }: { icon: React.ReactNode; title: string;
     <h3 className="mt-4 text-base font-black">{title}</h3>
     <p className="mt-2 text-sm leading-6 text-[var(--fx-muted)]">{body}</p>
   </div>
-)
+}
