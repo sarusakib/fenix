@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --fx-bg: #f5f8f7;
-  --fx-surface: rgba(255, 255, 255, 0.76);
-  --fx-surface-strong: rgba(255, 255, 255, 0.92);
+  --fx-bg: #f3f4f6;
+  --fx-surface: rgba(255, 255, 255, 0.94);
+  --fx-surface-strong: rgba(255, 255, 255, 0.98);
   --fx-border: rgba(11, 23, 54, 0.08);
   --fx-text: #0b1736;
   --fx-muted: #617080;
   --fx-primary: #008080;
-  --fx-primary-strong: #006f70;
+  --fx-primary-strong: #007575;
   --fx-primary-soft: rgba(0, 128, 128, 0.095);
   --fx-gold: #b88a2b;
 }
@@ -26,12 +26,12 @@ html {
 }
 
 html.dark {
-  --fx-bg: #030506;
-  --fx-surface: rgba(10, 18, 25, 0.76);
-  --fx-surface-strong: rgba(10, 18, 25, 0.93);
+  --fx-bg: #0b1020;
+  --fx-surface: rgba(15, 23, 42, 0.94);
+  --fx-surface-strong: rgba(15, 23, 42, 0.98);
   --fx-border: rgba(255, 255, 255, 0.08);
-  --fx-text: #f7fbfa;
-  --fx-muted: #9aaab2;
+  --fx-text: #f8fafc;
+  --fx-muted: #a8b2c1;
   --fx-primary: #63d8d4;
   --fx-primary-strong: #8ae4e0;
   --fx-primary-soft: rgba(99, 216, 212, 0.105);
@@ -67,6 +67,7 @@ button { cursor: pointer; }
 
 .fenix-shell { position: relative; isolation: isolate; }
 
+/* Lightweight shell: no image or heavy decorative background layer. */
 .fenix-grid {
   background-image:
     linear-gradient(rgba(11, 23, 54, 0.042) 1px, transparent 1px),
@@ -85,23 +86,23 @@ html.dark .fenix-grid {
   position: absolute;
   pointer-events: none;
   border-radius: 999px;
-  filter: blur(72px);
-  opacity: .65;
+  filter: blur(56px);
+  opacity: .35;
 }
 
 .fenix-surface {
   background: var(--fx-surface);
   border: 1px solid var(--fx-border);
   box-shadow: 0 18px 60px rgba(15, 23, 42, .055);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .fenix-surface-strong {
   background: var(--fx-surface-strong);
   border: 1px solid var(--fx-border);
   box-shadow: 0 24px 80px rgba(15, 23, 42, .075);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 html.dark .fenix-surface,
 html.dark .fenix-surface-strong {
