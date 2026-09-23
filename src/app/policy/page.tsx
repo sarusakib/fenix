@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, CheckCircle, ShieldCheck, Sparkle } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, ArrowRight, CheckCircle, ShieldCheck, Sparkle, Newspaper } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '../../components/Navbar'
 
 export const metadata = {
@@ -74,6 +74,16 @@ export default function FeniXPolicyPage() {
             </section>
           ))}
         </div>
+
+        <section id="news" className="mt-6 rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <Newspaper size={19} className="mt-0.5 shrink-0 text-[var(--fx-primary-strong)]" />
+            <div>
+              <h2 className="text-lg font-black">FeniX News standards</h2>
+              <p className="mt-2 text-sm leading-7 text-[var(--fx-muted)]">FeniX News is a public service, but publication remains controlled by FeniX Admin. Stories should identify their source where available and use clear labels such as Official source, Editor reviewed, Reported or Unverified. A label is not a guarantee of truth or outcome; corrections remain possible.</p>
+            </div>
+          </div>
+        </section>
 
         <div className="mt-6 rounded-[1.7rem] border border-teal-600/15 bg-teal-600/[.05] p-5 sm:p-6">
           <div className="flex items-start gap-3">

@@ -18,6 +18,7 @@ export type FeniXServiceIcon =
   | 'account'
   | 'map'
   | 'users'
+  | 'newspaper'
 
 export type FeniXService = {
   id: string
@@ -107,6 +108,19 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
     ],
   },
   {
+    id: 'news',
+    label: 'News',
+    labelBn: 'নিউজ',
+    description: 'FeniX-controlled public news with clear source and verification context.',
+    icon: 'newspaper',
+    services: [
+      { id: 'news', label: 'FeniX News', labelBn: 'ফেনিক্স নিউজ', description: 'Public local news, business updates, notices and FeniX updates.', href: '/news', status: 'live', icon: 'newspaper', tag: 'Public' },
+      { id: 'news-latest', label: 'Latest News', labelBn: 'সর্বশেষ খবর', description: 'Read the latest published stories.', href: '/news?sort=latest', status: 'live', icon: 'newspaper' },
+      { id: 'news-notices', label: 'Public Notices', labelBn: 'জনসাধারণের নোটিশ', description: 'FeniX-published public notices and announcements.', href: '/news?category=public_notice', status: 'live', icon: 'newspaper' },
+      { id: 'news-policy', label: 'News Standards', labelBn: 'নিউজ নীতিমালা', description: 'See source, verification and publication standards.', href: '/policy#news', status: 'live', icon: 'shield' },
+    ],
+  },
+  {
     id: 'trust',
     label: 'Trust',
     labelBn: 'ট্রাস্ট',
@@ -137,7 +151,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
 ]
 
 export const FENIX_PRIMARY_SERVICE_GROUPS = FENIX_SERVICE_GROUPS.filter((group) =>
-  ['build', 'connect', 'invest', 'shop', 'discover'].includes(group.id),
+  ['build', 'connect', 'invest', 'shop', 'discover', 'news'].includes(group.id),
 )
 
 export function getFeniXServiceGroup(id: string) {
