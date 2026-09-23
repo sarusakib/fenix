@@ -169,7 +169,7 @@ function FeniBrainGuide() {
   }, [])
 
   return (
-    <main className="relative min-h-dvh overflow-x-clip bg-[#030506] text-white">
+    <main className="fenix-brain relative min-h-dvh overflow-x-clip bg-[var(--fx-bg)] text-[var(--fx-text)]">
       <div className="relative z-10">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <Link
@@ -419,7 +419,7 @@ export default function GuidePage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-dvh bg-[#030506] px-4 py-10 text-white">
+        <main className="fenix-brain min-h-dvh px-4 py-10 text-[var(--fx-text)]">
           <div className="mx-auto max-w-6xl rounded-3xl border border-white/[0.08] bg-black/35 p-8 text-sm text-white/60 backdrop-blur-xl">
             Feni Brain loading…
           </div>
