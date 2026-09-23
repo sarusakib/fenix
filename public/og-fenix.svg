@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">FeniX — Feni Business Ecosystem</title>
+  <desc id="desc">Build. Connect. Grow.</desc>
+  <rect width="1200" height="630" rx="0" fill="#F3F7F7"/>
+  <rect x="72" y="72" width="486" height="486" rx="92" fill="#0B1736"/>
+  <path d="M190 205h238M190 285h166M190 365h238" fill="none" stroke="#14B8A6" stroke-width="36" stroke-linecap="round"/>
+  <path d="M440 195l-86 86 86 86M354 281l86 86" fill="none" stroke="#FFD700" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="190" cy="205" r="22" fill="#FFFFFF"/><circle cx="190" cy="285" r="22" fill="#FFFFFF"/><circle cx="190" cy="365" r="22" fill="#FFFFFF"/>
+  <circle cx="440" cy="205" r="22" fill="#FFD700"/><circle cx="440" cy="365" r="22" fill="#FFD700"/>
+  <text x="640" y="285" fill="#0B1736" font-family="Inter, Arial, sans-serif" font-size="104" font-weight="800" letter-spacing="-5">Feni<tspan fill="#008080">X</tspan></text>
+  <text x="648" y="360" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="600">Feni Business Ecosystem</text>
+  <text x="648" y="420" fill="#008080" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="800">Build. Connect. Grow.</text>
+  <text x="648" y="472" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="500">One account. One connected local experience.</text>
+</svg>
