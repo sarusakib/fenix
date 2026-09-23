@@ -118,7 +118,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'verification', label: 'Verification', labelBn: 'ভেরিফিকেশন', description: 'Understand how public verification labels work.', href: '/directory/verify', status: 'live', icon: 'shield' },
       { id: 'claim', label: 'Claim a Business', labelBn: 'বিজনেস ক্লেইম', description: 'Start an ownership/claim workflow.', href: '/directory/claim', status: 'live', icon: 'shield' },
       { id: 'admin-trust', label: 'Trust Center', labelBn: 'ট্রাস্ট সেন্টার', description: 'Admin moderation and review controls.', href: '/admin/trust', status: 'live', icon: 'shield' },
-      { id: 'qr', label: 'QR Business Identity', labelBn: 'QR বিজনেস আইডি', description: 'Open a shareable QR for a public business identity.', status: 'live', icon: 'shield' },
+      { id: 'qr', label: 'QR Business Identity', labelBn: 'QR বিজনেস আইডি', description: 'Open Directory, choose a business profile, then share its QR identity.', href: '/directory', status: 'live', icon: 'shield' },
     ],
   },
   {
