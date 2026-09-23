@@ -29,7 +29,7 @@ export default function InvestmentCard({ opportunity, compact = false, matchScor
         <div className="mt-4 rounded-2xl border border-[#008080]/15 bg-[#008080]/[.05] p-3">
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="font-bold text-[#007171] dark:text-[#8ee6e0]">Profile fit</span>
-            <span className="font-black text-[#007171] dark:text-[#8ee6e0]">{Math.round(Math.max(0, Math.min(Number(matchScore), 1)) * 100)}%</span>
+            <span className="font-black text-[#007171] dark:text-[#8ee6e0]">{Math.round(Math.max(0, Math.min(Number(matchScore), 100)))}%</span>
           </div>
           {matchReasons?.length ? <p className="mt-1 text-xs leading-5 opacity-60">{matchReasons.slice(0, 2).join(' · ')}</p> : null}
         </div>
