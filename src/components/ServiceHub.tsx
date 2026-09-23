@@ -31,7 +31,7 @@ export default function ServiceHub({
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[.2em] text-[var(--fx-primary-strong)]">FeniX Network</p>
-            <h2 className="mt-2 text-2xl font-black tracking-[-.04em] sm:text-4xl">Everything connected. One connected layer at a time.</h2>
+            <h2 className="mt-2 text-2xl font-black tracking-[-.04em] sm:text-4xl">Everything connected. One layer at a time.</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">প্রথমে একটি network path বাছুন, তারপর প্রয়োজনের পরের layer খুলুন।</p>
           </div>
           <div className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 py-2.5 text-[10px] font-bold uppercase tracking-[.13em] text-[var(--fx-muted)]">One layer at a time</div>
