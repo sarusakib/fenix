@@ -18,6 +18,7 @@ import {
   Storefront,
   TrendUp,
   UsersThree,
+  Newspaper,
 } from '@phosphor-icons/react'
 import Navbar from '../components/Navbar'
 import ServiceHub from '../components/ServiceHub'
