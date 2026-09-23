@@ -12,6 +12,7 @@ import {
 } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { ROUTES } from '../../lib/core/routes'
+import { getBusinessPath } from '../../lib/directory'
 
 import { answerFeniBrain } from '../actions/answerFeniBrain'
 
@@ -46,6 +47,25 @@ type LocationResult = {
   match_type: string
 }
 
+type BusinessMatch = {
+  id: string
+  name: string
+  title_bn: string | null
+  title_en: string | null
+  slug?: string | null
+  category: string | null
+  district: string | null
+  upazila: string | null
+  area: string | null
+  market: string | null
+  verification_level: string
+  owner_claimed: boolean
+  phone?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  map_label?: string | null
+}
+
 type LiveSource = {
   title: string
   url: string
@@ -68,6 +88,7 @@ type BrainAnswer = {
   guidanceTitle?: string
   guidanceText?: string
   safetyNote?: string | null
+  businessMatches?: BusinessMatch[]
 }
 
 function FeniBrainGuide() {
@@ -86,6 +107,7 @@ function FeniBrainGuide() {
   const [guidanceTitle, setGuidanceTitle] = useState('পরের ধাপ')
   const [guidanceText, setGuidanceText] = useState('')
   const [safetyNote, setSafetyNote] = useState<string | null>(null)
+  const [businessMatches, setBusinessMatches] = useState<BusinessMatch[]>([])
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -117,6 +139,7 @@ function FeniBrainGuide() {
     setGuidanceTitle('পরের ধাপ')
     setGuidanceText('')
     setSafetyNote(null)
+    setBusinessMatches([])
 
     try {
       const result = (await answerFeniBrain(nextQuery)) as BrainAnswer
@@ -131,6 +154,7 @@ function FeniBrainGuide() {
       const nextChildLocations = result.childLocations || []
       const nextLiveSources = result.liveSources || []
       const nextConfidence = Number(result.confidence || 0)
+      const nextBusinessMatches = result.businessMatches || []
 
       setResults(nextResults)
       setLocations(nextLocations)
@@ -143,6 +167,7 @@ function FeniBrainGuide() {
       setGuidanceTitle(result.guidanceTitle || 'পরের ধাপ')
       setGuidanceText(result.guidanceText || '')
       setSafetyNote(result.safetyNote || null)
+      setBusinessMatches(nextBusinessMatches)
 
       if (result.liveWebChecked && nextLiveSources.length) {
         setStatus('Stored Feni data + official live web data মিলিয়ে উত্তর তৈরি হয়েছে।')
@@ -345,6 +370,39 @@ function FeniBrainGuide() {
                       ? locations.slice(0, 4).map((location) => location.name_bn).join(' · ')
                       : 'Local Feni knowledge'}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {businessMatches.length > 0 && (
+              <div className="mt-8 rounded-3xl border border-[var(--fx-primary)]/15 bg-[var(--fx-surface)] p-5 sm:p-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--fx-primary-strong)]">
+                      Real FeniX business matches
+                    </div>
+                    <p className="mt-1 text-sm text-[var(--fx-muted)]">Verified directory records matching your request. No business is recommended solely from AI text.</p>
+                  </div>
+                  <Link href="/directory" className="shrink-0 rounded-xl border border-[var(--fx-border)] px-3 py-2 text-xs font-bold text-[var(--fx-text)]">Open Directory</Link>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {businessMatches.slice(0, 6).map((business) => {
+                    const title = business.title_bn || business.title_en || business.name
+                    const location = [business.market, business.area, business.upazila, business.district].filter(Boolean).slice(0, 3).join(' · ')
+                    return (
+                      <Link key={business.id} href={getBusinessPath({ id: business.id, slug: business.slug })} className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-bg)] p-4 transition hover:bg-black/[.03] dark:hover:bg-white/[.04]">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-black text-[var(--fx-text)]">{title}</div>
+                            {business.category && <div className="mt-1 text-xs text-[var(--fx-muted)]">{business.category}</div>}
+                          </div>
+                          <ShieldCheck size={16} className={business.verification_level === 'unverified' ? 'opacity-25' : 'text-[var(--fx-primary-strong)]'} />
+                        </div>
+                        {location && <div className="mt-3 text-xs leading-5 text-[var(--fx-muted)]">{location}</div>}
+                        <div className="mt-3 text-xs font-semibold text-[var(--fx-primary-strong)]">Open business profile →</div>
+                      </Link>
+                    )
+                  })}
                 </div>
               </div>
             )}
