@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import {
-  Bell, CaretDown, House, Lightbulb, List, Moon, ShieldCheck, SignIn, SignOut,
+  Bell, CaretDown, House, Lightbulb, List, MagnifyingGlass, Moon, ShieldCheck, SignIn, SignOut,
   Sun, TrendUp, UsersThree, X, UserCircle, Newspaper,
 } from '@phosphor-icons/react'
 import { useAuthStore } from '../store/useAuthStore'
@@ -31,6 +31,7 @@ export default function Navbar() {
   }, [])
 
   const exploreActive =
+    pathname === '/search' ||
     pathname === '/services' ||
     pathname === '/start' || pathname?.startsWith('/start/') ||
     pathname?.startsWith('/directory') ||
@@ -48,9 +49,10 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-1 md:flex">
             <NavLink href="/" active={pathname === '/'}><House size={17}/> {bn ? 'হোম' : 'Home'}</NavLink>
+            <NavLink href="/search" active={pathname === '/search'}><MagnifyingGlass size={17}/> {bn ? 'সার্চ' : 'Search'}</NavLink>
             <NavLink href="/feed" active={pathname === '/feed' || pathname?.startsWith('/feed/')}><UsersThree size={17}/> {bn ? 'ফিড' : 'Feed'}</NavLink>
             <button type="button" aria-expanded={exploreOpen} aria-haspopup="true" onClick={() => setExploreOpen(v => !v)} className={'inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold transition ' + (exploreActive ? 'bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]' : 'text-[var(--fx-muted)] hover:bg-black/[.03] dark:hover:bg-white/[.035]')}>
-              <List size={17}/>{bn ? 'এক্সপ্লোর' : 'Explore'}<CaretDown size={14} className={exploreOpen ? 'rotate-180 transition-transform' : 'transition-transform'}/>
+              <List size={17}/>{bn ? 'নেটওয়ার্ক' : 'Network'}<CaretDown size={14} className={exploreOpen ? 'rotate-180 transition-transform' : 'transition-transform'}/>
             </button>
             <NavLink href="/invest" active={pathname?.startsWith('/invest')}><TrendUp size={17}/> {bn ? 'ইনভেস্ট' : 'Invest'}</NavLink>
             <NavLink href="/news" active={pathname?.startsWith('/news')}><Newspaper size={17}/> {bn ? 'নিউজ' : 'News'}</NavLink>
@@ -97,6 +99,7 @@ export default function Navbar() {
           <div className="mx-auto max-w-xl">
             <div className="grid grid-cols-2 gap-2">
               <MobileLink href="/" onClick={closeMenus}><House size={18}/> {bn ? 'হোম' : 'Home'}</MobileLink>
+              <MobileLink href="/search" onClick={closeMenus} emphasized><MagnifyingGlass size={18}/> {bn ? 'সার্চ' : 'Search'}</MobileLink>
               <MobileLink href="/feed" onClick={closeMenus} emphasized><UsersThree size={18}/> {bn ? 'ফিড' : 'Feed'}</MobileLink>
               <MobileLink href="/guide" onClick={closeMenus} emphasized><Lightbulb size={18}/> {bn ? 'ব্রেইন' : 'Brain'}</MobileLink>
               <MobileLink href="/news" onClick={closeMenus} emphasized><Newspaper size={18}/> {bn ? 'নিউজ' : 'News'}</MobileLink>

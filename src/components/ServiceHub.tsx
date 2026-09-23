@@ -35,7 +35,7 @@ export default function ServiceHub({
       {showHeader && (
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[.2em] text-[var(--fx-primary-strong)]">Service Hub</p>
+            <p className="text-[10px] font-black uppercase tracking-[.2em] text-[var(--fx-primary-strong)]">FeniX Network</p>
             <h2 className="mt-2 text-2xl font-black tracking-[-.04em] sm:text-4xl">Choose a path. Then choose an action.</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">একটি category tap করুন। তারপর tool tap করলে তার next step এখানেই খুলবে।</p>
           </div>

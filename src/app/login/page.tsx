@@ -27,6 +27,17 @@ import AuthForm from './components/AuthForm'
 import AuthSwitch from './components/AuthSwitch'
 import SecurityNotice from './components/SecurityNotice'
 
+function getSafeNextDestination() {
+  const value = new URLSearchParams(window.location.search).get('next')
+  return value && value.startsWith('/') && !value.startsWith('//') ? value : '/'
+}
+
+function getAuthCallbackUrl(next: string) {
+  const callback = new URL('/auth/callback', window.location.origin)
+  callback.searchParams.set('next', next)
+  return callback.toString()
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const setAuth = useAuthStore((state) => state.setAuth)
@@ -54,7 +65,7 @@ export default function LoginPage() {
 
       if (session) {
         setAuth(session)
-        router.replace('/')
+        router.replace(getSafeNextDestination())
         return
       }
 
@@ -93,13 +104,20 @@ export default function LoginPage() {
           return
         }
 
-        const { data, error: signUpError } = await signUpWithEmail({ supabase, email, password, fullName })
+        const next = getSafeNextDestination()
+        const { data, error: signUpError } = await signUpWithEmail({
+          supabase,
+          email,
+          password,
+          fullName,
+          emailRedirectTo: getAuthCallbackUrl(next),
+        })
         if (signUpError) throw signUpError
 
         if (data.session) {
           setAuth(data.session)
           resetFailedAttempts()
-          router.replace('/')
+          router.replace(next)
           router.refresh()
           return
         }
@@ -116,7 +134,7 @@ export default function LoginPage() {
 
       setAuth(data.session)
       resetFailedAttempts()
-      router.replace('/')
+      router.replace(getSafeNextDestination())
       router.refresh()
     } catch (authError: unknown) {
       setError(authError instanceof Error ? getSafeAuthMessage(authError.message) : 'একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।')
@@ -131,7 +149,13 @@ export default function LoginPage() {
     const supabase = createClient()
 
     try {
-      const { error: oauthError } = await signInWithOAuth({ supabase, provider, origin: window.location.origin })
+      const next = getSafeNextDestination()
+      const { error: oauthError } = await signInWithOAuth({
+        supabase,
+        provider,
+        origin: window.location.origin,
+        next,
+      })
       if (oauthError) throw oauthError
     } catch (authError: unknown) {
       setError(authError instanceof Error ? getSafeAuthMessage(authError.message) : 'Social login চালু করা যাচ্ছে না।')

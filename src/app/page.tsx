@@ -104,6 +104,10 @@ export default function HomePage() {
               ))}
             </div>
 
+            <Link href="/search" className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold text-[var(--fx-text)]">
+              <MagnifyingGlass size={15} /> Search businesses, products and places
+            </Link>
+
             <div className="mt-5 grid gap-2 sm:grid-cols-3">
               <TrustMini title="Verified context" body="Trust labels explain what was actually checked." />
               <TrustMini title="Local first" body="Feni places, businesses and workflows stay connected." />

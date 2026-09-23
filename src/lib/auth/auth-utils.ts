@@ -24,12 +24,14 @@ type SignUpWithEmailInput = {
   email: string
   password: string
   fullName: string
+  emailRedirectTo?: string
 }
 
 type SignInWithOAuthInput = {
   supabase: FenixSupabaseClient
   provider: OAuthProvider
   origin: string
+  next?: string
 }
 
 type SendPasswordResetInput = {
@@ -154,11 +156,13 @@ export async function signUpWithEmail({
   email,
   password,
   fullName,
+  emailRedirectTo,
 }: SignUpWithEmailInput) {
   return supabase.auth.signUp({
     email: email.trim(),
     password,
     options: {
+      ...(emailRedirectTo ? { emailRedirectTo } : {}),
       data: {
         full_name: fullName.trim(),
         role: 'user',
@@ -171,11 +175,15 @@ export async function signInWithOAuth({
   supabase,
   provider,
   origin,
+  next = '/',
 }: SignInWithOAuthInput) {
+  const callback = new URL('/auth/callback', origin)
+  callback.searchParams.set('next', next)
+
   return supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: callback.toString(),
     },
   })
 }
