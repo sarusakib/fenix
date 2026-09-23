@@ -21,7 +21,7 @@ export default function ServiceHub({
   compact = false, showHeader = true, onNavigate,
 }: { compact?: boolean; showHeader?: boolean; onNavigate?: () => void }) {
   const [activeId, setActiveId] = useState('build')
-  const [selectedService, setSelectedService] = useState<{label: string; labelBn: string; href?: string; guide: FeniXServiceGuideline} | null>(null)
+  const [selectedService, setSelectedService] = useState<{id: string; label: string; labelBn: string; href?: string; guide: FeniXServiceGuideline} | null>(null)
   const activeGroup = getFeniXServiceGroup(activeId)
   const liveServices = activeGroup.services.filter((item) => item.status === 'live' && item.href)
 
@@ -93,7 +93,7 @@ export default function ServiceHub({
                     <button
                       key={service.id}
                       type="button"
-                      onClick={() => setSelectedService({ label: service.label, labelBn: service.labelBn, href: service.href, guide: getServiceGuideline(service.id) })}
+                      onClick={() => setSelectedService((current) => current?.id === service.id ? null : { id: service.id, label: service.label, labelBn: service.labelBn, href: service.href, guide: getServiceGuideline(service.id) })} aria-expanded={selectedService?.id === service.id}
                       className="fenix-interactive group flex min-h-16 items-center gap-3 rounded-2xl border border-[var(--fx-border)] bg-white/[.5] px-3.5 py-3 text-left dark:bg-white/[.025]"
                     >
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><Icon size={19} weight="duotone" /></span>
@@ -122,29 +122,32 @@ export default function ServiceHub({
       )}
 
       {selectedService && (
-        <div className="fixed inset-0 z-[120] grid place-items-end bg-slate-950/45 p-3 backdrop-blur-sm sm:place-items-center sm:p-6" role="dialog" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedService(null) }} aria-modal="true" aria-label={selectedService.label}>
-          <div className="max-h-[88vh] w-full max-w-xl overflow-y-auto rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-bg)] p-5 shadow-2xl sm:p-7">
-            <div className="flex items-start justify-between gap-4">
-              <div><p className="text-[10px] font-black uppercase tracking-[.16em] text-[var(--fx-primary-strong)]">Before you start</p><h3 className="mt-2 text-2xl font-black">{selectedService.label}</h3><p className="text-sm text-[var(--fx-muted)]">{selectedService.labelBn}</p></div>
-              <button type="button" onClick={() => setSelectedService(null)} aria-label="Close guide" className="grid h-10 w-10 place-items-center rounded-xl border border-[var(--fx-border)]"><X size={19}/></button>
+        <div className="mt-4 overflow-hidden rounded-3xl border border-[var(--fx-primary)]/15 bg-[var(--fx-primary-soft)] p-4 sm:p-5" aria-live="polite">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[.16em] text-[var(--fx-primary-strong)]">Next layer</p>
+              <h3 className="mt-1 text-xl font-black">{selectedService.label}</h3>
+              <p className="text-xs text-[var(--fx-muted)]">{selectedService.labelBn}</p>
+              <p className="mt-3 text-sm leading-6 text-[var(--fx-text)]">{selectedService.guide.introBn}</p>
             </div>
-            <p className="mt-5 text-sm leading-7 text-[var(--fx-muted)]">{selectedService.guide.introBn}</p>
-            <ol className="mt-5 space-y-3">
-              {selectedService.guide.stepsBn.map((step, index) => (
-                <li key={step} className="flex gap-3 rounded-2xl border border-[var(--fx-border)] bg-black/[.018] p-4 dark:bg-white/[.025]">
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[var(--fx-primary-soft)] text-xs font-black text-[var(--fx-primary-strong)]">{index+1}</span>
-                  <span className="pt-0.5 text-sm font-semibold">{step}</span>
-                </li>
-              ))}
-            </ol>
-            <div className="mt-5 rounded-2xl bg-[var(--fx-primary-soft)] p-4 text-xs leading-6 text-[var(--fx-text)]"><strong>মনে রাখবেন:</strong> {selectedService.guide.noteBn}</div>
-            <div className="mt-5 flex gap-2">
-              <button type="button" onClick={() => setSelectedService(null)} className="min-h-11 flex-1 rounded-xl border border-[var(--fx-border)] px-4 text-sm font-bold">পরে</button>
-              {selectedService.href && <Link href={selectedService.href} onClick={() => { setSelectedService(null); onNavigate?.() }} className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-sm font-bold text-white">শুরু করুন <ArrowRight size={16}/></Link>}
-            </div>
+            <button type="button" onClick={() => setSelectedService(null)} className="min-h-10 shrink-0 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-xs font-bold">Close</button>
+          </div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {selectedService.guide.stepsBn.map((step, index) => (
+              <div key={step} className="flex gap-3 rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-3.5">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[var(--fx-primary-soft)] text-xs font-black text-[var(--fx-primary-strong)]">{index + 1}</span>
+                <span className="pt-0.5 text-xs font-semibold leading-5">{step}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs leading-5 text-[var(--fx-muted)]"><strong className="text-[var(--fx-text)]">মনে রাখবেন:</strong> {selectedService.guide.noteBn}</p>
+            {selectedService.href && <Link href={selectedService.href} onClick={() => onNavigate?.()} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-sm font-bold text-white">শুরু করুন <ArrowRight size={16}/></Link>}
           </div>
         </div>
       )}
+
+
     </section>
   )
 }
