@@ -5,7 +5,7 @@ import { ArrowRight, MapPin, ShieldCheck, TrendUp, Wallet } from '@phosphor-icon
 import type { InvestmentOpportunity } from '@/types/database'
 import { formatBDT, opportunityTitle, progressPercent, riskLabel, statusLabel } from '@/lib/investment'
 
-export default function InvestmentCard({ opportunity, compact = false }: { opportunity: InvestmentOpportunity; compact?: boolean }) {
+export default function InvestmentCard({ opportunity, compact = false, matchScore, matchReasons }: { opportunity: InvestmentOpportunity; compact?: boolean; matchScore?: number | null; matchReasons?: string[] }) {
   const progress = progressPercent(opportunity)
 
   return (
@@ -24,6 +24,16 @@ export default function InvestmentCard({ opportunity, compact = false }: { oppor
       <p className="mt-3 line-clamp-3 text-sm leading-6 opacity-60">
         {opportunity.description_en}
       </p>
+
+      {matchScore != null && (
+        <div className="mt-4 rounded-2xl border border-[#008080]/15 bg-[#008080]/[.05] p-3">
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="font-bold text-[#007171] dark:text-[#8ee6e0]">Profile fit</span>
+            <span className="font-black text-[#007171] dark:text-[#8ee6e0]">{Math.round(Math.max(0, Math.min(Number(matchScore), 1)) * 100)}%</span>
+          </div>
+          {matchReasons?.length ? <p className="mt-1 text-xs leading-5 opacity-60">{matchReasons.slice(0, 2).join(' · ')}</p> : null}
+        </div>
+      )}
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <Info icon={<Wallet size={16} />} label="Target" value={formatBDT(opportunity.target_amount)} />
