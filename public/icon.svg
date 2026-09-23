@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+  <title>FeniX</title>
+  <rect width="192" height="192" rx="42" fill="#0B1736"/>
+  <path d="M46 48h58c22 0 40 14 40 34 0 16-10 28-25 32l29 30h-31l-25-27H76v27H46V48zm30 27v17h27c8 0 13-3 13-9s-5-8-13-8H76z" fill="#F3F7F7"/>
+  <path d="M118 48h20l-29 43 29 42h-20L89 91l29-43z" fill="#008080"/>
+  <circle cx="151" cy="43" r="9" fill="#FFD700"/>
+</svg>

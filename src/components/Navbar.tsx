@@ -31,7 +31,6 @@ export default function Navbar() {
   }, [])
 
   const exploreActive =
-    pathname === '/search' ||
     pathname === '/services' ||
     pathname === '/start' || pathname?.startsWith('/start/') ||
     pathname?.startsWith('/directory') ||
