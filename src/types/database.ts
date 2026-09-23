@@ -3499,6 +3499,264 @@ export type Database = {
         ]
       }
     }
+      news_posts: {
+        Row: {
+          id: string
+          slug: string
+          title_bn: string
+          title_en: string
+          excerpt_bn: string | null
+          excerpt_en: string | null
+          content_bn: string
+          content_en: string
+          category: string
+          status: string
+          featured: boolean
+          breaking: boolean
+          source_name: string | null
+          source_url: string | null
+          verification_status: string
+          image_url: string | null
+          author_id: string | null
+          published_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          title_bn: string
+          title_en: string
+          excerpt_bn?: string | null
+          excerpt_en?: string | null
+          content_bn: string
+          content_en: string
+          category: string
+          status?: string
+          featured?: boolean
+          breaking?: boolean
+          source_name?: string | null
+          source_url?: string | null
+          verification_status?: string
+          image_url?: string | null
+          author_id?: string | null
+          published_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          title_bn?: string
+          title_en?: string
+          excerpt_bn?: string | null
+          excerpt_en?: string | null
+          content_bn?: string
+          content_en?: string
+          category?: string
+          status?: string
+          featured?: boolean
+          breaking?: boolean
+          source_name?: string | null
+          source_url?: string | null
+          verification_status?: string
+          image_url?: string | null
+          author_id?: string | null
+          published_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fenix_topics: {
+        Row: {
+          id: string
+          slug: string
+          name_bn: string
+          name_en: string
+          description_bn: string | null
+          description_en: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name_bn: string
+          name_en: string
+          description_bn?: string | null
+          description_en?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name_bn?: string
+          name_en?: string
+          description_bn?: string | null
+          description_en?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      fenix_questions: {
+        Row: {
+          id: string
+          author_id: string
+          topic_id: string | null
+          title: string
+          body: string
+          created_at: string
+          updated_at: string
+          deleted_at: string | null
+        }
+        Insert: {
+          id?: string
+          author_id: string
+          topic_id?: string | null
+          title: string
+          body: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Update: {
+          id?: string
+          author_id?: string
+          topic_id?: string | null
+          title?: string
+          body?: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Relationships: []
+      }
+      fenix_answers: {
+        Row: {
+          id: string
+          question_id: string
+          author_id: string
+          body: string
+          created_at: string
+          updated_at: string
+          deleted_at: string | null
+        }
+        Insert: {
+          id?: string
+          question_id: string
+          author_id: string
+          body: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Update: {
+          id?: string
+          question_id?: string
+          author_id?: string
+          body?: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Relationships: []
+      }
+      fenix_content_votes: {
+        Row: {
+          user_id: string
+          content_type: string
+          content_id: string
+          value: number
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          content_type: string
+          content_id: string
+          value?: number
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          content_type?: string
+          content_id?: string
+          value?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      fenix_topic_follows: {
+        Row: {
+          user_id: string
+          topic_id: string
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          topic_id: string
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          topic_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      fenix_content_bookmarks: {
+        Row: {
+          user_id: string
+          content_type: string
+          content_id: string
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          content_type: string
+          content_id: string
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          content_type?: string
+          content_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      fenix_content_comments: {
+        Row: {
+          id: string
+          author_id: string
+          content_type: string
+          content_id: string
+          body: string
+          created_at: string
+          updated_at: string
+          deleted_at: string | null
+        }
+        Insert: {
+          id?: string
+          author_id: string
+          content_type: string
+          content_id: string
+          body: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Update: {
+          id?: string
+          author_id?: string
+          content_type?: string
+          content_id?: string
+          body?: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Relationships: []
+      }
     Views: {
       commerce_public_products: {
         Row: {
@@ -3555,6 +3813,41 @@ export type Database = {
           created_at: string | null
           id: string | null
           updated_at: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_question_feed: {
+        Row: {
+          id: string | null
+          title: string | null
+          body: string | null
+          created_at: string | null
+          updated_at: string | null
+          author_id: string | null
+          topic_id: string | null
+          author_name: string | null
+          author_username: string | null
+          author_avatar_url: string | null
+          topic_slug: string | null
+          topic_name_bn: string | null
+          topic_name_en: string | null
+          answer_count: number | null
+          score: number | null
+        }
+        Relationships: []
+      }
+      fenix_public_answer_feed: {
+        Row: {
+          id: string | null
+          question_id: string | null
+          body: string | null
+          created_at: string | null
+          updated_at: string | null
+          author_id: string | null
+          author_name: string | null
+          author_username: string | null
+          author_avatar_url: string | null
+          score: number | null
         }
         Relationships: []
       }
