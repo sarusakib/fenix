@@ -107,8 +107,7 @@ export default function ProfileEditorPage() {
     const { data: auth } = await s.auth.getUser()
     if (!auth.user) { setBusy(false); return }
     const [{ error: profileError }, { error: settingError }] = await Promise.all([
-      s.from('profiles').upsert({
-        id: auth.user.id,
+s.from('profiles').update({
         full_name: fullName.trim().slice(0,160) || null,
         username: cleanUsername,
         bio: bio.trim().slice(0,1000) || null,
@@ -117,7 +116,7 @@ export default function ProfileEditorPage() {
         location_text: locationText.trim().slice(0,160) || null,
         website_url: website,
         updated_at: new Date().toISOString(),
-      }, { onConflict: 'id' }),
+      }).eq('id', auth.user.id),
       s.from('profile_settings').upsert({
         user_id: auth.user.id,
         locale,
@@ -126,7 +125,11 @@ export default function ProfileEditorPage() {
         feed_visibility: feedVisibility,
       }, { onConflict: 'user_id' }),
     ])
-    if (profileError || settingError) setMessage(locale === 'bn' ? 'Profile save করা যায়নি। Username আগে থেকে ব্যবহার হয়ে থাকলে অন্যটা দিন।' : 'Could not save the profile. The username may already be taken.')
+    if (profileError || settingError) {
+      setMessage(locale === 'bn'
+        ? 'Profile save করা যায়নি। Username আগে থেকে ব্যবহার হয়ে থাকলে অন্যটা দিন।'
+        : 'Could not save the profile. The username may already be taken.')
+    }
     else setMessage(locale === 'bn' ? 'Profile successfully updated.' : 'Profile successfully updated.')
     setBusy(false)
   }
