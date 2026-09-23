@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   Storefront,
+  Newspaper,
   UsersThree,
 } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
@@ -23,6 +24,7 @@ const modules = [
   { title: 'Investment Operations', body: 'Opportunities, investors, documents and interests.', href: '/admin/investment', icon: ChartLineUp },
   { title: 'Brain & Knowledge', body: 'Open the public Feni Brain experience.', href: '/guide', icon: Brain },
   { title: 'Public Experience', body: 'See Directory, Invest and Commerce as members do.', href: '/directory', icon: Storefront },
+  { title: 'FeniX News', body: 'Create, review and publish the public FeniX newsroom.', href: '/admin/news', icon: Newspaper },
   { title: 'Platform Settings', body: 'Governance, member preferences and public policy links.', href: '/admin/settings', icon: GearSix },
 ] as const
 
