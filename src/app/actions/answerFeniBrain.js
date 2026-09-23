@@ -228,7 +228,7 @@ export async function answerFeniBrain(query) {
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
     }
   } catch (error) {
-    console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status })
+    console.warn('Feni Brain AI provider unavailable; using verified fallback.', { name: error?.name, status: error?.status })
     return {
       success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(cleanQuery, retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,

@@ -6,6 +6,8 @@ import FenixFlow from './FenixFlow'
 import HomeThemeProvider from '../components/theme/HomeThemeProvider'
 import SiteBackground from '../components/layout/SiteBackground'
 import MobileDock from '../components/MobileDock'
+import ServiceWorkerRegister from '../components/pwa/ServiceWorkerRegister'
+import VoiceSearchButton from '../components/search/VoiceSearchButton'
 import { FenixLocaleProvider } from '../components/i18n/FenixLocaleProvider'
 
 export const metadata = {
@@ -50,9 +52,7 @@ const themeBootstrap = `
         theme === 'dark' ? '#030506' : '#F3F7F7'
       );
     }
-  } catch (_) {
-    // Theme bootstrap must never block application startup.
-  }
+  } catch (_) {}
 })();
 `
 
@@ -64,26 +64,17 @@ export default function RootLayout({
   return (
     <html lang="bn" suppressHydrationWarning>
       <body className="min-h-screen w-full overflow-x-clip antialiased">
-        <Script
-          id="fenix-theme-bootstrap"
-          strategy="beforeInteractive"
-        >
-          {themeBootstrap}
-        </Script>
-
+        <Script id="fenix-theme-bootstrap" strategy="beforeInteractive">{themeBootstrap}</Script>
         <AuthSync />
-
         <FenixLocaleProvider>
           <HomeThemeProvider>
-          <FenixFlow>
-            <SiteBackground />
-
-            <div className="relative z-10 min-h-screen">
-              {children}
-            </div>
-
-            <MobileDock />
-          </FenixFlow>
+            <FenixFlow>
+              <SiteBackground />
+              <div className="relative z-10 min-h-screen">{children}</div>
+              <MobileDock />
+              <VoiceSearchButton />
+              <ServiceWorkerRegister />
+            </FenixFlow>
           </HomeThemeProvider>
         </FenixLocaleProvider>
       </body>

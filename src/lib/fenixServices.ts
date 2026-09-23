@@ -78,7 +78,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'investor-profile', label: 'Investor Profile', labelBn: 'ইনভেস্টর প্রোফাইল', description: 'Keep investor preferences and verification together.', href: '/invest/profile', status: 'live', icon: 'account' },
       { id: 'investment-workspace', label: 'Investment Workspace', labelBn: 'ইনভেস্টমেন্ট ওয়ার্কস্পেস', description: 'Manage interests, records and workflow.', href: '/invest/dashboard', status: 'live', icon: 'trend' },
       { id: 'scenario-calculator', label: 'Scenario Calculator', labelBn: 'সিনারিও ক্যালকুলেটর', description: 'Explore assumptions without promising returns.', href: '/invest/calculator', status: 'live', icon: 'trend' },
-      { id: 'due-diligence', label: 'Due Diligence Center', labelBn: 'ডিউ ডিলিজেন্স', description: 'Structured evidence review for future investment workflows.', status: 'planned', icon: 'shield' },
+      { id: 'due-diligence', label: 'Due Diligence Center', labelBn: 'ডিউ ডিলিজেন্স', description: 'Structured evidence review before an investment decision.', href: '/invest/due-diligence', status: 'live', icon: 'shield' },
     ],
   },
   {
@@ -131,7 +131,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'verification', label: 'Verification', labelBn: 'ভেরিফিকেশন', description: 'Understand how public verification labels work.', href: '/directory/verify', status: 'live', icon: 'shield' },
       { id: 'claim', label: 'Claim a Business', labelBn: 'বিজনেস ক্লেইম', description: 'Start an ownership/claim workflow.', href: '/directory/claim', status: 'live', icon: 'shield' },
       { id: 'admin-trust', label: 'Trust Center', labelBn: 'ট্রাস্ট সেন্টার', description: 'Admin moderation and review controls.', href: '/admin/trust', status: 'live', icon: 'shield' },
-      { id: 'qr', label: 'QR Business Identity', labelBn: 'QR বিজনেস আইডি', description: 'Shareable business identity layer is being expanded.', status: 'planned', icon: 'shield' },
+      { id: 'qr', label: 'QR Business Identity', labelBn: 'QR বিজনেস আইডি', description: 'Open Directory, choose a business profile, then share its QR identity.', href: '/directory', status: 'live', icon: 'shield' },
     ],
   },
   {
