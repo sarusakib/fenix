@@ -28,7 +28,7 @@ export default function Navbar() {
     <div className="hidden items-center gap-1 md:flex">
       <NavLink href="/" active={pathname==='/' }><House size={17}/> {bn?'হোম':'Home'}</NavLink>
       <NavLink href="/feed" active={pathname==='/feed'||pathname?.startsWith('/feed/')}><UsersThree size={17}/> {bn?'ফিড':'Feed'}</NavLink>
-      <button type="button" aria-expanded={servicesOpen} aria-haspopup="true" onClick={()=>setServicesOpen(v=>!v)} className={'inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold transition '+(servicesActive?'bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]':'text-[var(--fx-muted)] hover:bg-black/[.03] dark:hover:bg-white/[.035]')}><Storefront size={17}/>{bn?'সার্ভিস':'Services'}<CaretDown size={14} className={servicesOpen?'rotate-180 transition-transform':'transition-transform'}/></button>
+      <button type="button" aria-expanded={servicesOpen} aria-haspopup="true" onClick={()=>setServicesOpen(v=>!v)} className={'inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold transition '+(servicesActive?'bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]':'text-[var(--fx-muted)] hover:bg-black/[.03] dark:hover:bg-white/[.035]')}><Storefront size={17}/>{bn?'নেটওয়ার্ক':'Network'}<CaretDown size={14} className={servicesOpen?'rotate-180 transition-transform':'transition-transform'}/></button>
       <NavLink href="/directory" active={pathname?.startsWith('/directory')}><span className="text-sm">⌕</span> {bn?'এক্সপ্লোর':'Explore'}</NavLink>
       <NavLink href="/invest" active={pathname?.startsWith('/invest')}><TrendUp size={17}/> {bn?'ইনভেস্ট':'Invest'}</NavLink>
     </div>
