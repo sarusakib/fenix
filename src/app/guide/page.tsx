@@ -310,7 +310,7 @@ function FeniBrainGuide() {
                       href={source.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="block rounded-xl border border-white/[0.06] bg-[var(--fx-surface)] p-3 text-xs text-[var(--fx-text)]/65 transition hover:bg-white/[0.05] hover:text-[var(--fx-text)]"
+                      className="block rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-3 text-xs text-[var(--fx-text)]/70 transition hover:bg-black/[.03] dark:hover:bg-white/[.04] hover:text-[var(--fx-text)]"
                     >
                       <span className="font-semibold text-[var(--fx-text)]/80">{source.title}</span>
                       <span className="mt-1 block break-all text-[var(--fx-text)]/35">{source.url}</span>
@@ -400,7 +400,7 @@ function FeniBrainGuide() {
                         </div>
                       </div>
 
-                      <div className="shrink-0 rounded-full border border-[var(--fx-primary)]/15 bg-[#72ddda]/[0.06] px-3 py-1.5 text-xs font-semibold text-[var(--fx-primary-strong)]">
+                      <div className="shrink-0 rounded-full border border-[var(--fx-primary)]/15 bg-[var(--fx-primary-soft)] px-3 py-1.5 text-xs font-semibold text-[var(--fx-primary-strong)]">
                         {result.retrieval_method || 'matched'} · {Math.round(Number(result.similarity || 0) * 100)}%
                       </div>
                     </div>
@@ -419,8 +419,8 @@ export default function GuidePage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-dvh bg-[#030506] px-4 py-10 text-[var(--fx-text)]">
-          <div className="mx-auto max-w-6xl rounded-3xl border border-white/[0.08] bg-black/35 p-8 text-sm text-[var(--fx-text)]/60 backdrop-blur-xl">
+        <main className="min-h-dvh bg-[var(--fx-bg)] px-4 py-10 text-[var(--fx-text)]">
+          <div className="mx-auto max-w-6xl rounded-3xl border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-8 text-sm text-[var(--fx-text)]/60 backdrop-blur-xl">
             Feni Brain loading…
           </div>
         </main>
