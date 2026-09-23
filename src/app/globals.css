@@ -167,3 +167,20 @@ html { scrollbar-width: thin; scrollbar-color: rgba(0,128,128,.36) transparent; 
 @media (max-width: 480px) {
   .fenix-surface, .fenix-surface-strong { border-radius: 1.45rem; }
 }
+
+
+/* Compatibility layer for the Brain surface while its content-rich cards keep their existing markup. */
+.fenix-brain [class*="text-white/"],
+.fenix-brain [class~="text-white"] { color: var(--fx-text) !important; }
+.fenix-brain [class*="border-white/"] { border-color: var(--fx-border) !important; }
+.fenix-brain [class*="bg-black/"] { background-color: var(--fx-surface-strong) !important; }
+.fenix-brain [class*="bg-white/"] { background-color: var(--fx-surface) !important; }
+.fenix-brain [class*="text-[#72ddda]"],
+.fenix-brain [class*="text-[#008080]"] { color: var(--fx-primary-strong) !important; }
+.fenix-brain [class*="border-[#72ddda]"],
+.fenix-brain [class*="border-[#008080]"] { border-color: color-mix(in srgb, var(--fx-primary) 24%, transparent) !important; }
+.fenix-brain [class*="bg-[#008080]"] { background-color: var(--fx-primary-strong) !important; }
+.fenix-brain [class*="bg-amber-"] { background-color: color-mix(in srgb, var(--fx-gold) 10%, transparent) !important; }
+.fenix-brain [class*="text-amber-"] { color: color-mix(in srgb, var(--fx-gold) 82%, var(--fx-text)) !important; }
+.fenix-brain [class*="border-amber-"] { border-color: color-mix(in srgb, var(--fx-gold) 28%, transparent) !important; }
+.fenix-brain [class*="bg-[#008080]"] [class~="text-white"] { color: #fff !important; }
