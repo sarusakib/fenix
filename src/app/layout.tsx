@@ -15,9 +15,9 @@ export const metadata = {
   description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
   manifest: '/manifest.json',
   icons: {
-    icon: '/icon.png',
-    shortcut: '/icon.png',
-    apple: '/icon.png',
+    icon: '/fenix-logo.svg',
+    shortcut: '/fenix-logo.svg',
+    apple: '/fenix-logo.svg',
   },
   applicationName: 'FeniX',
 }
@@ -49,7 +49,7 @@ const themeBootstrap = `
     if (themeColor) {
       themeColor.setAttribute(
         'content',
-        theme === 'dark' ? '#030506' : '#F3F7F7'
+        theme === 'dark' ? '#06090d' : '#F4F7F6'
       );
     }
   } catch (_) {}
