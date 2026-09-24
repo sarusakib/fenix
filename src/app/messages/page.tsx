@@ -23,12 +23,14 @@ export default function MessagesPage() {
 
   useEffect(()=>{
     const params=new URLSearchParams(window.location.search)
-    setTo(params.get('to')||'')
-    setRecipientName(params.get('name')||'')
-    void load()
+    const targetId = params.get('to') || ''
+    const targetName = params.get('name') || ''
+    if (targetId) setTo(targetId)
+    if (targetName) setRecipientName(targetName)
+    void load(targetId, targetName)
   },[])
 
-  async function load(){
+  async function load(targetId = '', targetName = ''){
     const s=createClient()
     const [{data:auth},{data,error}]=await Promise.all([
       s.auth.getUser(),
@@ -43,6 +45,14 @@ export default function MessagesPage() {
     if(ids.length){
       const {data:profiles}=await s.from('fenix_public_profiles').select('id,full_name,username,avatar_url').in('id',ids)
       setPeople(Object.fromEntries(((profiles??[]) as Person[]).map(p=>[p.id,p])))
+    }
+    if(targetId && targetId !== auth.user.id){
+      const {data:target}=await s.from('fenix_public_profiles').select('id,full_name,username,avatar_url').eq('id',targetId).maybeSingle()
+      if(target?.id){
+        setTo(target.id)
+        setRecipientName(targetName || target.full_name || (target.username ? '@' + target.username : 'FeniX user'))
+        setPeople(current=>({...current,[target.id as string]:target as Person}))
+      }
     }
     const unread=rows.filter(m=>m.recipient_id===auth.user.id && !m.read_at).map(m=>m.id)
     if(unread.length) await s.from('fenix_direct_messages').update({read_at:new Date().toISOString()}).in('id',unread)
@@ -62,7 +72,7 @@ export default function MessagesPage() {
     if(!body.trim()) return
     setBusy(true);setStatus('')
     const recipient=await resolveRecipient()
-    if(!recipient){setStatus(locale==='bn'?'Username দিয়ে recipient পাওয়া যায়নি।':'Recipient could not be found by username.');setBusy(false);return}
+    if(!recipient){setStatus(locale==='bn'?'আগে একটি profile থেকে Message শুরু করুন।':'Start a message from a member profile first.');setBusy(false);return}
     if(recipient===userId){setStatus(locale==='bn'?'নিজেকে message পাঠানো যাবে না।':'You cannot message yourself.');setBusy(false);return}
     const s=createClient()
     const {error}=await s.from('fenix_direct_messages').insert({sender_id:userId,recipient_id:recipient,body:body.trim().slice(0,5000)})
@@ -91,11 +101,13 @@ export default function MessagesPage() {
     <Navbar/>
     <section className="mx-auto max-w-4xl px-4 pb-28 pt-7 sm:px-6">
       <Link href="/dashboard" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> Account</Link>
-      <div className="mt-6"><p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">Inbox</p><h1 className="mt-2 text-3xl font-black sm:text-5xl">{title}</h1><p className="mt-3 text-sm leading-7 text-[var(--fx-muted)]">{locale==='bn'?'Profile থেকে সরাসরি বা username দিয়ে নিরাপদভাবে message পাঠাতে পারবেন।':'Send a protected direct message from a profile or by username.'}</p></div>
+      <div className="mt-6"><p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">Inbox</p><h1 className="mt-2 text-3xl font-black sm:text-5xl">{title}</h1><p className="mt-3 text-sm leading-7 text-[var(--fx-muted)]">{locale==='bn'?'যে profile-কে message দিতে চান, সেই profile-এর Message button ব্যবহার করুন।':'Open a member profile and use its Message button to start a protected chat.'}</p></div>
 
       <section className="mt-6 rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5">
         <div className="flex items-center gap-2"><ChatCircleText size={21} className="text-[var(--fx-primary-strong)]"/><h2 className="font-black">{locale==='bn'?'নতুন message':'New message'}</h2></div>
-        <input value={recipientName} onChange={e=>{setRecipientName(e.target.value);setTo('')}} placeholder={locale==='bn'?'Username যেমন sakib_01':'Username, e.g. sakib_01'} className="mt-4 h-11 w-full rounded-xl border border-[var(--fx-border)] bg-transparent px-3 text-sm"/>
+        <div className="mt-4 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 py-3 text-sm">
+          {to ? <><span className="text-[var(--fx-muted)]">{locale==='bn'?'To':'To'}: </span><span className="font-bold">{recipientName || people[to]?.full_name || people[to]?.username || 'FeniX user'}</span></> : <Link href="/feed" className="font-bold text-[var(--fx-primary-strong)] hover:underline">{locale==='bn'?'Member profile খুলে Message চাপুন':'Open a member profile and tap Message'}</Link>}
+        </div>
         <textarea value={body} onChange={e=>setBody(e.target.value)} maxLength={5000} rows={4} placeholder={locale==='bn'?'আপনার message লিখুন':'Write your message'} className="mt-3 w-full rounded-xl border border-[var(--fx-border)] bg-transparent p-3 text-sm leading-6"/>
         <div className="mt-3 flex items-center justify-between gap-3"><span className="text-[10px] text-[var(--fx-muted)]">{body.length}/5000</span><button type="button" disabled={busy||!body.trim()} onClick={()=>void send()} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-sm font-bold text-white disabled:opacity-45"><PaperPlaneRight size={16}/> Send</button></div>
       </section>
