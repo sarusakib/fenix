@@ -2,6 +2,7 @@
 
 import { ChatCircleText } from '@phosphor-icons/react'
 import Link from 'next/link'
+import type { MouseEvent } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useState } from 'react'
 
@@ -21,7 +22,7 @@ export default function MessageButton({
   const [busy, setBusy] = useState(false)
   const href = '/messages?to=' + encodeURIComponent(userId) + '&name=' + encodeURIComponent(name)
 
-  async function openChat(event: React.MouseEvent<HTMLAnchorElement>) {
+  async function openChat(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault()
     if (!userId || busy) return
     setBusy(true)
