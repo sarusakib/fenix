@@ -2239,6 +2239,141 @@ export type Database = {
           },
         ]
       }
+      fenix_jobs: {
+        Row: {
+          application_deadline: string | null
+          business_id: string | null
+          created_at: string
+          currency: string
+          description: string
+          district: string
+          employment_type: string
+          external_apply_url: string | null
+          id: string
+          location_text: string | null
+          owner_id: string
+          published_at: string | null
+          salary_max: number | null
+          salary_min: number | null
+          status: string
+          title: string
+          updated_at: string
+          upazila: string | null
+          verification_note: string | null
+          verification_status: string
+          workplace_type: string
+        }
+        Insert: {
+          application_deadline?: string | null
+          business_id?: string | null
+          created_at?: string
+          currency?: string
+          description: string
+          district?: string
+          employment_type?: string
+          external_apply_url?: string | null
+          id?: string
+          location_text?: string | null
+          owner_id: string
+          published_at?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+          upazila?: string | null
+          verification_note?: string | null
+          verification_status?: string
+          workplace_type?: string
+        }
+        Update: {
+          application_deadline?: string | null
+          business_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string
+          district?: string
+          employment_type?: string
+          external_apply_url?: string | null
+          id?: string
+          location_text?: string | null
+          owner_id?: string
+          published_at?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+          upazila?: string | null
+          verification_note?: string | null
+          verification_status?: string
+          workplace_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_jobs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_job_applications: {
+        Row: {
+          applicant_id: string
+          cover_note: string | null
+          created_at: string
+          employer_note: string | null
+          id: string
+          job_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          cover_note?: string | null
+          created_at?: string
+          employer_note?: string | null
+          id?: string
+          job_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          cover_note?: string | null
+          created_at?: string
+          employer_note?: string | null
+          id?: string
+          job_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fenix_feature_flags: {
         Row: {
           description: string | null
