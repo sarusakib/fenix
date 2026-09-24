@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, Briefcase, CalendarBlank, MapPin, PaperPlaneRight, ShieldCheck } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
@@ -13,7 +13,8 @@ type Application={id:string;status:string;cover_note:string|null;created_at:stri
 
 const TYPES:Record<string,string>={full_time:'Full-time',part_time:'Part-time',contract:'Contract',internship:'Internship',freelance:'Freelance',temporary:'Temporary'}
 
-export default function JobDetailPage({params}:{params:{id:string}}){
+export default function JobDetailPage({params}:{params:Promise<{id:string}>}){
+  const routeParams=use(params)
   const [job,setJob]=useState<Job|null>(null)
   const [business,setBusiness]=useState<Business|null>(null)
   const [owner,setOwner]=useState<Profile|null>(null)
@@ -26,7 +27,7 @@ export default function JobDetailPage({params}:{params:{id:string}}){
 
   useEffect(()=>{void (async()=>{
     const s=createClient()
-    const [{data:auth},{data,error:e}]=await Promise.all([s.auth.getUser(),s.from('fenix_jobs').select('*').eq('id',params.id).maybeSingle()])
+    const [{data:auth},{data,error:e}]=await Promise.all([s.auth.getUser(),s.from('fenix_jobs').select('*').eq('id',routeParams.id).maybeSingle()])
     if(e||!data){setError('This job is not available.');setLoading(false);return}
     const row=data as Job
     setJob(row);setUserId(auth.user?.id||'')
@@ -34,7 +35,7 @@ export default function JobDetailPage({params}:{params:{id:string}}){
     const {data:p}=await s.from('fenix_public_profiles').select('id,full_name,username').eq('id',row.owner_id).maybeSingle();setOwner(p as Profile|null)
     if(auth.user){const {data:a}=await s.from('fenix_job_applications').select('id,status,cover_note,created_at').eq('job_id',row.id).eq('applicant_id',auth.user.id).maybeSingle();setApplication(a as Application|null)}
     setLoading(false)
-  })()},[params.id])
+  })()},[routeParams.id])
 
   async function apply(){
     if(!job||!userId||busy)return
