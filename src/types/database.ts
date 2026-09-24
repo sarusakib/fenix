@@ -1372,456 +1372,6 @@ export type Database = {
           },
         ]
       }
-      fenix_ambulance_providers: {
-        Row: {
-          ac_available: boolean
-          ambulance_type: string
-          available_24_7: boolean
-          base_area: string | null
-          created_at: string
-          display_name: string
-          id: string
-          is_verified: boolean
-          owner_id: string | null
-          oxygen_available: boolean
-          phone: string | null
-          service_area: string | null
-          status: string
-          updated_at: string
-          whatsapp: string | null
-        }
-        Insert: {
-          ac_available?: boolean
-          ambulance_type?: string
-          available_24_7?: boolean
-          base_area?: string | null
-          created_at?: string
-          display_name: string
-          id?: string
-          is_verified?: boolean
-          owner_id?: string | null
-          oxygen_available?: boolean
-          phone?: string | null
-          service_area?: string | null
-          status?: string
-          updated_at?: string
-          whatsapp?: string | null
-        }
-        Update: {
-          ac_available?: boolean
-          ambulance_type?: string
-          available_24_7?: boolean
-          base_area?: string | null
-          created_at?: string
-          display_name?: string
-          id?: string
-          is_verified?: boolean
-          owner_id?: string | null
-          oxygen_available?: boolean
-          phone?: string | null
-          service_area?: string | null
-          status?: string
-          updated_at?: string
-          whatsapp?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_ambulance_requests: {
-        Row: {
-          ambulance_type: string
-          condition_category: string
-          created_at: string
-          destination_hospital: string | null
-          id: string
-          note: string | null
-          oxygen_needed: boolean
-          pickup_area: string
-          pickup_upazila_id: string | null
-          provider_id: string | null
-          requester_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          ambulance_type?: string
-          condition_category?: string
-          created_at?: string
-          destination_hospital?: string | null
-          id?: string
-          note?: string | null
-          oxygen_needed?: boolean
-          pickup_area: string
-          pickup_upazila_id?: string | null
-          provider_id?: string | null
-          requester_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          ambulance_type?: string
-          condition_category?: string
-          created_at?: string
-          destination_hospital?: string | null
-          id?: string
-          note?: string | null
-          oxygen_needed?: boolean
-          pickup_area?: string
-          pickup_upazila_id?: string | null
-          provider_id?: string | null
-          requester_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_ambulance_requests_pickup_upazila_id_fkey"
-            columns: ["pickup_upazila_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_brain_locations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_ambulance_requests_provider_id_fkey"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_ambulance_providers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_ambulance_requests_provider_id_fkey"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_ambulance_providers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
-            columns: ["requester_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
-            columns: ["requester_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
-            columns: ["requester_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_answers: {
-        Row: {
-          author_id: string
-          body: string
-          created_at: string
-          deleted_at: string | null
-          id: string
-          question_id: string
-          updated_at: string
-        }
-        Insert: {
-          author_id: string
-          body: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          question_id: string
-          updated_at?: string
-        }
-        Update: {
-          author_id?: string
-          body?: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          question_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_answers_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_answers_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_answers_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_answers_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_question_feed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_answers_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_blood_donors: {
-        Row: {
-          area_text: string | null
-          availability: string
-          blood_group: string
-          created_at: string
-          is_public: boolean
-          last_donation_date: string | null
-          note: string | null
-          preferred_contact: string
-          upazila_id: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          area_text?: string | null
-          availability?: string
-          blood_group: string
-          created_at?: string
-          is_public?: boolean
-          last_donation_date?: string | null
-          note?: string | null
-          preferred_contact?: string
-          upazila_id?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          area_text?: string | null
-          availability?: string
-          blood_group?: string
-          created_at?: string
-          is_public?: boolean
-          last_donation_date?: string | null
-          note?: string | null
-          preferred_contact?: string
-          upazila_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_blood_donors_upazila_id_fkey"
-            columns: ["upazila_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_brain_locations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_donors_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_donors_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_donors_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_blood_requests: {
-        Row: {
-          area_text: string | null
-          blood_group: string
-          contact_method: string
-          created_at: string
-          hospital_area: string | null
-          hospital_name: string
-          id: string
-          needed_at: string | null
-          note: string | null
-          requester_id: string
-          status: string
-          units: number
-          upazila_id: string | null
-          updated_at: string
-          urgency: string
-        }
-        Insert: {
-          area_text?: string | null
-          blood_group: string
-          contact_method?: string
-          created_at?: string
-          hospital_area?: string | null
-          hospital_name: string
-          id?: string
-          needed_at?: string | null
-          note?: string | null
-          requester_id: string
-          status?: string
-          units: number
-          upazila_id?: string | null
-          updated_at?: string
-          urgency?: string
-        }
-        Update: {
-          area_text?: string | null
-          blood_group?: string
-          contact_method?: string
-          created_at?: string
-          hospital_area?: string | null
-          hospital_name?: string
-          id?: string
-          needed_at?: string | null
-          note?: string | null
-          requester_id?: string
-          status?: string
-          units?: number
-          upazila_id?: string | null
-          updated_at?: string
-          urgency?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
-            columns: ["requester_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
-            columns: ["requester_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
-            columns: ["requester_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_requests_upazila_id_fkey"
-            columns: ["upazila_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_brain_locations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_blood_responses: {
-        Row: {
-          created_at: string
-          donor_id: string
-          id: string
-          message: string | null
-          request_id: string
-          status: string
-        }
-        Insert: {
-          created_at?: string
-          donor_id: string
-          id?: string
-          message?: string | null
-          request_id: string
-          status?: string
-        }
-        Update: {
-          created_at?: string
-          donor_id?: string
-          id?: string
-          message?: string | null
-          request_id?: string
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
-            columns: ["donor_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
-            columns: ["donor_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
-            columns: ["donor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_responses_request_id_fkey"
-            columns: ["request_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_blood_requests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_blood_responses_request_id_fkey"
-            columns: ["request_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_blood_requests"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       fenix_brain_chunks: {
         Row: {
           chunk_index: number
@@ -2128,75 +1678,6 @@ export type Database = {
           },
         ]
       }
-      fenix_brain_pulse_intents_public: {
-        Row: {
-          intent_key: string
-          searches_30d: number
-          searches_7d: number
-        }
-        Insert: {
-          intent_key: string
-          searches_30d?: number
-          searches_7d?: number
-        }
-        Update: {
-          intent_key?: string
-          searches_30d?: number
-          searches_7d?: number
-        }
-        Relationships: []
-      }
-      fenix_brain_pulse_terms_public: {
-        Row: {
-          searches_30d: number
-          searches_7d: number
-          term: string
-          unique_queries_7d: number
-        }
-        Insert: {
-          searches_30d?: number
-          searches_7d?: number
-          term: string
-          unique_queries_7d?: number
-        }
-        Update: {
-          searches_30d?: number
-          searches_7d?: number
-          term?: string
-          unique_queries_7d?: number
-        }
-        Relationships: []
-      }
-      fenix_brain_query_events: {
-        Row: {
-          created_at: string
-          id: string
-          intent_key: string
-          language_code: string
-          query_hash: string
-          result_count: number
-          term: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          intent_key?: string
-          language_code?: string
-          query_hash: string
-          result_count?: number
-          term: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          intent_key?: string
-          language_code?: string
-          query_hash?: string
-          result_count?: number
-          term?: string
-        }
-        Relationships: []
-      }
       fenix_brain_query_terms: {
         Row: {
           created_at: string
@@ -2464,104 +1945,6 @@ export type Database = {
           },
         ]
       }
-      fenix_content_bookmarks: {
-        Row: {
-          content_id: string
-          content_type: string
-          created_at: string
-          user_id: string
-        }
-        Insert: {
-          content_id: string
-          content_type: string
-          created_at?: string
-          user_id: string
-        }
-        Update: {
-          content_id?: string
-          content_type?: string
-          created_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_content_comments: {
-        Row: {
-          author_id: string
-          body: string
-          content_id: string
-          content_type: string
-          created_at: string
-          deleted_at: string | null
-          id: string
-          updated_at: string
-        }
-        Insert: {
-          author_id: string
-          body: string
-          content_id: string
-          content_type: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          updated_at?: string
-        }
-        Update: {
-          author_id?: string
-          body?: string
-          content_id?: string
-          content_type?: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_content_comments_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_content_comments_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_content_comments_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       fenix_content_reports: {
         Row: {
           admin_note: string | null
@@ -2641,52 +2024,6 @@ export type Database = {
           {
             foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
             columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_content_votes: {
-        Row: {
-          content_id: string
-          content_type: string
-          created_at: string
-          user_id: string
-          value: number
-        }
-        Insert: {
-          content_id: string
-          content_type: string
-          created_at?: string
-          user_id: string
-          value?: number
-        }
-        Update: {
-          content_id?: string
-          content_type?: string
-          created_at?: string
-          user_id?: string
-          value?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_content_votes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_content_votes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_content_votes_user_id_fkey"
-            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -2821,35 +2158,7 @@ export type Database = {
             foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
             columns: ["blocked_id"]
             isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
-            columns: ["blocked_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
-            columns: ["blocked_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
-            columns: ["blocker_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
-            columns: ["blocker_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -2860,27 +2169,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      fenix_feature_flags: {
-        Row: {
-          description: string | null
-          enabled: boolean
-          key: string
-          updated_at: string
-        }
-        Insert: {
-          description?: string | null
-          enabled?: boolean
-          key: string
-          updated_at?: string
-        }
-        Update: {
-          description?: string | null
-          enabled?: boolean
-          key?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       fenix_message_pins: {
         Row: {
@@ -2904,20 +2192,6 @@ export type Database = {
             columns: ["message_id"]
             isOneToOne: false
             referencedRelation: "fenix_direct_messages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_message_pins_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_message_pins_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -2960,24 +2234,31 @@ export type Database = {
             foreignKeyName: "fenix_message_reactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_message_reactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_message_reactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      fenix_feature_flags: {
+        Row: {
+          description: string | null
+          enabled: boolean
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          description?: string | null
+          enabled?: boolean
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       fenix_notifications: {
         Row: {
@@ -3034,84 +2315,6 @@ export type Database = {
           },
         ]
       }
-      fenix_post_media: {
-        Row: {
-          author_id: string
-          byte_size: number
-          created_at: string
-          height: number | null
-          id: string
-          mime_type: string
-          post_id: string
-          sort_order: number
-          storage_bucket: string
-          storage_path: string
-          width: number | null
-        }
-        Insert: {
-          author_id: string
-          byte_size: number
-          created_at?: string
-          height?: number | null
-          id?: string
-          mime_type: string
-          post_id: string
-          sort_order?: number
-          storage_bucket?: string
-          storage_path: string
-          width?: number | null
-        }
-        Update: {
-          author_id?: string
-          byte_size?: number
-          created_at?: string
-          height?: number | null
-          id?: string
-          mime_type?: string
-          post_id?: string
-          sort_order?: number
-          storage_bucket?: string
-          storage_path?: string
-          width?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_post_media_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_post_media_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_post_media_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_post_media_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_posts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_post_media_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       fenix_posts: {
         Row: {
           author_id: string
@@ -3164,144 +2367,62 @@ export type Database = {
           },
         ]
       }
-      fenix_questions: {
+      fenix_post_media: {
         Row: {
           author_id: string
-          body: string
+          byte_size: number
           created_at: string
-          deleted_at: string | null
+          height: number | null
           id: string
-          title: string
-          topic_id: string | null
-          updated_at: string
+          mime_type: string
+          post_id: string
+          sort_order: number
+          storage_bucket: string
+          storage_path: string
+          width: number | null
         }
         Insert: {
           author_id: string
-          body: string
+          byte_size: number
           created_at?: string
-          deleted_at?: string | null
+          height?: number | null
           id?: string
-          title: string
-          topic_id?: string | null
-          updated_at?: string
+          mime_type: string
+          post_id: string
+          sort_order?: number
+          storage_bucket?: string
+          storage_path: string
+          width?: number | null
         }
         Update: {
           author_id?: string
-          body?: string
+          byte_size?: number
           created_at?: string
-          deleted_at?: string | null
+          height?: number | null
           id?: string
-          title?: string
-          topic_id?: string | null
-          updated_at?: string
+          mime_type?: string
+          post_id?: string
+          sort_order?: number
+          storage_bucket?: string
+          storage_path?: string
+          width?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "fenix_questions_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_questions_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_questions_author_id_fkey"
+            foreignKeyName: "fenix_post_media_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fenix_questions_topic_id_fkey"
-            columns: ["topic_id"]
+            foreignKeyName: "fenix_post_media_post_id_fkey"
+            columns: ["post_id"]
             isOneToOne: false
-            referencedRelation: "fenix_topics"
+            referencedRelation: "fenix_posts"
             referencedColumns: ["id"]
           },
         ]
-      }
-      fenix_topic_follows: {
-        Row: {
-          created_at: string
-          topic_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          topic_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          topic_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_topic_follows_topic_id_fkey"
-            columns: ["topic_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_topics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_topic_follows_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_topic_follows_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_topic_follows_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_topics: {
-        Row: {
-          created_at: string
-          description_bn: string | null
-          description_en: string | null
-          id: string
-          name_bn: string
-          name_en: string
-          slug: string
-        }
-        Insert: {
-          created_at?: string
-          description_bn?: string | null
-          description_en?: string | null
-          id?: string
-          name_bn: string
-          name_en: string
-          slug: string
-        }
-        Update: {
-          created_at?: string
-          description_bn?: string | null
-          description_en?: string | null
-          id?: string
-          name_bn?: string
-          name_en?: string
-          slug?: string
-        }
-        Relationships: []
       }
       fenix_user_moderation: {
         Row: {
@@ -3570,68 +2691,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "investment_documents_opportunity_id_fkey"
-            columns: ["opportunity_id"]
-            isOneToOne: false
-            referencedRelation: "investment_opportunities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      investment_due_diligence_checks: {
-        Row: {
-          check_key: string
-          created_at: string
-          id: string
-          investor_id: string
-          note: string | null
-          opportunity_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          check_key: string
-          created_at?: string
-          id?: string
-          investor_id: string
-          note?: string | null
-          opportunity_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          check_key?: string
-          created_at?: string
-          id?: string
-          investor_id?: string
-          note?: string | null
-          opportunity_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
-            columns: ["investor_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
-            columns: ["investor_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
-            columns: ["investor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "investment_due_diligence_checks_opportunity_id_fkey"
             columns: ["opportunity_id"]
             isOneToOne: false
             referencedRelation: "investment_opportunities"
@@ -3994,97 +3053,6 @@ export type Database = {
             columns: ["opportunity_id"]
             isOneToOne: false
             referencedRelation: "investment_opportunities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      news_posts: {
-        Row: {
-          author_id: string | null
-          breaking: boolean
-          category: string
-          content_bn: string
-          content_en: string
-          created_at: string
-          excerpt_bn: string | null
-          excerpt_en: string | null
-          featured: boolean
-          id: string
-          image_url: string | null
-          published_at: string | null
-          slug: string
-          source_name: string | null
-          source_url: string | null
-          status: string
-          title_bn: string
-          title_en: string
-          updated_at: string
-          verification_status: string
-        }
-        Insert: {
-          author_id?: string | null
-          breaking?: boolean
-          category: string
-          content_bn: string
-          content_en: string
-          created_at?: string
-          excerpt_bn?: string | null
-          excerpt_en?: string | null
-          featured?: boolean
-          id?: string
-          image_url?: string | null
-          published_at?: string | null
-          slug: string
-          source_name?: string | null
-          source_url?: string | null
-          status?: string
-          title_bn: string
-          title_en: string
-          updated_at?: string
-          verification_status?: string
-        }
-        Update: {
-          author_id?: string | null
-          breaking?: boolean
-          category?: string
-          content_bn?: string
-          content_en?: string
-          created_at?: string
-          excerpt_bn?: string | null
-          excerpt_en?: string | null
-          featured?: boolean
-          id?: string
-          image_url?: string | null
-          published_at?: string | null
-          slug?: string
-          source_name?: string | null
-          source_url?: string | null
-          status?: string
-          title_bn?: string
-          title_en?: string
-          updated_at?: string
-          verification_status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "news_posts_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "news_posts_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "news_posts_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -4540,103 +3508,11 @@ export type Database = {
           },
         ]
       }
-      profile_contacts: {
-        Row: {
-          created_at: string
-          facebook_public: boolean
-          facebook_url: string | null
-          instagram_public: boolean
-          instagram_url: string | null
-          linkedin_public: boolean
-          linkedin_url: string | null
-          phone_public: boolean
-          public_facebook_url: string | null
-          public_instagram_url: string | null
-          public_linkedin_url: string | null
-          public_whatsapp: string | null
-          public_youtube_url: string | null
-          updated_at: string
-          user_id: string
-          whatsapp: string | null
-          whatsapp_public: boolean
-          youtube_public: boolean
-          youtube_url: string | null
-        }
-        Insert: {
-          created_at?: string
-          facebook_public?: boolean
-          facebook_url?: string | null
-          instagram_public?: boolean
-          instagram_url?: string | null
-          linkedin_public?: boolean
-          linkedin_url?: string | null
-          phone_public?: boolean
-          public_facebook_url?: string | null
-          public_instagram_url?: string | null
-          public_linkedin_url?: string | null
-          public_whatsapp?: string | null
-          public_youtube_url?: string | null
-          updated_at?: string
-          user_id: string
-          whatsapp?: string | null
-          whatsapp_public?: boolean
-          youtube_public?: boolean
-          youtube_url?: string | null
-        }
-        Update: {
-          created_at?: string
-          facebook_public?: boolean
-          facebook_url?: string | null
-          instagram_public?: boolean
-          instagram_url?: string | null
-          linkedin_public?: boolean
-          linkedin_url?: string | null
-          phone_public?: boolean
-          public_facebook_url?: string | null
-          public_instagram_url?: string | null
-          public_linkedin_url?: string | null
-          public_whatsapp?: string | null
-          public_youtube_url?: string | null
-          updated_at?: string
-          user_id?: string
-          whatsapp?: string | null
-          whatsapp_public?: boolean
-          youtube_public?: boolean
-          youtube_url?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "profile_contacts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "profile_contacts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profile_contacts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       profile_settings: {
         Row: {
           feed_visibility: string
-          interests: string[]
           locale: string
           message_permissions: string
-          onboarding_completed: boolean
-          onboarding_dismissed: boolean
-          onboarding_step: string
           profile_visibility: string
           reduced_motion: boolean
           theme: string
@@ -4645,12 +3521,8 @@ export type Database = {
         }
         Insert: {
           feed_visibility?: string
-          interests?: string[]
           locale?: string
           message_permissions?: string
-          onboarding_completed?: boolean
-          onboarding_dismissed?: boolean
-          onboarding_step?: string
           profile_visibility?: string
           reduced_motion?: boolean
           theme?: string
@@ -4659,12 +3531,8 @@ export type Database = {
         }
         Update: {
           feed_visibility?: string
-          interests?: string[]
           locale?: string
           message_permissions?: string
-          onboarding_completed?: boolean
-          onboarding_dismissed?: boolean
-          onboarding_step?: string
           profile_visibility?: string
           reduced_motion?: boolean
           theme?: string
@@ -4697,106 +3565,48 @@ export type Database = {
       }
       profiles: {
         Row: {
-          area_text: string | null
           avatar_url: string | null
           bio: string | null
-          country_code: string
           cover_url: string | null
           created_at: string
-          district_id: string | null
-          exact_location_visibility: string
-          feed_public: boolean
           full_name: string | null
-          holding_no: string | null
-          house_details: string | null
           id: string
-          is_public: boolean
-          locality_id: string | null
-          location_public_level: string
           location_text: string | null
           phone: string | null
-          road_text: string | null
           role: string | null
-          upazila_id: string | null
           updated_at: string
           username: string | null
           website_url: string | null
         }
         Insert: {
-          area_text?: string | null
           avatar_url?: string | null
           bio?: string | null
-          country_code?: string
           cover_url?: string | null
           created_at?: string
-          district_id?: string | null
-          exact_location_visibility?: string
-          feed_public?: boolean
           full_name?: string | null
-          holding_no?: string | null
-          house_details?: string | null
           id: string
-          is_public?: boolean
-          locality_id?: string | null
-          location_public_level?: string
           location_text?: string | null
           phone?: string | null
-          road_text?: string | null
           role?: string | null
-          upazila_id?: string | null
           updated_at?: string
           username?: string | null
           website_url?: string | null
         }
         Update: {
-          area_text?: string | null
           avatar_url?: string | null
           bio?: string | null
-          country_code?: string
           cover_url?: string | null
           created_at?: string
-          district_id?: string | null
-          exact_location_visibility?: string
-          feed_public?: boolean
           full_name?: string | null
-          holding_no?: string | null
-          house_details?: string | null
           id?: string
-          is_public?: boolean
-          locality_id?: string | null
-          location_public_level?: string
           location_text?: string | null
           phone?: string | null
-          road_text?: string | null
           role?: string | null
-          upazila_id?: string | null
           updated_at?: string
           username?: string | null
           website_url?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_district_id_fkey"
-            columns: ["district_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_brain_locations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profiles_locality_id_fkey"
-            columns: ["locality_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_brain_locations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profiles_upazila_id_fkey"
-            columns: ["upazila_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_brain_locations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       vendor_profiles: {
         Row: {
@@ -4878,6 +3688,54 @@ export type Database = {
           },
         ]
       }
+      news_posts: {
+        Row: { id: string; slug: string; title_bn: string; title_en: string; excerpt_bn: string | null; excerpt_en: string | null; content_bn: string; content_en: string; category: string; status: string; featured: boolean; breaking: boolean; source_name: string | null; source_url: string | null; verification_status: string; image_url: string | null; author_id: string | null; published_at: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; slug: string; title_bn: string; title_en: string; excerpt_bn?: string | null; excerpt_en?: string | null; content_bn: string; content_en: string; category: string; status?: string; featured?: boolean; breaking?: boolean; source_name?: string | null; source_url?: string | null; verification_status?: string; image_url?: string | null; author_id?: string | null; published_at?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; slug?: string; title_bn?: string; title_en?: string; excerpt_bn?: string | null; excerpt_en?: string | null; content_bn?: string; content_en?: string; category?: string; status?: string; featured?: boolean; breaking?: boolean; source_name?: string | null; source_url?: string | null; verification_status?: string; image_url?: string | null; author_id?: string | null; published_at?: string | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      fenix_topics: {
+        Row: { id: string; slug: string; name_bn: string; name_en: string; description_bn: string | null; description_en: string | null; created_at: string }
+        Insert: { id?: string; slug: string; name_bn: string; name_en: string; description_bn?: string | null; description_en?: string | null; created_at?: string }
+        Update: { id?: string; slug?: string; name_bn?: string; name_en?: string; description_bn?: string | null; description_en?: string | null; created_at?: string }
+        Relationships: []
+      }
+      fenix_questions: {
+        Row: { id: string; author_id: string; topic_id: string | null; title: string; body: string; created_at: string; updated_at: string; deleted_at: string | null }
+        Insert: { id?: string; author_id: string; topic_id?: string | null; title: string; body: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
+        Update: { id?: string; author_id?: string; topic_id?: string | null; title?: string; body?: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
+        Relationships: []
+      }
+      fenix_answers: {
+        Row: { id: string; question_id: string; author_id: string; body: string; created_at: string; updated_at: string; deleted_at: string | null }
+        Insert: { id?: string; question_id: string; author_id: string; body: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
+        Update: { id?: string; question_id?: string; author_id?: string; body?: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
+        Relationships: []
+      }
+      fenix_content_votes: {
+        Row: { user_id: string; content_type: string; content_id: string; value: number; created_at: string }
+        Insert: { user_id: string; content_type: string; content_id: string; value?: number; created_at?: string }
+        Update: { user_id?: string; content_type?: string; content_id?: string; value?: number; created_at?: string }
+        Relationships: []
+      }
+      fenix_topic_follows: {
+        Row: { user_id: string; topic_id: string; created_at: string }
+        Insert: { user_id?: string; topic_id?: string; created_at?: string }
+        Update: { user_id?: string; topic_id?: string; created_at?: string }
+        Relationships: []
+      }
+      fenix_content_bookmarks: {
+        Row: { user_id: string; content_type: string; content_id: string; created_at: string }
+        Insert: { user_id?: string; content_type?: string; content_id?: string; created_at?: string }
+        Update: { user_id?: string; content_type?: string; content_id?: string; created_at?: string }
+        Relationships: []
+      }
+      fenix_content_comments: {
+        Row: { id: string; author_id: string; content_type: string; content_id: string; body: string; created_at: string; updated_at: string; deleted_at: string | null }
+        Insert: { id?: string; author_id: string; content_type: string; content_id: string; body: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
+        Update: { id?: string; author_id?: string; content_type?: string; content_id?: string; body?: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
+        Relationships: []
+      }
     }
     Views: {
       commerce_public_products: {
@@ -4925,146 +3783,12 @@ export type Database = {
           },
         ]
       }
-      fenix_brain_pulse_intents: {
-        Row: {
-          intent_key: string | null
-          searches_30d: number | null
-          searches_7d: number | null
-        }
-        Relationships: []
-      }
-      fenix_brain_pulse_terms: {
-        Row: {
-          searches_30d: number | null
-          searches_7d: number | null
-          term: string | null
-          unique_queries_7d: number | null
-        }
-        Relationships: []
-      }
-      fenix_public_ambulance_providers: {
-        Row: {
-          ac_available: boolean | null
-          ambulance_type: string | null
-          available_24_7: boolean | null
-          base_area: string | null
-          display_name: string | null
-          id: string | null
-          is_verified: boolean | null
-          oxygen_available: boolean | null
-          phone: string | null
-          service_area: string | null
-          whatsapp: string | null
-        }
-        Insert: {
-          ac_available?: boolean | null
-          ambulance_type?: string | null
-          available_24_7?: boolean | null
-          base_area?: string | null
-          display_name?: string | null
-          id?: string | null
-          is_verified?: boolean | null
-          oxygen_available?: boolean | null
-          phone?: string | null
-          service_area?: string | null
-          whatsapp?: string | null
-        }
-        Update: {
-          ac_available?: boolean | null
-          ambulance_type?: string | null
-          available_24_7?: boolean | null
-          base_area?: string | null
-          display_name?: string | null
-          id?: string | null
-          is_verified?: boolean | null
-          oxygen_available?: boolean | null
-          phone?: string | null
-          service_area?: string | null
-          whatsapp?: string | null
-        }
+      fenix_public_question_feed: {
+        Row: { id: string | null; title: string | null; body: string | null; created_at: string | null; updated_at: string | null; author_id: string | null; topic_id: string | null; author_name: string | null; author_username: string | null; author_avatar_url: string | null; topic_slug: string | null; topic_name_bn: string | null; topic_name_en: string | null; answer_count: number | null; score: number | null }
         Relationships: []
       }
       fenix_public_answer_feed: {
-        Row: {
-          author_avatar_url: string | null
-          author_id: string | null
-          author_name: string | null
-          author_username: string | null
-          body: string | null
-          created_at: string | null
-          id: string | null
-          question_id: string | null
-          score: number | null
-          updated_at: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_answers_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_answers_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_answers_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_answers_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_question_feed"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_answers_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_public_blood_donors: {
-        Row: {
-          area_text: string | null
-          availability: string | null
-          avatar_url: string | null
-          blood_group: string | null
-          full_name: string | null
-          last_donation_date: string | null
-          preferred_contact: string | null
-          upazila_bn: string | null
-          upazila_en: string | null
-          username: string | null
-        }
-        Relationships: []
-      }
-      fenix_public_blood_requests: {
-        Row: {
-          area_text: string | null
-          blood_group: string | null
-          created_at: string | null
-          hospital_area: string | null
-          hospital_name: string | null
-          id: string | null
-          needed_at: string | null
-          status: string | null
-          units: number | null
-          upazila_bn: string | null
-          upazila_en: string | null
-          urgency: string | null
-        }
+        Row: { id: string | null; question_id: string | null; body: string | null; created_at: string | null; updated_at: string | null; author_id: string | null; author_name: string | null; author_username: string | null; author_avatar_url: string | null; score: number | null }
         Relationships: []
       }
       fenix_public_feed: {
@@ -5086,69 +3810,13 @@ export type Database = {
           bio: string | null
           cover_url: string | null
           created_at: string | null
-          facebook_url: string | null
           full_name: string | null
           id: string | null
-          instagram_url: string | null
-          linkedin_url: string | null
           location_text: string | null
-          phone: string | null
-          public_location: string | null
           username: string | null
           website_url: string | null
-          whatsapp: string | null
-          youtube_url: string | null
         }
         Relationships: []
-      }
-      fenix_public_question_feed: {
-        Row: {
-          answer_count: number | null
-          author_avatar_url: string | null
-          author_id: string | null
-          author_name: string | null
-          author_username: string | null
-          body: string | null
-          created_at: string | null
-          id: string | null
-          score: number | null
-          title: string | null
-          topic_id: string | null
-          topic_name_bn: string | null
-          topic_name_en: string | null
-          topic_slug: string | null
-          updated_at: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_questions_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_feed"
-            referencedColumns: ["author_id"]
-          },
-          {
-            foreignKeyName: "fenix_questions_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_questions_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_questions_topic_id_fkey"
-            columns: ["topic_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_topics"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Functions: {
@@ -5270,10 +3938,7 @@ export type Database = {
         Returns: boolean
       }
       is_fenix_admin: { Args: never; Returns: boolean }
-      is_fenix_username_available: {
-        Args: { p_exclude_user_id?: string; p_username: string }
-        Returns: boolean
-      }
+      is_fenix_user_active: { Args: { p_user_id?: string }; Returns: boolean }
       keyword_feni_brain_chunks: {
         Args: { match_count?: number; query_text: string }
         Returns: {
@@ -5372,16 +4037,6 @@ export type Database = {
       owner_update_investment_interest: {
         Args: { p_interest_id: string; p_owner_note?: string; p_status: string }
         Returns: boolean
-      }
-      record_feni_brain_events: {
-        Args: {
-          p_intent_key: string
-          p_language_code: string
-          p_query_hash: string
-          p_result_count?: number
-          p_terms: string[]
-        }
-        Returns: number
       }
       save_business_embedding: {
         Args: { p_business_id: string; p_embedding: string }
@@ -5638,12 +4293,6 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-
-export const Constants = {
-  public: {
-    Enums: {},
-  },
-} as const
 
 
 /** FeniX application compatibility aliases. Keep these alongside generated Supabase types. */
