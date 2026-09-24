@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - "auto-fix/**"
+      - "feat/**"
 
   pull_request:
     branches:

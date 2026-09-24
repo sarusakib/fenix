@@ -3,16 +3,20 @@
 @tailwind utilities;
 
 :root {
-  --fx-bg: #f5f8f7;
-  --fx-surface: rgba(255, 255, 255, 0.76);
-  --fx-surface-strong: rgba(255, 255, 255, 0.92);
-  --fx-border: rgba(11, 23, 54, 0.08);
+  --fx-bg: #f4f7f6;
+  --fx-surface: rgba(255,255,255,.82);
+  --fx-surface-strong: rgba(255,255,255,.94);
+  --fx-surface-solid: #ffffff;
+  --fx-border: rgba(11,23,54,.085);
   --fx-text: #0b1736;
-  --fx-muted: #617080;
+  --fx-muted: #657384;
   --fx-primary: #008080;
   --fx-primary-strong: #006f70;
-  --fx-primary-soft: rgba(0, 128, 128, 0.095);
-  --fx-gold: #b88a2b;
+  --fx-primary-soft: rgba(0,128,128,.085);
+  --fx-gold: #c49a35;
+  --fx-navy: #0b1736;
+  --fx-shadow: 0 18px 60px rgba(11,23,54,.065);
+  --fx-shadow-lg: 0 28px 90px rgba(11,23,54,.09);
 }
 
 html {
@@ -26,21 +30,24 @@ html {
 }
 
 html.dark {
-  --fx-bg: #030506;
-  --fx-surface: rgba(10, 18, 25, 0.76);
-  --fx-surface-strong: rgba(10, 18, 25, 0.93);
-  --fx-border: rgba(255, 255, 255, 0.08);
-  --fx-text: #f7fbfa;
-  --fx-muted: #9aaab2;
-  --fx-primary: #63d8d4;
-  --fx-primary-strong: #8ae4e0;
-  --fx-primary-soft: rgba(99, 216, 212, 0.105);
+  --fx-bg: #06090d;
+  --fx-surface: rgba(11,18,25,.76);
+  --fx-surface-strong: rgba(11,18,25,.92);
+  --fx-surface-solid: #0b1219;
+  --fx-border: rgba(255,255,255,.085);
+  --fx-text: #f4fbfa;
+  --fx-muted: #9aabb5;
+  --fx-primary: #66dad6;
+  --fx-primary-strong: #8be5e1;
+  --fx-primary-soft: rgba(102,218,214,.10);
   --fx-gold: #d7bc7f;
+  --fx-navy: #091327;
+  --fx-shadow: 0 18px 60px rgba(0,0,0,.24);
+  --fx-shadow-lg: 0 28px 90px rgba(0,0,0,.34);
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
-
 body {
   margin: 0;
   min-height: 100dvh;
@@ -50,137 +57,84 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+img, svg, video, canvas { display:block; max-width:100%; }
+button, input, textarea, select { font:inherit; }
+input, textarea, select { font-size:16px; }
+button, a { touch-action:manipulation; }
+a { color:inherit; text-decoration:none; }
+button { cursor:pointer; }
+::selection { background:rgba(0,128,128,.2); color:var(--fx-text); }
+:focus-visible { outline:2px solid var(--fx-primary); outline-offset:3px; }
+.text-balance { text-wrap:balance; }
+.text-pretty { text-wrap:pretty; }
+.safe-top { padding-top:env(safe-area-inset-top); }
+.safe-bottom { padding-bottom:env(safe-area-inset-bottom); }
 
-img, svg, video, canvas { display: block; max-width: 100%; }
-button, input, textarea, select { font: inherit; }
-input, textarea, select { font-size: 16px; }
-button, a { touch-action: manipulation; }
-a { color: inherit; text-decoration: none; }
-button { cursor: pointer; }
-
-::selection { background: rgba(0, 128, 128, 0.2); color: var(--fx-text); }
-:focus-visible { outline: 2px solid var(--fx-primary); outline-offset: 3px; }
-.text-balance { text-wrap: balance; }
-.text-pretty { text-wrap: pretty; }
-.safe-top { padding-top: env(safe-area-inset-top); }
-.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-
-.fenix-shell { position: relative; isolation: isolate; }
-
-.fenix-grid {
-  background-image:
-    linear-gradient(rgba(11, 23, 54, 0.042) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(11, 23, 54, 0.042) 1px, transparent 1px);
-  background-size: 34px 34px;
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 58%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 0%, black 58%, transparent 100%);
-}
-html.dark .fenix-grid {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px);
-}
-
-.fenix-orb {
-  position: absolute;
-  pointer-events: none;
-  border-radius: 999px;
-  filter: blur(72px);
-  opacity: .65;
-}
-
+.fenix-shell { position:relative; isolation:isolate; }
 .fenix-surface {
-  background: var(--fx-surface);
-  border: 1px solid var(--fx-border);
-  box-shadow: 0 18px 60px rgba(15, 23, 42, .055);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background:var(--fx-surface);
+  border:1px solid var(--fx-border);
+  box-shadow:var(--fx-shadow);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
 }
 .fenix-surface-strong {
-  background: var(--fx-surface-strong);
-  border: 1px solid var(--fx-border);
-  box-shadow: 0 24px 80px rgba(15, 23, 42, .075);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background:var(--fx-surface-strong);
+  border:1px solid var(--fx-border);
+  box-shadow:var(--fx-shadow-lg);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
 }
-html.dark .fenix-surface,
-html.dark .fenix-surface-strong {
-  box-shadow: 0 24px 80px rgba(0, 0, 0, .28);
+.fenix-card {
+  background:var(--fx-surface-strong);
+  border:1px solid var(--fx-border);
+  box-shadow:var(--fx-shadow);
+  border-radius:1.5rem;
 }
-
-.fenix-glow {
-  box-shadow: 0 0 0 1px rgba(0, 128, 128, .06), 0 0 70px rgba(0, 128, 128, .07);
+.fenix-kicker {
+  color:var(--fx-primary-strong);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.18em;
+  text-transform:uppercase;
 }
-
-.fenix-interactive {
-  transition: transform 200ms ease, border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
-}
-.fenix-reveal { animation: fenix-fade-up .5s cubic-bezier(.22,1,.36,1) both; }
-.fenix-float { animation: fenix-float 6s ease-in-out infinite; }
+.fenix-page-title { letter-spacing:-.055em; line-height:.98; }
+.fenix-interactive { transition:transform 180ms ease,border-color 180ms ease,background 180ms ease,box-shadow 180ms ease; }
+.fenix-reveal { animation:fenix-fade-up .45s cubic-bezier(.22,1,.36,1) both; }
+.fenix-glow { box-shadow:0 0 0 1px rgba(0,128,128,.06),0 0 70px rgba(0,128,128,.075); }
 
 @keyframes fenix-fade-up {
-  from { opacity: 0; transform: translateY(9px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fenix-float {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-html[data-reduce-motion="true"] *,
-html[data-reduce-motion="true"] *::before,
-html[data-reduce-motion="true"] *::after {
-  animation-duration: .001ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: .001ms !important;
-  scroll-behavior: auto !important;
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
 }
 
 @media (hover:hover) {
   .fenix-interactive:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 64px rgba(15,23,42,.085), 0 0 0 1px rgba(0,128,128,.07);
+    transform:translateY(-2px);
+    box-shadow:0 20px 64px rgba(11,23,54,.09),0 0 0 1px rgba(0,128,128,.075);
   }
   html.dark .fenix-interactive:hover {
-    box-shadow: 0 20px 64px rgba(0,0,0,.33), 0 0 0 1px rgba(99,216,212,.07);
+    box-shadow:0 20px 64px rgba(0,0,0,.34),0 0 0 1px rgba(102,218,214,.075);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,*::before,*::after {
-    animation-duration:.001ms !important;
-    animation-iteration-count:1 !important;
-    transition-duration:.001ms !important;
-    scroll-behavior:auto !important;
-  }
-}
+[class*="bg-[#f7faf9]"] { background:var(--fx-bg) !important; }
+[class*="dark:bg-[#030506]"] { background:var(--fx-bg) !important; }
+[class*="text-[#0b1736]"] { color:var(--fx-text) !important; }
+[class*="bg-white/85"], [class*="bg-white/80"], [class*="bg-white/75"] { background:var(--fx-surface-strong) !important; }
+html.dark [class*="bg-white/85"], html.dark [class*="bg-white/80"], html.dark [class*="bg-white/75"] { background:var(--fx-surface-strong) !important; }
+[class*="border-black/10"], [class*="border-black/15"] { border-color:var(--fx-border) !important; }
+html.dark [class*="border-white/10"] { border-color:var(--fx-border) !important; }
 
-@media (max-width: 767px) {
-  body { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
-}
+@media (max-width:767px) { body { padding-bottom:calc(88px + env(safe-area-inset-bottom)); } }
+@media (max-width:480px) { .fenix-surface,.fenix-surface-strong,.fenix-card { border-radius:1.35rem; } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; } }
+html { scrollbar-width:thin; scrollbar-color:rgba(0,128,128,.35) transparent; }
+::-webkit-scrollbar { width:8px; height:8px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(0,128,128,.25); border-radius:999px; }
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,128,128,.28); border-radius: 999px; }
-html { scrollbar-width: thin; scrollbar-color: rgba(0,128,128,.36) transparent; }
-
-@media (max-width: 480px) {
-  .fenix-surface, .fenix-surface-strong { border-radius: 1.45rem; }
-}
-
-
-/* Compatibility layer for the Brain surface while its content-rich cards keep their existing markup. */
-.fenix-brain [class*="text-white/"],
-.fenix-brain [class~="text-white"] { color: var(--fx-text) !important; }
-.fenix-brain [class*="border-white/"] { border-color: var(--fx-border) !important; }
-.fenix-brain [class*="bg-black/"] { background-color: var(--fx-surface-strong) !important; }
-.fenix-brain [class*="bg-white/"] { background-color: var(--fx-surface) !important; }
-.fenix-brain [class*="text-[#72ddda]"],
-.fenix-brain [class*="text-[#008080]"] { color: var(--fx-primary-strong) !important; }
-.fenix-brain [class*="border-[#72ddda]"],
-.fenix-brain [class*="border-[#008080]"] { border-color: color-mix(in srgb, var(--fx-primary) 24%, transparent) !important; }
-.fenix-brain [class*="bg-[#008080]"] { background-color: var(--fx-primary-strong) !important; }
-.fenix-brain [class*="bg-amber-"] { background-color: color-mix(in srgb, var(--fx-gold) 10%, transparent) !important; }
-.fenix-brain [class*="text-amber-"] { color: color-mix(in srgb, var(--fx-gold) 82%, var(--fx-text)) !important; }
-.fenix-brain [class*="border-amber-"] { border-color: color-mix(in srgb, var(--fx-gold) 28%, transparent) !important; }
-.fenix-brain [class*="bg-[#008080]"] [class~="text-white"] { color: #fff !important; }
+.fenix-brain [class*="text-white/"], .fenix-brain [class~="text-white"] { color:var(--fx-text) !important; }
+.fenix-brain [class*="border-white/"] { border-color:var(--fx-border) !important; }
+.fenix-brain [class*="bg-black/"] { background:var(--fx-surface-strong) !important; }
+.fenix-brain [class*="bg-white/"] { background:var(--fx-surface) !important; }

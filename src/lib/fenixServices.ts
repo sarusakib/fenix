@@ -3,7 +3,7 @@
  *
  * Keep the visible navigation small and intentional. A group is the first
  * decision; its children are the second decision. "planned" entries remain
- * visible without pretending that a backend workflow is already live.
+ * only includes workflows that have a real route behind them.
  */
 export type FeniXServiceStatus = 'live' | 'planned'
 
@@ -19,6 +19,7 @@ export type FeniXServiceIcon =
   | 'map'
   | 'users'
   | 'newspaper'
+  | 'search'
 
 export type FeniXService = {
   id: string
@@ -65,6 +66,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'suppliers', label: 'Find Suppliers', labelBn: 'সাপ্লায়ার খুঁজুন', description: 'Find relevant suppliers and local business relationships.', href: '/directory/suppliers', status: 'live', icon: 'storefront' },
       { id: 'requests', label: 'Requests', labelBn: 'রিকোয়েস্ট', description: 'Track investment and ecosystem requests.', href: '/requests', status: 'live', icon: 'users' },
       { id: 'messages', label: 'Messages', labelBn: 'মেসেজ', description: 'Protected conversations inside eligible workflows.', href: '/messages', status: 'live', icon: 'account' },
+      { id: 'feed', label: 'Community Feed', labelBn: 'কমিউনিটি ফিড', description: 'Ask, share and discover local conversations.', href: '/feed', status: 'live', icon: 'users' },
     ],
   },
   {
@@ -78,7 +80,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'investor-profile', label: 'Investor Profile', labelBn: 'ইনভেস্টর প্রোফাইল', description: 'Keep investor preferences and verification together.', href: '/invest/profile', status: 'live', icon: 'account' },
       { id: 'investment-workspace', label: 'Investment Workspace', labelBn: 'ইনভেস্টমেন্ট ওয়ার্কস্পেস', description: 'Manage interests, records and workflow.', href: '/invest/dashboard', status: 'live', icon: 'trend' },
       { id: 'scenario-calculator', label: 'Scenario Calculator', labelBn: 'সিনারিও ক্যালকুলেটর', description: 'Explore assumptions without promising returns.', href: '/invest/calculator', status: 'live', icon: 'trend' },
-      { id: 'due-diligence', label: 'Due Diligence Center', labelBn: 'ডিউ ডিলিজেন্স', description: 'Structured evidence review for future investment workflows.', status: 'planned', icon: 'shield' },
+      { id: 'due-diligence', label: 'Due Diligence Center', labelBn: 'ডিউ ডিলিজেন্স', description: 'Structured evidence review before an investment decision.', href: '/invest/due-diligence', status: 'live', icon: 'shield' },
     ],
   },
   {
@@ -101,6 +103,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
     description: 'Explore places, work and local opportunity signals.',
     icon: 'map',
     services: [
+      { id: 'search', label: 'Search FeniX', labelBn: 'ফেনিক্স সার্চ', description: 'Search businesses, products and places in one place.', href: '/search', status: 'live', icon: 'search', tag: 'Core' },
       { id: 'brain', label: 'Feni Brain', labelBn: 'ফেনি ব্রেইন', description: 'Ask natural questions and get source-aware guidance.', href: '/guide', status: 'live', icon: 'brain', tag: 'Core' },
       { id: 'jobs', label: 'Jobs & Work', labelBn: 'চাকরি ও কাজ', description: 'Explore the work and opportunity direction.', href: '/jobs', status: 'live', icon: 'briefcase' },
       { id: 'radar', label: 'Opportunity Radar', labelBn: 'অপর্চুনিটি রাডার', description: 'Surface local opportunity signals by place and intent.', href: '/radar', status: 'live', icon: 'trend' },
@@ -131,7 +134,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'verification', label: 'Verification', labelBn: 'ভেরিফিকেশন', description: 'Understand how public verification labels work.', href: '/directory/verify', status: 'live', icon: 'shield' },
       { id: 'claim', label: 'Claim a Business', labelBn: 'বিজনেস ক্লেইম', description: 'Start an ownership/claim workflow.', href: '/directory/claim', status: 'live', icon: 'shield' },
       { id: 'admin-trust', label: 'Trust Center', labelBn: 'ট্রাস্ট সেন্টার', description: 'Admin moderation and review controls.', href: '/admin/trust', status: 'live', icon: 'shield' },
-      { id: 'qr', label: 'QR Business Identity', labelBn: 'QR বিজনেস আইডি', description: 'Shareable business identity layer is being expanded.', status: 'planned', icon: 'shield' },
+      { id: 'qr', label: 'QR Business Identity', labelBn: 'QR বিজনেস আইডি', description: 'Open Directory, choose a business profile, then share its QR identity.', href: '/directory', status: 'live', icon: 'shield' },
     ],
   },
   {
@@ -145,6 +148,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'business', label: 'My Business', labelBn: 'আমার ব্যবসা', description: 'Open your business workspace.', href: '/dashboard/business', status: 'live', icon: 'storefront' },
       { id: 'notifications', label: 'Notifications', labelBn: 'নোটিফিকেশন', description: 'Trust, account and ecosystem activity.', href: '/notifications', status: 'live', icon: 'account' },
       { id: 'settings', label: 'Settings', labelBn: 'সেটিংস', description: 'Appearance, accessibility and safety preferences.', href: '/dashboard/settings', status: 'live', icon: 'account' },
+      { id: 'profile', label: 'My Profile', labelBn: 'আমার প্রোফাইল', description: 'Manage your identity, public profile and privacy.', href: '/profile', status: 'live', icon: 'account' },
       { id: 'help', label: 'Help & Safety', labelBn: 'হেল্প ও সেফটি', description: 'Practical answers for using FeniX safely.', href: '/help', status: 'live', icon: 'shield' },
     ],
   },
