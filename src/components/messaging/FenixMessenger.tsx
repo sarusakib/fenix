@@ -923,7 +923,7 @@ export default function FenixMessenger() {
             </div>
           )}
 
-          <input ref={fileRef} type="file" accept="image/*,video/mp4,video/webm,application/pdf" className="hidden" onChange={chooseAttachment}/>
+          <input ref={fileRef} type="file" accept="image/*,video/mp4,video/webm,application/pdf,audio/webm,audio/ogg,audio/mpeg" className="hidden" onChange={chooseAttachment}/>
         </section>
       )}
     </>
