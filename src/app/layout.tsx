@@ -52,6 +52,9 @@ const themeBootstrap = `
         theme === 'dark' ? '#06090d' : '#F4F7F6'
       );
     }
+
+    var reduceMotion = localStorage.getItem('fenix-reduce-motion') === 'true';
+    root.dataset.reduceMotion = reduceMotion ? 'true' : 'false';
   } catch (_) {}
 })();
 `
