@@ -58,20 +58,11 @@ export default function MessagesPage() {
     if(unread.length) await s.from('fenix_direct_messages').update({read_at:new Date().toISOString()}).in('id',unread)
   }
 
-  async function resolveRecipient(){
-    if(to) return to
-    const username=recipientName.trim().replace(/^@/,'').toLowerCase()
-    if(!username) return ''
-    const s=createClient()
-    const {data}=await s.from('fenix_public_profiles').select('id,full_name,username,avatar_url').eq('username',username).maybeSingle()
-    if(data?.id){setTo(data.id);setPeople(p=>({...p,[data.id as string]:data as Person}));return data.id}
-    return ''
-  }
 
   async function send(){
     if(!body.trim()) return
     setBusy(true);setStatus('')
-    const recipient=await resolveRecipient()
+    const recipient=to
     if(!recipient){setStatus(locale==='bn'?'আগে একটি profile থেকে Message শুরু করুন।':'Start a message from a member profile first.');setBusy(false);return}
     if(recipient===userId){setStatus(locale==='bn'?'নিজেকে message পাঠানো যাবে না।':'You cannot message yourself.');setBusy(false);return}
     const s=createClient()
