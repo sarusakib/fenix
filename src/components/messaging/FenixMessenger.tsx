@@ -2,7 +2,7 @@
 
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowLeft, Check, CheckCircle, DotsThreeVertical, File, FileImage,
+  ArrowLeft, Check, CheckCircle, DotsThreeVertical, File as FileIcon, FileImage,
   Heart, MagnifyingGlass, MapPin, Minus, Paperclip, PaperPlaneRight,
   PencilSimple, PushPin, Smiley, Stop, Trash, UserCircle, X, Microphone,
 } from '@phosphor-icons/react'
@@ -865,7 +865,7 @@ export default function FenixMessenger() {
                         {message.message_type === 'image' && mediaUrl && <a href={mediaUrl} target="_blank" rel="noreferrer noopener" className="mb-2 block overflow-hidden rounded-xl"><img src={mediaUrl} alt={message.attachment_name || 'Shared photo'} className="max-h-64 w-full rounded-xl object-contain"/></a>}
                         {message.message_type === 'video' && mediaUrl && <video src={mediaUrl} controls className="mb-2 max-h-64 w-full rounded-xl"/>}
                         {message.message_type === 'audio' && mediaUrl && <audio src={mediaUrl} controls className="mb-2 w-full max-w-[255px]"/>}
-                        {message.message_type === 'file' && mediaUrl && <a href={mediaUrl} target="_blank" rel="noreferrer noopener" className="mb-2 flex items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 py-2 text-xs font-bold"><File size={17}/><span className="min-w-0 flex-1 truncate">{message.attachment_name || 'Document'}</span><span className="text-[9px] opacity-60">{formatBytes(message.attachment_size)}</span></a>}
+                        {message.message_type === 'file' && mediaUrl && <a href={mediaUrl} target="_blank" rel="noreferrer noopener" className="mb-2 flex items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 py-2 text-xs font-bold"><FileIcon size={17}/><span className="min-w-0 flex-1 truncate">{message.attachment_name || 'Document'}</span><span className="text-[9px] opacity-60">{formatBytes(message.attachment_size)}</span></a>}
                         {message.message_type === 'gif' && <a href={String(message.metadata.url || message.body)} target="_blank" rel="noreferrer noopener"><img src={String(message.metadata.url || message.body)} alt="Shared GIF" referrerPolicy="no-referrer" className="mb-2 max-h-64 rounded-xl object-contain"/></a>}
                         {loc && <a href={'https://www.google.com/maps?q=' + String(loc.lat) + ',' + String(loc.lng)} target="_blank" rel="noreferrer noopener" className="mb-2 flex items-center gap-3 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 py-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><MapPin size={18}/></span><span><b className="block text-xs">Shared location</b><span className="text-[9px] opacity-65">{loc.lat.toFixed(5)}, {loc.lng.toFixed(5)}</span></span></a>}
                         {message.message_type === 'text' && <p className="whitespace-pre-wrap break-words text-[13px] leading-5">{renderLinks(message.body)}</p>}
