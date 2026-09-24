@@ -8,6 +8,7 @@ import SiteBackground from '../components/layout/SiteBackground'
 import MobileDock from '../components/MobileDock'
 import ServiceWorkerRegister from '../components/pwa/ServiceWorkerRegister'
 import VoiceSearchButton from '../components/search/VoiceSearchButton'
+import FenixMessenger from '../components/messaging/FenixMessenger'
 import { FenixLocaleProvider } from '../components/i18n/FenixLocaleProvider'
 
 export const metadata = {
@@ -76,6 +77,7 @@ export default function RootLayout({
               <div className="relative z-10 min-h-screen">{children}</div>
               <MobileDock />
               <VoiceSearchButton />
+              <FenixMessenger />
               <ServiceWorkerRegister />
             </FenixFlow>
           </HomeThemeProvider>
