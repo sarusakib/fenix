@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, Check, Copy, Globe, LinkSimple, MapPin, ShieldCheck, UserCircle } from '@phosphor-icons/react'
+import { ArrowLeft, Check, Copy, Globe, ImageSquare, LinkSimple, MapPin, ShieldCheck, UploadSimple, UserCircle } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
+import { optimizeImageFile, removePublicImage, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
 
 type Visibility = 'public' | 'private'
 type MessagePermission = 'everyone' | 'authenticated' | 'nobody'
@@ -39,6 +40,7 @@ export default function ProfileEditorPage() {
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
   const [copied, setCopied] = useState(false)
+  const [imageBusy, setImageBusy] = useState<'avatar' | 'cover' | null>(null)
 
   useEffect(() => {
     let active = true
@@ -87,8 +89,43 @@ export default function ProfileEditorPage() {
     }
   }
 
-  async function save() {
-    setBusy(true)
+  function previousStoragePath(value: string, bucket: string) {
+    const marker = '/storage/v1/object/public/' + bucket + '/'
+    const index = value.indexOf(marker)
+    return index >= 0 ? decodeURIComponent(value.slice(index + marker.length)) : ''
+  }
+
+  async function uploadProfileImage(kind: 'avatar' | 'cover', file: File) {
+    setImageBusy(kind)
+    setMessage('')
+    try {
+      const s = createClient()
+      const { data: auth } = await s.auth.getUser()
+      if (!auth.user) throw new Error('Please sign in again.')
+      const previousUrl = kind === 'avatar' ? avatarUrl : coverUrl
+      const optimized = await optimizeImageFile(file, { maxDimension: kind === 'avatar' ? 960 : 1800 })
+      const extension = optimized.mimeType === 'image/webp' ? 'webp' : 'jpg'
+      const path = auth.user.id + '/' + kind + '/' + crypto.randomUUID() + '.' + extension
+      const uploaded = await uploadOptimizedPublicImage(s, 'avatars', path, optimized)
+      const patch = kind === 'avatar' ? { avatar_url: uploaded.publicUrl } : { cover_url: uploaded.publicUrl }
+      const { error } = await s.from('profiles').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', auth.user.id)
+      if (error) {
+        await removePublicImage(s, 'avatars', path)
+        throw error
+      }
+      if (kind === 'avatar') setAvatarUrl(uploaded.publicUrl)
+      else setCoverUrl(uploaded.publicUrl)
+      const oldPath = previousStoragePath(previousUrl, 'avatars')
+      if (oldPath) await removePublicImage(s, 'avatars', oldPath)
+      setMessage(locale === 'bn' ? (kind === 'avatar' ? 'Profile photo gallery থেকে আপলোড হয়েছে।' : 'Cover photo gallery থেকে আপলোড হয়েছে।') : (kind === 'avatar' ? 'Profile photo uploaded from your gallery.' : 'Cover photo uploaded from your gallery.'))
+    } catch (error) {
+      setMessage(locale === 'bn' ? 'ছবিটি আপলোড করা যায়নি। অন্য একটি photo চেষ্টা করুন।' : (error instanceof Error ? error.message : 'Image upload failed.'))
+    } finally {
+      setImageBusy(null)
+    }
+  }
+
+  async function save() {    setBusy(true)
     setMessage('')
     const cleanUsername = username.trim().toLowerCase()
     if (!/^[a-z0-9_]{3,32}$/.test(cleanUsername)) {
@@ -151,11 +188,21 @@ s.from('profiles').update({
         <div className="mt-7 grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
           <div className="fenix-surface-strong overflow-hidden rounded-[2rem]">
             <div className="relative h-36 overflow-hidden bg-[var(--fx-primary-soft)] sm:h-48">
+              <label className="absolute right-3 top-3 z-10 inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-xl bg-black/55 px-3 text-xs font-bold text-white backdrop-blur">
+                <ImageSquare size={15}/>{imageBusy==='cover' ? 'Uploading…' : 'Cover photo'}
+                <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('cover',file)}}/>
+              </label>
               {coverUrl ? <img src={coverUrl} alt="" className="h-full w-full object-cover"/> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,128,128,.22),transparent_42%),linear-gradient(135deg,rgba(11,23,54,.02),rgba(0,128,128,.10))]"/>}
             </div>
             <div className="px-5 pb-6 sm:px-7">
-              <div className="-mt-12 flex items-end justify-between gap-4 sm:-mt-14">
-                {avatarUrl ? <img src={avatarUrl} alt="" className="h-24 w-24 rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover sm:h-28 sm:w-28"/> : <div className="grid h-24 w-24 place-items-center rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)] sm:h-28 sm:w-28"><UserCircle size={58} className="text-[var(--fx-primary-strong)]"/></div>}
+              <div className="-mt-12 flex flex-wrap items-end justify-between gap-4 sm:-mt-14">
+                <div className="flex items-end gap-3">
+                  {avatarUrl ? <img src={avatarUrl} alt="" className="h-24 w-24 rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover sm:h-28 sm:w-28"/> : <div className="grid h-24 w-24 place-items-center rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)] sm:h-28 sm:w-28"><UserCircle size={58} className="text-[var(--fx-primary-strong)]"/></div>}
+                  <label className="mb-1 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-xs font-bold shadow-sm">
+                    <UploadSimple size={16}/><span>{imageBusy==='avatar' ? 'Uploading…' : 'Gallery'}</span>
+                    <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('avatar',file)}}/>
+                  </label>
+                </div>
                 <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--fx-primary-soft)] px-3 py-1.5 text-[10px] font-bold text-[var(--fx-primary-strong)]"><ShieldCheck size={14}/> Profile controls active</span>
               </div>
               <div className="mt-4"><h1 className="text-3xl font-black tracking-[-.045em] sm:text-4xl">{fullName || 'Your FeniX profile'}</h1><p className="mt-1 text-sm text-[var(--fx-muted)]">@{username || 'username'} · {email}</p>{bio && <p className="mt-4 max-w-2xl whitespace-pre-wrap text-sm leading-7 text-[var(--fx-muted)]">{bio}</p>}<div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">{locationText && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><MapPin size={14}/>{locationText}</span>}{websiteUrl && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><Globe size={14}/>Website</span>}</div></div>
