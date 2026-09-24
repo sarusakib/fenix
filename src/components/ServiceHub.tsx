@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, type ElementType } from 'react'
 import {
-  ArrowRight, Brain, Briefcase, CaretDown, CheckCircle, MapPin, Rocket,
+  ArrowRight, Brain, Briefcase, CaretDown, CheckCircle, MagnifyingGlass, MapPin, Rocket,
   ShieldCheck, ShoppingBag, Storefront, TrendUp, UserCircle, UsersThree, X, Newspaper,
 } from '@phosphor-icons/react'
 import {
@@ -14,10 +14,10 @@ import { getServiceGuideline } from '../lib/serviceGuidelines'
 
 const ICONS: Record<FeniXServiceIcon, ElementType> = {
   rocket: Rocket, storefront: Storefront, trend: TrendUp, brain: Brain, shop: ShoppingBag,
-  briefcase: Briefcase, shield: ShieldCheck, account: UserCircle, map: MapPin, users: UsersThree, newspaper: Newspaper,
+  briefcase: Briefcase, shield: ShieldCheck, account: UserCircle, map: MapPin, users: UsersThree, newspaper: Newspaper, search: MagnifyingGlass,
 }
 
-const VISIBLE_GROUP_IDS = ['build', 'connect', 'invest', 'shop', 'discover', 'news', 'trust']
+const VISIBLE_GROUP_IDS = ['build', 'connect', 'invest', 'shop', 'discover', 'news', 'trust', 'account']
 const VISIBLE_GROUPS = FENIX_SERVICE_GROUPS.filter((group) => VISIBLE_GROUP_IDS.includes(group.id))
 const COMPACT_GROUP_IDS = ['build', 'connect', 'invest', 'shop']
 
