@@ -53,11 +53,11 @@ export default function FenixMessenger() {
   const [minimized, setMinimized] = useState(false)
   const [activeId, setActiveId] = useState('')
   const [query, setQuery] = useState('')
-  const [newUsername, setNewUsername] = useState('')
   const [body, setBody] = useState('')
   const [busy, setBusy] = useState(false)
   const [showEmoji, setShowEmoji] = useState(false)
   const [error, setError] = useState('')
+  const [requestedUserId, setRequestedUserId] = useState('')
   const userIdRef = useRef('')
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -125,6 +125,71 @@ export default function FenixMessenger() {
     }
   }, [hidden, supabase])
 
+  useEffect(() => {
+    if (hidden) return
+
+    const handleOpenMessage = (event: Event) => {
+      const detail = (event as CustomEvent<{ userId?: string }>).detail
+      if (detail?.userId) setRequestedUserId(detail.userId)
+    }
+
+    window.addEventListener('fenix:open-message', handleOpenMessage)
+    return () => window.removeEventListener('fenix:open-message', handleOpenMessage)
+  }, [hidden])
+
+  useEffect(() => {
+    if (!requestedUserId || !userId || requestedUserId === userId) {
+      if (requestedUserId === userId && requestedUserId) {
+        setError('You cannot message yourself.')
+        setRequestedUserId('')
+      }
+      return
+    }
+
+    let cancelled = false
+
+    async function openRequestedConversation() {
+      setError('')
+      const { data } = await supabase
+        .from('fenix_public_profiles')
+        .select('id,full_name,username,avatar_url')
+        .eq('id', requestedUserId)
+        .maybeSingle()
+
+      if (cancelled) return
+      setRequestedUserId('')
+
+      if (!data) {
+        setError('This profile is not available.')
+        return
+      }
+
+      const person = data as Person
+      setPeople(current => ({ ...current, [person.id]: person }))
+      setActiveId(person.id)
+      setOpen(true)
+      setMinimized(false)
+      setShowEmoji(false)
+
+      const { data: unreadRows } = await supabase
+        .from('fenix_direct_messages')
+        .select('id')
+        .eq('sender_id', person.id)
+        .eq('recipient_id', userId)
+        .is('read_at', null)
+
+      if (cancelled || !unreadRows?.length) return
+
+      const ids = unreadRows.map(row => row.id)
+      const now = new Date().toISOString()
+      setMessages(current => current.map(message => ids.includes(message.id) ? { ...message, read_at: now } : message))
+      await supabase.from('fenix_direct_messages').update({ read_at: now }).in('id', ids)
+    }
+
+    void openRequestedConversation()
+    return () => { cancelled = true }
+  }, [requestedUserId, supabase, userId])
+
   const conversations = useMemo<Conversation[]>(() => {
     const map = new Map<string, Message[]>()
     for (const message of messages) {
@@ -173,28 +238,6 @@ export default function FenixMessenger() {
     }
   }
 
-  async function resolveUsername() {
-    const username = newUsername.trim().replace(/^@/, '').toLowerCase()
-    if (!username) return
-    setError('')
-    const { data } = await supabase
-      .from('fenix_public_profiles')
-      .select('id,full_name,username,avatar_url')
-      .eq('username', username)
-      .maybeSingle()
-
-    if (!data) {
-      setError('User not found.')
-      return
-    }
-    if (data.id === userId) {
-      setError('You cannot message yourself.')
-      return
-    }
-    setPeople(current => ({ ...current, [data.id]: data as Person }))
-    setNewUsername('')
-    await openConversation(data as Person)
-  }
 
   async function send() {
     const text = body.trim()
@@ -275,9 +318,8 @@ export default function FenixMessenger() {
                   <MagnifyingGlass size={17} className="text-[var(--fx-muted)]"/>
                   <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search conversations" className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none"/>
                 </div>
-                <div className="mt-2 flex gap-2">
-                  <input value={newUsername} onChange={e => setNewUsername(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void resolveUsername() }} placeholder="@username for new chat" className="h-10 min-w-0 flex-1 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 text-xs outline-none"/>
-                  <button type="button" onClick={() => void resolveUsername()} className="h-10 rounded-xl bg-[var(--fx-primary-strong)] px-3 text-xs font-black text-white">Chat</button>
+                <div className="mt-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 py-2 text-[11px] leading-5 text-[var(--fx-muted)]">
+                  Open any FeniX member profile and tap <span className="font-bold text-[var(--fx-text)]">Message</span> to start a new chat.
                 </div>
                 {error && <p className="mt-2 text-[11px] font-semibold text-red-600 dark:text-red-300">{error}</p>}
               </div>
@@ -296,7 +338,7 @@ export default function FenixMessenger() {
                   <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
                     <div className="grid h-16 w-16 place-items-center rounded-3xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><ChatCircleDots size={34} weight="duotone"/></div>
                     <p className="mt-4 text-sm font-black">Your conversations</p>
-                    <p className="mt-1 text-xs leading-5 text-[var(--fx-muted)]">Search an existing chat or enter a @username above to start one.</p>
+                    <p className="mt-1 text-xs leading-5 text-[var(--fx-muted)]">Open a member profile and tap Message to start a new chat.</p>
                   </div>
                 )}
               </div>
