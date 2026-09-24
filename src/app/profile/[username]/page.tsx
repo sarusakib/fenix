@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, ChatCircleText, Globe, MapPin, UserCircle } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, Globe, MapPin, UserCircle } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import ProfileReportButton from '@/components/profile/ProfileReportButton'
+import MessageButton from '@/components/messaging/MessageButton'
 import { createClient } from '@/utils/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -47,7 +48,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" className="h-28 w-28 rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover"/> : <div className="grid h-28 w-28 place-items-center rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)]"><UserCircle size={62} className="text-[var(--fx-primary-strong)]"/></div>}
               <div className="flex flex-wrap gap-2">
                 <span className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-[var(--fx-primary-soft)] px-3 text-xs font-bold text-[var(--fx-primary-strong)]">Public profile</span>
-                <Link href={'/messages?to=' + encodeURIComponent(profileId) + '&name=' + encodeURIComponent(safeName)} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-xs font-bold text-white"><ChatCircleText size={16}/> Message</Link>
+                <MessageButton userId={profileId} name={safeName} />
               </div>
             </div>
             <div className="mt-5">
