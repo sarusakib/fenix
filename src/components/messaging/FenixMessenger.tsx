@@ -58,6 +58,7 @@ export default function FenixMessenger() {
   const [busy, setBusy] = useState(false)
   const [showEmoji, setShowEmoji] = useState(false)
   const [error, setError] = useState('')
+  const userIdRef = useRef('')
   const endRef = useRef<HTMLDivElement>(null)
 
   const hidden = pathname === '/messages' || pathname.startsWith('/login') || pathname.startsWith('/auth')
@@ -67,6 +68,7 @@ export default function FenixMessenger() {
     const { data: auth } = await supabase.auth.getUser()
     if (!auth.user) return
     setUserId(auth.user.id)
+    userIdRef.current = auth.user.id
 
     const { data, error: messageError } = await supabase
       .from('fenix_direct_messages')
@@ -102,9 +104,10 @@ export default function FenixMessenger() {
       .channel('fenix-messenger-live')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fenix_direct_messages' }, payload => {
         const next = payload.new as Message
-        if (next.sender_id !== userId && next.recipient_id !== userId) return
+        const currentUserId = userIdRef.current
+        if (!currentUserId || (next.sender_id !== currentUserId && next.recipient_id !== currentUserId)) return
         setMessages(current => current.some(m => m.id === next.id) ? current : [next, ...current])
-        if (next.sender_id !== userId) {
+        if (next.sender_id !== currentUserId) {
           void supabase
             .from('fenix_public_profiles')
             .select('id,full_name,username,avatar_url')
@@ -120,7 +123,7 @@ export default function FenixMessenger() {
     return () => {
       void supabase.removeChannel(channel)
     }
-  }, [hidden, supabase, userId])
+  }, [hidden, supabase])
 
   const conversations = useMemo<Conversation[]>(() => {
     const map = new Map<string, Message[]>()
