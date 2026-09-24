@@ -19,6 +19,7 @@ export type FeniXServiceIcon =
   | 'map'
   | 'users'
   | 'newspaper'
+  | 'search'
 
 export type FeniXService = {
   id: string
