@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import {
   ArrowRight,
+  Briefcase,
   Brain,
   Buildings,
   ChartLineUp,
