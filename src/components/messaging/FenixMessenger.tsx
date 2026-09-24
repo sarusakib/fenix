@@ -217,12 +217,17 @@ export default function FenixMessenger() {
     return haystack.toLowerCase().includes(query.trim().toLowerCase())
   })
 
-  const active = conversations.find(c => c.person.id === activeId)
+  const activeConversation = conversations.find(c => c.person.id === activeId)
+  const activePerson = activeConversation?.person ?? (activeId ? people[activeId] : undefined)
+  const activeMessages = activeConversation?.messages ?? (activeId
+    ? [...messages.filter(m => m.sender_id === activeId || m.recipient_id === activeId)]
+      .sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at))
+    : [])
 
   useEffect(() => {
     if (!activeId) return
     requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }))
-  }, [activeId, active?.messages.length])
+  }, [activeId, activeMessages.length])
 
   async function openConversation(person: Person) {
     setActiveId(person.id)
@@ -289,13 +294,13 @@ export default function FenixMessenger() {
           ].join(' ')}
         >
           <div className="flex h-16 items-center gap-3 border-b border-[var(--fx-border)] bg-[var(--fx-surface-strong)] px-4">
-            {active && !minimized ? (
+            {activePerson && !minimized ? (
               <>
                 <button type="button" aria-label="Back to conversations" onClick={() => setActiveId('')} className="grid h-9 w-9 place-items-center rounded-xl hover:bg-[var(--fx-primary-soft)]"><ArrowLeft size={18}/></button>
-                {active.person.avatar_url ? <img src={active.person.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover"/> : <div className="grid h-9 w-9 place-items-center rounded-full bg-[var(--fx-primary-soft)] text-xs font-black text-[var(--fx-primary-strong)]">{initials(active.person)}</div>}
+                {activePerson.avatar_url ? <img src={activePerson.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover"/> : <div className="grid h-9 w-9 place-items-center rounded-full bg-[var(--fx-primary-soft)] text-xs font-black text-[var(--fx-primary-strong)]">{initials(activePerson)}</div>}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-black">{active.person.full_name || active.person.username || 'FeniX user'}</p>
-                  <p className="truncate text-[10px] text-[var(--fx-muted)]">@{active.person.username || 'user'}</p>
+                  <p className="truncate text-sm font-black">{activePerson.full_name || activePerson.username || 'FeniX user'}</p>
+                  <p className="truncate text-[10px] text-[var(--fx-muted)]">@{activePerson.username || 'user'}</p>
                 </div>
               </>
             ) : (
@@ -311,7 +316,7 @@ export default function FenixMessenger() {
             <button type="button" aria-label="Close messages" onClick={() => { setOpen(false); setActiveId(''); setMinimized(false) }} className="grid h-9 w-9 place-items-center rounded-xl hover:bg-[var(--fx-primary-soft)]"><X size={17}/></button>
           </div>
 
-          {!minimized && !active && (
+          {!minimized && !activePerson && (
             <div className="relative flex h-[calc(100%-64px)] flex-col">
               <div className="relative z-10 border-b border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-3">
                 <div className="flex items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3">
@@ -345,11 +350,11 @@ export default function FenixMessenger() {
             </div>
           )}
 
-          {!minimized && active && (
+          {!minimized && activePerson && (
             <div className="flex h-[calc(100%-64px)] flex-col">
               <div className="fenix-chat-wallpaper flex-1 overflow-y-auto px-3 py-4">
                 <div className="mx-auto mb-4 w-fit rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] px-3 py-1 text-[9px] font-bold text-[var(--fx-muted)] shadow-sm">Private • FeniX protected chat</div>
-                {active.messages.map(message => {
+                {activeMessages.map(message => {
                   const mine = message.sender_id === userId
                   return (
                     <div key={message.id} className={mine ? 'mb-2 flex justify-end' : 'mb-2 flex justify-start'}>
@@ -363,6 +368,7 @@ export default function FenixMessenger() {
                     </div>
                   )
                 })}
+                {activeMessages.length === 0 && <div className="relative z-10 flex h-full min-h-40 items-center justify-center px-8 text-center"><p className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] px-4 py-3 text-xs leading-5 text-[var(--fx-muted)]">You’re connected. Send the first message to start this conversation.</p></div>}
                 <div ref={endRef}/>
               </div>
 
