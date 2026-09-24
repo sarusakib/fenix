@@ -2234,6 +2234,63 @@ export type Database = {
           },
         ]
       }
+      fenix_post_media: {
+        Row: {
+          author_id: string
+          byte_size: number
+          created_at: string
+          height: number | null
+          id: string
+          mime_type: string
+          post_id: string
+          sort_order: number
+          storage_bucket: string
+          storage_path: string
+          width: number | null
+        }
+        Insert: {
+          author_id: string
+          byte_size: number
+          created_at?: string
+          height?: number | null
+          id?: string
+          mime_type: string
+          post_id: string
+          sort_order?: number
+          storage_bucket?: string
+          storage_path: string
+          width?: number | null
+        }
+        Update: {
+          author_id?: string
+          byte_size?: number
+          created_at?: string
+          height?: number | null
+          id?: string
+          mime_type?: string
+          post_id?: string
+          sort_order?: number
+          storage_bucket?: string
+          storage_path?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fenix_user_moderation: {
         Row: {
           banned_until: string | null

@@ -53,7 +53,7 @@ export default function FeedPage(){
     const postIds=((p??[]) as any[]).map(row=>row.id as string)
     const mediaByPost:Record<string,PostMediaRow[]>={}
     if(postIds.length){
-      const {data:media}=await (s as any).from('fenix_post_media').select('id,post_id,storage_bucket,storage_path,mime_type,width,height,sort_order,byte_size').in('post_id',postIds).order('sort_order',{ascending:true})
+      const {data:media}=await s.from('fenix_post_media').select('id,post_id,storage_bucket,storage_path,mime_type,width,height,sort_order,byte_size').in('post_id',postIds).order('sort_order',{ascending:true})
       for(const row of (media??[]) as PostMediaRow[]) (mediaByPost[row.post_id]??=[]).push(row)
     }
     if(uid){
@@ -133,7 +133,7 @@ export default function FeedPage(){
       postCreated=true
 
       if(uploaded.length){
-        const {error:mediaError}=await (s as any).from('fenix_post_media').insert(uploaded.map((item,index)=>({post_id:postId,author_id:userId,storage_bucket:'fenix-post-media',storage_path:item.path,mime_type:item.mimeType,byte_size:item.byteSize,width:item.width,height:item.height,sort_order:index})))
+        const {error:mediaError}=await s.from('fenix_post_media').insert(uploaded.map((item,index)=>({post_id:postId,author_id:userId,storage_bucket:'fenix-post-media',storage_path:item.path,mime_type:item.mimeType,byte_size:item.byteSize,width:item.width,height:item.height,sort_order:index})))
         if(mediaError)throw mediaError
       }
 
