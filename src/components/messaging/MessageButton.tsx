@@ -31,7 +31,7 @@ export default function MessageButton({
     const { data } = await supabase.auth.getUser()
 
     if (!data.user) {
-      window.location.assign(href)
+      window.location.assign('/login?next=' + encodeURIComponent(href))
       return
     }
 
