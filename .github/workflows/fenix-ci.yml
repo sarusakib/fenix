@@ -1,4 +1,5 @@
 name: FeniX CI
+# Production master-upgrade verification gate
 
 on:
   push:
