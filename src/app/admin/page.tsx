@@ -22,6 +22,7 @@ const modules = [
   { title: 'Community Moderation', body: 'Review reports and manage user suspension or bans.', href: '/admin/community', icon: ShieldCheck },
   { title: 'Commerce Operations', body: 'Seller, product, order and return operations.', href: '/commerce/admin', icon: ShoppingBag },
   { title: 'Investment Operations', body: 'Opportunities, investors, documents and interests.', href: '/admin/investment', icon: ChartLineUp },
+  { title: 'Jobs Operations', body: 'Review employer postings and protect applicant workflows.', href: '/admin/jobs', icon: UsersThree },
   { title: 'Brain & Knowledge', body: 'Open the public Feni Brain experience.', href: '/guide', icon: Brain },
   { title: 'Public Experience', body: 'See Directory, Invest and Commerce as members do.', href: '/directory', icon: Storefront },
   { title: 'FeniX News', body: 'Create, review and publish the public FeniX newsroom.', href: '/admin/news', icon: Newspaper },
@@ -63,6 +64,8 @@ export default async function AdminPage() {
     brainCandidatesResult,
     investmentOpportunitiesResult,
     investmentInterestsResult,
+    jobsResult,
+    jobApplicationsResult,
   ] = await Promise.all([
     supabase.from('profiles').select('id', { count: 'exact', head: true }),
     supabase.from('businesses').select('id', { count: 'exact', head: true }),
@@ -75,6 +78,8 @@ export default async function AdminPage() {
     supabase.from('fenix_brain_update_candidates').select('id', { count: 'exact', head: true }),
     supabase.from('investment_opportunities').select('id', { count: 'exact', head: true }).in('status', ['approved', 'fully_funded', 'closed']),
     supabase.from('investment_interests').select('id', { count: 'exact', head: true }),
+    supabase.from('fenix_jobs').select('id', { count: 'exact', head: true }).eq('status', 'published'),
+    supabase.from('fenix_job_applications').select('id', { count: 'exact', head: true }),
   ])
 
   const stats = [
@@ -89,6 +94,8 @@ export default async function AdminPage() {
     ['Brain queue', brainCandidatesResult.count ?? 0, Brain],
     ['Invest offers', investmentOpportunitiesResult.count ?? 0, ChartLineUp],
     ['Invest interest', investmentInterestsResult.count ?? 0, UsersThree],
+    ['Published jobs', jobsResult.count ?? 0, Briefcase],
+    ['Job applications', jobApplicationsResult.count ?? 0, UsersThree],
   ] as const
 
   return (
