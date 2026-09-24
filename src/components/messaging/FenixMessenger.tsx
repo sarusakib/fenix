@@ -659,7 +659,10 @@ export default function FenixMessenger() {
   async function deleteForMe(message: Message) {
     const field = message.sender_id === userId ? 'deleted_for_sender_at' : 'deleted_for_recipient_at'
     const now = new Date().toISOString()
-    const { error: deleteError } = message.sender_id === userId\n      ? await supabase.from('fenix_direct_messages').update({ deleted_for_sender_at: now }).eq('id', message.id)\n      : await supabase.from('fenix_direct_messages').update({ deleted_for_recipient_at: now }).eq('id', message.id)\n    if (deleteError) setError('Message could not be removed.')
+    const { error: deleteError } = message.sender_id === userId
+      ? await supabase.from('fenix_direct_messages').update({ deleted_for_sender_at: now }).eq('id', message.id)
+      : await supabase.from('fenix_direct_messages').update({ deleted_for_recipient_at: now }).eq('id', message.id)
+    if (deleteError) setError('Message could not be removed.')
     else setMessages(value => value.map(row => row.id === message.id ? { ...row, [field]: now } as Message : row))
     setMenuId('')
   }
