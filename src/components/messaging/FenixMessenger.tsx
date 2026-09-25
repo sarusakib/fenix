@@ -98,16 +98,16 @@ function renderLinks(text: string) {
   )
 }
 
-export default function FenixMessenger() {
+export default function FenixMessenger({ fullPage = false }: { fullPage?: boolean }) {
   const pathname = usePathname()
   const supabase = useMemo(() => createClient(), [])
-  const hidden = pathname === '/messages' || pathname.startsWith('/login') || pathname.startsWith('/auth')
+  const hidden = ((!fullPage && pathname === '/messages') || pathname.startsWith('/login') || pathname.startsWith('/auth'))
 
   const [userId, setUserId] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [people, setPeople] = useState<Record<string, Person>>({})
   const [reactions, setReactions] = useState<Reaction[]>([])
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(fullPage)
   const [minimized, setMinimized] = useState(false)
   const [activeId, setActiveId] = useState('')
   const [conversationQuery, setConversationQuery] = useState('')
@@ -192,6 +192,14 @@ export default function FenixMessenger() {
       setUserId(authId)
       await load(authId)
       if (disposed) return
+
+      if (fullPage) {
+        const params = new URLSearchParams(window.location.search)
+        const targetId = params.get('to') || ''
+        if (targetId && targetId !== authId) {
+          window.dispatchEvent(new CustomEvent('fenix:open-message', { detail: { userId: targetId } }))
+        }
+      }
 
       const channel = supabase
         .channel('fenix-messenger-' + authId, { config: { presence: { key: authId } } })
@@ -748,7 +756,7 @@ export default function FenixMessenger() {
 
   return (
     <>
-      {!open && (
+      {!fullPage && !open && (
         <button
           type="button"
           aria-label="Open FeniX messages"
@@ -764,8 +772,10 @@ export default function FenixMessenger() {
         <section
           aria-label="FeniX Messenger"
           className={[
-            'fixed z-[80] overflow-hidden border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] shadow-[0_30px_100px_rgba(4,12,25,.28)] backdrop-blur-2xl',
-            minimized ? 'bottom-5 right-5 h-16 w-[320px] rounded-[1.35rem]' : 'inset-x-0 bottom-0 h-[min(760px,calc(100dvh-18px))] rounded-t-[1.5rem] sm:inset-auto sm:bottom-5 sm:right-5 sm:h-[min(720px,calc(100dvh-40px))] sm:w-[420px] sm:rounded-[1.6rem]',
+            fullPage
+              ? 'relative z-[1] mx-auto min-h-[calc(100dvh-72px)] w-full max-w-7xl overflow-hidden border-x border-[var(--fx-border)] bg-[var(--fx-surface-strong)] shadow-[0_30px_100px_rgba(4,12,25,.18)] backdrop-blur-2xl'
+              : 'fixed z-[80] overflow-hidden border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] shadow-[0_30px_100px_rgba(4,12,25,.28)] backdrop-blur-2xl',
+            fullPage ? 'min-h-[calc(100dvh-72px)]' : (minimized ? 'bottom-5 right-5 h-16 w-[320px] rounded-[1.35rem]' : 'inset-x-0 bottom-0 h-[min(760px,calc(100dvh-18px))] rounded-t-[1.5rem] sm:inset-auto sm:bottom-5 sm:right-5 sm:h-[min(720px,calc(100dvh-40px))] sm:w-[420px] sm:rounded-[1.6rem]'),
           ].join(' ')}
         >
           <div className="flex h-16 items-center gap-2 border-b border-[var(--fx-border)] bg-[var(--fx-surface-strong)] px-3">
@@ -787,8 +797,8 @@ export default function FenixMessenger() {
 
             {activePerson && <button type="button" aria-label="Chat actions" onClick={() => setMenuId(menuId === '__chat__' ? '' : '__chat__')} className="grid h-9 w-9 place-items-center rounded-xl hover:bg-[var(--fx-primary-soft)]"><DotsThreeVertical size={18}/></button>}
             {!activePerson && <button type="button" aria-label="Enable notifications" onClick={notify} className="grid h-9 w-9 place-items-center rounded-xl hover:bg-[var(--fx-primary-soft)]"><CheckCircle size={17}/></button>}
-            <button type="button" aria-label="Minimize" onClick={() => setMinimized(value => !value)} className="grid h-9 w-9 place-items-center rounded-xl hover:bg-[var(--fx-primary-soft)]"><Minus size={17}/></button>
-            <button type="button" aria-label="Close" onClick={() => { setOpen(false); setActiveId(''); setMinimized(false); setMenuId('') }} className="grid h-9 w-9 place-items-center rounded-xl hover:bg-[var(--fx-primary-soft)]"><X size={17}/></button>
+            {!fullPage && <button type="button" aria-label="Minimize" onClick={() => setMinimized(value => !value)} className="grid h-9 w-9 place-items-center rounded-xl hover:bg-[var(--fx-primary-soft)]"><Minus size={17}/></button>}
+            {!fullPage && <button type="button" aria-label="Close" onClick={() => { setOpen(false); setActiveId(''); setMinimized(false); setMenuId('') }} className="grid h-9 w-9 place-items-center rounded-xl hover:bg-[var(--fx-primary-soft)]"><X size={17}/></button>}
           </div>
 
           {activePerson && menuId === '__chat__' && !minimized && (
