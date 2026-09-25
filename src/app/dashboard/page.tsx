@@ -21,7 +21,6 @@ export default async function DashboardPage() {
   ])
 
   const cards = [
-    ['Profile', 'Open', UserCircle, '/profile'],
     ['Businesses', businesses.count ?? 0, Buildings, '/dashboard/business'],
     ['Start journeys', starts.count ?? 0, Rocket, '/start/dashboard'],
     ['Investment interests', interests.count ?? 0, ChartLineUp, '/invest/dashboard'],
