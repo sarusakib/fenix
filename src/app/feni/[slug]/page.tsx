@@ -50,6 +50,6 @@ export default async function FeniArticlePage({params}:{params:Promise<{slug:str
    </div>
   </article>
   <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(jsonLd)}}/>
-  <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(crumbs)}}/>
+  <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(crumbs)}}/>
  </main>
 }
