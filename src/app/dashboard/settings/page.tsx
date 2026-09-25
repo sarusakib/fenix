@@ -14,7 +14,7 @@ const THEMES: Array<{key:HomeTheme;label:string;icon:typeof Sun}>=[
 
 export default function DashboardSettingsPage(){
  const {theme,setTheme}=useHomeTheme()
- const {locale}=useFenixLocale()
+ const {locale,setLocale}=useFenixLocale()
  const [userId,setUserId]=useState('')
  const [reducedMotion,setReducedMotion]=useState(false)
  const [notice,setNotice]=useState('')
@@ -29,6 +29,7 @@ export default function DashboardSettingsPage(){
    if(!active||!data)return
    if(['light','dark','system'].includes(data.theme)) setTheme(data.theme as HomeTheme)
    setReducedMotion(Boolean(data.reduced_motion))
+   if(data.locale==='bn'||data.locale==='en') setLocale(data.locale)
   }
   void load(); return ()=>{active=false}
  },[setTheme])
@@ -62,6 +63,15 @@ export default function DashboardSettingsPage(){
      </div>
     </section>
 
+
+
+    <section className="rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-7">
+     <SectionHead icon={<span className="text-base font-black">অ</span>} title={locale==='bn'?'ভাষা':'Language'} text={locale==='bn'?'ফেনীএক্সের সব নিয়ন্ত্রিত ইন্টারফেসের ভাষা ঠিক করুন।':'Choose the FeniX interface language.'}/>
+     <div className="mt-5 grid grid-cols-2 gap-2">
+      <button type="button" aria-pressed={locale==='bn'} onClick={()=>{setLocale('bn');void update({locale:'bn'},'ভাষা বাংলা করা হয়েছে।')}} className={'min-h-12 rounded-xl border text-sm font-bold '+(locale==='bn'?'border-[var(--fx-primary)]/25 bg-[var(--fx-primary-soft)]':'border-[var(--fx-border)]')}>বাংলা</button>
+      <button type="button" aria-pressed={locale==='en'} onClick={()=>{setLocale('en');void update({locale:'en'},'Language set to English.')}} className={'min-h-12 rounded-xl border text-sm font-bold '+(locale==='en'?'border-[var(--fx-primary)]/25 bg-[var(--fx-primary-soft)]':'border-[var(--fx-border)]')}>{locale==='bn'?'ইংরেজি':'English'}</button>
+     </div>
+    </section>
 
     <section className="rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-7">
      <SectionHead icon={<Palette size={21}/>} title={bn?'Appearance':'Appearance'} text={bn?'Light, dark বা device preference।':'Light, dark or device preference.'}/>
