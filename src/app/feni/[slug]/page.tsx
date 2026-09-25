@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import type { Metadata } from 'next'
 import { ArrowLeft, ArrowRight, ArrowSquareOut, BookOpen, MapPin } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
@@ -12,6 +13,7 @@ export async function generateMetadata({params}:{params:Promise<{slug:string}>})
 
 export default async function FeniArticlePage({params}:{params:Promise<{slug:string}>}){
  const {slug}=await params; const article=getFeniArticle(slug); if(!article) return null
+ const nonce = (await headers()).get('x-fenix-nonce') ?? undefined
  const jsonLd={'@context':'https://schema.org','@type':'Article','headline':article.titleEn,'description':article.descriptionEn,'datePublished':article.updated,'dateModified':article.updated,'author':{'@type':'Organization','name':'FeniX','url':'https://fenix-saru.vercel.app/'},'publisher':{'@type':'Organization','name':'FeniX'},'mainEntityOfPage':`https://fenix-saru.vercel.app/feni/${article.slug}`, 'keywords':article.tags}
  const crumbs={'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':1,'name':'FeniX','item':'https://fenix-saru.vercel.app/'},{'@type':'ListItem','position':2,'name':'Feni Knowledge','item':'https://fenix-saru.vercel.app/feni'},{'@type':'ListItem','position':3,'name':article.titleEn,'item':`https://fenix-saru.vercel.app/feni/${article.slug}`}]}
  const related=article.slug==='feni-district-guide'?'/feni/feni-services-directory':'/feni/feni-district-guide'
@@ -47,7 +49,7 @@ export default async function FeniArticlePage({params}:{params:Promise<{slug:str
     <div className="mt-4 flex flex-wrap gap-2"><Link href="/guide" className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-xs font-bold text-white">Ask Brain <ArrowRight size={14}/></Link><Link href={related} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-4 text-xs font-bold">Related guide <ArrowRight size={14}/></Link></div>
    </div>
   </article>
-  <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(jsonLd)}}/>
+  <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(jsonLd)}}/>
   <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(crumbs)}}/>
  </main>
 }
