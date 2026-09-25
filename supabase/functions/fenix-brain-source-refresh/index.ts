@@ -74,17 +74,16 @@ function isLikelyStoryUrl(itemUrl:string, sourceUrl:string, parserKey:string) {
 
   if(parserKey==="notice_html") {
     return (
-      /\\/(notice|notices)(\\/|$)/i.test(path) ||
-      /\\/(form-(administrative|legal-aid|circulars))(\\/|$)/i.test(path) ||
+      /\/(notice|notices)(\/|$)/i.test(path) ||
+      /\/(form-(administrative|legal-aid|circulars))(\/|$)/i.test(path) ||
       /notice|notices/i.test(decodeURIComponent(path))
     );
   }
 
-  if(/\\/(category|topic|tag|author|page|search|archive|feed|wp-json)(\\/|$)/i.test(path)) return false;
-  if(/\\/(about|contact|privacy|terms|login|register|menu)(\\/|$)/i.test(path)) return false;
+  if(/\/(category|topic|tag|author|page|search|archive|feed|wp-json)(\/|$)/i.test(path)) return false;
+  if(/\/(about|contact|privacy|terms|login|register|menu)(\/|$)/i.test(path)) return false;
   return true;
 }
-
 function extractNewsItems(raw: string, sourceUrl: string, parserKey: string) {
   const items:{title:string;url:string;publishedAt:string|null}[]=[];
   const seen=new Set<string>();
