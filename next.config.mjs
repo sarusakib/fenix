@@ -33,6 +33,12 @@ if (process.env.NODE_ENV === 'production') {
 const nextConfig = {
   reactStrictMode: true,
 
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '64kb',
+    },
+  },
+
   poweredByHeader: false,
 
   compress: true,
