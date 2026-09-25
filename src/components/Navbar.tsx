@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Bell, CaretDown, House, Lightbulb, List, MagnifyingGlass, Moon, ShieldCheck, SignIn, SignOut, Sun, TrendUp, UsersThree, X, UserCircle } from '@phosphor-icons/react'
+import { Bell, ChatCircleDots, CaretDown, House, Lightbulb, List, MagnifyingGlass, Moon, ShieldCheck, SignIn, SignOut, Sun, TrendUp, UsersThree, X, UserCircle } from '@phosphor-icons/react'
 import { useAuthStore } from '../store/useAuthStore'
 import { useHomeTheme } from './theme/HomeThemeProvider'
 import { useFenixLocale } from './i18n/FenixLocaleProvider'
@@ -39,9 +39,10 @@ export default function Navbar() {
           <div className="hidden items-center gap-1 md:flex">
             <NavLink href="/" active={pathname === '/'}><House size={16}/>{bn ? 'হোম' : 'Home'}</NavLink>
             <NavLink href="/search" active={pathname === '/search'}><MagnifyingGlass size={16}/>{bn ? 'সার্চ' : 'Search'}</NavLink>
-            <button type="button" aria-expanded={networkOpen} aria-haspopup="true" onClick={() => setNetworkOpen(v => !v)} className={'inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold transition ' + (networkActive ? 'bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]' : 'text-[var(--fx-muted)] hover:bg-black/[.03] dark:hover:bg-white/[.035]')}>
-              <List size={16}/>{bn ? 'নেটওয়ার্ক' : 'Network'}<CaretDown size={14} className={networkOpen ? 'rotate-180 transition-transform' : 'transition-transform'}/>
-            </button>
+            <Link href="/messages" aria-label={bn ? 'মেসেজ' : 'Messages'} className={'group relative grid h-11 w-11 place-items-center rounded-xl transition ' + (pathname === '/messages' ? 'bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]' : 'text-[var(--fx-muted)] hover:bg-black/[.03] dark:hover:bg-white/[.035]')}>
+              <ChatCircleDots size={21} weight="duotone"/>
+              <span className="pointer-events-none absolute left-1/2 top-[calc(100%+7px)] z-20 hidden -translate-x-1/2 whitespace-nowrap rounded-lg border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] px-2 py-1 text-[10px] font-bold text-[var(--fx-text)] shadow-lg group-hover:block">{bn ? 'মেসেজ' : 'Messages'}</span>
+            </Link>
             <NavLink href="/guide" active={pathname === '/guide'}><Lightbulb size={16}/>{bn ? 'ব্রেইন' : 'Brain'}</NavLink>
           </div>
 
