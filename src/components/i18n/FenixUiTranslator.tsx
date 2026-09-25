@@ -1,3 +1,45 @@
+  useEffect(() => {
+    const skip=(node:Node)=>Boolean(node.parentElement?.closest('script,style,input,textarea,select,option,pre,code,[data-fx-raw]'))
+    const run=()=>{
+      const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT)
+      const nodes:Text[]=[]
+      while(w.nextNode()) nodes.push(w.currentNode as Text)
+      nodes.forEach(node=>{
+        if(skip(node)) return
+        const current=node.nodeValue||''
+        const saved=textOriginals.get(node)
+        if(locale==='bn'){
+          const original=saved===undefined || current!==tr(saved) ? current : saved
+          textOriginals.set(node,original)
+          const next=tr(original)
+          if(next!==current) node.nodeValue=next
+        }else if(saved!==undefined && current!==saved){
+          node.nodeValue=saved
+        }
+      })
+      document.querySelectorAll('input[placeholder],textarea[placeholder],[aria-label],[title]').forEach(el=>{
+        if((el as Element).matches('[data-fx-raw]')) return
+        const saved=attrOriginals.get(el)||{}
+        const nextSaved={...saved}
+        for(const attr of ['placeholder','aria-label','title']){
+          const value=el.getAttribute(attr)
+          if(value===null) continue
+          if(nextSaved[attr]===undefined || value!==tr(nextSaved[attr])) nextSaved[attr]=value
+          const original=nextSaved[attr]
+          const next=locale==='bn'?tr(original):original
+          if(value!==next) el.setAttribute(attr,next)
+        }
+        attrOriginals.set(el,nextSaved)
+      })
+    }
+    let raf=0
+    const schedule=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(run)}
+    run()
+    const mo=new MutationObserver(schedule)
+    mo.observe(document.body,{subtree:true,childList:true})
+    return()=>{mo.disconnect();cancelAnimationFrame(raf)}
+  },[locale])
+
 'use client'
 
 import { useEffect } from 'react'
@@ -56,6 +98,8 @@ const BN: Record<string,string> = {
 
 const entries=Object.entries(BN).sort((a,b)=>b[0].length-a[0].length)
 const tr=(value:string)=>entries.reduce((s,[a,b])=>s.includes(a)?s.split(a).join(b):s,value)
+const textOriginals=new WeakMap<Text,string>()
+const attrOriginals=new WeakMap<Element,Record<string,string>>()
 
 export default function FenixUiTranslator(){
   const {locale}=useFenixLocale()
