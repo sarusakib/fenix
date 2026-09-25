@@ -197,7 +197,7 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
         const params = new URLSearchParams(window.location.search)
         const targetId = params.get('to') || ''
         if (targetId && targetId !== authId) {
-          window.dispatchEvent(new CustomEvent('fenix:open-message', { detail: { userId: targetId } }))
+          window.setTimeout(() => window.dispatchEvent(new CustomEvent('fenix:open-message', { detail: { userId: targetId } })), 0)
         }
       }
 
