@@ -57,6 +57,9 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
+            {user && <Link href="/messages" aria-label={bn ? 'বার্তা' : 'Messages'} className={'grid h-11 w-11 place-items-center rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] ' + (pathname === '/messages' ? 'text-[var(--fx-primary-strong)]' : 'text-[var(--fx-muted)]')}>
+              <ChatCircleDots size={21} weight="duotone"/>
+            </Link>}
             <button type="button" onClick={toggleTheme} aria-label="Toggle theme" className="grid h-11 w-11 place-items-center rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)]">{resolvedTheme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}</button>
             <button type="button" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? (bn ? 'মেনু বন্ধ' : 'Close menu') : (bn ? 'মেনু খুলুন' : 'Open menu')} aria-expanded={menuOpen} className="grid h-11 w-11 place-items-center rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)]">{menuOpen ? <X size={22}/> : <List size={22}/>}</button>
           </div>
@@ -71,6 +74,7 @@ export default function Navbar() {
               <MobileLink href="/" onClick={closeMenus} icon={<House size={18}/>} >{bn ? 'হোম' : 'Home'}</MobileLink>
               <MobileLink href="/search" onClick={closeMenus} emphasized icon={<MagnifyingGlass size={18}/>}>{bn ? 'সার্চ' : 'Search'}</MobileLink>
               <MobileLink href="/guide" onClick={closeMenus} emphasized icon={<Lightbulb size={18}/>}>{bn ? 'ব্রেইন' : 'Brain'}</MobileLink>
+              {user && <MobileLink href="/messages" onClick={closeMenus} emphasized icon={<ChatCircleDots size={18}/>}>{bn ? 'বার্তা' : 'Messages'}</MobileLink>}
               <MobileLink href="/invest" onClick={closeMenus} emphasized icon={<TrendUp size={18}/>}>{bn ? 'ইনভেস্ট' : 'Invest'}</MobileLink>
               <MobileLink href="/services" onClick={closeMenus} icon={<List size={18}/>}>{bn ? 'নেটওয়ার্ক' : 'Network'}</MobileLink>
               {user && <MobileLink href="/profile" onClick={closeMenus} icon={<UserCircle size={18}/>}>{bn ? 'প্রোফাইল' : 'Profile'}</MobileLink>}
