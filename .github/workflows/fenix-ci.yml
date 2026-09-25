@@ -22,9 +22,13 @@ jobs:
   quality:
     name: Lint, Typecheck & Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+      npm_config_ignore_scripts: 'true'
+      npm_config_audit: 'false'
+      npm_config_fund: 'false'
 
     steps:
       - name: Checkout
@@ -34,9 +38,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies (lifecycle scripts disabled)
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Dependency vulnerability scan
+        run: npm audit --audit-level=high --omit=dev
 
       - name: Lint
         run: npm run lint
