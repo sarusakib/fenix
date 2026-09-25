@@ -1,5 +1,6 @@
 import './globals.css'
 
+import { headers } from 'next/headers'
 import Script from 'next/script'
 import AuthSync from '../components/AuthSync'
 import FenixFlow from './FenixFlow'
@@ -60,15 +61,17 @@ const themeBootstrap = `
 })();
 `
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const nonce = (await headers()).get('x-fenix-nonce') ?? undefined
+
   return (
     <html lang="bn" suppressHydrationWarning>
       <body className="min-h-screen w-full overflow-x-clip antialiased">
-        <Script id="fenix-theme-bootstrap" strategy="beforeInteractive">{themeBootstrap}</Script>
+        <Script id="fenix-theme-bootstrap" nonce={nonce} strategy="beforeInteractive">{themeBootstrap}</Script>
         <AuthSync />
         <FenixLocaleProvider>
           <HomeThemeProvider>
