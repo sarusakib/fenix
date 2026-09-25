@@ -15,7 +15,11 @@ const securityHeaders = [
   },
   {
     key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(self), geolocation=(self), payment=()',
+    value: 'camera=(), microphone=(self), geolocation=(self), payment=(), usb=(), midi=(), serial=()',
+  },
+  {
+    key: 'Cross-Origin-Resource-Policy',
+    value: 'same-site',
   },
 ]
 
