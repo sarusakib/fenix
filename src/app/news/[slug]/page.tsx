@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Clock, Newspaper, ShieldCheck } from '@phosphor-
 import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
+import MarkNewsSeen from '@/components/news/MarkNewsSeen'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +21,7 @@ export default async function NewsArticle({params}:{params:Promise<{slug:string}
   const s=await createClient()
   const {data,error}=await (s as any).from('news_posts').select('*').eq('slug',slug).eq('status','published').maybeSingle()
   if(error || !data) notFound()
-  return <main className="fenix-shell min-h-dvh"><Navbar/><article className="mx-auto max-w-4xl px-4 pb-28 pt-7 sm:px-6">
+  return <main className="fenix-shell min-h-dvh"><Navbar/><MarkNewsSeen id={data.id}/><article className="mx-auto max-w-4xl px-4 pb-28 pt-7 sm:px-6">
     <Link href="/news" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3.5 text-xs font-bold"><ArrowLeft size={15}/> FeniX News</Link>
     <div className="mt-7"><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-[var(--fx-primary-soft)] px-3 py-1.5 text-[9px] font-black uppercase tracking-[.13em] text-[var(--fx-primary-strong)]">{labels[data.category]}</span>{data.breaking&&<span className="rounded-full bg-red-600 px-3 py-1.5 text-[9px] font-black uppercase tracking-[.13em] text-white">Breaking</span>}</div>
       <h1 className="mt-5 text-4xl font-black leading-tight tracking-[-.055em] sm:text-6xl">{data.title_en}</h1>
