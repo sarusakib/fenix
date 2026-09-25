@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import type { Metadata } from 'next'
 import { ArrowRight, BookOpen, MapPin, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
@@ -10,7 +11,8 @@ export const metadata: Metadata = {
   alternates:{canonical:'/feni'},
 }
 
-export default function FeniKnowledgeHub(){
+export default async function FeniKnowledgeHub(){
+  const nonce = (await headers()).get('x-fenix-nonce') ?? undefined
   const itemList=FENI_ARTICLES.map((article,index)=>({
     '@type':'ListItem',position:index+1,url:`https://fenix-saru.vercel.app/feni/${article.slug}`,name:article.titleEn,
   }))
@@ -32,7 +34,7 @@ export default function FeniKnowledgeHub(){
           <Link href={`/feni/${article.slug}`} className="mt-5 inline-flex min-h-10 items-center gap-2 text-sm font-bold text-[var(--fx-primary-strong)]">Read guide <ArrowRight size={15}/></Link>
         </article>)}
       </div>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({'@context':'https://schema.org','@type':'CollectionPage','name':'Feni District Guide | FeniX','description':'Public FeniX knowledge hub for Feni district.','url':'https://fenix-saru.vercel.app/feni','mainEntity':{'@type':'ItemList','itemListElement':itemList}})}}/>
+      <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({'@context':'https://schema.org','@type':'CollectionPage','name':'Feni District Guide | FeniX','description':'Public FeniX knowledge hub for Feni district.','url':'https://fenix-saru.vercel.app/feni','mainEntity':{'@type':'ItemList','itemListElement':itemList}})}}/>
     </section>
   </main>
 }
