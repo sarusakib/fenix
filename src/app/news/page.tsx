@@ -23,7 +23,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   const s = await createClient()
   const cookieStore = await cookies()
   const seenCookie = cookieStore.get('fenix_news_seen')?.value ?? ''
-  const seenIds = seenCookie.split(',').map(v => v.trim()).filter(Boolean).slice(0, 80)
+  const seenIds = seenCookie.split(',').map(v => v.trim()).filter(v => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v)).slice(0, 80)
   let query = (s as any).from('news_posts').select('id,slug,title_bn,title_en,excerpt_bn,excerpt_en,category,featured,breaking,verification_status,image_url,published_at,source_name').eq('status','published').order('published_at',{ascending:false}).limit(48)
   if (seenIds.length) query = query.not('id','in','(' + seenIds.join(',') + ')')
   if (category !== 'all') query = query.eq('category', category)
@@ -52,7 +52,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
       </div>
 
       {error ? <div className="mt-8 rounded-[1.7rem] border border-amber-500/20 bg-amber-500/[.05] p-6 text-sm leading-7 text-[var(--fx-muted)]"><strong className="text-[var(--fx-text)]">FeniX News is being prepared.</strong><br/>The newsroom database is not connected to this deployment yet.</div> :
-      !posts.length ? <div className="mt-8 rounded-[2rem] border border-dashed border-[var(--fx-border)] p-12 text-center"><Newspaper size={34} className="mx-auto opacity-30"/><p className="mt-4 text-lg font-black">No published stories yet.</p><p className="mt-2 text-sm text-[var(--fx-muted)]">FeniX Admin controls what becomes public.</p></div> :
+      !posts.length ? <div className="mt-8 rounded-[2rem] border border-dashed border-[var(--fx-border)] p-12 text-center"><Newspaper size={34} className="mx-auto opacity-30"/><p className="mt-4 text-lg font-black">You’re caught up.</p><p className="mt-2 text-sm text-[var(--fx-muted)]">You’ve already seen the available stories. New stories will appear here when they are published.</p></div> :
       <div className="mt-7">
         {lead && <Link href={'/news/'+lead.slug} className="group grid overflow-hidden rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] lg:grid-cols-[1.18fr_.82fr]">
           <div className="min-h-[320px] bg-[var(--fx-primary-soft)] p-6 sm:p-9 lg:p-10">
