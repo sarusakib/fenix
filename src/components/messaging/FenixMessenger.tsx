@@ -104,6 +104,7 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
   const hidden = ((!fullPage && pathname === '/messages') || pathname.startsWith('/login') || pathname.startsWith('/auth'))
 
   const [userId, setUserId] = useState('')
+  const [authChecked, setAuthChecked] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [people, setPeople] = useState<Record<string, Person>>({})
   const [reactions, setReactions] = useState<Reaction[]>([])
@@ -186,7 +187,9 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
 
     async function boot() {
       const { data: auth } = await supabase.auth.getUser()
-      if (disposed || !auth.user) return
+      if (disposed) return
+      setAuthChecked(true)
+      if (!auth.user) return
       const authId = auth.user.id
       userIdRef.current = authId
       setUserId(authId)
@@ -753,6 +756,18 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
   }
 
   if (hidden) return null
+  if (fullPage && authChecked && !userId) {
+    return (
+      <section className="relative z-[1] mx-auto flex min-h-[calc(100dvh-72px)] w-full max-w-7xl items-center justify-center border-x border-[var(--fx-border)] bg-[var(--fx-surface-strong)] px-6 text-center">
+        <div className="max-w-md rounded-3xl border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-8 shadow-xl backdrop-blur-xl">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><PaperPlaneRight size={30} weight="fill"/></div>
+          <h1 className="mt-5 text-xl font-black">Sign in to open messages</h1>
+          <p className="mt-2 text-sm leading-6 text-[var(--fx-muted)]">Your private conversations are available after you sign in.</p>
+          <a href="/login?next=%2Fmessages" className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--fx-primary-strong)] px-5 text-sm font-bold text-white">Sign in</a>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <>
