@@ -279,7 +279,7 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
       Object.values(typingTimersRef.current).forEach(clearTimeout)
       typingTimersRef.current = {}
     }
-  }, [hidden, supabase])
+  }, [fullPage, hidden, supabase])
 
   useEffect(() => {
     const handleOpen = (event: Event) => {
