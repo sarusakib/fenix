@@ -11,6 +11,7 @@ import ServiceWorkerRegister from '../components/pwa/ServiceWorkerRegister'
 import VoiceSearchButton from '../components/search/VoiceSearchButton'
 import FenixMessenger from '../components/messaging/FenixMessenger'
 import { FenixLocaleProvider } from '../components/i18n/FenixLocaleProvider'
+import FenixUiTranslator from '../components/i18n/FenixUiTranslator'
 
 export const metadata = {
   title: 'FeniX | Feni Business Ecosystem',
@@ -74,6 +75,7 @@ export default async function RootLayout({
         <Script id="fenix-theme-bootstrap" nonce={nonce} strategy="beforeInteractive">{themeBootstrap}</Script>
         <AuthSync />
         <FenixLocaleProvider>
+          <FenixUiTranslator />
           <HomeThemeProvider>
             <FenixFlow>
               <SiteBackground />
