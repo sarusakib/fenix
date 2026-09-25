@@ -155,10 +155,29 @@ html { scrollbar-width:thin; scrollbar-color:rgba(0,128,128,.35) transparent; }
 .fenix-brain [class*="bg-white/"] { background:var(--fx-surface) !important; }
 
 
-/* FeniX Messenger — original CSS ecosystem wallpaper */
-.fenix-chat-wallpaper{position:relative;isolation:isolate;background:radial-gradient(circle at 15% 18%,rgba(0,128,128,.11),transparent 24%),radial-gradient(circle at 84% 78%,rgba(196,154,53,.08),transparent 22%),linear-gradient(135deg,rgba(7,18,35,.045),rgba(0,128,128,.035))}
-.fenix-chat-wallpaper:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.42;background-image:radial-gradient(circle at 16px 16px,rgba(0,128,128,.16) 0 1.2px,transparent 1.8px),linear-gradient(32deg,transparent 47%,rgba(0,128,128,.055) 48% 49%,transparent 50%),linear-gradient(148deg,transparent 47%,rgba(196,154,53,.045) 48% 49%,transparent 50%);background-size:64px 64px,96px 96px,128px 128px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 100%)}
-.fenix-chat-wallpaper:after{content:"✦   ◇      ⟡   ·      ⌁      ✧   ◇      ·   ✦";position:absolute;inset:8% -10%;z-index:-1;display:flex;align-items:center;justify-content:center;white-space:pre-wrap;word-spacing:34px;font-size:22px;line-height:7;letter-spacing:14px;color:rgba(0,128,128,.055);transform:rotate(-12deg) scale(1.15);pointer-events:none}
-html.dark .fenix-chat-wallpaper{background:radial-gradient(circle at 15% 18%,rgba(102,218,214,.12),transparent 24%),radial-gradient(circle at 84% 78%,rgba(215,188,127,.07),transparent 22%),linear-gradient(135deg,rgba(3,8,15,.86),rgba(0,70,70,.20))}
-html.dark .fenix-chat-wallpaper:before{opacity:.58;background-image:radial-gradient(circle at 16px 16px,rgba(102,218,214,.17) 0 1.2px,transparent 1.8px),linear-gradient(32deg,transparent 47%,rgba(102,218,214,.065) 48% 49%,transparent 50%),linear-gradient(148deg,transparent 47%,rgba(215,188,127,.05) 48% 49%,transparent 50%)}
-html.dark .fenix-chat-wallpaper:after{color:rgba(102,218,214,.065)}
+/* FeniX Messages — colourful abstract CSS artwork (no external image asset) */
+.fenix-chat-wallpaper{position:relative;isolation:isolate;overflow:hidden;background:
+radial-gradient(circle at 12% 14%,rgba(0,128,128,.20),transparent 25%),
+radial-gradient(circle at 86% 12%,rgba(91,93,214,.17),transparent 24%),
+radial-gradient(circle at 78% 82%,rgba(236,72,153,.13),transparent 26%),
+radial-gradient(circle at 18% 84%,rgba(196,154,53,.14),transparent 24%),
+linear-gradient(135deg,#f7fbfa 0%,#eef8f6 45%,#f8f5fb 100%)}
+.fenix-chat-wallpaper:before{content:"";position:absolute;inset:-18%;z-index:-1;opacity:.68;background:
+radial-gradient(ellipse at 25% 35%,rgba(0,128,128,.12),transparent 24%),
+radial-gradient(ellipse at 70% 28%,rgba(91,93,214,.10),transparent 22%),
+radial-gradient(ellipse at 58% 72%,rgba(236,72,153,.08),transparent 24%),
+linear-gradient(125deg,transparent 0 40%,rgba(255,255,255,.45) 47%,transparent 54%);
+filter:blur(16px);transform:rotate(-8deg)}
+.fenix-chat-wallpaper:after{content:"✦   ◇      ⟡   ·      ⌁      ✧   ◇      ·   ✦";position:absolute;inset:8% -10%;z-index:-1;display:flex;align-items:center;justify-content:center;white-space:pre-wrap;word-spacing:34px;font-size:22px;line-height:7;letter-spacing:14px;color:rgba(11,23,54,.075);transform:rotate(-12deg) scale(1.15);pointer-events:none}
+html.dark .fenix-chat-wallpaper{background:
+radial-gradient(circle at 12% 14%,rgba(102,218,214,.15),transparent 25%),
+radial-gradient(circle at 86% 12%,rgba(129,140,248,.15),transparent 24%),
+radial-gradient(circle at 78% 82%,rgba(244,114,182,.10),transparent 26%),
+radial-gradient(circle at 18% 84%,rgba(215,188,127,.10),transparent 24%),
+linear-gradient(135deg,#071116 0%,#081a1a 45%,#10101e 100%)}
+html.dark .fenix-chat-wallpaper:before{opacity:.72;background:
+radial-gradient(ellipse at 25% 35%,rgba(102,218,214,.10),transparent 24%),
+radial-gradient(ellipse at 70% 28%,rgba(129,140,248,.10),transparent 22%),
+radial-gradient(ellipse at 58% 72%,rgba(244,114,182,.08),transparent 24%),
+linear-gradient(125deg,transparent 0 40%,rgba(255,255,255,.05) 47%,transparent 54%)}
+html.dark .fenix-chat-wallpaper:after{color:rgba(139,229,225,.075)}
