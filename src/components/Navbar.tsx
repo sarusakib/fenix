@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Bell, ChatCircleDots, CaretDown, House, Lightbulb, List, MagnifyingGlass, Moon, ShieldCheck, SignIn, SignOut, Sun, TrendUp, UsersThree, X, UserCircle } from '@phosphor-icons/react'
+import { Bell, ChatCircleDots, House, Lightbulb, List, MagnifyingGlass, Moon, ShieldCheck, SignIn, SignOut, Sun, TrendUp, X, UserCircle } from '@phosphor-icons/react'
 import { useAuthStore } from '../store/useAuthStore'
 import { useHomeTheme } from './theme/HomeThemeProvider'
 import { useFenixLocale } from './i18n/FenixLocaleProvider'
@@ -16,10 +16,9 @@ export default function Navbar() {
   const { locale } = useFenixLocale()
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [networkOpen, setNetworkOpen] = useState(false)
   const bn = locale === 'bn'
 
-  const closeMenus = () => { setMenuOpen(false); setNetworkOpen(false) }
+  const closeMenus = () => setMenuOpen(false)
   const toggleTheme = () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
 
   useEffect(() => {
@@ -28,7 +27,6 @@ export default function Navbar() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  const networkActive = pathname === '/services' || pathname === '/start' || pathname?.startsWith('/start/') || pathname?.startsWith('/directory') || pathname?.startsWith('/commerce') || pathname === '/jobs' || pathname === '/radar' || pathname === '/news' || pathname?.startsWith('/invest')
 
   return (
     <header className="sticky top-0 z-[80] border-b border-[var(--fx-border)] bg-[var(--fx-bg)]/88 text-[var(--fx-text)] backdrop-blur-2xl">
