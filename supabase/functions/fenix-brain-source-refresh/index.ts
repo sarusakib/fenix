@@ -71,7 +71,7 @@ function extractNewsItems(raw: string, sourceUrl: string, parserKey: string) {
   const sourcePage=new URL(sourceUrl);
   const localOnly=/fenirshomoy\.com|feninewsbd\.com/i.test(sourceUrl);
 
-  const regex=/<a\b[^>]*href=(["'])(.*?)\1[^>]*>([\\s\\S]*?)<\\/a>/gi;
+  const regex=/<a\b[^>]*href=(["'])(.*?)\1[^>]*>([\s\S]*?)<\/a>/gi;
   for(const match of raw.matchAll(regex)) {
     const href=String(match[2]??"").trim();
     const title=cleanTitle(String(match[3]??""));
