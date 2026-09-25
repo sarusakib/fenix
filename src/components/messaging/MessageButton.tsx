@@ -40,8 +40,7 @@ export default function MessageButton({
       return
     }
 
-    window.dispatchEvent(new CustomEvent('fenix:open-message', { detail: { userId } }))
-    setBusy(false)
+    window.location.assign(href)
   }
 
   return (
