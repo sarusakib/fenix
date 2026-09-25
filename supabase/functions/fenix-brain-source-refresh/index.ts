@@ -65,6 +65,26 @@ function isNewsItemTitle(value: string) {
     !/^page\s*\d+$/i.test(normalized);
 }
 
+function isLikelyStoryUrl(itemUrl:string, sourceUrl:string, parserKey:string) {
+  const item=new URL(itemUrl);
+  const source=new URL(sourceUrl);
+  if(item.hostname.toLowerCase()!==source.hostname.toLowerCase()) return false;
+
+  const path=item.pathname.toLowerCase();
+
+  if(parserKey==="notice_html") {
+    return (
+      /\\/(notice|notices)(\\/|$)/i.test(path) ||
+      /\\/(form-(administrative|legal-aid|circulars))(\\/|$)/i.test(path) ||
+      /notice|notices/i.test(decodeURIComponent(path))
+    );
+  }
+
+  if(/\\/(category|topic|tag|author|page|search|archive|feed|wp-json)(\\/|$)/i.test(path)) return false;
+  if(/\\/(about|contact|privacy|terms|login|register|menu)(\\/|$)/i.test(path)) return false;
+  return true;
+}
+
 function extractNewsItems(raw: string, sourceUrl: string, parserKey: string) {
   const items:{title:string;url:string;publishedAt:string|null}[]=[];
   const seen=new Set<string>();
@@ -84,6 +104,7 @@ function extractNewsItems(raw: string, sourceUrl: string, parserKey: string) {
       if(url.hostname.toLowerCase()!==sourcePage.hostname.toLowerCase()) continue;
       url.hash="";
       itemUrl=url.toString();
+      if(!isLikelyStoryUrl(itemUrl,sourceUrl,parserKey)) continue;
     } catch {
       continue;
     }
