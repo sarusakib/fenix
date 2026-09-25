@@ -31,7 +31,7 @@ export default function DashboardSettingsPage(){
    setReducedMotion(Boolean(data.reduced_motion))
   }
   void load(); return ()=>{active=false}
- },[setLocale,setTheme])
+ },[setTheme])
 
  const update=async(patch:Record<string,unknown>,success?:string)=>{
   if(!userId)return
