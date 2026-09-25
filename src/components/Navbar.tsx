@@ -7,7 +7,6 @@ import { Bell, ChatCircleDots, House, Lightbulb, List, MagnifyingGlass, Moon, Sh
 import { useAuthStore } from '../store/useAuthStore'
 import { useHomeTheme } from './theme/HomeThemeProvider'
 import { useFenixLocale } from './i18n/FenixLocaleProvider'
-import ServiceHub from './ServiceHub'
 import FenixBrand from './FenixBrand'
 
 export default function Navbar() {
@@ -64,11 +63,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {networkOpen && (
-        <div className="hidden border-t border-[var(--fx-border)] bg-[var(--fx-bg)]/97 px-4 py-4 backdrop-blur-2xl md:block">
-          <div className="mx-auto max-h-[72vh] max-w-6xl overflow-y-auto"><ServiceHub compact onNavigate={closeMenus} showHeader={false}/></div>
-        </div>
-      )}
 
       {menuOpen && (
         <div className="border-t border-[var(--fx-border)] bg-[var(--fx-bg)]/98 px-4 pb-6 pt-3 backdrop-blur-2xl md:hidden">
