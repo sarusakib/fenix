@@ -7,6 +7,10 @@ const ALLOWED_HOSTS = new Set([
   "bangladesh.gov.bd","feni.gov.bd","bbs.feni.gov.bd","sadar.feni.gov.bd",
   "chhagalnaiya.feni.gov.bd","daganbhuiyan.feni.gov.bd","fulgazi.feni.gov.bd",
   "parshuram.feni.gov.bd","sonagazi.feni.gov.bd","lged.sadar.feni.gov.bd",
+  "zpfeni.gov.bd","feni.judiciary.gov.bd",
+  "www.ntvbd.com","publisher.ntvbd.com","www.prothomalo.com",
+  "www.ajkerpatrika.com","fenirshomoy.com","www.fenirshomoy.com",
+  "feninewsbd.com","www.feninewsbd.com",
 ]);
 
 function isAllowedSourceUrl(raw: string) {
@@ -32,6 +36,172 @@ function cleanHtml(input: string) {
     .replace(/&gt;/gi,">")
     .replace(/\s+/g," ")
     .trim();
+}
+
+const NEWS_LOCAL_TERMS = [
+  "ফেনী","ফেনীতে","ফেনী সদর","ছাগলনাইয়া","ছাগলনাইয়া","দাগনভূঞা","দাগনভূইয়া",
+  "ফুলগাজী","পরশুরাম","সোনাগাজী","মহিপাল","ফেনী শহর","feni","chhagalnaiya",
+  "daganbhuiyan","fulgazi","parshuram","sonagazi",
+];
+
+const NEWS_NAV_NOISE = new Set([
+  "home","হোম","latest","সর্বশেষ","জাতীয়","আন্তর্জাতিক","বাংলাদেশ","বিশ্ব",
+  "অর্থনীতি","খেলা","বিনোদন","শিক্ষা","রাজনীতি","contact","যোগাযোগ","about","প্রথম পাতা",
+]);
+
+function cleanTitle(input: string) {
+  return cleanHtml(input)
+    .replace(/[|•]+/g," ")
+    .replace(/\s+/g," ")
+    .trim()
+    .slice(0,240);
+}
+
+function isNewsItemTitle(value: string) {
+  const normalized=value.trim().toLowerCase();
+  return normalized.length>=8 &&
+    normalized.length<=240 &&
+    !NEWS_NAV_NOISE.has(normalized) &&
+    !/^page\s*\d+$/i.test(normalized);
+}
+
+function extractNewsItems(raw: string, sourceUrl: string, parserKey: string) {
+  const items:{title:string;url:string;publishedAt:string|null}[]=[];
+  const seen=new Set<string>();
+  const sourcePage=new URL(sourceUrl);
+  const localOnly=/fenirshomoy\.com|feninewsbd\.com/i.test(sourceUrl);
+
+  const regex=/<a\b[^>]*href=(["'])(.*?)\1[^>]*>([\\s\\S]*?)<\\/a>/gi;
+  for(const match of raw.matchAll(regex)) {
+    const href=String(match[2]??"").trim();
+    const title=cleanTitle(String(match[3]??""));
+    if(!href||!isNewsItemTitle(title)) continue;
+
+    let itemUrl:string;
+    try {
+      const url=new URL(href,sourcePage);
+      if(!isAllowedSourceUrl(url.toString())) continue;
+      if(url.hostname.toLowerCase()!==sourcePage.hostname.toLowerCase()) continue;
+      url.hash="";
+      itemUrl=url.toString();
+    } catch {
+      continue;
+    }
+
+    if(itemUrl===sourcePage.toString() || seen.has(itemUrl)) continue;
+
+    const localRelevant=NEWS_LOCAL_TERMS.some((term)=>
+      title.toLowerCase().includes(term.toLowerCase()) ||
+      itemUrl.toLowerCase().includes(term.toLowerCase()),
+    );
+
+    if(parserKey==="news_html" && localOnly && !localRelevant) continue;
+
+    seen.add(itemUrl);
+    items.push({title,url:itemUrl,publishedAt:null});
+    if(items.length>=24) break;
+  }
+
+  return items;
+}
+
+function categoryForNews(title:string, parserKey:string) {
+  if(parserKey==="notice_html") return "public_notice";
+  const value=title.toLowerCase();
+  if(value.includes("চাকরি")||value.includes("নিয়োগ")||value.includes("নিয়োগ")||value.includes("job")) return "jobs";
+  if(value.includes("ব্যবসা")||value.includes("বাজার")||value.includes("business")) return "business";
+  if(value.includes("অনুষ্ঠান")||value.includes("উৎসব")||value.includes("event")) return "events";
+  return "local";
+}
+
+async function fetchAllowlistedSource(sourceUrl:string,headers:Record<string,string>) {
+  let currentUrl=sourceUrl;
+  for(let redirectCount=0;redirectCount<=3;redirectCount+=1) {
+    if(!isAllowedSourceUrl(currentUrl)) {
+      throw new Error("Blocked redirect to non-allowlisted host");
+    }
+
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),15000);
+    let response:Response;
+    try {
+      response=await fetch(currentUrl,{headers,redirect:"manual",signal:controller.signal});
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    if([301,302,303,307,308].includes(response.status)) {
+      const location=response.headers.get("location");
+      if(!location) throw new Error("Redirect without location");
+      currentUrl=new URL(location,currentUrl).toString();
+      continue;
+    }
+
+    return {response,finalUrl:currentUrl};
+  }
+
+  throw new Error("Too many redirects");
+}
+
+async function publishDiscoveredNews(
+  db:any,
+  source:any,
+  items:{title:string;url:string;publishedAt:string|null}[],
+  now:string,
+) {
+  if(!items.length) return {discovered:0,inserted:0,publicationStatus:"none"};
+
+  const rows=[];
+  for(const item of items) {
+    const key=await sha256(item.url);
+    const official=Boolean(source.auto_publish && source.trust_tier===1 && source.parser_key==="notice_html");
+    const status=official?"published":"review";
+    const titleBn=item.title;
+    const titleEn=official?("Official notice: "+item.title):item.title;
+    const sourceName=String(source.publisher||source.title||"FeniX News Source");
+    const sourceSentence=official
+      ? `এই তথ্যটি ${sourceName} প্রকাশিত একটি অফিসিয়াল নোটিশ/আপডেট থেকে FeniX News Feed-এ স্বয়ংক্রিয়ভাবে যুক্ত হয়েছে। মূল উৎস যাচাই করতে Source খুলুন।`
+      : `FeniX এই আপডেটটি ${sourceName} প্রকাশিত ফেনী-সংক্রান্ত কনটেন্ট থেকে শনাক্ত করেছে। এটি public করার আগে FeniX Admin review queue-তে থাকবে। মূল প্রতিবেদন Source-এ দেখুন।`;
+    const sourceSentenceEn=official
+      ? `This item was automatically added from an official notice or update published by ${sourceName}. Open the source for the original notice.`
+      : `FeniX detected this Feni-related update from ${sourceName}. It remains in the FeniX review queue before public publication. Open the source for the original report.`;
+
+    rows.push({
+      slug:"auto-"+key.slice(0,20),
+      title_bn:titleBn,
+      title_en:titleEn,
+      excerpt_bn:sourceSentence,
+      excerpt_en:sourceSentenceEn,
+      content_bn:sourceSentence+"\n\n"+titleBn,
+      content_en:sourceSentenceEn+"\n\n"+titleEn,
+      category:categoryForNews(item.title,source.parser_key),
+      status,
+      featured:false,
+      breaking:false,
+      source_name:sourceName,
+      source_url:item.url,
+      source_item_key:key,
+      source_published_at:item.publishedAt,
+      discovered_at:now,
+      automation_status:official?"auto_official":"review_queue",
+      verification_status:official?"official_source":"reported",
+      published_at:official?(item.publishedAt||now):null,
+    });
+  }
+
+  const result=await db
+    .from("news_posts")
+    .upsert(rows,{onConflict:"source_item_key",ignoreDuplicates:true})
+    .select("id,status,automation_status");
+
+  if(result.error) throw new Error("News insert failed: "+result.error.message);
+
+  const inserted=Array.isArray(result.data)?result.data.length:0;
+  return {
+    discovered:items.length,
+    inserted,
+    publicationStatus:rows.some((row)=>row.status==="published")?"published":"review",
+  };
 }
 
 async function sha256(text: string) {
@@ -146,17 +316,9 @@ Deno.serve(async(req)=>{
         throw new Error("Source host is not allowlisted");
       }
 
-      const controller=new AbortController();
-      const timeout=setTimeout(()=>controller.abort(),15000);
-      let response:Response;
-      try {
-        response=await fetch(source.url,{
-          headers,redirect:"follow",signal:controller.signal,
-        });
-      } finally {
-        clearTimeout(timeout);
-      }
-
+      const fetched=await fetchAllowlistedSource(source.url,headers);
+      const response=fetched.response;
+      const finalSourceUrl=fetched.finalUrl;
       const now=new Date().toISOString();
 
       if(response.status===304) {
@@ -178,6 +340,64 @@ Deno.serve(async(req)=>{
       const raw=await response.text();
       if(raw.length>source.max_bytes) {
         throw new Error("Source exceeds configured byte limit");
+      }
+
+      if(source.parser_key==="notice_html" || source.parser_key==="news_html") {
+        const items=extractNewsItems(raw,finalSourceUrl,source.parser_key);
+        if(!items.length) throw new Error("News source produced no usable local items");
+
+        const itemSignature=await sha256(items.map((item)=>item.url+"|"+item.title).join("\n"));
+        const refreshNow=await db
+          .from("fenix_brain_source_refresh")
+          .select("last_content_hash")
+          .eq("source_id",source.source_id)
+          .single();
+        const previousItemHash=refreshNow.data?.last_content_hash??null;
+
+        if(previousItemHash===itemSignature) {
+          report.unchanged++;
+          await db.from("fenix_brain_update_runs").update({
+            completed_at:now,status:"unchanged",http_status:response.status,
+            content_hash:itemSignature,bytes_read:raw.length,
+          }).eq("id",runId);
+        } else {
+          const newsResult=await publishDiscoveredNews(db,source,items,now);
+          report.changed++;
+          report.published+=newsResult.inserted;
+
+          await db.from("fenix_brain_update_candidates").insert({
+            source_id:source.source_id,
+            content_hash:itemSignature,
+            previous_hash:previousItemHash,
+            title:source.title,
+            source_url:finalSourceUrl,
+            extracted_content:items.slice(0,20).map((item)=>item.title).join("\n"),
+            change_summary:previousItemHash
+              ? `News source changed; discovered ${newsResult.discovered} local items and inserted ${newsResult.inserted} news records.`
+              : `Initial news discovery; found ${newsResult.discovered} local items.`,
+            status:source.auto_publish ? "auto_published" : "pending",
+            reviewed_at:source.auto_publish ? now : null,
+          });
+
+          await db.from("fenix_brain_update_runs").update({
+            completed_at:now,status:"changed",http_status:response.status,
+            content_hash:itemSignature,bytes_read:raw.length,
+          }).eq("id",runId);
+        }
+
+        await db.from("fenix_brain_source_refresh").update({
+          next_refresh_at:nextAt(source.refresh_interval_hours),
+          last_checked_at:now,
+          last_success_at:now,
+          last_http_status:response.status,
+          last_content_hash:itemSignature,
+          etag:response.headers.get("etag"),
+          last_modified:response.headers.get("last-modified"),
+          last_error:null,
+          updated_at:now,
+        }).eq("source_id",source.source_id);
+
+        continue;
       }
 
       const text=cleanHtml(raw);
