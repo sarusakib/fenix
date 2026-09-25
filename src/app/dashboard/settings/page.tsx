@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, Bell, CheckCircle, GearSix, Globe, LockKey, Moon, Palette, ShieldCheck, Sun, UserCircle } from '@phosphor-icons/react'
+import { ArrowLeft, Bell, CheckCircle, GearSix, Moon, Palette, ShieldCheck, Sun, UserCircle } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { useHomeTheme, type HomeTheme } from '@/components/theme/HomeThemeProvider'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
@@ -14,11 +14,8 @@ const THEMES: Array<{key:HomeTheme;label:string;icon:typeof Sun}>=[
 
 export default function DashboardSettingsPage(){
  const {theme,setTheme}=useHomeTheme()
- const {locale,setLocale}=useFenixLocale()
+ const {locale}=useFenixLocale()
  const [userId,setUserId]=useState('')
- const [visibility,setVisibility]=useState<'public'|'private'>('public')
- const [messagePermissions,setMessagePermissions]=useState<'everyone'|'authenticated'|'nobody'>('everyone')
- const [feedVisibility,setFeedVisibility]=useState<'public'|'authenticated'>('public')
  const [reducedMotion,setReducedMotion]=useState(false)
  const [notice,setNotice]=useState('')
 
@@ -32,10 +29,6 @@ export default function DashboardSettingsPage(){
    if(!active||!data)return
    if(['light','dark','system'].includes(data.theme)) setTheme(data.theme as HomeTheme)
    setReducedMotion(Boolean(data.reduced_motion))
-   if(data.profile_visibility==='private')setVisibility('private')
-   if(data.message_permissions==='everyone'||data.message_permissions==='authenticated'||data.message_permissions==='nobody')setMessagePermissions(data.message_permissions)
-   if(data.feed_visibility==='authenticated')setFeedVisibility('authenticated')
-   if(data.locale==='bn'||data.locale==='en')setLocale(data.locale)
   }
   void load(); return ()=>{active=false}
  },[setLocale,setTheme])
@@ -69,13 +62,6 @@ export default function DashboardSettingsPage(){
      </div>
     </section>
 
-    <section className="rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-7">
-     <SectionHead icon={<Globe size={21}/>} title={bn?'Language':'Language'} text={bn?'FeniX-এর shared UI preference ঠিক করুন।':'Choose the shared FeniX interface language.'}/>
-     <div className="mt-5 grid grid-cols-2 gap-2">
-      <button type="button" onClick={()=>{setLocale('bn');void update({locale:'bn'},'ভাষা বাংলা করা হয়েছে।')}} className={'min-h-12 rounded-xl border text-sm font-bold '+(locale==='bn'?'border-[var(--fx-primary)]/25 bg-[var(--fx-primary-soft)]':'border-[var(--fx-border)]')}>বাংলা</button>
-      <button type="button" onClick={()=>{setLocale('en');void update({locale:'en'},'Language set to English.')}} className={'min-h-12 rounded-xl border text-sm font-bold '+(locale==='en'?'border-[var(--fx-primary)]/25 bg-[var(--fx-primary-soft)]':'border-[var(--fx-border)]')}>English</button>
-     </div>
-    </section>
 
     <section className="rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-7">
      <SectionHead icon={<Palette size={21}/>} title={bn?'Appearance':'Appearance'} text={bn?'Light, dark বা device preference।':'Light, dark or device preference.'}/>
@@ -83,14 +69,6 @@ export default function DashboardSettingsPage(){
      <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-[var(--fx-border)] p-4"><div><p className="text-sm font-bold">{bn?'Reduced motion':'Reduced motion'}</p><p className="mt-1 text-xs text-[var(--fx-muted)]">{bn?'Animation কমিয়ে দিন।':'Reduce extra motion and transitions.'}</p></div><button type="button" role="switch" aria-checked={reducedMotion} onClick={()=>chooseMotion(!reducedMotion)} className={'relative h-7 w-12 shrink-0 rounded-full '+(reducedMotion?'bg-[var(--fx-primary)]':'bg-black/10 dark:bg-white/10')}><span className={'absolute top-1 h-5 w-5 rounded-full bg-white transition '+(reducedMotion?'left-6':'left-1')}/></button></div>
     </section>
 
-    <section className="rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-7">
-     <SectionHead icon={<LockKey size={21}/>} title={bn?'Privacy & visibility':'Privacy & visibility'} text={bn?'আপনার public identity ও community visibility নিয়ন্ত্রণ করুন।':'Control public identity and community visibility.'}/>
-     <div className="mt-5 grid gap-4 sm:grid-cols-3">
-      <Select label={bn?'Profile':'Profile'} value={visibility} onChange={v=>{setVisibility(v as typeof visibility);void update({profile_visibility:v})}} options={[['public','Public'],['private',bn?'Private':'Private']]}/>
-      <Select label={bn?'Message':'Messages'} value={messagePermissions} onChange={v=>{setMessagePermissions(v as typeof messagePermissions);void update({message_permissions:v})}} options={[['everyone',bn?'Everyone':'Everyone'],['authenticated',bn?'Logged-in users':'Authenticated users'],['nobody',bn?'Nobody':'Nobody']]}/>
-      <Select label={bn?'Feed':'Feed'} value={feedVisibility} onChange={v=>{setFeedVisibility(v as typeof feedVisibility);void update({feed_visibility:v})}} options={[['public','Public'],['authenticated',bn?'Logged-in users':'Authenticated users']]}/>
-     </div>
-    </section>
 
     <section className="rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-7">
      <SectionHead icon={<ShieldCheck size={21}/>} title={bn?'Safety & control':'Safety & control'} text={bn?'Report, policy, verification ও support এখান থেকে পাওয়া যাবে।':'Access reporting, policy, verification and help.'}/>
