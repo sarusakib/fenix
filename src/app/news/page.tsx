@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Clock, Newspaper, ShieldCheck, TrendUp } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
+import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +21,11 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   const category = categories.some(([id]) => id === params.category) ? params.category : 'all'
   const q = (params.q ?? '').trim().slice(0, 80)
   const s = await createClient()
+  const cookieStore = await cookies()
+  const seenCookie = cookieStore.get('fenix_news_seen')?.value ?? ''
+  const seenIds = seenCookie.split(',').map(v => v.trim()).filter(Boolean).slice(0, 80)
   let query = (s as any).from('news_posts').select('id,slug,title_bn,title_en,excerpt_bn,excerpt_en,category,featured,breaking,verification_status,image_url,published_at,source_name').eq('status','published').order('published_at',{ascending:false}).limit(48)
+  if (seenIds.length) query = query.not('id','in','(' + seenIds.join(',') + ')')
   if (category !== 'all') query = query.eq('category', category)
   if (q) query = query.or('title_bn.ilike.%'+q+'%,title_en.ilike.%'+q+'%,excerpt_bn.ilike.%'+q+'%,excerpt_en.ilike.%'+q+'%')
   const { data, error } = await query
