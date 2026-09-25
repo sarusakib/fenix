@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, Bell, CheckCircle, GearSix, Moon, Palette, ShieldCheck, Sun, UserCircle } from '@phosphor-icons/react'
+import { ArrowLeft, CheckCircle, Moon, Palette, ShieldCheck, Sun, UserCircle } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { useHomeTheme, type HomeTheme } from '@/components/theme/HomeThemeProvider'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
