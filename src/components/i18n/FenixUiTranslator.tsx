@@ -6,7 +6,7 @@ import { useFenixLocale } from './FenixLocaleProvider'
 const BN: Record<string,string> = {
   'Feni Business Ecosystem':'ফেনীর ব্যবসা ও স্থানীয় ইকোসিস্টেম',
   'Build. Connect. Grow.':'গড়ুন। সংযুক্ত হন। এগিয়ে যান।',
-  Home:'হোম', Search:'সার্চ', Messages:'বার্তা', Message:'বার্তা', Network:'নেটওয়ার্ক',
+  Home:'হোম', Feed:'ফিড', Search:'সার্চ', Messages:'বার্তা', Message:'বার্তা', Network:'নেটওয়ার্ক',
   Brain:'ব্রেইন', Invest:'বিনিয়োগ', Profile:'প্রোফাইল', Logout:'লগআউট', Login:'লগইন',
   Account:'অ্যাকাউন্ট', Notifications:'নোটিফিকেশন', Settings:'সেটিংস', Language:'ভাষা',
   Appearance:'চেহারা ও প্রদর্শন', 'Edit profile':'প্রোফাইল সম্পাদনা', 'My Profile':'আমার প্রোফাইল',
