@@ -135,8 +135,6 @@ export default function ProfileEditorPage() {
 
   const publicUrl = username ? '/profile/' + encodeURIComponent(username) : '/profile'
 
-  const cleanOptionalUrl = (value: string) => cleanPublicUrl(value)
-
   async function copyProfileLink() {
     try {
       await navigator.clipboard.writeText(window.location.origin + publicUrl)
