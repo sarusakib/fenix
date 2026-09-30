@@ -28,6 +28,7 @@ export default async function NewsArticle({params}:{params:Promise<{slug:string}
       <p className="mt-4 text-xl leading-8 text-[var(--fx-muted)]">{data.title_bn}</p>
       <div className="mt-5 flex flex-wrap items-center gap-4 text-[11px] text-[var(--fx-muted)]"><span className="inline-flex items-center gap-1.5"><Clock size={14}/>{data.published_at?new Date(data.published_at).toLocaleString('en-BD'):''}</span><span className="inline-flex items-center gap-1.5"><ShieldCheck size={14}/>{data.source_name||'FeniX News Desk'}</span></div>
     </div>
+    {data.image_url&&<img src={data.image_url} alt="" width={1600} height={900} className="mt-8 max-h-[620px] w-full rounded-[2rem] border border-[var(--fx-border)] object-cover"/>}
     <div className="mt-8 rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-8">
       <div className="border-b border-[var(--fx-border)] pb-7"><p className="text-base leading-8 text-[var(--fx-muted)]">{data.excerpt_en||data.excerpt_bn||''}</p></div>
       <div className="mt-7 whitespace-pre-wrap text-[15px] leading-8">{data.content_en}</div>

@@ -8,9 +8,11 @@ import { canonicalBrainIntent, buildZeroResultHints } from '../../lib/feniBrainE
 import { classifyFeniBrainQuestion, detectLanguage, detectFeniBrainIntent, detectRequestedFactSubject, extractBudgetBDT, extractEntities } from '../../lib/feniBrainQuery'
 
 const MODEL = process.env.FENI_BRAIN_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
+const PROVIDER = 'together'
 const MAX_QUERY_LENGTH = 120
 const MAX_CONTEXT_LENGTH = 12000
-const MAX_ANSWER_TOKENS = 900
+const MAX_ANSWER_TOKENS = 650
+const AI_TIMEOUT_MS = 9000
 const MAX_EVIDENCE_ITEMS = 8
 
 function clean(value) {
@@ -226,9 +228,9 @@ export async function answerFeniBrain(query) {
   try {
     const hf = new HfInference(token)
     const context = buildContext(retrieval.results || [], liveSources)
-    const response = await hf.chatCompletion({
+    const responsePromise = hf.chatCompletion({
       model: MODEL,
-      provider: 'auto',
+      provider: PROVIDER,
       messages: [
         {
           role: 'system',
@@ -247,6 +249,11 @@ export async function answerFeniBrain(query) {
       temperature: 0.2,
     })
 
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Feni Brain AI timeout.')), AI_TIMEOUT_MS)
+    })
+    const response = await Promise.race([responsePromise, timeoutPromise])
+
     const answer = response?.choices?.[0]?.message?.content?.trim()
     if (!answer) throw new Error('Empty Feni Brain response.')
 
@@ -260,7 +267,7 @@ export async function answerFeniBrain(query) {
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
     }
   } catch (error) {
-    console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status })
+    console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status, provider: PROVIDER, model: MODEL, message: error?.message?.slice?.(0, 240) })
     return {
       success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(cleanQuery, retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
