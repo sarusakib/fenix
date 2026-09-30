@@ -259,13 +259,14 @@ export default function SettingsPage() {
 }
 
 function SettingsSection({ icon, title, text, children }: { icon: React.ReactNode; title: string; text: string; children: React.ReactNode }) {
-  return <section className="rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-5 sm:p-7">
-    <div className="flex items-start gap-3">
+  return <details className="group rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-0">
+    <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 p-5 [&::-webkit-details-marker]:hidden sm:p-6">
       <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]">{icon}</div>
-      <div><h2 className="text-lg font-black">{title}</h2><p className="mt-1 text-sm leading-6 text-[var(--fx-muted)]">{text}</p></div>
-    </div>
-    <div className="mt-5 space-y-2">{children}</div>
-  </section>
+      <div className="min-w-0 flex-1"><h2 className="text-lg font-black">{title}</h2><p className="mt-1 text-sm leading-6 text-[var(--fx-muted)]">{text}</p></div>
+      <span aria-hidden="true" className="text-xl font-light text-[var(--fx-muted)] transition-transform group-open:rotate-45">+</span>
+    </summary>
+    <div className="space-y-2 border-t border-[var(--fx-border)] p-5 sm:p-6">{children}</div>
+  </details>
 }
 
 function SettingRow({ title, body, control }: { title: string; body: string; control: React.ReactNode }) {
