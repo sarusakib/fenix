@@ -4113,6 +4113,7 @@ export type Database = {
       }
       is_fenix_admin: { Args: never; Returns: boolean }
       is_fenix_user_active: { Args: { p_user_id?: string }; Returns: boolean }
+      is_fenix_username_available: { Args: { p_exclude_user_id?: string; p_username: string }; Returns: boolean }
       keyword_feni_brain_chunks: {
         Args: { match_count?: number; query_text: string }
         Returns: {
