@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Globe, MapPin, UserCircle } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, FacebookLogo, Globe, InstagramLogo, MapPin, UserCircle, WhatsappLogo } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import ProfileReportButton from '@/components/profile/ProfileReportButton'
 import MessageButton from '@/components/messaging/MessageButton'
@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
   const s = await createClient()
-  const { data } = await s.from('fenix_public_profiles').select('full_name,username,bio,location_text').eq('username', decodeURIComponent(username).toLowerCase()).maybeSingle()
+  const { data } = await s.from('fenix_public_profiles').select('full_name,username,bio,location_text,instagram_url,facebook_url,whatsapp_url').eq('username', decodeURIComponent(username).toLowerCase()).maybeSingle()
   return {
     title: data?.full_name ? `${data.full_name} | FeniX` : 'FeniX Profile',
     description: data?.bio || 'Public profile on FeniX — Feni Business Ecosystem.',
@@ -23,7 +23,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const s = await createClient()
   const { data: profile } = await s
     .from('fenix_public_profiles')
-    .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,created_at')
+    .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,instagram_url,facebook_url,whatsapp_url,created_at')
     .eq('username', decodeURIComponent(username).toLowerCase())
     .maybeSingle()
 
@@ -58,6 +58,11 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               <div className="mt-5 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">
                 {profile.location_text && <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5"><MapPin size={14}/>{profile.location_text}</span>}
                 {website && <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5 hover:underline"><Globe size={14}/>Website</a>}
+              </div>
+              {(profile.instagram_url || profile.facebook_url || profile.whatsapp_url) && <div className="mt-4 flex gap-2">
+                {profile.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><InstagramLogo size={17}/></a>}
+                {profile.facebook_url && <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><FacebookLogo size={17}/></a>}
+                {profile.whatsapp_url && <a href={profile.whatsapp_url} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><WhatsappLogo size={17}/></a>}
               </div>
               <ProfileReportButton profileId={profileId} locale="bn" />
               <p className="mt-5 text-[11px] text-[var(--fx-muted)]">FeniX member since {new Date(createdAt).toLocaleDateString('en-BD')}</p>
