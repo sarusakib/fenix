@@ -173,11 +173,11 @@ function FeniBrainGuide() {
       <div className="relative z-10">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <Link
-            href="/"
+            href="/feed"
             className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm text-white/65 transition hover:bg-white/[0.07] hover:text-white"
           >
             <ArrowLeft size={17} />
-            Back
+            Feed
           </Link>
 
           <div className="mt-8 rounded-3xl border border-white/[0.08] bg-black/35 p-5 backdrop-blur-xl sm:p-8">
