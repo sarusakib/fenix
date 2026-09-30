@@ -389,14 +389,3 @@ function PostCard({p,locale,userId,followedProfiles,onVote,onFollow,onSave,onSha
     </div>}
   </article>
 }
-  return <article className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5">
-    <div className="flex items-center gap-3">{p.author_avatar_url?<img src={p.author_avatar_url} alt="" loading="lazy" decoding="async" width={36} height={36} className="h-9 w-9 rounded-full object-cover"/>:<UserCircle size={36} className="opacity-40"/>}<div><p className="text-sm font-bold">{p.author_name||p.author_username||'FeniX user'}</p><time className="text-[11px] text-[var(--fx-muted)]">{fmt(p.created_at,locale)}</time></div></div>
-    {p.body&&<p className="mt-3 whitespace-pre-wrap text-sm leading-7">{p.body}</p>}
-    {p.media?.length>0&&<div className={`mt-4 grid gap-2 ${p.media.length===1?'grid-cols-1':'grid-cols-2'}`}>{p.media.map(media=><div key={media.id} className="overflow-hidden rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)]"><img src={media.public_url} alt="" loading="lazy" decoding="async" width={media.width??1200} height={media.height??800} className="max-h-[520px] w-full object-cover"/></div>)}</div>}
-    <div className="mt-4 flex flex-wrap items-center gap-2">
-      <button onClick={()=>onVote(p.id)} className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ThumbsUp size={15}/>{locale==='bn'?'Like':'Like'} · {p.score}</button>
-      <Link href={`/feed/post/${p.id}`} className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ChatCircle size={15}/>{locale==='bn'?'মন্তব্য':'Comments'} · {p.comment_count}</Link>
-      <button onClick={()=>void navigator.share?.({title:p.author_name||'FeniX post',url:location.origin+`/feed/post/${p.id}`})} className="ml-auto inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ShareNetwork size={15}/>{locale==='bn'?'শেয়ার':'Share'}</button>
-    </div>
-  </article>
-}
