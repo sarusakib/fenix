@@ -90,10 +90,14 @@ export default function ProfileEditorPage() {
         return
       }
 
-      const [{ data: profile }, { data: settings }] = await Promise.all([
+      const [{ data: profile }, { data: contacts }, { data: settings }] = await Promise.all([
         s.from('profiles')
-          .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url')
+          .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url')
           .eq('id', auth.user.id)
+          .maybeSingle(),
+        s.from('profile_contacts')
+          .select('whatsapp,facebook_url,instagram_url,public_whatsapp,public_facebook_url,public_instagram_url')
+          .eq('user_id', auth.user.id)
           .maybeSingle(),
         s.from('profile_settings')
           .select('locale,theme,profile_visibility,message_permissions,feed_visibility,reduced_motion')
@@ -118,9 +122,9 @@ export default function ProfileEditorPage() {
       setBio(profile?.bio ?? '')
       setLocationText(profile?.location_text ?? '')
       setWebsiteUrl(profile?.website_url ?? '')
-      setWhatsappUrl(profile?.whatsapp_url ?? '')
-      setFacebookUrl(profile?.facebook_url ?? '')
-      setInstagramUrl(profile?.instagram_url ?? '')
+      setWhatsappUrl(contacts?.whatsapp ?? contacts?.public_whatsapp ?? '')
+      setFacebookUrl(contacts?.facebook_url ?? contacts?.public_facebook_url ?? '')
+      setInstagramUrl(contacts?.instagram_url ?? contacts?.public_instagram_url ?? '')
       setAvatarUrl(profile?.avatar_url ?? providerAvatar)
       setCoverUrl(profile?.cover_url ?? '')
 
@@ -284,11 +288,21 @@ export default function ProfileEditorPage() {
         cover_url: cleanPublicUrl(coverUrl),
         location_text: locationText.trim().slice(0, 160) || null,
         website_url: values.website,
-        whatsapp_url: values.whatsapp,
-        facebook_url: values.facebook,
-        instagram_url: values.instagram,
         updated_at: new Date().toISOString(),
       }).eq('id', auth.user.id),
+      s.from('profile_contacts').upsert({
+        user_id: auth.user.id,
+        whatsapp: values.whatsapp,
+        facebook_url: values.facebook,
+        instagram_url: values.instagram,
+        public_whatsapp: values.whatsapp,
+        public_facebook_url: values.facebook,
+        public_instagram_url: values.instagram,
+        whatsapp_public: Boolean(values.whatsapp),
+        facebook_public: Boolean(values.facebook),
+        instagram_public: Boolean(values.instagram),
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' }),
       s.from('profile_settings').upsert({
         user_id: auth.user.id,
         locale,
@@ -312,6 +326,12 @@ export default function ProfileEditorPage() {
       setMessage(bn ? 'Profile updated.' : 'Profile updated.')
     }
     setBusy(false)
+  }
+
+  async function updateLocale(next: 'bn' | 'en') {
+    setLocale(next)
+    const s = createClient()
+    await s.from('profile_settings').update({ locale: next, updated_at: new Date().toISOString() }).eq('user_id', userId)
   }
 
   async function chooseTheme(next: HomeTheme) {
@@ -465,8 +485,8 @@ export default function ProfileEditorPage() {
 
           <SettingRow icon={<Translate size={19}/>} title={bn ? 'ভাষা' : 'Language'} hint={bn ? 'বাংলা / English' : 'Bangla / English'}>
             <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => { setLocale('bn'); void save() }} className={'min-h-11 rounded-xl border text-xs font-bold ' + (bn ? 'border-[var(--fx-primary)]/30 bg-[var(--fx-primary-soft)]' : 'border-[var(--fx-border)]')}>বাংলা</button>
-              <button type="button" onClick={() => { setLocale('en'); void save() }} className={'min-h-11 rounded-xl border text-xs font-bold ' + (!bn ? 'border-[var(--fx-primary)]/30 bg-[var(--fx-primary-soft)]' : 'border-[var(--fx-border)]')}>English</button>
+              <button type="button" onClick={() => void updateLocale('bn')} className={'min-h-11 rounded-xl border text-xs font-bold ' + (bn ? 'border-[var(--fx-primary)]/30 bg-[var(--fx-primary-soft)]' : 'border-[var(--fx-border)]')}>বাংলা</button>
+              <button type="button" onClick={() => void updateLocale('en')} className={'min-h-11 rounded-xl border text-xs font-bold ' + (!bn ? 'border-[var(--fx-primary)]/30 bg-[var(--fx-primary-soft)]' : 'border-[var(--fx-border)]')}>English</button>
             </div>
           </SettingRow>
 
