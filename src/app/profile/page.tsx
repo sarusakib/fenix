@@ -54,6 +54,32 @@ export default function ProfileEditorPage() {
   const [message, setMessage] = useState('')
   const [copied, setCopied] = useState(false)
   const [imageBusy, setImageBusy] = useState<'avatar' | 'cover' | null>(null)
+  const [imageProgress, setImageProgress] = useState(0)
+  const [usernameStatus, setUsernameStatus] = useState<'idle'|'checking'|'available'|'taken'|'invalid'>('idle')
+
+  useEffect(() => {
+    const value = username.trim().toLowerCase()
+    if (!value) {
+      setUsernameStatus('idle')
+      return
+    }
+    if (!/^[a-z0-9._]{3,30}$/.test(value) || value.startsWith('.') || value.endsWith('.') || value.includes('..')) {
+      setUsernameStatus('invalid')
+      return
+    }
+    if (value === username.toLowerCase() && value === username.trim().toLowerCase() && value === (originalUsername || '').toLowerCase()) {
+      setUsernameStatus('available')
+      return
+    }
+    setUsernameStatus('checking')
+    const timer = window.setTimeout(async () => {
+      const s = createClient()
+      const { data, error } = await s.rpc('is_fenix_username_available', { p_username: value, p_exclude_user_id: userId || undefined })
+      if (!error) setUsernameStatus(data ? 'available' : 'taken')
+      else setUsernameStatus('idle')
+    }, 450)
+    return () => window.clearTimeout(timer)
+  }, [username, originalUsername, userId])
 
   useEffect(() => {
     let active = true
@@ -130,10 +156,13 @@ export default function ProfileEditorPage() {
       const { data: auth } = await s.auth.getUser()
       if (!auth.user) throw new Error('Please sign in again.')
       const previousUrl = kind === 'avatar' ? avatarUrl : coverUrl
-      const optimized = await optimizeImageFile(file, { maxDimension: kind === 'avatar' ? 960 : 1800 })
+      setImageProgress(15)
+      const optimized = await optimizeImageFile(file, { maxDimension: kind === 'avatar' ? 960 : 1800, targetBytes: 138 * 1024, hardLimitBytes: 150 * 1024 })
+      setImageProgress(55)
       const extension = optimized.mimeType === 'image/webp' ? 'webp' : 'jpg'
       const path = auth.user.id + '/' + kind + '/' + crypto.randomUUID() + '.' + extension
-      const uploaded = await uploadOptimizedPublicImage(s, 'avatars', path, optimized)
+      const uploaded = await uploadOptimizedPublicImage(s, 'avatars', path, optimized, 150 * 1024)
+      setImageProgress(80)
       const patch = kind === 'avatar' ? { avatar_url: uploaded.publicUrl } : { cover_url: uploaded.publicUrl }
       const { error } = await s.from('profiles').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', auth.user.id)
       if (error) {
@@ -142,12 +171,14 @@ export default function ProfileEditorPage() {
       }
       if (kind === 'avatar') setAvatarUrl(uploaded.publicUrl)
       else setCoverUrl(uploaded.publicUrl)
+      setImageProgress(100)
       const oldPath = previousStoragePath(previousUrl, 'avatars')
       if (oldPath) await removePublicImage(s, 'avatars', oldPath)
       setMessage(locale === 'bn' ? (kind === 'avatar' ? 'Profile photo gallery থেকে আপলোড হয়েছে।' : 'Cover photo gallery থেকে আপলোড হয়েছে।') : (kind === 'avatar' ? 'Profile photo uploaded from your gallery.' : 'Cover photo uploaded from your gallery.'))
     } catch (error) {
       setMessage(locale === 'bn' ? 'ছবিটি আপলোড করা যায়নি। অন্য একটি photo চেষ্টা করুন।' : (error instanceof Error ? error.message : 'Image upload failed.'))
     } finally {
+      window.setTimeout(() => setImageProgress(0), 500)
       setImageBusy(null)
     }
   }
@@ -156,8 +187,13 @@ export default function ProfileEditorPage() {
     setBusy(true)
     setMessage('')
     const cleanUsername = username.trim().toLowerCase()
-    if (!/^[a-z0-9_]{3,32}$/.test(cleanUsername)) {
+    if (!/^[a-z0-9._]{3,30}$/.test(cleanUsername) || cleanUsername.startsWith('.') || cleanUsername.endsWith('.') || cleanUsername.includes('..')) {
       setMessage(locale === 'bn' ? 'Username 3–32 অক্ষরের lowercase letter/number/underscore হতে হবে।' : 'Username must be 3–32 lowercase letters, numbers or underscores.')
+      setBusy(false)
+      return
+    }
+    if (usernameStatus === 'checking' || usernameStatus === 'taken' || usernameStatus === 'invalid') {
+      setMessage(locale === 'bn' ? 'এই username ব্যবহার করা যাবে না।' : 'This username is not available.')
       setBusy(false)
       return
     }
@@ -270,7 +306,7 @@ export default function ProfileEditorPage() {
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">These details power your public identity across eligible FeniX features. Private account information is never turned into public profile content.</p>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <Field label={locale==='bn'?'নাম':'Name'} value={fullName} onChange={setFullName} maxLength={160}/>
-            <Field label="Username" value={username} onChange={v=>setUsername(v.replace(/[^a-zA-Z0-9_]/g,'').toLowerCase())} maxLength={32} prefix="@"/>
+            <div><Field label="Username" value={username} onChange={v=>setUsername(v.replace(/[^a-zA-Z0-9._]/g,'').toLowerCase())} maxLength={30} prefix="@"/><p className={'mt-1 text-[10px] '+(usernameStatus==='available'?'text-[var(--fx-primary-strong)]':usernameStatus==='taken'||usernameStatus==='invalid'?'text-red-600':'text-[var(--fx-muted)]')}>{usernameStatus==='checking'?(locale==='bn'?'Username যাচাই হচ্ছে…':'Checking username…'):usernameStatus==='available'?(locale==='bn'?'Username পাওয়া যাচ্ছে':'Username available'):usernameStatus==='taken'?(locale==='bn'?'এই username ইতিমধ্যে নেওয়া হয়েছে':'Username already taken'):usernameStatus==='invalid'?(locale==='bn'?'3–30 অক্ষর, a-z/0-9/._ এবং শুরু/শেষে dot নয়':'Use 3–30 lowercase letters, numbers, dot or underscore; no leading/trailing dot'):(locale==='bn'?'Username 3–30 অক্ষর':'Username 3–30 characters')}</p></div>
             <Field label={locale==='bn'?'ওয়েবসাইট':'Website'} value={websiteUrl} onChange={setWebsiteUrl} maxLength={500} icon={<Globe size={15}/>} placeholder="https://example.com"/>
             <Field label={locale==='bn'?'WhatsApp link':'WhatsApp link'} value={whatsappUrl} onChange={setWhatsappUrl} maxLength={500} icon={<WhatsappLogo size={15}/>} placeholder="https://wa.me/…"/>
             <Field label={locale==='bn'?'Facebook link':'Facebook link'} value={facebookUrl} onChange={setFacebookUrl} maxLength={500} icon={<FacebookLogo size={15}/>} placeholder="https://facebook.com/…"/>
