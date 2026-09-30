@@ -51,7 +51,18 @@ const BN: Record<string,string> = {
   'Read News':'সংবাদ পড়ুন', 'Ask Question':'প্রশ্ন করুন', 'Your settings':'আপনার সেটিংস',
   'Your account':'আপনার অ্যাকাউন্ট', 'Loading…':'লোড হচ্ছে…',
   'You’re caught up.':'আপনি সব নতুন সংবাদ দেখে ফেলেছেন।',
-  'No published stories yet.':'এখনও কোনো প্রকাশিত সংবাদ নেই।'
+  'No published stories yet.':'এখনও কোনো প্রকাশিত সংবাদ নেই।',
+  'Profile controls active':'প্রোফাইল নিয়ন্ত্রণ সক্রিয়', Gallery:'গ্যালারি', 'Uploading…':'আপলোড হচ্ছে…',
+  'Cover photo':'কভার ছবি', 'Profile photo':'প্রোফাইল ছবি', 'Profile health':'প্রোফাইল অবস্থা',
+  'ready to share':'শেয়ার করার জন্য প্রস্তুত', Ready:'প্রস্তুত', Add:'যোগ করুন', Identity:'পরিচয়',
+  'Make the profile useful.':'প্রোফাইলকে আরও কাজে লাগান।', 'Privacy & preferences':'গোপনীয়তা ও পছন্দ',
+  'You control your visibility.':'আপনার দৃশ্যমানতা আপনি নিয়ন্ত্রণ করেন।',
+  'Profile save করুন':'প্রোফাইল সংরক্ষণ করুন',
+  'Use FeniX with confidence.':'আত্মবিশ্বাসের সঙ্গে FeniX ব্যবহার করুন।',
+  'Trust & freshness':'বিশ্বাস ও তথ্যের সাম্প্রতিকতা', 'Emergency help':'জরুরি সহায়তা',
+  'Search FeniX for published ambulance or transport services. Always confirm availability before relying on a listing.':'প্রকাশিত অ্যাম্বুলেন্স বা পরিবহন সেবা খুঁজুন। কোনো তালিকার ওপর নির্ভর করার আগে প্রাপ্যতা নিশ্চিত করুন।',
+  'Search published local information for blood-donor discovery. Do not treat an unverified profile as a confirmed donor.':'প্রকাশিত স্থানীয় তথ্য থেকে রক্তদাতা খুঁজুন। যাচাইহীন প্রোফাইলকে নিশ্চিত রক্তদাতা হিসেবে ধরে নেবেন না।',
+  'Use map-first discovery when you already know the service or area you need to reach.':'কোন সেবা বা এলাকায় যেতে হবে জানা থাকলে মানচিত্রভিত্তিক অনুসন্ধান ব্যবহার করুন।' 
 }
 
 
@@ -63,7 +74,7 @@ const attrOriginals=new WeakMap<Element,Record<string,string>>()
 export default function FenixUiTranslator(){
   const {locale}=useFenixLocale()
   useEffect(()=>{
-    const skip=(node:Node)=>Boolean(node.parentElement?.closest('script,style,input,textarea,select,option,pre,code,[data-fx-raw]'))
+    const skip=(node:Node)=>Boolean(node.parentElement?.closest('script,style,input,textarea,select,pre,code,[data-fx-raw]'))
     const run=()=>{
       const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT)
       const nodes:Text[]=[]
