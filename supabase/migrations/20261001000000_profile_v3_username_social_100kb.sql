@@ -1,4 +1,4 @@
--- Profile v3: Instagram-style username rules, social links and strict 100KB profile media.
+-- Profile v3: Instagram-style username rules, social links and strict 150KB profile media.
 -- Idempotent source-of-truth migration for the live profile system.
 
 begin;
@@ -58,7 +58,7 @@ as $function$
 $function$;
 
 update storage.buckets
-set file_size_limit = 102400,
+set file_size_limit = 153600,
     allowed_mime_types = array['image/jpeg','image/png','image/webp']::text[]
 where id = 'avatars';
 
