@@ -63,7 +63,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                 {profile.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><InstagramLogo size={17}/></a>}
                 {profile.facebook_url && <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><FacebookLogo size={17}/></a>}
                 {profile.whatsapp_url && <a href={profile.whatsapp_url} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><WhatsappLogo size={17}/></a>}
-              </div>
+              </div>}
               <ProfileReportButton profileId={profileId} locale="bn" />
               <p className="mt-5 text-[11px] text-[var(--fx-muted)]">FeniX member since {new Date(createdAt).toLocaleDateString('en-BD')}</p>
             </div>
