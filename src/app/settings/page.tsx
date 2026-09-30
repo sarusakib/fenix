@@ -77,7 +77,7 @@ export default function SettingsPage() {
     return () => { active = false }
   }, [user])
 
-  async function save(patch: Record<string, unknown>, key: string, success = 'Saved') {
+  async function save(patch: Record<string, unknown>, key: string, success = locale === 'bn' ? 'সংরক্ষণ হয়েছে।' : 'Saved') {
     if (!user) return
     setSavingKey(key)
     setNotice('')
