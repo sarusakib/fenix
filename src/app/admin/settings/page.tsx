@@ -22,7 +22,7 @@ const sections = [
   { title: 'Commerce Operations', body: 'Seller, catalogue, order, return and review operations.', href: '/commerce/admin', icon: Storefront },
   { title: 'Investment Operations', body: 'Opportunity, investor, document and interest workflows.', href: '/admin/investment', icon: TrendUp },
   { title: 'Brain & Knowledge', body: 'Open the source-aware Brain experience and review public guidance.', href: '/guide', icon: Brain },
-  { title: 'Member Preferences', body: 'Appearance and accessibility remain in the member settings surface.', href: '/dashboard/settings', icon: SlidersHorizontal },
+  { title: 'Member Preferences', body: 'Appearance and accessibility remain in the member settings surface.', href: '/settings', icon: SlidersHorizontal },
   { title: 'FeniX Policy', body: 'Public trust, privacy, anti-scam and responsible-AI rules.', href: '/policy', icon: LockKey },
 ] as const
 
