@@ -61,7 +61,7 @@ export default async function DashboardPage() {
             ['/feed','Community Feed','Post and read text-only community updates.',UsersThree],
             ['/profile','My Profile','Edit your public-safe profile, bio and visibility.',UserCircle],
             ['/deals','Deals','View recorded investment deal workflow.',Handshake],
-            ['/dashboard/settings','Account settings','Review account and privacy guidance.',GearSix],
+            ['/settings','Account settings','Review account and privacy guidance.',GearSix],
           ].map(([href,title,body,Icon]) => (
             <Link key={String(href)} href={String(href)} className="group rounded-3xl border border-black/10 bg-white/75 p-5 dark:border-white/10 dark:bg-white/[.04]">
               <Icon size={22} className="text-[#008080]" />
