@@ -46,8 +46,8 @@ export default function SettingsPage() {
   const [notice, setNotice] = useState('')
 
   useEffect(() => {
-    const currentUser = user
-    if (!currentUser) {
+    const currentUserId = user?.id
+    if (!currentUserId) {
       window.location.replace('/login?next=/settings')
       return
     }
@@ -57,7 +57,7 @@ export default function SettingsPage() {
       const { data } = await s
         .from('profile_settings')
         .select('profile_visibility,message_permissions,feed_visibility,reduced_motion,notification_preferences')
-        .eq('user_id', currentUser.id)
+         .eq('user_id', currentUserId)
         .maybeSingle()
       if (!active) return
       if (data?.profile_visibility === 'private') setProfileVisibility('private')
