@@ -53,6 +53,7 @@ declare
   recipient_id uuid;
   actor_id uuid;
   actor_name text;
+  actor_username text;
   target_path text;
   title_text text;
   body_text text;
