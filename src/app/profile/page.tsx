@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import {
-  ArrowLeft, Bell, Camera, CaretDown, Check, CheckCircle, Copy, Gear,
-  Globe, InstagramLogo, FacebookLogo, LinkSimple, LockKey, MapPin,
-  Moon, Palette, ShareNetwork, SignOut, SpinnerGap, Sun, Translate,
-  UserCircle, UserSwitch, WarningCircle, WhatsappLogo, X
+  ArrowLeft, Camera, Check, CheckCircle, Copy, Gear, Globe, InstagramLogo,
+  FacebookLogo, LinkSimple, LockKey, MapPin, Moon, Palette, ShareNetwork,
+  SignOut, SpinnerGap, Sun, Translate, UserCircle, UserSwitch, WarningCircle,
+  WhatsappLogo, X, DotsThree
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
@@ -17,7 +17,8 @@ import { optimizeImageFile, removePublicImage, uploadOptimizedPublicImage } from
 type Visibility = 'public' | 'private'
 type MessagePermission = 'everyone' | 'authenticated' | 'nobody'
 type FeedVisibility = 'public' | 'authenticated'
-type Panel = 'edit' | 'privacy' | 'appearance' | 'language' | 'links' | 'account' | null
+type SettingsSection = 'edit' | 'privacy' | 'appearance' | 'language' | 'links' | 'account' | null
+type Tab = 'posts' | 'activity'
 type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
 
 const PROFILE_MAX_BYTES = 150 * 1024
@@ -30,14 +31,12 @@ function cleanUrl(value: string) {
 }
 
 function normalizeUsername(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9._]/g, '')
-    .slice(0, 30)
+  return value.toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 30)
 }
 
 function validUsername(value: string) {
-  return /^[a-z0-9._]{3,30}$/.test(value) && !value.startsWith('.') && !value.endsWith('.') && !value.includes('..')
+  return /^[a-z0-9._]{3,30}$/.test(value) &&
+    !value.startsWith('.') && !value.endsWith('.') && !value.includes('..')
 }
 
 function makeUsername(value: string) {
@@ -50,6 +49,8 @@ function storagePathFromPublicUrl(value: string, bucket: string) {
   const index = value.indexOf(marker)
   return index >= 0 ? decodeURIComponent(value.slice(index + marker.length)) : ''
 }
+
+type PostPreview = { id: string; body: string; created_at: string }
 
 export default function ProfilePage() {
   const { locale, setLocale } = useFenixLocale()
@@ -73,9 +74,15 @@ export default function ProfilePage() {
   const [messagePermissions, setMessagePermissions] = useState<MessagePermission>('everyone')
   const [feedVisibility, setFeedVisibility] = useState<FeedVisibility>('public')
   const [reducedMotion, setReducedMotion] = useState(false)
-  const [panel, setPanel] = useState<Panel>(null)
-  const [busy, setBusy] = useState(false)
+
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [settingsSection, setSettingsSection] = useState<SettingsSection>(null)
+  const [editOpen, setEditOpen] = useState(false)
+  const [tab, setTab] = useState<Tab>('posts')
+
+  const [posts, setPosts] = useState<PostPreview[]>([])
   const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
   const [imageBusy, setImageBusy] = useState<'avatar' | 'cover' | null>(null)
   const [imageProgress, setImageProgress] = useState(0)
   const [message, setMessage] = useState('')
@@ -93,9 +100,22 @@ export default function ProfilePage() {
         window.location.replace('/login?next=/profile')
         return
       }
-      const [{ data: profile }, { data: settings }] = await Promise.all([
-        s.from('profiles').select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url').eq('id', auth.user.id).maybeSingle(),
-        s.from('profile_settings').select('locale,theme,profile_visibility,message_permissions,feed_visibility,reduced_motion').eq('user_id', auth.user.id).maybeSingle(),
+
+      const [{ data: profile }, { data: settings }, { data: userPosts }] = await Promise.all([
+        s.from('profiles')
+          .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url')
+          .eq('id', auth.user.id)
+          .maybeSingle(),
+        s.from('profile_settings')
+          .select('locale,theme,profile_visibility,message_permissions,feed_visibility,reduced_motion')
+          .eq('user_id', auth.user.id)
+          .maybeSingle(),
+        s.from('fenix_posts')
+          .select('id,body,created_at')
+          .eq('author_id', auth.user.id)
+          .is('deleted_at', null)
+          .order('created_at', { ascending: false })
+          .limit(12),
       ])
       if (!active) return
 
@@ -106,10 +126,10 @@ export default function ProfilePage() {
             ? auth.user.user_metadata.picture
             : ''
 
+      const initialUsername = profile?.username ?? makeUsername(auth.user.email ?? 'user')
       setUserId(auth.user.id)
       setEmail(auth.user.email ?? '')
       setFullName(profile?.full_name ?? auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? '')
-      const initialUsername = profile?.username ?? makeUsername(auth.user.email ?? 'user')
       setUsername(initialUsername)
       setOriginalUsername(initialUsername)
       setBio(profile?.bio ?? '')
@@ -120,6 +140,7 @@ export default function ProfilePage() {
       setInstagramUrl(profile?.instagram_url ?? '')
       setAvatarUrl(profile?.avatar_url ?? providerAvatar)
       setCoverUrl(profile?.cover_url ?? '')
+      setPosts((userPosts ?? []) as PostPreview[])
 
       if (settings?.locale === 'bn' || settings?.locale === 'en') setLocale(settings.locale)
       if (settings?.theme === 'light' || settings?.theme === 'dark' || settings?.theme === 'system') setTheme(settings.theme as HomeTheme)
@@ -140,11 +161,7 @@ export default function ProfilePage() {
       return
     }
     const clean = normalizeUsername(username)
-    if (clean !== username) {
-      setUsernameStatus('invalid')
-      return
-    }
-    if (!validUsername(clean)) {
+    if (clean !== username || !validUsername(clean)) {
       setUsernameStatus('invalid')
       return
     }
@@ -160,19 +177,24 @@ export default function ProfilePage() {
         p_username: clean,
         p_exclude_user_id: userId,
       })
-      if (error) setUsernameStatus('idle')
-      else setUsernameStatus(data ? 'available' : 'taken')
+      setUsernameStatus(error ? 'idle' : data ? 'available' : 'taken')
     }, 350)
 
     return () => window.clearTimeout(timer)
   }, [originalUsername, userId, username])
 
-  const profileCompletion = useMemo(() => {
-    const values = [fullName.trim(), username.trim(), bio.trim(), locationText.trim(), avatarUrl]
-    return Math.round(values.filter(Boolean).length / values.length * 100)
-  }, [avatarUrl, bio, fullName, locationText, username])
+  function openEdit() {
+    setMessage('')
+    setEditOpen(true)
+    setSettingsOpen(false)
+  }
 
-  const togglePanel = (next: Exclude<Panel, null>) => setPanel(current => current === next ? null : next)
+  function openSettings(section: Exclude<SettingsSection, null> = null) {
+    setMessage('')
+    setSettingsSection(section)
+    setSettingsOpen(true)
+    setEditOpen(false)
+  }
 
   async function copyProfileLink() {
     try {
@@ -189,6 +211,7 @@ export default function ProfilePage() {
       setMessage(bn ? 'একটি image file বাছাই করুন।' : 'Choose an image file.')
       return
     }
+
     setImageBusy(kind)
     setImageProgress(4)
     setMessage('')
@@ -197,7 +220,6 @@ export default function ProfilePage() {
       const { data: auth } = await s.auth.getUser()
       if (!auth.user) throw new Error(bn ? 'আবার sign in করুন।' : 'Please sign in again.')
 
-      const previousUrl = kind === 'avatar' ? avatarUrl : coverUrl
       setImageProgress(10)
       const optimized = await optimizeImageFile(file, {
         maxDimension: kind === 'avatar' ? 1000 : 1600,
@@ -207,7 +229,7 @@ export default function ProfilePage() {
 
       setImageProgress(72)
       if (optimized.byteSize > PROFILE_MAX_BYTES) {
-        throw new Error(bn ? 'ছবিটি 100KB-এর মধ্যে আনা যায়নি।' : 'This image could not be reduced below 100KB.')
+        throw new Error(bn ? 'ছবিটি 150KB-এর মধ্যে আনা যায়নি।' : 'This image could not be reduced below 150KB.')
       }
 
       const extension = optimized.mimeType === 'image/webp' ? 'webp' : 'jpg'
@@ -226,15 +248,13 @@ export default function ProfilePage() {
       if (kind === 'avatar') setAvatarUrl(uploaded.publicUrl)
       else setCoverUrl(uploaded.publicUrl)
 
-      const oldPath = storagePathFromPublicUrl(previousUrl, 'avatars')
+      const oldPath = storagePathFromPublicUrl(kind === 'avatar' ? avatarUrl : coverUrl, 'avatars')
       if (oldPath) await removePublicImage(s, 'avatars', oldPath)
 
       setImageProgress(100)
-      setMessage(bn
-        ? (kind === 'avatar' ? 'Profile photo আপডেট হয়েছে।' : 'Cover photo আপডেট হয়েছে.')
-        : (kind === 'avatar' ? 'Profile photo updated.' : 'Cover photo updated.'))
+      setMessage(bn ? (kind === 'avatar' ? 'Profile photo আপডেট হয়েছে।' : 'Cover photo আপডেট হয়েছে.') : (kind === 'avatar' ? 'Profile photo updated.' : 'Cover photo updated.'))
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : (bn ? 'ছবিটি upload করা যায়নি।' : 'Image upload failed.'))
+      setMessage(error instanceof Error ? error.message : (bn ? 'Image upload failed.' : 'Image upload failed.'))
     } finally {
       window.setTimeout(() => setImageProgress(0), 450)
       setImageBusy(null)
@@ -244,7 +264,6 @@ export default function ProfilePage() {
   async function saveProfile() {
     const cleanUsername = normalizeUsername(username)
     if (usernameStatus !== 'available' || cleanUsername !== username || !validUsername(cleanUsername)) {
-      setPanel('edit')
       setMessage(bn ? 'Username available না হওয়া পর্যন্ত save করা যাবে না।' : 'Choose an available username before saving.')
       return
     }
@@ -255,13 +274,14 @@ export default function ProfilePage() {
     const instagram = cleanUrl(instagramUrl)
 
     for (const [label, original, clean] of [
-      [bn ? 'Website' : 'Website', websiteUrl, website],
-      [bn ? 'WhatsApp link' : 'WhatsApp link', whatsappUrl, whatsapp],
-      [bn ? 'Facebook link' : 'Facebook link', facebookUrl, facebook],
-      [bn ? 'Instagram link' : 'Instagram link', instagramUrl, instagram],
-    ] as Array<[string,string,string|null]>) {
+      ['Website', websiteUrl, website],
+      ['WhatsApp', whatsappUrl, whatsapp],
+      ['Facebook', facebookUrl, facebook],
+      ['Instagram', instagramUrl, instagram],
+    ] as Array<[string, string, string | null]>) {
       if (original.trim() && !clean) {
-        setPanel('links')
+        setSettingsOpen(true)
+        setSettingsSection('links')
         setMessage((bn ? label + ' এ পূর্ণ http/https link দিন।' : label + ' must be a full http/https link.'))
         return
       }
@@ -309,7 +329,7 @@ export default function ProfilePage() {
       setUsername(cleanUsername)
       setUsernameStatus('available')
       setMessage(bn ? 'Profile updated successfully.' : 'Profile updated successfully.')
-      setPanel(null)
+      setEditOpen(false)
     }
     setBusy(false)
   }
@@ -340,145 +360,262 @@ export default function ProfilePage() {
   }
 
   if (loading) {
-    return <main className="min-h-dvh"><Navbar/><section className="mx-auto max-w-2xl px-4 py-16 sm:px-6"><div className="fenix-surface-strong animate-pulse rounded-[2rem] p-8 text-sm text-[var(--fx-muted)]">{bn ? 'Profile loading…' : 'Loading profile…'}</div></section></main>
+    return (
+      <main className="min-h-dvh">
+        <Navbar />
+        <section className="mx-auto max-w-2xl px-4 py-16">
+          <div className="animate-pulse rounded-3xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-8 text-sm text-[var(--fx-muted)]">
+            {bn ? 'Profile loading…' : 'Loading profile…'}
+          </div>
+        </section>
+      </main>
+    )
   }
 
   return (
     <main className="fenix-shell min-h-dvh">
-      <Navbar/>
-      <section className="mx-auto max-w-2xl px-3 pb-28 pt-4 sm:px-5 sm:pt-7">
-        <div className="flex items-center justify-between gap-3">
-          <Link href="/feed" aria-label={bn ? 'ফিডে ফিরে যান' : 'Back to feed'} className="grid h-10 w-10 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><ArrowLeft size={18}/></Link>
-          <div className="text-center"><p className="text-sm font-black">{bn ? 'প্রোফাইল' : 'Profile'}</p><p className="text-[10px] text-[var(--fx-muted)]">@{username}</p></div>
-          <button type="button" aria-label={bn ? 'সেটিংস' : 'Settings'} onClick={() => togglePanel('account')} className="grid h-10 w-10 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><Gear size={18}/></button>
-        </div>
+      <Navbar />
 
-        <article className="fenix-surface-strong mt-4 overflow-hidden rounded-[2rem]">
-          <div className="relative h-32 bg-[var(--fx-primary-soft)] sm:h-44">
-            {coverUrl ? <img src={coverUrl} alt="" className="h-full w-full object-cover"/> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(0,128,128,.24),transparent_40%),linear-gradient(135deg,rgba(11,23,54,.02),rgba(0,128,128,.10))]"/>}
-            <label className="absolute right-3 top-3 grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-black/55 text-white backdrop-blur" title={bn ? 'Cover photo বদলান' : 'Change cover photo'}>
-              {imageBusy === 'cover' ? <span className="text-[10px] font-black">{imageProgress}%</span> : <Camera size={17}/>}
-              <input type="file" accept="image/*" className="sr-only" disabled={imageBusy !== null} onChange={e => { const file = e.target.files?.[0]; e.currentTarget.value = ''; if (file) void uploadProfileImage('cover', file) }}/>
-            </label>
+      <section className="mx-auto max-w-3xl px-3 pb-28 pt-2 sm:px-5 sm:pt-5">
+        <header className="flex h-12 items-center justify-between border-b border-[var(--fx-border)]">
+          <Link href="/feed" aria-label={bn ? 'ফিডে ফিরে যান' : 'Back to feed'} className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/[.04] dark:hover:bg-white/[.05]">
+            <ArrowLeft size={18} />
+          </Link>
+          <div className="min-w-0 text-center">
+            <p className="truncate text-sm font-black">@{username}</p>
+          </div>
+          <button type="button" onClick={() => openSettings()} aria-label={bn ? 'সেটিংস' : 'Settings'} className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/[.04] dark:hover:bg-white/[.05]">
+            <Gear size={19} />
+          </button>
+        </header>
+
+        <div className="py-7 sm:py-9">
+          <div className="flex items-center gap-5 sm:gap-9">
+            <div className="relative shrink-0">
+              {avatarUrl
+                ? <img src={avatarUrl} alt="" className="h-24 w-24 rounded-full border border-[var(--fx-border)] bg-[var(--fx-bg)] object-cover sm:h-32 sm:w-32" />
+                : <div className="grid h-24 w-24 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-primary-soft)] sm:h-32 sm:w-32"><UserCircle size={65} className="text-[var(--fx-primary-strong)]" /></div>}
+              <label className="absolute bottom-0 right-0 grid h-8 w-8 cursor-pointer place-items-center rounded-full border-2 border-[var(--fx-bg)] bg-[var(--fx-primary-strong)] text-white shadow">
+                {imageBusy === 'avatar' ? <span className="text-[8px] font-black">{imageProgress}%</span> : <Camera size={14} />}
+                <input type="file" accept="image/*" className="sr-only" disabled={imageBusy !== null} onChange={e => { const file = e.target.files?.[0]; e.currentTarget.value = ''; if (file) void uploadProfileImage('avatar', file) }} />
+              </label>
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={openEdit} className="min-h-9 rounded-lg bg-[var(--fx-primary-strong)] px-4 text-xs font-bold text-white">{bn ? 'Edit profile' : 'Edit profile'}</button>
+                <button type="button" onClick={() => void copyProfileLink()} className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--fx-border)] bg-[var(--fx-surface)]" aria-label={bn ? 'Profile link copy' : 'Copy profile link'}>
+                  {copied ? <Check size={16} /> : <ShareNetwork size={16} />}
+                </button>
+                <Link href={publicUrl} target="_blank" className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--fx-border)] bg-[var(--fx-surface)]" aria-label={bn ? 'Public profile' : 'Public profile'}>
+                  <Globe size={16} />
+                </Link>
+                <button type="button" onClick={() => openSettings()} className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--fx-border)] bg-[var(--fx-surface)]" aria-label={bn ? 'More' : 'More'}>
+                  <DotsThree size={18} weight="bold" />
+                </button>
+              </div>
+              <div className="mt-5 flex items-center gap-7 text-sm">
+                <span><strong className="font-black">{posts.length}</strong> {bn ? 'পোস্ট' : 'posts'}</span>
+                <span className="text-[var(--fx-muted)]"><strong className="text-[var(--fx-text)]">FeniX</strong> {bn ? 'member' : 'member'}</span>
+              </div>
+            </div>
           </div>
 
-          <div className="px-4 pb-5 sm:px-6 sm:pb-6">
-            <div className="-mt-12 flex items-end justify-between gap-3 sm:-mt-14">
+          <div className="mt-6 max-w-xl">
+            <h1 className="text-base font-black">{fullName || (bn ? 'FeniX user' : 'FeniX user')}</h1>
+            {bio && <p className="mt-1 whitespace-pre-wrap text-sm leading-6">{bio}</p>}
+            {locationText && <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-[var(--fx-muted)]"><MapPin size={13} />{locationText}</p>}
+            {(websiteUrl || instagramUrl || facebookUrl || whatsappUrl) && (
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {websiteUrl && <a href={websiteUrl} target="_blank" rel="noreferrer noopener" className="inline-flex items-center gap-1.5 text-xs font-bold"><Globe size={14}/>Website</a>}
+                {instagramUrl && <a href={instagramUrl} target="_blank" rel="noreferrer noopener" aria-label="Instagram" className="grid h-8 w-8 place-items-center rounded-full border border-[var(--fx-border)]"><InstagramLogo size={15}/></a>}
+                {facebookUrl && <a href={facebookUrl} target="_blank" rel="noreferrer noopener" aria-label="Facebook" className="grid h-8 w-8 place-items-center rounded-full border border-[var(--fx-border)]"><FacebookLogo size={15}/></a>}
+                {whatsappUrl && <a href={whatsappUrl} target="_blank" rel="noreferrer noopener" aria-label="WhatsApp" className="grid h-8 w-8 place-items-center rounded-full border border-[var(--fx-border)]"><WhatsappLogo size={15}/></a>}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="border-t border-[var(--fx-border)]">
+          <div className="grid grid-cols-2">
+            <button type="button" onClick={() => setTab('posts')} className={'relative h-12 text-[11px] font-black uppercase tracking-[.08em] ' + (tab === 'posts' ? '' : 'text-[var(--fx-muted)]')}>
+              {bn ? 'পোস্ট' : 'Posts'}
+              {tab === 'posts' && <span className="absolute inset-x-6 bottom-0 h-0.5 rounded-full bg-[var(--fx-text)]" />}
+            </button>
+            <button type="button" onClick={() => setTab('activity')} className={'relative h-12 text-[11px] font-black uppercase tracking-[.08em] ' + (tab === 'activity' ? '' : 'text-[var(--fx-muted)]')}>
+              {bn ? 'অ্যাক্টিভিটি' : 'Activity'}
+              {tab === 'activity' && <span className="absolute inset-x-6 bottom-0 h-0.5 rounded-full bg-[var(--fx-text)]" />}
+            </button>
+          </div>
+
+          {tab === 'posts' ? (
+            posts.length ? (
+              <div className="space-y-2 py-3">
+                {posts.map(post => (
+                  <article key={post.id} className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4">
+                    <p className="whitespace-pre-wrap text-sm leading-6">{post.body}</p>
+                    <p className="mt-2 text-[10px] text-[var(--fx-muted)]">{new Date(post.created_at).toLocaleString(bn ? 'bn-BD' : 'en-BD')}</p>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <EmptyState text={bn ? 'এখনও কোনো পোস্ট নেই।' : 'No posts yet.'} />
+            )
+          ) : (
+            <EmptyState text={bn ? 'আপনার FeniX activity এখানে দেখা যাবে।' : 'Your FeniX activity will appear here.'} />
+          )}
+        </div>
+      </section>
+
+      {message && <Toast message={message} onClose={() => setMessage('')} />}
+
+      {editOpen && (
+        <Sheet title={bn ? 'Edit profile' : 'Edit profile'} onClose={() => setEditOpen(false)}>
+          <div className="space-y-5">
+            <div className="flex items-center gap-4">
               <div className="relative">
-                {avatarUrl ? <img src={avatarUrl} alt="" className="h-24 w-24 rounded-[1.7rem] border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover sm:h-28 sm:w-28"/> : <div className="grid h-24 w-24 place-items-center rounded-[1.7rem] border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)] sm:h-28 sm:w-28"><UserCircle size={58} className="text-[var(--fx-primary-strong)]"/></div>}
-                <label className="absolute -bottom-1 -right-1 grid h-9 w-9 cursor-pointer place-items-center rounded-full border-2 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-strong)] text-white shadow-lg">
-                  {imageBusy === 'avatar' ? <span className="text-[9px] font-black">{imageProgress}%</span> : <Camera size={15}/>}
-                  <input type="file" accept="image/*" className="sr-only" disabled={imageBusy !== null} onChange={e => { const file = e.target.files?.[0]; e.currentTarget.value = ''; if (file) void uploadProfileImage('avatar', file) }}/>
+                {avatarUrl ? <img src={avatarUrl} alt="" className="h-20 w-20 rounded-full object-cover" /> : <div className="grid h-20 w-20 place-items-center rounded-full bg-[var(--fx-primary-soft)]"><UserCircle size={42}/></div>}
+                <label className="absolute -bottom-1 -right-1 grid h-7 w-7 cursor-pointer place-items-center rounded-full bg-[var(--fx-primary-strong)] text-white">
+                  {imageBusy === 'avatar' ? <span className="text-[7px] font-black">{imageProgress}%</span> : <Camera size={12}/>}
+                  <input type="file" accept="image/*" className="sr-only" disabled={imageBusy !== null} onChange={e => { const file = e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('avatar', file) }} />
                 </label>
               </div>
-              <div className="flex gap-2">
-                <button type="button" onClick={() => togglePanel('edit')} className="rounded-xl bg-[var(--fx-primary-strong)] px-4 py-2.5 text-xs font-bold text-white">{bn ? 'প্রোফাইল edit' : 'Edit profile'}</button>
-                <button type="button" onClick={() => void copyProfileLink()} aria-label={bn ? 'প্রোফাইল লিংক কপি' : 'Copy profile link'} className="grid h-10 w-10 place-items-center rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)]">{copied ? <Check size={17}/> : <ShareNetwork size={17}/>}</button>
+              <div><p className="text-sm font-black">{bn ? 'Profile photo' : 'Profile photo'}</p><p className="mt-1 text-[11px] text-[var(--fx-muted)]">{bn ? 'যেকোনো image → সর্বোচ্চ 150KB' : 'Any image → max 150KB'}</p></div>
+            </div>
+
+            <Field label={bn ? 'নাম' : 'Name'} value={fullName} onChange={setFullName} maxLength={160} />
+            <div>
+              <label className="text-xs font-bold">Username</label>
+              <div className="mt-2 flex items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3">
+                <span className="text-sm text-[var(--fx-muted)]">@</span>
+                <input value={username} onChange={e => setUsername(normalizeUsername(e.target.value))} maxLength={30} className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none"/>
+                {usernameStatus === 'checking' && <SpinnerGap size={16} className="animate-spin text-[var(--fx-muted)]"/>}
+                {usernameStatus === 'available' && <CheckCircle size={17} className="text-[var(--fx-primary-strong)]"/>}
+                {usernameStatus === 'taken' && <WarningCircle size={17} className="text-red-500"/>}
+                {usernameStatus === 'invalid' && <WarningCircle size={17} className="text-amber-500"/>}
+              </div>
+              <p className="mt-1 text-[10px] text-[var(--fx-muted)]">{usernameStatus === 'available' ? 'Available' : usernameStatus === 'taken' ? 'Already taken' : usernameStatus === 'invalid' ? '3–30 • a-z • 0-9 • . • _' : 'Changes your public profile URL'}</p>
+            </div>
+            <Field label={bn ? 'Bio' : 'Bio'} value={bio} onChange={setBio} maxLength={1000} multiline />
+            <Field label={bn ? 'Location' : 'Location'} value={locationText} onChange={setLocationText} maxLength={160} icon={<MapPin size={15}/>} />
+
+            <div>
+              <p className="text-xs font-black">{bn ? 'Cover photo' : 'Cover photo'}</p>
+              <div className="mt-2 relative overflow-hidden rounded-xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)]">
+                {coverUrl ? <img src={coverUrl} alt="" className="h-28 w-full object-cover"/> : <div className="h-28"/>}
+                <label className="absolute right-2 top-2 grid h-8 w-8 cursor-pointer place-items-center rounded-full bg-black/55 text-white">
+                  {imageBusy === 'cover' ? <span className="text-[8px] font-black">{imageProgress}%</span> : <Camera size={14}/>}
+                  <input type="file" accept="image/*" className="sr-only" disabled={imageBusy !== null} onChange={e => { const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('cover',file)}} />
+                </label>
               </div>
             </div>
 
-            <div className="mt-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0"><h1 className="truncate text-2xl font-black tracking-[-.045em] sm:text-3xl">{fullName || (bn ? 'আপনার FeniX profile' : 'Your FeniX profile')}</h1><p className="mt-1 truncate text-sm text-[var(--fx-muted)]">@{username}</p></div>
-                <span className="shrink-0 rounded-full bg-[var(--fx-primary-soft)] px-2.5 py-1 text-[9px] font-black text-[var(--fx-primary-strong)]">{profileCompletion}%</span>
-              </div>
-              {bio && <p className="mt-3 whitespace-pre-wrap text-sm leading-6">{bio}</p>}
-              <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">
-                {locationText && <span className="inline-flex items-center gap-1.5"><MapPin size={14}/>{locationText}</span>}
-                {websiteUrl && <span className="inline-flex items-center gap-1.5"><Globe size={14}/>Website</span>}
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {instagramUrl && <a href={instagramUrl} target="_blank" rel="noreferrer noopener" aria-label="Instagram" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><InstagramLogo size={17}/></a>}
-                {facebookUrl && <a href={facebookUrl} target="_blank" rel="noreferrer noopener" aria-label="Facebook" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><FacebookLogo size={17}/></a>}
-                {whatsappUrl && <a href={whatsappUrl} target="_blank" rel="noreferrer noopener" aria-label="WhatsApp" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><WhatsappLogo size={17}/></a>}
-              </div>
-            </div>
+            <button type="button" disabled={busy || usernameStatus !== 'available'} onClick={() => void saveProfile()} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] text-xs font-bold text-white disabled:opacity-40">
+              {busy ? <SpinnerGap size={16} className="animate-spin"/> : <Check size={16}/>} {busy ? 'Saving…' : 'Save changes'}
+            </button>
           </div>
-        </article>
+        </Sheet>
+      )}
 
-        <div className="mt-3 overflow-hidden rounded-[1.6rem] border border-[var(--fx-border)] bg-[var(--fx-surface)]">
-          <AccordionRow open={panel === 'edit'} onClick={() => togglePanel('edit')} icon={<UserSwitch size={19}/>} title={bn ? 'Edit profile' : 'Edit profile'} summary={bn ? 'নাম, username, bio ও location' : 'Name, username, bio and location'} />
-          {panel === 'edit' && <div className="border-t border-[var(--fx-border)] p-4 sm:p-5">
-            <div className="grid gap-3">
-              <Field label={bn ? 'নাম' : 'Name'} value={fullName} onChange={setFullName} maxLength={160}/>
-              <div>
-                <label className="text-xs font-bold">Username</label>
-                <div className="mt-2 flex items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3">
-                  <span className="text-sm text-[var(--fx-muted)]">@</span>
-                  <input value={username} onChange={e => setUsername(normalizeUsername(e.target.value))} maxLength={30} className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none"/>
-                  {usernameStatus === 'checking' && <SpinnerGap size={16} className="animate-spin text-[var(--fx-muted)]"/>}
-                  {usernameStatus === 'available' && <CheckCircle size={17} className="text-[var(--fx-primary-strong)]"/>}
-                  {usernameStatus === 'taken' && <WarningCircle size={17} className="text-red-500"/>}
-                  {usernameStatus === 'invalid' && <WarningCircle size={17} className="text-amber-500"/>}
-                </div>
-                <p className="mt-1 text-[10px] text-[var(--fx-muted)]">
-                  {usernameStatus === 'available' ? (bn ? 'Username available • 3–30 • letters, numbers, . and _' : 'Username available • 3–30 • letters, numbers, . and _') :
-                   usernameStatus === 'taken' ? (bn ? 'এই username নেওয়া হয়েছে।' : 'This username is already taken.') :
-                   usernameStatus === 'invalid' ? (bn ? '3–30 অক্ষর • শুরু/শেষে dot নয় • .. ব্যবহার নয়' : '3–30 characters • no leading/trailing dot • no ..') :
-                   (bn ? 'Username পরিবর্তন করলে public profile URL-ও বদলাবে।' : 'Changing this updates your public profile URL.')}
-                </p>
-              </div>
-              <Field label={bn ? 'Location' : 'Location'} value={locationText} onChange={setLocationText} maxLength={160} icon={<MapPin size={15}/>}/>
-              <label className="block"><span className="text-xs font-bold">Bio</span><textarea value={bio} onChange={e => setBio(e.target.value)} maxLength={1000} rows={4} className="mt-2 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] p-3 text-sm leading-6 outline-none"/><span className="mt-1 block text-[10px] text-[var(--fx-muted)]">{bio.length}/1000</span></label>
+      {settingsOpen && (
+        <Sheet title={bn ? 'Settings' : 'Settings'} onClose={() => setSettingsOpen(false)}>
+          {settingsSection === null ? (
+            <div className="overflow-hidden rounded-2xl border border-[var(--fx-border)]">
+              <SettingRow icon={<UserSwitch size={18}/>} title={bn ? 'Edit profile' : 'Edit profile'} onClick={openEdit} />
+              <SettingRow icon={<LinkSimple size={18}/>} title={bn ? 'Links & contact' : 'Links & contact'} onClick={() => setSettingsSection('links')} />
+              <SettingRow icon={<LockKey size={18}/>} title={bn ? 'Privacy & messaging' : 'Privacy & messaging'} onClick={() => setSettingsSection('privacy')} />
+              <SettingRow icon={<Palette size={18}/>} title={bn ? 'Appearance' : 'Appearance'} onClick={() => setSettingsSection('appearance')} />
+              <SettingRow icon={<Translate size={18}/>} title={bn ? 'Language' : 'Language'} onClick={() => setSettingsSection('language')} />
+              <SettingRow icon={<Gear size={18}/>} title={bn ? 'Account & safety' : 'Account & safety'} onClick={() => setSettingsSection('account')} />
             </div>
-            <div className="mt-4 rounded-xl bg-[var(--fx-primary-soft)] p-3 text-xs">
-              <p className="font-bold">{bn ? 'Public profile URL' : 'Public profile URL'}</p>
-              <p className="mt-1 break-all text-[var(--fx-muted)]">{publicUrl}</p>
-            </div>
-            <button type="button" disabled={busy || usernameStatus !== 'available'} onClick={() => void saveProfile()} className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-xs font-bold text-white disabled:opacity-40"><Check size={16}/>{busy ? (bn ? 'Saving…' : 'Saving…') : (bn ? 'Save changes' : 'Save changes')}</button>
-          </div>}
-
-          <AccordionRow open={panel === 'links'} onClick={() => togglePanel('links')} icon={<LinkSimple size={19}/>} title={bn ? 'Links & contact' : 'Links & contact'} summary={bn ? 'Website, Instagram, Facebook, WhatsApp' : 'Website, Instagram, Facebook, WhatsApp'} />
-          {panel === 'links' && <div className="border-t border-[var(--fx-border)] p-4 sm:p-5"><div className="grid gap-3">
-            <Field label="Website" value={websiteUrl} onChange={setWebsiteUrl} maxLength={500} placeholder="https://example.com"/>
-            <Field label="Instagram" value={instagramUrl} onChange={setInstagramUrl} maxLength={500} placeholder="https://instagram.com/username"/>
-            <Field label="Facebook" value={facebookUrl} onChange={setFacebookUrl} maxLength={500} placeholder="https://facebook.com/username"/>
-            <Field label="WhatsApp" value={whatsappUrl} onChange={setWhatsappUrl} maxLength={500} placeholder="https://wa.me/..."/>
-            <button type="button" disabled={busy || usernameStatus !== 'available'} onClick={() => void saveProfile()} className="min-h-11 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-xs font-bold text-white disabled:opacity-40">{bn ? 'Links save করুন' : 'Save links'}</button>
-          </div><p className="mt-3 text-[10px] text-[var(--fx-muted)]">{bn ? 'শুধু আপনি যে public links দিতে চান সেগুলোই দিন।' : 'Only add the public links you want to share.'}</p></div>}
-
-          <AccordionRow open={panel === 'privacy'} onClick={() => togglePanel('privacy')} icon={<LockKey size={19}/>} title={bn ? 'Privacy & messaging' : 'Privacy & messaging'} summary={bn ? 'কে profile দেখবে ও message করবে' : 'Who can view and message you'} />
-          {panel === 'privacy' && <div className="border-t border-[var(--fx-border)] p-4 sm:p-5"><div className="space-y-2">
-            <SettingSelect label={bn ? 'Profile visibility' : 'Profile visibility'} value={visibility} onChange={v => void changeSetting({ profile_visibility: v }, () => setVisibility(v as Visibility))} options={[['public',bn?'Public':'Public'],['private',bn?'Private':'Private']]}/>
-            <SettingSelect label={bn ? 'কে message করতে পারবে' : 'Who can message you'} value={messagePermissions} onChange={v => void changeSetting({ message_permissions: v }, () => setMessagePermissions(v as MessagePermission))} options={[['everyone',bn?'সবাই':'Everyone'],['authenticated',bn?'শুধু logged-in users':'Authenticated users'],['nobody',bn?'কেউ না':'Nobody']]}/>
-            <SettingSelect label={bn ? 'Feed visibility' : 'Feed visibility'} value={feedVisibility} onChange={v => void changeSetting({ feed_visibility: v }, () => setFeedVisibility(v as FeedVisibility))} options={[['public','Public'],['authenticated',bn?'Logged-in users':'Authenticated users']]}/>
-          </div></div>}
-
-          <AccordionRow open={panel === 'appearance'} onClick={() => togglePanel('appearance')} icon={<Palette size={19}/>} title={bn ? 'Appearance' : 'Appearance'} summary={bn ? 'Light, dark বা device' : 'Light, dark or device'} />
-          {panel === 'appearance' && <div className="border-t border-[var(--fx-border)] p-4 sm:p-5"><div className="grid grid-cols-3 gap-2">{([
-            ['light',Sun,bn?'Light':'Light'],['system',Palette,bn?'Device':'System'],['dark',Moon,bn?'Dark':'Dark']
-          ] as Array<[HomeTheme, typeof Sun, string]>).map(([key,Icon,label]) => <button key={key} type="button" onClick={() => void changeTheme(key)} aria-pressed={theme === key} className={'flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl border text-xs font-bold ' + (theme === key ? 'border-[var(--fx-primary)]/30 bg-[var(--fx-primary-soft)]' : 'border-[var(--fx-border)]')}><Icon size={18}/>{label}</button>)}</div><div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-[var(--fx-border)] p-3"><div><p className="text-xs font-bold">{bn?'Reduced motion':'Reduced motion'}</p><p className="mt-1 text-[10px] text-[var(--fx-muted)]">{bn?'অপ্রয়োজনীয় animation কমান।':'Reduce extra animation.'}</p></div><button type="button" role="switch" aria-checked={reducedMotion} onClick={() => void changeSetting({ reduced_motion: !reducedMotion }, () => { const next = !reducedMotion; setReducedMotion(next); try { localStorage.setItem('fenix-reduce-motion', String(next)); document.documentElement.dataset.reduceMotion = next ? 'true' : 'false' } catch {} })} className={'relative h-7 w-12 shrink-0 rounded-full ' + (reducedMotion ? 'bg-[var(--fx-primary)]' : 'bg-black/10 dark:bg-white/10')}><span className={'absolute top-1 h-5 w-5 rounded-full bg-white transition ' + (reducedMotion ? 'left-6' : 'left-1')}/></button></div></div>}
-
-          <AccordionRow open={panel === 'language'} onClick={() => togglePanel('language')} icon={<Translate size={19}/>} title={bn ? 'Language' : 'Language'} summary={bn ? 'বাংলা / English' : 'Bangla / English'} />
-          {panel === 'language' && <div className="border-t border-[var(--fx-border)] p-4 sm:p-5"><div className="grid grid-cols-2 gap-2"><button type="button" onClick={() => void changeLocale('bn')} className={'min-h-11 rounded-xl border text-xs font-bold ' + (bn ? 'border-[var(--fx-primary)]/30 bg-[var(--fx-primary-soft)]' : 'border-[var(--fx-border)]')}>বাংলা</button><button type="button" onClick={() => void changeLocale('en')} className={'min-h-11 rounded-xl border text-xs font-bold ' + (!bn ? 'border-[var(--fx-primary)]/30 bg-[var(--fx-primary-soft)]' : 'border-[var(--fx-border)]')}>English</button></div></div>}
-
-          <AccordionRow open={panel === 'account'} onClick={() => togglePanel('account')} icon={<Gear size={19}/>} title={bn ? 'Account & safety' : 'Account & safety'} summary={bn ? 'Email, profile link, sign out' : 'Email, profile link, sign out'} />
-          {panel === 'account' && <div className="border-t border-[var(--fx-border)] p-4 sm:p-5">
-            <div className="flex items-center gap-3 rounded-xl border border-[var(--fx-border)] p-3"><div className="grid h-9 w-9 place-items-center rounded-lg bg-[var(--fx-primary-soft)]"><Bell size={17}/></div><div className="min-w-0"><p className="text-xs font-bold">{bn?'Account email':'Account email'}</p><p className="truncate text-[11px] text-[var(--fx-muted)]">{email || '—'}</p></div></div>
-            <button type="button" onClick={() => void copyProfileLink()} className="mt-2 flex min-h-11 w-full items-center justify-between rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><span className="inline-flex items-center gap-2"><Copy size={16}/>{bn?'Profile link copy':'Copy profile link'}</span>{copied && <Check size={15}/>}</button>
-            <Link href={publicUrl} target="_blank" className="mt-2 flex min-h-11 w-full items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><Globe size={16}/>{bn?'Public profile দেখুন':'View public profile'}</Link>
-            <button type="button" onClick={() => void signOut()} className="mt-2 flex min-h-11 w-full items-center gap-2 rounded-xl border border-red-500/20 px-3 text-xs font-bold text-red-600"><SignOut size={16}/>{bn?'Sign out':'Sign out'}</button>
-          </div>}
-        </div>
-
-        {message && <div className="mt-3 flex items-start gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)] p-3 text-xs"><span className="mt-0.5">{message.toLowerCase().includes('failed') || message.toLowerCase().includes('cannot') || message.includes('যায়নি') ? <X size={15}/> : <CheckCircle size={15}/>}</span><p>{message}</p></div>}
-      </section>
+          ) : (
+            <SettingsDetail section={settingsSection} bn={bn} email={email} websiteUrl={websiteUrl} instagramUrl={instagramUrl} facebookUrl={facebookUrl} whatsappUrl={whatsappUrl} setWebsiteUrl={setWebsiteUrl} setInstagramUrl={setInstagramUrl} setFacebookUrl={setFacebookUrl} setWhatsappUrl={setWhatsappUrl} visibility={visibility} messagePermissions={messagePermissions} feedVisibility={feedVisibility} reducedMotion={reducedMotion} theme={theme} onTheme={changeTheme} onLocale={changeLocale} onSetting={changeSetting} setVisibility={setVisibility} setMessagePermissions={setMessagePermissions} setFeedVisibility={setFeedVisibility} setReducedMotion={setReducedMotion} onBack={() => setSettingsSection(null)} copy={copyProfileLink} copied={copied} publicUrl={publicUrl} signOut={signOut} />
+          )}
+        </Sheet>
+      )}
     </main>
   )
 }
 
-function AccordionRow({open,onClick,icon,title,summary}:{open:boolean;onClick:()=>void;icon:ReactNode;title:string;summary:string}) {
-  return <button type="button" onClick={onClick} aria-expanded={open} className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-black/[.02] dark:hover:bg-white/[.03]">
-    <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]">{icon}</span>
-    <span className="min-w-0 flex-1"><span className="block text-sm font-bold">{title}</span><span className="mt-0.5 block truncate text-[10px] text-[var(--fx-muted)]">{summary}</span></span>
-    <CaretDown size={17} className={'shrink-0 transition ' + (open ? 'rotate-180' : '')}/>
-  </button>
+function EmptyState({ text }: { text: string }) {
+  return <div className="py-12 text-center text-xs text-[var(--fx-muted)]">{text}</div>
 }
 
-function Field({label,value,onChange,maxLength,icon,placeholder}:{label:string;value:string;onChange:(v:string)=>void;maxLength:number;icon?:ReactNode;placeholder?:string}) {
-  return <label className="block"><span className="text-xs font-bold">{label}</span><div className="mt-2 flex items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3"><span className="text-[var(--fx-muted)]">{icon}</span><input value={value} onChange={e=>onChange(e.target.value)} maxLength={maxLength} placeholder={placeholder} className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--fx-muted)]"/></div></label>
+function Toast({ message, onClose }: { message: string; onClose: () => void }) {
+  return <button type="button" onClick={onClose} className="fixed bottom-5 left-1/2 z-[70] -translate-x-1/2 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] px-4 py-2.5 text-xs font-semibold shadow-xl">{message}</button>
 }
 
-function SettingSelect({label,value,onChange,options}:{label:string;value:string;onChange:(v:string)=>void;options:string[][]}) {
-  return <label className="block"><span className="text-xs font-bold">{label}</span><select value={value} onChange={e=>onChange(e.target.value)} className="mt-2 h-11 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 text-xs outline-none">{options.map(([value,text])=><option key={value} value={value}>{text}</option>)}</select></label>
+function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/45 p-0 sm:items-center sm:p-5" role="dialog" aria-modal="true">
+      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default" />
+      <div className="relative max-h-[92dvh] w-full overflow-auto rounded-t-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4 shadow-2xl sm:max-w-xl sm:rounded-[2rem] sm:p-6">
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-base font-black">{title}</h2>
+          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/[.05]"><X size={18}/></button>
+        </div>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function SettingRow({ icon, title, onClick }: { icon: ReactNode; title: string; onClick: () => void }) {
+  return <button type="button" onClick={onClick} className="flex min-h-12 w-full items-center gap-3 border-b border-[var(--fx-border)] px-4 text-left last:border-b-0 hover:bg-black/[.03]"><span className="text-[var(--fx-primary-strong)]">{icon}</span><span className="flex-1 text-sm font-bold">{title}</span><span className="text-[var(--fx-muted)]">›</span></button>
+}
+
+function Field({ label, value, onChange, maxLength, icon, multiline }: { label: string; value: string; onChange: (v: string) => void; maxLength: number; icon?: ReactNode; multiline?: boolean }) {
+  return <label className="block"><span className="text-xs font-bold">{label}</span>{multiline ? <textarea value={value} onChange={e=>onChange(e.target.value)} maxLength={maxLength} rows={4} className="mt-2 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] p-3 text-sm outline-none"/> : <div className="mt-2 flex items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3"><span className="text-[var(--fx-muted)]">{icon}</span><input value={value} onChange={e=>onChange(e.target.value)} maxLength={maxLength} className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none"/></div>}</label>
+}
+
+function SettingsDetail(props: {
+  section: Exclude<SettingsSection, null>; bn: boolean; email: string
+  websiteUrl: string; instagramUrl: string; facebookUrl: string; whatsappUrl: string
+  setWebsiteUrl: (v:string)=>void; setInstagramUrl:(v:string)=>void; setFacebookUrl:(v:string)=>void; setWhatsappUrl:(v:string)=>void
+  visibility: Visibility; messagePermissions: MessagePermission; feedVisibility: FeedVisibility; reducedMotion:boolean; theme:HomeTheme
+  onTheme:(v:HomeTheme)=>void; onLocale:(v:'bn'|'en')=>void
+  onSetting:(patch:Record<string,unknown>,apply:()=>void)=>void
+  setVisibility:(v:Visibility)=>void; setMessagePermissions:(v:MessagePermission)=>void; setFeedVisibility:(v:FeedVisibility)=>void; setReducedMotion:(v:boolean)=>void
+  onBack:()=>void; copy:()=>void; copied:boolean; publicUrl:string; signOut:()=>void
+}) {
+  const p=props
+  return <div>
+    <button type="button" onClick={p.onBack} className="mb-4 text-xs font-bold text-[var(--fx-primary-strong)]">‹ {p.bn ? 'Settings' : 'Settings'}</button>
+
+    {p.section === 'links' && <div className="space-y-3">
+      <Field label="Website" value={p.websiteUrl} onChange={p.setWebsiteUrl} maxLength={500}/>
+      <Field label="Instagram" value={p.instagramUrl} onChange={p.setInstagramUrl} maxLength={500}/>
+      <Field label="Facebook" value={p.facebookUrl} onChange={p.setFacebookUrl} maxLength={500}/>
+      <Field label="WhatsApp" value={p.whatsappUrl} onChange={p.setWhatsappUrl} maxLength={500}/>
+      <button type="button" onClick={() => p.onBack()} className="min-h-11 w-full rounded-xl bg-[var(--fx-primary-strong)] text-xs font-bold text-white">{p.bn ? 'Save করতে Edit profile ব্যবহার করুন' : 'Save from Edit profile'}</button>
+    </div>}
+
+    {p.section === 'privacy' && <div className="space-y-3">
+      <SelectRow label={p.bn?'Profile visibility':'Profile visibility'} value={p.visibility} options={[['public','Public'],['private','Private']]} onChange={v=>p.onSetting({profile_visibility:v},()=>p.setVisibility(v as Visibility))}/>
+      <SelectRow label={p.bn?'Who can message you':'Who can message you'} value={p.messagePermissions} options={[['everyone',p.bn?'Everyone':'Everyone'],['authenticated',p.bn?'Logged-in users':'Authenticated users'],['nobody',p.bn?'Nobody':'Nobody']]} onChange={v=>p.onSetting({message_permissions:v},()=>p.setMessagePermissions(v as MessagePermission))}/>
+      <SelectRow label={p.bn?'Feed visibility':'Feed visibility'} value={p.feedVisibility} options={[['public','Public'],['authenticated',p.bn?'Logged-in users':'Authenticated users']]} onChange={v=>p.onSetting({feed_visibility:v},()=>p.setFeedVisibility(v as FeedVisibility))}/>
+    </div>}
+
+    {p.section === 'appearance' && <div className="space-y-3">
+      <div className="grid grid-cols-3 gap-2">{(['light','system','dark'] as HomeTheme[]).map(k=><button key={k} type="button" onClick={()=>void p.onTheme(k)} className={'min-h-11 rounded-xl border text-xs font-bold '+(p.theme===k?'border-[var(--fx-primary)] bg-[var(--fx-primary-soft)]':'border-[var(--fx-border)]')}>{k==='light'?<Sun size={17} className="mx-auto mb-1"/>:k==='dark'?<Moon size={17} className="mx-auto mb-1"/>:<Palette size={17} className="mx-auto mb-1"/>}{k}</button>)}</div>
+      <ToggleRow label={p.bn?'Reduced motion':'Reduced motion'} value={p.reducedMotion} onChange={v=>p.onSetting({reduced_motion:v},()=>{p.setReducedMotion(v);try{localStorage.setItem('fenix-reduce-motion',String(v));document.documentElement.dataset.reduceMotion=v?'true':'false'}catch{}})}/>
+    </div>}
+
+    {p.section === 'language' && <div className="grid grid-cols-2 gap-2"><button type="button" onClick={()=>void p.onLocale('bn')} className={'min-h-11 rounded-xl border text-xs font-bold '+(p.bn?'border-[var(--fx-primary)] bg-[var(--fx-primary-soft)]':'border-[var(--fx-border)]')}>বাংলা</button><button type="button" onClick={()=>void p.onLocale('en')} className={'min-h-11 rounded-xl border text-xs font-bold '+(!p.bn?'border-[var(--fx-primary)] bg-[var(--fx-primary-soft)]':'border-[var(--fx-border)]')}>English</button></div>}
+
+    {p.section === 'account' && <div className="space-y-2">
+      <div className="rounded-xl border border-[var(--fx-border)] p-3"><p className="text-xs font-black">Account email</p><p className="mt-1 truncate text-[11px] text-[var(--fx-muted)]">{p.email || '—'}</p></div>
+      <button type="button" onClick={p.copy} className="flex min-h-11 w-full items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><Copy size={16}/> {p.copied ? 'Copied' : 'Copy profile link'}</button>
+      <Link href={p.publicUrl} target="_blank" className="flex min-h-11 w-full items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><Globe size={16}/> View public profile</Link>
+      <button type="button" onClick={()=>void p.signOut()} className="flex min-h-11 w-full items-center gap-2 rounded-xl border border-red-500/20 px-3 text-xs font-bold text-red-600"><SignOut size={16}/> Sign out</button>
+    </div>}
+  </div>
+}
+
+function SelectRow({label,value,options,onChange}:{label:string;value:string;options:string[][];onChange:(v:string)=>void}) {
+  return <label className="block"><span className="text-xs font-bold">{label}</span><select value={value} onChange={e=>onChange(e.target.value)} className="mt-2 h-11 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 text-xs outline-none">{options.map(([v,t])=><option key={v} value={v}>{t}</option>)}</select></label>
+}
+
+function ToggleRow({label,value,onChange}:{label:string;value:boolean;onChange:(v:boolean)=>void}) {
+  return <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--fx-border)] p-3"><span className="text-xs font-bold">{label}</span><button type="button" role="switch" aria-checked={value} onClick={()=>onChange(!value)} className={'relative h-7 w-12 rounded-full '+(value?'bg-[var(--fx-primary)]':'bg-black/10 dark:bg-white/10')}><span className={'absolute top-1 h-5 w-5 rounded-full bg-white transition '+(value?'left-6':'left-1')}/></button></div>
 }
