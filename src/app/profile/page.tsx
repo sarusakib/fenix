@@ -20,8 +20,8 @@ type FeedVisibility = 'public' | 'authenticated'
 type Panel = 'edit' | 'privacy' | 'appearance' | 'language' | 'links' | 'account' | null
 type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
 
-const PROFILE_MAX_BYTES = 100 * 1024
-const PROFILE_TARGET_BYTES = 92 * 1024
+const PROFILE_MAX_BYTES = 150 * 1024
+const PROFILE_TARGET_BYTES = 138 * 1024
 
 function cleanUrl(value: string) {
   const raw = value.trim()
@@ -77,6 +77,7 @@ export default function ProfilePage() {
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [imageBusy, setImageBusy] = useState<'avatar' | 'cover' | null>(null)
+  const [imageProgress, setImageProgress] = useState(0)
   const [message, setMessage] = useState('')
   const [copied, setCopied] = useState(false)
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
@@ -189,6 +190,7 @@ export default function ProfilePage() {
       return
     }
     setImageBusy(kind)
+    setImageProgress(4)
     setMessage('')
     try {
       const s = createClient()
@@ -196,19 +198,23 @@ export default function ProfilePage() {
       if (!auth.user) throw new Error(bn ? 'আবার sign in করুন।' : 'Please sign in again.')
 
       const previousUrl = kind === 'avatar' ? avatarUrl : coverUrl
+      setImageProgress(10)
       const optimized = await optimizeImageFile(file, {
         maxDimension: kind === 'avatar' ? 1000 : 1600,
         targetBytes: PROFILE_TARGET_BYTES,
         hardLimitBytes: PROFILE_MAX_BYTES,
       })
 
+      setImageProgress(72)
       if (optimized.byteSize > PROFILE_MAX_BYTES) {
         throw new Error(bn ? 'ছবিটি 100KB-এর মধ্যে আনা যায়নি।' : 'This image could not be reduced below 100KB.')
       }
 
       const extension = optimized.mimeType === 'image/webp' ? 'webp' : 'jpg'
       const path = auth.user.id + '/' + kind + '/' + crypto.randomUUID() + '.' + extension
+      setImageProgress(82)
       const uploaded = await uploadOptimizedPublicImage(s, 'avatars', path, optimized, PROFILE_MAX_BYTES)
+      setImageProgress(94)
 
       const patch = kind === 'avatar' ? { avatar_url: uploaded.publicUrl } : { cover_url: uploaded.publicUrl }
       const { error } = await s.from('profiles').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', auth.user.id)
@@ -223,12 +229,14 @@ export default function ProfilePage() {
       const oldPath = storagePathFromPublicUrl(previousUrl, 'avatars')
       if (oldPath) await removePublicImage(s, 'avatars', oldPath)
 
+      setImageProgress(100)
       setMessage(bn
-        ? (kind === 'avatar' ? 'Profile photo আপডেট হয়েছে।' : 'Cover photo আপডেট হয়েছে।') + ' • 100KB-এর মধ্যে'
-        : (kind === 'avatar' ? 'Profile photo updated.' : 'Cover photo updated.') + ' • under 100KB')
+        ? (kind === 'avatar' ? 'Profile photo আপডেট হয়েছে।' : 'Cover photo আপডেট হয়েছে.')
+        : (kind === 'avatar' ? 'Profile photo updated.' : 'Cover photo updated.'))
     } catch (error) {
       setMessage(error instanceof Error ? error.message : (bn ? 'ছবিটি upload করা যায়নি।' : 'Image upload failed.'))
     } finally {
+      window.setTimeout(() => setImageProgress(0), 450)
       setImageBusy(null)
     }
   }
@@ -349,7 +357,7 @@ export default function ProfilePage() {
           <div className="relative h-32 bg-[var(--fx-primary-soft)] sm:h-44">
             {coverUrl ? <img src={coverUrl} alt="" className="h-full w-full object-cover"/> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(0,128,128,.24),transparent_40%),linear-gradient(135deg,rgba(11,23,54,.02),rgba(0,128,128,.10))]"/>}
             <label className="absolute right-3 top-3 grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-black/55 text-white backdrop-blur" title={bn ? 'Cover photo বদলান' : 'Change cover photo'}>
-              {imageBusy === 'cover' ? <SpinnerGap size={17} className="animate-spin"/> : <Camera size={17}/>}
+              {imageBusy === 'cover' ? <span className="text-[10px] font-black">{imageProgress}%</span> : <Camera size={17}/>}
               <input type="file" accept="image/*" className="sr-only" disabled={imageBusy !== null} onChange={e => { const file = e.target.files?.[0]; e.currentTarget.value = ''; if (file) void uploadProfileImage('cover', file) }}/>
             </label>
           </div>
@@ -359,7 +367,7 @@ export default function ProfilePage() {
               <div className="relative">
                 {avatarUrl ? <img src={avatarUrl} alt="" className="h-24 w-24 rounded-[1.7rem] border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover sm:h-28 sm:w-28"/> : <div className="grid h-24 w-24 place-items-center rounded-[1.7rem] border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)] sm:h-28 sm:w-28"><UserCircle size={58} className="text-[var(--fx-primary-strong)]"/></div>}
                 <label className="absolute -bottom-1 -right-1 grid h-9 w-9 cursor-pointer place-items-center rounded-full border-2 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-strong)] text-white shadow-lg">
-                  {imageBusy === 'avatar' ? <SpinnerGap size={15} className="animate-spin"/> : <Camera size={15}/>}
+                  {imageBusy === 'avatar' ? <span className="text-[9px] font-black">{imageProgress}%</span> : <Camera size={15}/>}
                   <input type="file" accept="image/*" className="sr-only" disabled={imageBusy !== null} onChange={e => { const file = e.target.files?.[0]; e.currentTarget.value = ''; if (file) void uploadProfileImage('avatar', file) }}/>
                 </label>
               </div>
