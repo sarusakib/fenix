@@ -47,7 +47,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     .order('created_at', { ascending: false })
     .limit(12)
 
-  const postIds = (publicPosts ?? []).map((post: { id: string }) => post.id)
+  const postIds = (publicPosts ?? []).map(post => post.id).filter((id): id is string => Boolean(id))
   const { data: publicMedia } = postIds.length
     ? await s.from('fenix_post_media').select('id,post_id,storage_bucket,storage_path,width,height,sort_order').in('post_id', postIds).order('sort_order', { ascending: true })
     : { data: [] }
