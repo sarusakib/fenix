@@ -15,7 +15,7 @@ type QuestionRow = {
   topic_name:string|null; answer_count?:number; score?:number;
 }
 type NewsRow = { id:string; slug:string; title_bn:string; title_en:string; excerpt_bn:string|null; excerpt_en:string|null; category:string; verification_status:string; featured:boolean; breaking:boolean; published_at:string|null; source_name:string|null }
-type PostMediaRow = { id:string; post_id:string; storage_bucket:string; storage_path:string; mime_type:string; width:number|null; height:number|null; sort_order:number; byte_size:number }
+type PostMediaRow = { id:string; post_id:string; storage_bucket:string; storage_path:string; mime_type:string; width:number|null; height:number|null; sort_order:number; byte_size:number; source_byte_size:number|null; source_digest:string|null }
 type PostRow = { id:string; body:string; created_at:string; author_id:string; author_name:string|null; author_username:string|null; author_avatar_url:string|null; media:PostMediaRow[] }
 
 const fmt=(v:string,locale:string)=>new Date(v).toLocaleString(locale==='bn'?'bn-BD':'en-BD',{dateStyle:'medium',timeStyle:'short'})
@@ -36,7 +36,7 @@ export default function FeedPage(){
   const [composer,setComposer]=useState<'question'|'post'>('question')
   const [busy,setBusy]=useState(false)
   const [message,setMessage]=useState('')
-  const [postImages,setPostImages]=useState<Array<{id:string;file:File;previewUrl:string;width:number;height:number;byteSize:number}>>([])
+  const [postImages,setPostImages]=useState<Array<{id:string;file:File;previewUrl:string;width:number;height:number;byteSize:number;sourceByteSize:number;sourceDigest:string}>>([])
   const [imageBusy,setImageBusy]=useState(false)
 
   const load=useCallback(async()=>{
@@ -53,7 +53,7 @@ export default function FeedPage(){
     const postIds=((p??[]) as any[]).map(row=>row.id as string)
     const mediaByPost:Record<string,PostMediaRow[]>={}
     if(postIds.length){
-      const {data:media}=await s.from('fenix_post_media').select('id,post_id,storage_bucket,storage_path,mime_type,width,height,sort_order,byte_size').in('post_id',postIds).order('sort_order',{ascending:true})
+      const {data:media}=await s.from('fenix_post_media').select('id,post_id,storage_bucket,storage_path,mime_type,width,height,sort_order,byte_size,source_byte_size,source_digest').in('post_id',postIds).order('sort_order',{ascending:true})
       for(const row of (media??[]) as PostMediaRow[]) (mediaByPost[row.post_id]??=[]).push(row)
     }
     if(uid){
@@ -85,13 +85,17 @@ export default function FeedPage(){
     const available=Math.max(0,4-postImages.length)
     if(available===0){setMessage(locale==='bn'?'একটি post-এ সর্বোচ্চ ৪টি photo দিতে পারবেন।':'You can add up to 4 photos to one post.');return}
     setImageBusy(true);setMessage('')
-    const prepared:Array<{id:string;file:File;previewUrl:string;width:number;height:number;byteSize:number}>=[]
+    const prepared:Array<{id:string;file:File;previewUrl:string;width:number;height:number;byteSize:number;sourceByteSize:number;sourceDigest:string}>=[]
     try{
       for(const file of Array.from(files).slice(0,available)){
         const optimized=await optimizeImageFile(file,{maxDimension:1600})
-        prepared.push({id:crypto.randomUUID(),file:optimized.file,previewUrl:URL.createObjectURL(optimized.file),width:optimized.width,height:optimized.height,byteSize:optimized.byteSize})
+        if (optimized.sourceDigest && (postImages.some(image => image.sourceDigest === optimized.sourceDigest) || prepared.some(image => image.sourceDigest === optimized.sourceDigest))) continue
+        prepared.push({id:crypto.randomUUID(),file:optimized.file,previewUrl:URL.createObjectURL(optimized.file),width:optimized.width,height:optimized.height,byteSize:optimized.byteSize,sourceByteSize:optimized.sourceByteSize ?? file.size,sourceDigest:optimized.sourceDigest ?? ''})
       }
       setPostImages(value=>[...value,...prepared])
+      if (prepared.length < Math.min(files.length, available)) {
+        setMessage(locale==='bn'?'একই photo আবার দেওয়া হয়নি।':'Duplicate photos were skipped.')
+      }
       if(files.length>available)setMessage(locale==='bn'?'সর্বোচ্চ ৪টি photo রাখা হয়েছে।':'Only the first 4 photos were kept.')
     }catch(error){
       for(const item of prepared)URL.revokeObjectURL(item.previewUrl)
@@ -189,7 +193,7 @@ export default function FeedPage(){
     {userId&&<section className="mt-4 rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4">
       <div className="flex flex-wrap gap-2"><button type="button" onClick={()=>{clearPostImages();setComposer('question')}} className={`rounded-xl px-3 py-2 text-xs font-bold ${composer==='question'?'bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]':''}`}><Question size={15} className="mr-1 inline"/> {copy.ask}</button><button type="button" onClick={()=>setComposer('post')} className={`rounded-xl px-3 py-2 text-xs font-bold ${composer==='post'?'bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]':''}`}><PaperPlaneRight size={15} className="mr-1 inline"/> {copy.post}</button></div>
       {composer==='question'?<div className="mt-3 space-y-2"><input value={title} onChange={e=>setTitle(e.target.value)} maxLength={240} placeholder={copy.placeholderTitle} className="w-full rounded-xl border border-[var(--fx-border)] bg-transparent p-3 text-sm font-bold outline-none"/><textarea value={body} onChange={e=>setBody(e.target.value)} maxLength={12000} rows={4} placeholder={copy.placeholderBody} className="w-full rounded-xl border border-[var(--fx-border)] bg-transparent p-3 text-sm leading-7 outline-none"/><div className="flex flex-wrap items-center gap-2"><select value={topicId} onChange={e=>setTopicId(e.target.value)} className="rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-2 text-xs"><option value="">{copy.topic}</option>{topics.map(t=><option key={t.id} value={t.id}>{label(t,locale)}</option>)}</select><button disabled={busy||title.trim().length<8||!body.trim()} onClick={()=>void ask()} className="ml-auto rounded-xl bg-[var(--fx-primary-strong)] px-4 py-2.5 text-xs font-bold text-white disabled:opacity-40"><Plus size={15} className="mr-1 inline"/>{copy.submit}</button></div></div>
-      :<div className="mt-3"><textarea value={body} onChange={e=>setBody(e.target.value)} maxLength={5000} rows={4} placeholder={locale==='bn'?'আপনি কী শেয়ার করতে চান?':'What would you like to share?'} className="w-full rounded-xl border border-[var(--fx-border)] bg-transparent p-3 text-sm leading-7"/>{postImages.length>0&&<div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{postImages.map(image=><div key={image.id} className="relative overflow-hidden rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)]"><img src={image.previewUrl} alt="" className="aspect-square h-full w-full object-cover"/><button type="button" onClick={()=>removePostImage(image.id)} className="absolute right-1.5 top-1.5 grid h-8 w-8 place-items-center rounded-full bg-black/60 text-white"><X size={15}/></button><span className="absolute bottom-1.5 left-1.5 rounded-full bg-black/60 px-2 py-1 text-[10px] font-bold text-white">{Math.round(image.byteSize/1024)}KB</span></div>)}</div>}<div className="mt-2 flex flex-wrap items-center gap-2"><label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ImageSquare size={16}/>{imageBusy?'Preparing…':'Add photos'}<input type="file" accept="image/*" multiple disabled={busy||imageBusy||postImages.length>=4} className="sr-only" onChange={e=>{void selectPostImages(e.target.files);e.currentTarget.value=''}}/></label><span className="text-[10px] text-[var(--fx-muted)]">JPG/PNG/WebP · automatically optimized below 200KB · up to 4</span><button disabled={busy||imageBusy||(!body.trim()&&!postImages.length)} onClick={()=>void publishPost()} className="ml-auto rounded-xl bg-[var(--fx-primary-strong)] px-4 py-2.5 text-xs font-bold text-white disabled:opacity-40"><UploadSimple size={15} className="mr-1 inline"/>{copy.submit}</button></div></div>}
+      :<div className="mt-3"><textarea value={body} onChange={e=>setBody(e.target.value)} maxLength={5000} rows={4} placeholder={locale==='bn'?'আপনি কী শেয়ার করতে চান?':'What would you like to share?'} className="w-full rounded-xl border border-[var(--fx-border)] bg-transparent p-3 text-sm leading-7"/>{postImages.length>0&&<div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{postImages.map(image=><div key={image.id} className="relative overflow-hidden rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)]"><img src={image.previewUrl} alt="" className="aspect-square h-full w-full object-cover"/><button type="button" onClick={()=>removePostImage(image.id)} className="absolute right-1.5 top-1.5 grid h-8 w-8 place-items-center rounded-full bg-black/60 text-white"><X size={15}/></button><span className="absolute bottom-1.5 left-1.5 rounded-full bg-black/60 px-2 py-1 text-[10px] font-bold text-white">{Math.round(image.byteSize/1024)}KB</span></div>)}</div>}<div className="mt-2 flex flex-wrap items-center gap-2"><label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ImageSquare size={16}/>{imageBusy?'Preparing…':'Add photos'}<input type="file" accept="image/*" multiple disabled={busy||imageBusy||postImages.length>=4} className="sr-only" onChange={e=>{void selectPostImages(e.target.files);e.currentTarget.value=''}}/></label><span className="text-[10px] text-[var(--fx-muted)]">JPG/PNG/WebP + supported browser formats · smart-composed toward ~300KB · max 400KB · up to 4</span><button disabled={busy||imageBusy||(!body.trim()&&!postImages.length)} onClick={()=>void publishPost()} className="ml-auto rounded-xl bg-[var(--fx-primary-strong)] px-4 py-2.5 text-xs font-bold text-white disabled:opacity-40"><UploadSimple size={15} className="mr-1 inline"/>{copy.submit}</button></div></div>}
     </section>}
     {!userId&&<Link href="/login?next=/feed" className="mt-4 flex min-h-12 items-center justify-center rounded-2xl bg-[var(--fx-primary-soft)] text-sm font-bold text-[var(--fx-primary-strong)]">{copy.login}</Link>}
     {message&&<p className="mt-3 rounded-xl bg-[var(--fx-primary-soft)] p-3 text-xs">{message}</p>}
