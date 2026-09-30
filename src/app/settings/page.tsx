@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
-  Bell, ChatCircleDots, Check, GearSix, Globe, Lock, Moon, Palette, ShieldCheck,
+  Bell, BookmarkSimple, ChatCircleDots, Check, GearSix, Globe, Lock, Moon, Palette, ShieldCheck,
   SignOut, Sun, UserCircle, Users, WarningCircle,
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
@@ -151,6 +151,7 @@ export default function SettingsPage() {
             <QuickLink href="/messages" icon={<ChatCircleDots size={18}/>} title={bn ? 'বার্তা' : 'Messages'} />
             <QuickLink href="/notifications" icon={<Bell size={18}/>} title={bn ? 'নোটিফিকেশন' : 'Notifications'} />
             <QuickLink href="/dashboard" icon={<Users size={18}/>} title={bn ? 'ওয়ার্কস্পেস' : 'Workspace'} />
+            <QuickLink href="/saved" icon={<BookmarkSimple size={18}/>} title={bn ? 'Saved' : 'Saved'} />
           </div>
         </header>
 
@@ -238,6 +239,7 @@ export default function SettingsPage() {
               <QuickLink href="/invest" icon={<ShieldCheck size={18}/>} title={bn ? 'Invest' : 'Invest'} />
               <QuickLink href="/jobs" icon={<Users size={18}/>} title={bn ? 'Jobs' : 'Jobs'} />
               <QuickLink href="/news" icon={<Bell size={18}/>} title={bn ? 'News' : 'News'} />
+              <QuickLink href="/saved" icon={<BookmarkSimple size={18}/>} title={bn ? 'Saved' : 'Saved'} />
             </div>
           </SettingsSection>
 
