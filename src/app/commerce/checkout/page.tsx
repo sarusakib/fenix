@@ -32,7 +32,7 @@ export default function CommerceCheckoutPage() {
       const items = readCart()
       if (active) setCart(items)
       const supabase = createClient()
-      const { data } = await supabase.auth.getUser()
+      await supabase.auth.getUser()
       if (active) {
         setLoading(false)
       }
