@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, BookmarkSimple, CaretDown, ChatCircle, Flag, ImageSquare, Newspaper, PaperPlaneRight, Plus, Question, ShareNetwork, ThumbsUp, Trash, UploadSimple, UserCircle, X } from '@phosphor-icons/react'
+import { ArrowLeft, ChatCircle, ImageSquare, Newspaper, PaperPlaneRight, Plus, Question, ShareNetwork, ThumbsUp, UploadSimple, UserCircle, X } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
-import { optimizeImageFile, removePublicImage, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
+import { optimizeImageFile, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
 
 type Topic = { id:string; slug:string; name_bn:string; name_en:string }
 type QuestionRow = {
@@ -198,14 +198,11 @@ export default function FeedPage(){
     {!userId&&<Link href="/login?next=/feed" className="mt-4 flex min-h-12 items-center justify-center rounded-2xl bg-[var(--fx-primary-soft)] text-sm font-bold text-[var(--fx-primary-strong)]">{copy.login}</Link>}
     {message&&<p className="mt-3 rounded-xl bg-[var(--fx-primary-soft)] p-3 text-xs">{message}</p>}
 
-    <div className="mt-5 space-y-3">{feedItems.length?feedItems.map(item=>item.kind==='question'?<QuestionCard key={'q'+item.data.id} q={item.data} locale={locale} userId={userId} onVote={vote} onFollow={toggleFollow} followed={followed}/>:item.kind==='news'?<NewsCard key={'n'+item.data.id} n={item.data} locale={locale}/>:<PostCard key={'p'+item.data.id} p={item.data} locale={locale}/>):<div className="rounded-[1.7rem] border border-dashed border-[var(--fx-border)] p-10 text-center text-sm text-[var(--fx-muted)]">{copy.empty}</div>}</div>
+    <div className="mt-5 space-y-3">{feedItems.length?feedItems.map(item=>item.kind==='question'?<QuestionCard key={'q'+item.data.id} q={item.data} locale={locale} onVote={vote} onFollow={toggleFollow} followed={followed}/>:item.kind==='news'?<NewsCard key={'n'+item.data.id} n={item.data} locale={locale}/>:<PostCard key={'p'+item.data.id} p={item.data} locale={locale}/>):<div className="rounded-[1.7rem] border border-dashed border-[var(--fx-border)] p-10 text-center text-sm text-[var(--fx-muted)]">{copy.empty}</div>}</div>
   </section></main>
 }
 
-function QuestionCard({q,locale,userId,onVote,onFollow,followed}:{q:QuestionRow;locale:string;userId:string|null;onVote:(id:string)=>void;onFollow:(id:string)=>void;followed:string[]}){
-  const [score,setScore]=useState(q.score??0)
-  const [answerCount,setAnswerCount]=useState(q.answer_count??0)
-  useEffect(()=>{setScore(q.score??0);setAnswerCount(q.answer_count??0)},[q.score,q.answer_count])
+function QuestionCard({q,locale,onVote,onFollow,followed}:{q:QuestionRow;locale:string;onVote:(id:string)=>void;onFollow:(id:string)=>void;followed:string[]}){
   return <article className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5">
     <div className="flex items-start gap-3">{q.author_avatar_url?<img src={q.author_avatar_url} alt="" className="h-10 w-10 rounded-full object-cover"/>:<UserCircle size={40} className="shrink-0 opacity-40"/>}<div className="min-w-0 flex-1">
       <div className="flex flex-wrap items-center gap-2 text-[11px] text-[var(--fx-muted)]"><span className="font-bold text-[var(--fx-text)]">{q.author_name||q.author_username||'FeniX user'}</span><span>·</span><time>{fmt(q.created_at,locale)}</time>{q.topic_id&&<><span>·</span><span className="font-bold">{q.topic_name}</span></>}</div>
