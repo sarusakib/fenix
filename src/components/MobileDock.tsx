@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Brain, House, List, UserCircle, UsersThree } from '@phosphor-icons/react'
+import { Brain, House, List, MagnifyingGlass, UserCircle } from '@phosphor-icons/react'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 
 export default function MobileDock() {
@@ -12,10 +12,10 @@ export default function MobileDock() {
   const bn = locale === 'bn'
   const items = [
     { href: '/', label: bn ? 'হোম' : 'Home', icon: House },
-    { href: '/feed', label: bn ? 'ফিড' : 'Feed', icon: UsersThree },
+    { href: '/search', label: bn ? 'সার্চ' : 'Search', icon: MagnifyingGlass },
     { href: '/services', label: bn ? 'নেটওয়ার্ক' : 'Network', icon: List },
     { href: '/guide', label: bn ? 'ব্রেইন' : 'Brain', icon: Brain },
-    { href: '/dashboard', label: bn ? 'অ্যাকাউন্ট' : 'Account', icon: UserCircle },
+    { href: '/profile', label: bn ? 'প্রোফাইল' : 'Profile', icon: UserCircle },
   ]
   return (
     <nav aria-label="Mobile primary navigation" className="fixed inset-x-2 bottom-2 z-[70] md:hidden">
