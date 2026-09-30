@@ -3436,6 +3436,12 @@ export type Database = {
           sort_order: number
           storage_bucket: string
           storage_path: string
+          byte_size: number | null
+          height: number | null
+          source_byte_size: number | null
+          source_digest: string | null
+          optimization_version: string
+          width: number | null
         }
         Insert: {
           alt_text_bn?: string | null
@@ -3464,6 +3470,12 @@ export type Database = {
           sort_order?: number
           storage_bucket?: string
           storage_path?: string
+          byte_size?: number | null
+          height?: number | null
+          source_byte_size?: number | null
+          source_digest?: string | null
+          optimization_version?: string
+          width?: number | null
         }
         Relationships: [
           {
