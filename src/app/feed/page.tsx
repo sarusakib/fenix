@@ -60,7 +60,7 @@ export default function FeedPage(){
       if(tab==='latest'){
         const postRows=(p??[]) as unknown as PostRow[]
         const postIds=postRows.map(row=>row.id)
-        let nextPostMedia:PostMediaRow[]=[]
+        let nextPostMedia:Array<Omit<PostMediaRow,'public_url'>>=[]
         let voteRows:{content_id:string;value:number}[]=[]
         let commentRows:{content_id:string}[]=[]
         if(postIds.length){
