@@ -8,10 +8,11 @@ import { canonicalBrainIntent, buildZeroResultHints } from '../../lib/feniBrainE
 import { classifyFeniBrainQuestion, detectLanguage, detectFeniBrainIntent, detectRequestedFactSubject, extractBudgetBDT, extractEntities } from '../../lib/feniBrainQuery'
 
 const MODEL = process.env.FENI_BRAIN_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
+const PROVIDER = 'together'
 const MAX_QUERY_LENGTH = 120
 const MAX_CONTEXT_LENGTH = 12000
 const MAX_ANSWER_TOKENS = 650
-const AI_TIMEOUT_MS = 12000
+const AI_TIMEOUT_MS = 9000
 const MAX_EVIDENCE_ITEMS = 8
 
 function clean(value) {
