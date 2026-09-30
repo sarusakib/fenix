@@ -467,10 +467,12 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
     setError('')
     let uploadFile = file
     let messageType = 'file'
+    let optimizedMeta: Awaited<ReturnType<typeof optimizeImageFile>> | null = null
 
     try {
       if (file.type.startsWith('image/')) {
-        uploadFile = (await optimizeImageFile(file, { maxDimension: 1600, targetBytes: 190 * 1024 })).file
+        optimizedMeta = await optimizeImageFile(file, { maxDimension: 1600 })
+        uploadFile = optimizedMeta.file
         messageType = 'image'
       } else if (file.type === 'video/mp4' || file.type === 'video/webm') {
         if (file.size > MAX_FILE_BYTES) throw new Error('Video must be 10MB or smaller.')
@@ -501,7 +503,11 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
         attachment_type: uploadFile.type,
         attachment_size: uploadFile.size,
         message_type: messageType,
-        metadata: {},
+        metadata: optimizedMeta ? {
+          source_byte_size: optimizedMeta.sourceByteSize ?? file.size,
+          source_digest: optimizedMeta.sourceDigest ?? null,
+          optimization_version: 'fenix-image-v2',
+        } : {},
       }).select(fields).single()
 
       if (messageError) {
