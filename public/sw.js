@@ -1,5 +1,5 @@
 const CACHE_NAME = 'fenix-shell-v2'
-const SHELL = ['/offline.html', '/manifest.json', '/icon.png']
+const SHELL = ['/offline.html', '/manifest.json', '/icon.svg']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -34,7 +34,7 @@ self.addEventListener('fetch', (event) => {
   const isStaticAsset =
     url.pathname.startsWith('/_next/static/') ||
     url.pathname === '/manifest.json' ||
-    url.pathname === '/icon.png'
+    url.pathname === '/icon.svg'
 
   if (isStaticAsset) {
     event.respondWith(
