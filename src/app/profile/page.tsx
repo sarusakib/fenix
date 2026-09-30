@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, Check, Copy, Globe, ImageSquare, LinkSimple, MapPin, ShieldCheck, UploadSimple, UserCircle } from '@phosphor-icons/react'
+import { ArrowLeft, Check, Copy, FacebookLogo, Globe, ImageSquare, InstagramLogo, LinkSimple, MapPin, ShieldCheck, UploadSimple, UserCircle, WhatsappLogo } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 import { optimizeImageFile, removePublicImage, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
+import FeniLocationPicker from '@/components/profile/FeniLocationPicker'
 
 type Visibility = 'public' | 'private'
 type MessagePermission = 'everyone' | 'authenticated' | 'nobody'
@@ -33,6 +34,18 @@ export default function ProfileEditorPage() {
   const [websiteUrl, setWebsiteUrl] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
   const [coverUrl, setCoverUrl] = useState('')
+  const [whatsappUrl, setWhatsappUrl] = useState('')
+  const [facebookUrl, setFacebookUrl] = useState('')
+  const [instagramUrl, setInstagramUrl] = useState('')
+  const [districtId, setDistrictId] = useState('')
+  const [upazilaId, setUpazilaId] = useState('')
+  const [localityId, setLocalityId] = useState('')
+  const [areaText, setAreaText] = useState('')
+  const [roadText, setRoadText] = useState('')
+  const [houseDetails, setHouseDetails] = useState('')
+  const [holdingNo, setHoldingNo] = useState('')
+  const [locationPublicLevel, setLocationPublicLevel] = useState<'district'|'upazila'|'locality'>('district')
+  const [exactLocationVisibility, setExactLocationVisibility] = useState<'private'|'connections'>('private')
   const [visibility, setVisibility] = useState<Visibility>('public')
   const [messagePermissions, setMessagePermissions] = useState<MessagePermission>('everyone')
   const [feedVisibility, setFeedVisibility] = useState<FeedVisibility>('public')
@@ -49,7 +62,7 @@ export default function ProfileEditorPage() {
       const { data: auth } = await s.auth.getUser()
       if (!auth.user) { window.location.replace('/login?next=/profile'); return }
       const [{ data: profile }, { data: settings }] = await Promise.all([
-        s.from('profiles').select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url').eq('id', auth.user.id).maybeSingle(),
+        s.from('profiles').select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url,district_id,upazila_id,locality_id,area_text,road_text,house_details,holding_no,location_public_level,exact_location_visibility').eq('id', auth.user.id).maybeSingle(),
         s.from('profile_settings').select('locale,profile_visibility,message_permissions,feed_visibility').eq('user_id', auth.user.id).maybeSingle(),
       ])
       if (!active) return
@@ -62,6 +75,18 @@ export default function ProfileEditorPage() {
       setWebsiteUrl(profile?.website_url ?? '')
       setAvatarUrl(profile?.avatar_url ?? providerAvatar)
       setCoverUrl(profile?.cover_url ?? '')
+      setWhatsappUrl(profile?.whatsapp_url ?? '')
+      setFacebookUrl(profile?.facebook_url ?? '')
+      setInstagramUrl(profile?.instagram_url ?? '')
+      setDistrictId(profile?.district_id ?? '')
+      setUpazilaId(profile?.upazila_id ?? '')
+      setLocalityId(profile?.locality_id ?? '')
+      setAreaText(profile?.area_text ?? '')
+      setRoadText(profile?.road_text ?? '')
+      setHouseDetails(profile?.house_details ?? '')
+      setHoldingNo(profile?.holding_no ?? '')
+      if(profile?.location_public_level==='upazila'||profile?.location_public_level==='locality') setLocationPublicLevel(profile.location_public_level)
+      if(profile?.exact_location_visibility==='connections') setExactLocationVisibility('connections')
       if (settings?.locale === 'bn' || settings?.locale === 'en') setLocale(settings.locale)
       if (settings?.profile_visibility === 'private') setVisibility('private')
       if (settings?.message_permissions === 'everyone' || settings?.message_permissions === 'authenticated' || settings?.message_permissions === 'nobody') setMessagePermissions(settings.message_permissions)
@@ -78,6 +103,8 @@ export default function ProfileEditorPage() {
   }, [avatarUrl, bio, fullName, locationText, username, visibility, websiteUrl])
 
   const publicUrl = username ? '/profile/' + encodeURIComponent(username) : '/profile'
+
+  const cleanOptionalUrl = (value: string) => cleanPublicUrl(value)
 
   async function copyProfileLink() {
     try {
@@ -134,8 +161,16 @@ export default function ProfileEditorPage() {
       return
     }
     const website = cleanPublicUrl(websiteUrl)
+    const whatsapp = cleanOptionalUrl(whatsappUrl)
+    const facebook = cleanOptionalUrl(facebookUrl)
+    const instagram = cleanOptionalUrl(instagramUrl)
     if (websiteUrl.trim() && !website) {
       setMessage(locale === 'bn' ? 'Website-এর ক্ষেত্রে https:// বা http:// URL দিন।' : 'Use a full http:// or https:// website URL.')
+      setBusy(false)
+      return
+    }
+    if ((whatsappUrl.trim() && !whatsapp) || (facebookUrl.trim() && !facebook) || (instagramUrl.trim() && !instagram)) {
+      setMessage(locale === 'bn' ? 'Social link-এ পূর্ণ http:// অথবা https:// URL দিন।' : 'Use a full http:// or https:// URL for social links.')
       setBusy(false)
       return
     }
@@ -178,7 +213,7 @@ s.from('profiles').update({
       <Navbar/>
       <section className="mx-auto max-w-5xl px-4 pb-28 pt-7 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link href="/dashboard" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> Account</Link>
+          <Link href="/settings" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> {locale==='bn'?'সেটিংস':'Settings'}</Link>
           <div className="flex flex-wrap gap-2">
             <Link href={publicUrl} target="_blank" className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--fx-primary-soft)] px-3.5 text-xs font-bold text-[var(--fx-primary-strong)]"><LinkSimple size={15}/> View public profile</Link>
             <button type="button" onClick={()=>void copyProfileLink()} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold">{copied?<Check size={15}/>:<Copy size={15}/>} {copied?'Copied':'Copy link'}</button>
@@ -226,8 +261,10 @@ s.from('profiles').update({
             <Field label="Username" value={username} onChange={v=>setUsername(v.replace(/[^a-zA-Z0-9_]/g,'').toLowerCase())} maxLength={32} prefix="@"/>
             <Field label={locale==='bn'?'এলাকা':'Location'} value={locationText} onChange={setLocationText} maxLength={160} icon={<MapPin size={15}/>}/>
             <Field label="Website" value={websiteUrl} onChange={setWebsiteUrl} maxLength={500} icon={<Globe size={15}/>} placeholder="https://example.com"/>
-            <Field label="Profile image URL" value={avatarUrl} onChange={setAvatarUrl} maxLength={500} placeholder="https://…"/>
-            <Field label="Cover image URL" value={coverUrl} onChange={setCoverUrl} maxLength={500} placeholder="https://…"/>
+            <Field label={locale==='bn'?'WhatsApp link':'WhatsApp link'} value={whatsappUrl} onChange={setWhatsappUrl} maxLength={500} icon={<WhatsappLogo size={15}/>} placeholder="https://wa.me/…"/>
+            <Field label={locale==='bn'?'Facebook link':'Facebook link'} value={facebookUrl} onChange={setFacebookUrl} maxLength={500} icon={<FacebookLogo size={15}/>} placeholder="https://facebook.com/…"/>
+            <Field label={locale==='bn'?'Instagram link':'Instagram link'} value={instagramUrl} onChange={setInstagramUrl} maxLength={500} icon={<InstagramLogo size={15}/>} placeholder="https://instagram.com/…"/>
+            <Field label="Website" value={websiteUrl} onChange={setWebsiteUrl} maxLength={500} icon={<Globe size={15}/>} placeholder="https://example.com"/>
           </div>
           <label className="mt-4 block"><span className="text-xs font-bold">Bio</span><textarea value={bio} onChange={e=>setBio(e.target.value)} maxLength={1000} rows={5} className="mt-2 w-full rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-3 text-sm leading-7 outline-none" placeholder={locale==='bn'?'আপনি কী করেন? কী নিয়ে কাজ করেন?':'What do you do and what are you building?'}/><span className="mt-1 block text-[10px] text-[var(--fx-muted)]">{bio.length}/1000</span></label>
         </section>
