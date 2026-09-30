@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   ShieldCheck,
   Storefront,
+  UserCircle,
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import {
@@ -153,7 +154,7 @@ export default function FenixSearchPage() {
             Find what you need.
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--fx-muted)] sm:text-base">
-            Business, product and local place discovery in one search. Bangla, English, Banglish and common local names can be used.
+            People, business, product and local place discovery in one search. Bangla, English, Banglish and common local names can be used.
           </p>
         </div>
 
@@ -164,7 +165,7 @@ export default function FenixSearchPage() {
               autoFocus
               value={query}
               onChange={(event) => setQuery(event.target.value.slice(0, 120))}
-              placeholder="Business, product, place…"
+              placeholder="People, business, product, place…"
               maxLength={120}
               className="min-w-0 flex-1 bg-transparent px-1 py-3 text-sm outline-none placeholder:text-[var(--fx-muted)]"
               aria-label="Search FeniX"
