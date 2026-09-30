@@ -49,7 +49,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" className="h-28 w-28 rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover"/> : <div className="grid h-28 w-28 place-items-center rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)]"><UserCircle size={62} className="text-[var(--fx-primary-strong)]"/></div>}
               <div className="flex flex-wrap gap-2">
                 <span className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-[var(--fx-primary-soft)] px-3 text-xs font-bold text-[var(--fx-primary-strong)]">Public profile</span>
-                <ProfileFollowButton profileId={profileId} />
+                <ProfileFollowButton profileId={profileId} nextPath={'/profile/'+encodeURIComponent(profileUsername)} />
                 <MessageButton userId={profileId} name={safeName} />
               </div>
             </div>
