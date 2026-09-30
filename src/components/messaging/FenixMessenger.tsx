@@ -9,6 +9,7 @@ import {
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { optimizeImageFile } from '@/lib/media/image-upload'
+import FenixCallControls from './FenixCallControls'
 
 type Message = {
   id: string
@@ -814,6 +815,7 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
                   <p className="truncate text-sm font-black">{activePerson.full_name || activePerson.username || 'FeniX user'}</p>
                   <p className="truncate text-[10px] text-[var(--fx-muted)]">{activeTyping ? 'typing…' : blocked ? 'Blocked by you' : activeOnline ? 'Active now' : 'Private • protected'}</p>
                 </div>
+                <FenixCallControls supabase={supabase} userId={userId} person={activePerson} />
               </>
             ) : (
               <>
