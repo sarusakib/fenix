@@ -153,11 +153,10 @@ export default function FeniLocationPicker({
         </label>
         <div className="rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-3 text-xs leading-5 text-[var(--fx-muted)]">
           <p className="font-bold text-[var(--fx-text)]">{bn ? 'Exact address privacy' : 'Exact address privacy'}</p>
-          <p className="mt-1">{bn ? 'Exact address public করা যাবে না। Connections setting বর্তমানে private/public-profile masking-এর জন্য রাখা হয়েছে।' : 'Exact address is never exposed publicly. Connections mode is reserved for future connection-only access.'}</p>
-          <select value={exactVisibility} onChange={e=>onChange({exactVisibility:e.target.value as Props['exactVisibility']})} className="mt-2 h-9 rounded-lg border border-[var(--fx-border)] bg-[var(--fx-bg)] px-2 text-xs">
-            <option value="private">{bn ? 'Private' : 'Private'}</option>
-            <option value="connections">{bn ? 'Connections' : 'Connections'}</option>
-          </select>
+          <p className="mt-1">{bn ? 'Exact address public করা যাবে না। Connections setting এখন চালু নেই; exact address private থাকবে।' : 'Exact address is never exposed publicly. Connection-only exact-address access is not enabled; exact address remains private.'}</p>
+          <div className="mt-2 inline-flex min-h-9 items-center rounded-lg border border-[var(--fx-border)] bg-[var(--fx-bg)] px-2.5 text-xs font-bold">
+            {exactVisibility === 'private' ? (bn ? 'Private' : 'Private') : (bn ? 'Private (masked publicly)' : 'Private (masked publicly)')}
+          </div>
         </div>
       </div>
     </section>
