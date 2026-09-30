@@ -16,7 +16,7 @@ type QuestionRow = {
 }
 type NewsRow = { id:string; slug:string; title_bn:string; title_en:string; excerpt_bn:string|null; excerpt_en:string|null; category:string; verification_status:string; featured:boolean; breaking:boolean; published_at:string|null; source_name:string|null; image_url:string|null }
 type PostMediaRow = { id:string; post_id:string; storage_bucket:string; storage_path:string; mime_type:string; width:number|null; height:number|null; sort_order:number; byte_size:number; source_byte_size:number|null; source_digest:string|null; public_url:string }
-type PostRow = { id:string; body:string; created_at:string; author_id:string; author_name:string|null; author_username:string|null; author_avatar_url:string|null; media:PostMediaRow[] }
+type PostRow = { id:string; body:string; created_at:string; author_id:string; author_name:string|null; author_username:string|null; author_avatar_url:string|null; media:PostMediaRow[]; score:number; comment_count:number }
 
 const fmt=(v:string,locale:string)=>new Date(v).toLocaleString(locale==='bn'?'bn-BD':'en-BD',{dateStyle:'medium',timeStyle:'short'})
 const label=(t:Topic,locale:string)=>locale==='bn'?t.name_bn:t.name_en
@@ -70,7 +70,15 @@ export default function FeedPage(){
             ;(mediaByPost[row.post_id]??=[]).push({...row,public_url})
           }
         }
-        nextPosts=postRows.map(row=>({...row,media:mediaByPost[row.id]??[]}))
+        const [voteRows,commentRows]=await Promise.all([
+          s.from('fenix_content_votes').select('content_id,value').eq('content_type','post').in('content_id',postIds),
+          s.from('fenix_content_comments').select('content_id').eq('content_type','post').in('content_id',postIds).is('deleted_at',null),
+        ])
+        const scoreByPost:Record<string,number>={}
+        for(const row of voteRows.data??[]) scoreByPost[row.content_id]=(scoreByPost[row.content_id]??0)+Number(row.value??0)
+        const commentsByPost:Record<string,number>={}
+        for(const row of commentRows.data??[]) commentsByPost[row.content_id]=(commentsByPost[row.content_id]??0)+1
+        nextPosts=postRows.map(row=>({...row,media:mediaByPost[row.id]??[],score:scoreByPost[row.id]??0,comment_count:commentsByPost[row.id]??0}))
       }
       const qq=(q??[]).map((x:any)=>({
         ...x,
@@ -193,6 +201,17 @@ export default function FeedPage(){
     setBusy(false)
   }
 
+  async function votePost(contentId:string){
+    if(!userId){setMessage(locale==='bn'?'Like দিতে Login করুন।':'Sign in to like.');return}
+    const s=createClient()
+    const {data:old}=await s.from('fenix_content_votes').select('value').eq('user_id',userId).eq('content_type','post').eq('content_id',contentId).maybeSingle()
+    const result=old
+      ? await s.from('fenix_content_votes').delete().eq('user_id',userId).eq('content_type','post').eq('content_id',contentId)
+      : await s.from('fenix_content_votes').insert({user_id:userId,content_type:'post',content_id:contentId,value:1})
+    if(result.error){setMessage(locale==='bn'?'Like আপডেট করা যায়নি।':'Could not update like.');return}
+    setPosts(value=>value.map(p=>p.id===contentId?{...p,score:Math.max(0,p.score+(old?-1:1))}:p))
+  }
+
   async function vote(contentId:string){
     if(!userId){setMessage(locale==='bn'?'Vote দিতে Login করুন।':'Sign in to vote.');return}
     const s=createClient()
@@ -241,7 +260,7 @@ export default function FeedPage(){
     {message&&<p className="mt-3 rounded-xl bg-[var(--fx-primary-soft)] p-3 text-xs">{message}</p>}
 
     <div className="mt-5" aria-busy={loading}>
-      {loading && loadedTab!==tab ? <FeedSkeleton /> : feedItems.length ? <div className="space-y-3">{feedItems.map(item=>item.kind==='question'?<QuestionCard key={'q'+item.data.id} q={item.data} locale={locale} onVote={vote} onFollow={toggleFollow} followed={followed}/>:item.kind==='news'?<NewsCard key={'n'+item.data.id} n={item.data} locale={locale}/>:<PostCard key={'p'+item.data.id} p={item.data} locale={locale}/>)}</div> : <div className="rounded-[1.7rem] border border-dashed border-[var(--fx-border)] p-10 text-center text-sm text-[var(--fx-muted)]">{copy.empty}</div>}
+      {loading && loadedTab!==tab ? <FeedSkeleton /> : feedItems.length ? <div className="space-y-3">{feedItems.map(item=>item.kind==='question'?<QuestionCard key={'q'+item.data.id} q={item.data} locale={locale} onVote={vote} onFollow={toggleFollow} followed={followed}/>:item.kind==='news'?<NewsCard key={'n'+item.data.id} n={item.data} locale={locale}/>:<PostCard key={'p'+item.data.id} p={item.data} locale={locale} onVote={votePost}/>)}</div> : <div className="rounded-[1.7rem] border border-dashed border-[var(--fx-border)] p-10 text-center text-sm text-[var(--fx-muted)]">{copy.empty}</div>}
       {loading && loadedTab===tab && <div className="mt-3 text-center text-[10px] font-semibold text-[var(--fx-muted)]">Refreshing…</div>}
     </div>
   </section></main>
@@ -272,6 +291,15 @@ function NewsCard({n,locale}:{n:NewsRow;locale:string}){
   </article>
 }
 
-function PostCard({p,locale}:{p:PostRow;locale:string}){
-  return <article className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5"><div className="flex items-center gap-3">{p.author_avatar_url?<img src={p.author_avatar_url} alt="" loading="lazy" decoding="async" className="h-9 w-9 rounded-full object-cover"/>:<UserCircle size={36} className="opacity-40"/>}<div><p className="text-sm font-bold">{p.author_name||p.author_username||'FeniX user'}</p><time className="text-[11px] text-[var(--fx-muted)]">{fmt(p.created_at,locale)}</time></div></div>{p.body&&<p className="mt-3 whitespace-pre-wrap text-sm leading-7">{p.body}</p>}{p.media?.length>0&&<div className={`mt-4 grid gap-2 ${p.media.length===1?'grid-cols-1':'grid-cols-2'}`}>{p.media.map(media=><div key={media.id} className="overflow-hidden rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)]"><img src={media.public_url} alt="" loading="lazy" decoding="async" width={media.width??1200} height={media.height??800} className="max-h-[520px] w-full object-cover"/></div>)}</div>}</article>
+function PostCard({p,locale,onVote}:{p:PostRow;locale:string;onVote:(id:string)=>void}){
+  return <article className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5">
+    <div className="flex items-center gap-3">{p.author_avatar_url?<img src={p.author_avatar_url} alt="" loading="lazy" decoding="async" width={36} height={36} className="h-9 w-9 rounded-full object-cover"/>:<UserCircle size={36} className="opacity-40"/>}<div><p className="text-sm font-bold">{p.author_name||p.author_username||'FeniX user'}</p><time className="text-[11px] text-[var(--fx-muted)]">{fmt(p.created_at,locale)}</time></div></div>
+    {p.body&&<p className="mt-3 whitespace-pre-wrap text-sm leading-7">{p.body}</p>}
+    {p.media?.length>0&&<div className={`mt-4 grid gap-2 ${p.media.length===1?'grid-cols-1':'grid-cols-2'}`}>{p.media.map(media=><div key={media.id} className="overflow-hidden rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)]"><img src={media.public_url} alt="" loading="lazy" decoding="async" width={media.width??1200} height={media.height??800} className="max-h-[520px] w-full object-cover"/></div>)}</div>}
+    <div className="mt-4 flex flex-wrap items-center gap-2">
+      <button onClick={()=>onVote(p.id)} className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ThumbsUp size={15}/>{locale==='bn'?'Like':'Like'} · {p.score}</button>
+      <Link href={`/feed/post/${p.id}`} className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ChatCircle size={15}/>{locale==='bn'?'মন্তব্য':'Comments'} · {p.comment_count}</Link>
+      <button onClick={()=>void navigator.share?.({title:p.author_name||'FeniX post',url:location.origin+`/feed/post/${p.id}`})} className="ml-auto inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ShareNetwork size={15}/>{locale==='bn'?'শেয়ার':'Share'}</button>
+    </div>
+  </article>
 }
