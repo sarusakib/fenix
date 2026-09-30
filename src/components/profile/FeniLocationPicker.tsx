@@ -85,11 +85,21 @@ export default function FeniLocationPicker({
   }, [districtId, feniDistrict, onChange])
 
   function selectUpazila(value: string) {
-    onChange({ upazilaId: value, localityId: '', publicLevel: publicLevel === 'locality' ? 'upazila' : publicLevel })
+    const nextUpazila = rows.find(row => row.id === value)
+    onChange({
+      upazilaId: value,
+      localityId: '',
+      publicLevel: publicLevel === 'locality' ? 'upazila' : publicLevel,
+      locationText: [label(feniDistrict), label(nextUpazila), areaText.trim(), roadText.trim()].filter(Boolean).join(' · ').slice(0, 500),
+    })
   }
 
   function selectLocality(value: string) {
-    onChange({ localityId: value })
+    const nextLocality = rows.find(row => row.id === value)
+    onChange({
+      localityId: value,
+      locationText: [label(feniDistrict), label(selectedUpazila), label(nextLocality), areaText.trim(), roadText.trim()].filter(Boolean).join(' · ').slice(0, 500),
+    })
   }
 
   function makeLocationText() {
