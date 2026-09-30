@@ -53,7 +53,7 @@ export default function FeedPage(){
         .eq('status','published').order('published_at',{ascending:false}).limit(24)
       const postsPromise = tab === 'latest' ? s.from('fenix_public_feed').select('id,body,created_at,author_id,author_name,author_username,author_avatar_url').order('created_at',{ascending:false}).limit(20) : Promise.resolve({data:null})
       const [{data:auth},{data:q},{data:n},{data:p}] = await Promise.all([s.auth.getSession(),questionPromise,newsPromise,postsPromise])
-      const uid=auth.user?.id??null
+      const uid=auth.session?.user?.id??null
       setUserId(uid)
 
       let nextPosts:PostRow[]=[]
