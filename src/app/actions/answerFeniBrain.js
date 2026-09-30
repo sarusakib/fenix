@@ -10,7 +10,8 @@ import { classifyFeniBrainQuestion, detectLanguage, detectFeniBrainIntent, detec
 const MODEL = process.env.FENI_BRAIN_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
 const MAX_QUERY_LENGTH = 120
 const MAX_CONTEXT_LENGTH = 12000
-const MAX_ANSWER_TOKENS = 900
+const MAX_ANSWER_TOKENS = 650
+const AI_TIMEOUT_MS = 12000
 const MAX_EVIDENCE_ITEMS = 8
 
 function clean(value) {
@@ -225,6 +226,8 @@ export async function answerFeniBrain(query) {
 
   try {
     const hf = new HfInference(token)
+    const controller = new AbortController()
+    const aiTimeout = setTimeout(() => controller.abort(), AI_TIMEOUT_MS)
     const context = buildContext(retrieval.results || [], liveSources)
     const response = await hf.chatCompletion({
       model: MODEL,
@@ -245,7 +248,12 @@ export async function answerFeniBrain(query) {
       ],
       max_tokens: MAX_ANSWER_TOKENS,
       temperature: 0.2,
+    }, {
+      retry_on_error: false,
+      signal: controller.signal,
     })
+
+    clearTimeout(aiTimeout)
 
     const answer = response?.choices?.[0]?.message?.content?.trim()
     if (!answer) throw new Error('Empty Feni Brain response.')
