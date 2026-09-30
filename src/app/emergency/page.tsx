@@ -48,8 +48,8 @@ export default function EmergencyPage() {
     <main className="fenix-shell min-h-dvh overflow-x-clip">
       <Navbar />
       <section className="mx-auto w-full max-w-6xl px-4 pb-28 pt-8 sm:px-6 lg:px-8">
-        <Link href="/" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold">
-          <ArrowLeft size={16} /> {bn ? 'হোম' : 'Home'}
+        <Link href="/feed" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold">
+          <ArrowLeft size={16} /> {bn ? 'ফিড' : 'Feed'}
         </Link>
 
         <header className="mt-7 overflow-hidden rounded-[2.2rem] border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-6 sm:p-9">
