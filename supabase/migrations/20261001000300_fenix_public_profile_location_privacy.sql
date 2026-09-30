@@ -38,3 +38,7 @@ left join public.fenix_brain_locations u on u.id = p.upazila_id and u.level = 'u
 left join public.fenix_brain_locations l on l.id = p.locality_id and l.level in ('union','ward','municipality') and l.is_active
 where coalesce(ps.profile_visibility, 'public') = 'public'
   and coalesce(m.status, 'active') = 'active';
+
+-- Public profile views run with caller permissions so underlying RLS remains effective.
+alter view public.fenix_public_profiles set (security_invoker = true);
+alter view public.fenix_public_profiles_v2 set (security_invoker = true);
