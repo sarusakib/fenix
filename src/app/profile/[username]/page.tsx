@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, FacebookLogo, Globe, InstagramLogo, MapPin, UserCircle, WhatsappLogo } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, DotsThree, FacebookLogo, Globe, InstagramLogo, MapPin, UserCircle, WhatsappLogo } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import ProfileReportButton from '@/components/profile/ProfileReportButton'
 import MessageButton from '@/components/messaging/MessageButton'
@@ -8,67 +8,116 @@ import { createClient } from '@/utils/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
+type PublicPost = { id: string; body: string; created_at: string }
+
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
   const s = await createClient()
-  const { data } = await s.from('fenix_public_profiles').select('full_name,username,bio,location_text,instagram_url,facebook_url,whatsapp_url').eq('username', decodeURIComponent(username).toLowerCase()).maybeSingle()
+  const { data } = await s.from('fenix_public_profiles')
+    .select('full_name,username,bio,location_text,instagram_url,facebook_url,whatsapp_url')
+    .eq('username', decodeURIComponent(username).toLowerCase())
+    .maybeSingle()
+
   return {
-    title: data?.full_name ? `${data.full_name} | FeniX` : 'FeniX Profile',
+    title: data?.full_name ? data.full_name + ' | FeniX' : 'FeniX Profile',
     description: data?.bio || 'Public profile on FeniX — Feni Business Ecosystem.',
   }
 }
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
+  const normalized = decodeURIComponent(username).trim().toLowerCase()
   const s = await createClient()
-  const { data: profile } = await s
-    .from('fenix_public_profiles')
-    .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,instagram_url,facebook_url,whatsapp_url,created_at')
-    .eq('username', decodeURIComponent(username).toLowerCase())
+
+  const { data: profile } = await s.from('fenix_public_profiles')
+    .select('id,full_name,username,bio,avatar_url,location_text,website_url,instagram_url,facebook_url,whatsapp_url,created_at')
+    .eq('username', normalized)
     .maybeSingle()
 
-  if (!profile) notFound()
+  if (!profile?.id || !profile.username || !profile.created_at) notFound()
 
-  const profileId = profile.id
-  const profileUsername = profile.username
-  const createdAt = profile.created_at
-  if (!profileId || !profileUsername || !createdAt) notFound()
-  const safeName = profile.full_name || `@${profileUsername}`
+  const [{ data: publicPosts, count: postCount }] = await Promise.all([
+    s.from('fenix_posts')
+      .select('id,body,created_at', { count: 'exact' })
+      .eq('author_id', profile.id)
+      .eq('visibility', 'public')
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false })
+      .limit(12),
+  ])
+
+  const safeName = profile.full_name || '@' + profile.username
   const website = profile.website_url && /^https?:\/\//i.test(profile.website_url) ? profile.website_url : null
+  const posts = (publicPosts ?? []) as PublicPost[]
 
   return (
     <main className="fenix-shell min-h-dvh">
       <Navbar />
-      <section className="mx-auto max-w-4xl px-4 pb-28 pt-7 sm:px-6 lg:px-8">
-        <Link href="/feed" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> Feed</Link>
-        <article className="fenix-surface-strong mt-6 overflow-hidden rounded-[2rem]">
-          <div className="relative h-36 bg-[var(--fx-primary-soft)] sm:h-52">{profile.cover_url ? <img src={profile.cover_url} alt="" className="h-full w-full object-cover"/> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(0,128,128,.25),transparent_38%),linear-gradient(135deg,rgba(11,23,54,.02),rgba(0,128,128,.09))]"/>}</div>
-          <div className="p-5 sm:p-8">
-            <div className="-mt-14 flex items-end justify-between gap-4 sm:-mt-16">
-              {profile.avatar_url ? <img src={profile.avatar_url} alt="" className="h-28 w-28 rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover"/> : <div className="grid h-28 w-28 place-items-center rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)]"><UserCircle size={62} className="text-[var(--fx-primary-strong)]"/></div>}
+      <section className="mx-auto max-w-3xl px-3 pb-28 pt-2 sm:px-5 sm:pt-5">
+        <header className="flex h-12 items-center justify-between border-b border-[var(--fx-border)]">
+          <Link href="/feed" aria-label="Back to feed" className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/[.04] dark:hover:bg-white/[.05]">
+            <ArrowLeft size={18} />
+          </Link>
+          <p className="truncate text-sm font-black">@{profile.username}</p>
+          <button type="button" aria-label="More" className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/[.04] dark:hover:bg-white/[.05]">
+            <DotsThree size={19} weight="bold" />
+          </button>
+        </header>
+
+        <div className="py-7 sm:py-9">
+          <div className="flex items-center gap-5 sm:gap-9">
+            {profile.avatar_url
+              ? <img src={profile.avatar_url} alt="" className="h-24 w-24 shrink-0 rounded-full border border-[var(--fx-border)] bg-[var(--fx-bg)] object-cover sm:h-32 sm:w-32" />
+              : <div className="grid h-24 w-24 shrink-0 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-primary-soft)] sm:h-32 sm:w-32"><UserCircle size={65} className="text-[var(--fx-primary-strong)]" /></div>}
+            <div className="min-w-0 flex-1">
               <div className="flex flex-wrap gap-2">
-                <span className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-[var(--fx-primary-soft)] px-3 text-xs font-bold text-[var(--fx-primary-strong)]">Public profile</span>
-                <MessageButton userId={profileId} name={safeName} />
+                <MessageButton userId={profile.id} name={safeName} />
+                <Link href="/feed" className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--fx-border)] bg-[var(--fx-surface)]" aria-label="Back to feed">
+                  <ArrowLeft size={15} />
+                </Link>
               </div>
-            </div>
-            <div className="mt-5">
-              <h1 className="text-3xl font-black tracking-[-.05em] sm:text-4xl">{safeName}</h1>
-              <p className="mt-1 text-sm text-[var(--fx-muted)]">@{profileUsername}</p>
-              {profile.bio && <p className="mt-5 max-w-3xl whitespace-pre-wrap text-sm leading-7">{profile.bio}</p>}
-              <div className="mt-5 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">
-                {profile.location_text && <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5"><MapPin size={14}/>{profile.location_text}</span>}
-                {website && <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5 hover:underline"><Globe size={14}/>Website</a>}
+              <div className="mt-5 text-sm">
+                <strong className="font-black">{postCount ?? 0}</strong> posts
               </div>
-              {(profile.instagram_url || profile.facebook_url || profile.whatsapp_url) && <div className="mt-4 flex gap-2">
-                {profile.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><InstagramLogo size={17}/></a>}
-                {profile.facebook_url && <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><FacebookLogo size={17}/></a>}
-                {profile.whatsapp_url && <a href={profile.whatsapp_url} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="grid h-9 w-9 place-items-center rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)]"><WhatsappLogo size={17}/></a>}
-              </div>}
-              <ProfileReportButton profileId={profileId} locale="bn" />
-              <p className="mt-5 text-[11px] text-[var(--fx-muted)]">FeniX member since {new Date(createdAt).toLocaleDateString('en-BD')}</p>
             </div>
           </div>
-        </article>
+
+          <div className="mt-6 max-w-xl">
+            <h1 className="text-base font-black">{safeName}</h1>
+            <p className="mt-1 text-xs text-[var(--fx-muted)]">@{profile.username}</p>
+            {profile.bio && <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{profile.bio}</p>}
+            {profile.location_text && <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-[var(--fx-muted)]"><MapPin size={13} />{profile.location_text}</p>}
+            {(website || profile.instagram_url || profile.facebook_url || profile.whatsapp_url) && (
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {website && <a href={website} target="_blank" rel="noreferrer noopener" className="inline-flex items-center gap-1.5 text-xs font-bold"><Globe size={14}/>Website</a>}
+                {profile.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noreferrer noopener" aria-label="Instagram" className="grid h-8 w-8 place-items-center rounded-full border border-[var(--fx-border)]"><InstagramLogo size={15}/></a>}
+                {profile.facebook_url && <a href={profile.facebook_url} target="_blank" rel="noreferrer noopener" aria-label="Facebook" className="grid h-8 w-8 place-items-center rounded-full border border-[var(--fx-border)]"><FacebookLogo size={15}/></a>}
+                {profile.whatsapp_url && <a href={profile.whatsapp_url} target="_blank" rel="noreferrer noopener" aria-label="WhatsApp" className="grid h-8 w-8 place-items-center rounded-full border border-[var(--fx-border)]"><WhatsappLogo size={15}/></a>}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="border-t border-[var(--fx-border)]">
+          <div className="h-12 border-b border-[var(--fx-border)] text-center text-[11px] font-black uppercase tracking-[.08em]">
+            <span className="inline-flex h-full items-center border-b-2 border-[var(--fx-text)] px-5">Posts</span>
+          </div>
+          {posts.length ? (
+            <div className="space-y-2 py-3">
+              {posts.map(post => (
+                <article key={post.id} className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4">
+                  <p className="whitespace-pre-wrap text-sm leading-6">{post.body}</p>
+                  <p className="mt-2 text-[10px] text-[var(--fx-muted)]">{new Date(post.created_at).toLocaleString('en-BD')}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center text-xs text-[var(--fx-muted)]">No public posts yet.</div>
+          )}
+          <div className="pb-4 pt-2">
+            <ProfileReportButton profileId={profile.id} locale="bn" />
+          </div>
+        </div>
       </section>
     </main>
   )
