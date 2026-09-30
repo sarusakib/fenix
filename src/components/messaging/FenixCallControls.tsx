@@ -199,7 +199,7 @@ export default function FenixCallControls({
             .maybeSingle()
           const caller: Person = (data as Person | null) || { id: signal.from, full_name: 'FeniX user', username: null, avatar_url: null }
           setIncomingOffer(signal)
-          setCall({ id: signal.callId, type: signal.callType as CallType, direction: 'incoming', peer: caller, status: 'Incoming call', session: signal.session })
+          setCall({ id: signal.callId, type: signal.callType as CallType, direction: 'incoming', peer: caller, status: 'Incoming call', session: signal.session! })
         })()
       })
       .subscribe()
