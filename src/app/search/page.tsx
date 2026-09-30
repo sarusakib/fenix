@@ -82,7 +82,7 @@ export default function FenixSearchPage() {
 
     const supabase = createClient()
 
-    const profileSearch = supabase.from('profiles').select('id,username,full_name,bio,avatar_url').or('username.ilike.%'+value.replace(/[%_\\]/g,(character)=>'\\'+character)+'%,full_name.ilike.%'+value.replace(/[%_\\]/g,(character)=>'\\'+character)+'%').eq('is_public',true).order('full_name').limit(12)
+    const profileSearch = supabase.from('fenix_public_profiles').select('id,username,full_name,bio,avatar_url').or('username.ilike.%'+value.replace(/[%_\\]/g,(character)=>'\\'+character)+'%,full_name.ilike.%'+value.replace(/[%_\\]/g,(character)=>'\\'+character)+'%').order('full_name').limit(12)
     const [businessResult, productResult, placeResult, profileResult] = await Promise.all([
       searchDirectoryBusinesses({ query: value, limit: 12 }),
       supabase
