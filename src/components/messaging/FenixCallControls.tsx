@@ -163,7 +163,7 @@ export default function FenixCallControls({
       await pc.setRemoteDescription(offer.sdp)
       const answer = await pc.createAnswer()
       await pc.setLocalDescription(answer)
-      setCall({ id: offer.callId, type: offer.callType, direction: 'incoming', peer: person || { id: offer.from, full_name: 'FeniX user', username: null, avatar_url: null }, status: 'Connected', session: offer.session })
+      setCall({ id: offer.callId, type: offer.callType, direction: 'incoming', peer: call?.peer || person || { id: offer.from, full_name: 'FeniX user', username: null, avatar_url: null }, status: 'Connecting…', session: offer.session })
       await sendSignal({ type: 'answer', callId: offer.callId, from: userId, to: offer.from, sdp: pc.localDescription || undefined })
     } catch (e) {
       cleanup()
@@ -191,9 +191,16 @@ export default function FenixCallControls({
         const signal = payload.payload as Signal
         if (signal.type !== 'invite' || signal.to !== userId || !signal.sdp || !signal.session || !signal.callType) return
         if (call || incomingOffer) return
-        const caller: Person = person?.id === signal.from ? person : { id: signal.from, full_name: 'FeniX user', username: null, avatar_url: null }
-        setIncomingOffer(signal)
-        setCall({ id: signal.callId, type: signal.callType, direction: 'incoming', peer: caller, status: 'Incoming call', session: signal.session })
+        void (async () => {
+          const { data } = await supabase
+            .from('fenix_public_profiles')
+            .select('id,full_name,username,avatar_url')
+            .eq('id', signal.from)
+            .maybeSingle()
+          const caller: Person = (data as Person | null) || { id: signal.from, full_name: 'FeniX user', username: null, avatar_url: null }
+          setIncomingOffer(signal)
+          setCall({ id: signal.callId, type: signal.callType as CallType, direction: 'incoming', peer: caller, status: 'Incoming call', session: signal.session })
+        })()
       })
       .subscribe()
     return () => { void supabase.removeChannel(inbox) }
