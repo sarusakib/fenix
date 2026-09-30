@@ -84,6 +84,7 @@ export const ROUTES = {
     notifications: '/notifications',
     settings: '/settings',
     blocked: '/settings/blocked',
+    saved: '/saved',
   },
   dashboard: {
     root: '/dashboard',
