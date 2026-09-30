@@ -6,6 +6,7 @@ export const ROUTES = {
   home: '/',
   services: '/services',
   help: '/help',
+  emergency: '/emergency',
   admin: '/admin',
   policy: '/policy',
   auth: {
@@ -79,7 +80,6 @@ export const ROUTES = {
     requests: '/requests',
     messages: '/messages',
     notifications: '/notifications',
-    payments: '/payments',
   },
   dashboard: {
     root: '/dashboard',

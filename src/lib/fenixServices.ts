@@ -67,6 +67,7 @@ export const FENIX_SERVICE_GROUPS: readonly FeniXServiceGroup[] = [
       { id: 'requests', label: 'Requests', labelBn: 'রিকোয়েস্ট', description: 'Track investment and ecosystem requests.', href: '/requests', status: 'live', icon: 'users' },
       { id: 'messages', label: 'Messages', labelBn: 'মেসেজ', description: 'Protected conversations inside eligible workflows.', href: '/messages', status: 'live', icon: 'account' },
       { id: 'feed', label: 'Community Feed', labelBn: 'কমিউনিটি ফিড', description: 'Ask, share and discover local conversations.', href: '/feed', status: 'live', icon: 'users' },
+      { id: 'emergency', label: 'Emergency Help', labelBn: 'জরুরি সহায়তা', description: 'Find ambulance and blood-donor discovery paths without exposing unverified numbers.', href: '/emergency', status: 'live', icon: 'shield', tag: 'Safety' },
     ],
   },
   {
