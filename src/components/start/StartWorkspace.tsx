@@ -1110,7 +1110,7 @@ export default function StartWorkspace({ step }: Props) {
   )
 }
 
-function TopBar({ title }: { title: string }) {
+function TopBar({ title: _title }: { title: string }) {
   return (
     <div className="flex items-center justify-between gap-3">
       <Link href="/start" className={SOFT}><ArrowLeft size={17} /> Back</Link>
