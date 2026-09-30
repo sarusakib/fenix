@@ -30,10 +30,10 @@ export default function QuestionPage({params}:{params:Promise<{id:string}>}){
    const s=createClient();
    try{
      const [{data:auth},{data:qv},{data:av},{data:cv}]=await Promise.all([
-       s.auth.getUser(),
+       s.auth.getSession(),
        s.from('fenix_public_question_feed').select('id,title,body,created_at,author_id,topic_id,author_name,author_username,author_avatar_url,topic_name_bn,topic_name_en').eq('id',id).maybeSingle(),
-       s.from('fenix_public_answer_feed').select('id,question_id,body,created_at,updated_at,author_id,author_name,author_username,author_avatar_url,score').eq('question_id',id).order('created_at',{ascending:true}),
-       s.from('fenix_content_comments').select('id,author_id,body,created_at').eq('content_type','question').eq('content_id',id).order('created_at',{ascending:true}),
+       s.from('fenix_public_answer_feed').select('id,question_id,body,created_at,updated_at,author_id,author_name,author_username,author_avatar_url,score').eq('question_id',id).order('created_at',{ascending:true}).limit(100),
+       s.from('fenix_content_comments').select('id,author_id,body,created_at').eq('content_type','question').eq('content_id',id).order('created_at',{ascending:true}).limit(100),
      ]);
      const uid=auth.user?.id??null;
      setUserId(uid);
