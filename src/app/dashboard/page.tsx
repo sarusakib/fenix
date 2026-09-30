@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowRight, Bell, Buildings, ChartLineUp, ChatCircleText, ClipboardText, Handshake, GearSix, Rocket, ShieldCheck, Storefront, UserCircle, UsersThree } from '@phosphor-icons/react/dist/ssr'
+import { ArrowRight, Bell, Bookmark, Buildings, ChartLineUp, ChatCircleText, ClipboardText, Handshake, GearSix, Rocket, ShieldCheck, Storefront, UserCircle, UsersThree } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
 
@@ -60,6 +60,7 @@ export default async function DashboardPage() {
             ['/messages','Messages','Open your protected direct messages.',ChatCircleText],
             ['/feed','Community Feed','Post and read text-only community updates.',UsersThree],
             ['/profile','My Profile','Edit your public-safe profile, bio and visibility.',UserCircle],
+            ['/saved','Saved','Review posts you saved for later.',Bookmark],
             ['/deals','Deals','View recorded investment deal workflow.',Handshake],
             ['/settings','Account settings','Review account and privacy guidance.',GearSix],
           ].map(([href,title,body,Icon]) => (
