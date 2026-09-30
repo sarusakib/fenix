@@ -6,6 +6,7 @@ export const ROUTES = {
   home: '/feed',
   legacyHome: '/',
   services: '/services',
+  settings: '/settings',
   help: '/help',
   emergency: '/emergency',
   admin: '/admin',
@@ -81,6 +82,8 @@ export const ROUTES = {
     requests: '/requests',
     messages: '/messages',
     notifications: '/notifications',
+    settings: '/settings',
+    blocked: '/settings/blocked',
   },
   dashboard: {
     root: '/dashboard',
