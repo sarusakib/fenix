@@ -27,6 +27,8 @@ function makeUsername(value: string) {
 export default function ProfileEditorPage() {
   const { locale, setLocale } = useFenixLocale()
   const [email, setEmail] = useState('')
+  const [userId, setUserId] = useState<string | null>(null)
+  const [originalUsername, setOriginalUsername] = useState('')
   const [fullName, setFullName] = useState('')
   const [username, setUsername] = useState('')
   const [bio, setBio] = useState('')
@@ -93,9 +95,12 @@ export default function ProfileEditorPage() {
       ])
       if (!active) return
       const providerAvatar = typeof auth.user.user_metadata?.avatar_url === 'string' ? auth.user.user_metadata.avatar_url : typeof auth.user.user_metadata?.picture === 'string' ? auth.user.user_metadata.picture : ''
+      setUserId(auth.user.id)
       setEmail(auth.user.email ?? '')
       setFullName(profile?.full_name ?? auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? '')
-      setUsername(profile?.username ?? makeUsername(auth.user.email ?? 'user'))
+      const loadedUsername = profile?.username ?? makeUsername(auth.user.email ?? 'user')
+      setUsername(loadedUsername)
+      setOriginalUsername(loadedUsername)
       setBio(profile?.bio ?? '')
       setLocationText(profile?.location_text ?? '')
       setWebsiteUrl(profile?.website_url ?? '')
