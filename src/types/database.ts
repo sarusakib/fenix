@@ -5891,6 +5891,10 @@ export type Database = {
         Args: { p_exclude_user_id?: string; p_username: string }
         Returns: boolean
       }
+      fenix_public_profile_stats: {
+        Args: { p_profile_id: string }
+        Returns: Json
+      }
       keyword_feni_brain_chunks: {
         Args: { match_count?: number; query_text: string }
         Returns: {
