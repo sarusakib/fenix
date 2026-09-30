@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { use, useCallback, useEffect, useState } from 'react'
-import { ArrowLeft, BookmarkSimple, ChatCircle, PaperPlaneRight, ShareNetwork, ThumbsUp, Trash, UserCircle } from '@phosphor-icons/react'
+import { ArrowLeft, BookmarkSimple, PaperPlaneRight, ShareNetwork, ThumbsUp, UserCircle } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
@@ -12,7 +12,7 @@ type Question={id:string;title:string;body:string;created_at:string;author_id:st
 
 export default function QuestionPage({params}:{params:Promise<{id:string}>}){
  const {id}=use(params);
- const {locale}=useFenixLocale(); const [q,setQ]=useState<Question|null>(null); const [answers,setAnswers]=useState<Answer[]>([]); const [userId,setUserId]=useState<string|null>(null); const [body,setBody]=useState(''); const [busy,setBusy]=useState(false); const [message,setMessage]=useState('')
+ const {locale}=useFenixLocale(); const [q,setQ]=useState<Question|null>(null); const [answers,setAnswers]=useState<Answer[]>([]); const [userId,setUserId]=useState<string|null>(null); const [body,setBody]=useState(''); const [busy,setBusy]=useState(false); const [,setMessage]=useState('')
  const load=useCallback(async()=>{const s=createClient();const [{data:auth},{data:qv},{data:av}]=await Promise.all([s.auth.getUser(),s.from('fenix_public_question_feed').select('*').eq('id',id).maybeSingle(),s.from('fenix_public_answer_feed').select('*').eq('question_id',id).order('created_at',{ascending:true})]);setUserId(auth.user?.id??null);if(qv)setQ({...qv,topic_name:locale==='bn'?((qv as any).topic_name_bn??(qv as any).topic_name_en):((qv as any).topic_name_en??(qv as any).topic_name_bn)} as Question);setAnswers((av??[]) as Answer[]);},[id,locale])
  useEffect(()=>{void load()},[load])
  async function answer(){if(!userId||!body.trim())return;setBusy(true);const s=createClient();const {error}=await s.from('fenix_answers').insert({question_id:id,author_id:userId,body:body.trim()});if(error)setMessage(locale==='bn'?'উত্তর দেওয়া যায়নি।':'Could not publish answer.');else{setBody('');await load()}setBusy(false)}
