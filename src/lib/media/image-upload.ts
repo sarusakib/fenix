@@ -5,12 +5,13 @@ import { createClient } from '@/utils/supabase/client'
 /**
  * FeniX Intelligent Image Composer
  *
- * User-facing uploads have no product-level source-size cap. The transport
- * layer can still use resumable/chunked uploads for very large files.
+ * There is no product-level source-size cap here. Very large files should be
+ * transported with resumable/chunked upload by the caller before decoding.
  *
- * The stored image is optimized toward ~100 KB using content-independent,
- * browser-native perceptual encoding. 100 KB is a target, not a guarantee
- * that every source can preserve every original detail at that size.
+ * The stored image targets ~100 KB while keeping the best perceptual quality
+ * the browser encoder can achieve at that size. If 100 KB would be too
+ * destructive, the optimizer can fall back up to 200 KB rather than creating
+ * a visibly broken image.
  */
 export const TARGET_IMAGE_BYTES = 100 * 1024
 export const MAX_IMAGE_UPLOAD_BYTES = TARGET_IMAGE_BYTES
@@ -22,8 +23,8 @@ export type OptimizedImage = {
   height: number
   byteSize: number
   mimeType: string
-  sourceByteSize: number
-  compressionRatio: number
+  sourceByteSize?: number
+  compressionRatio?: number
 }
 
 type OptimizeOptions = {
@@ -94,34 +95,32 @@ function encodeCanvas(
   })
 }
 
-function getEncoderCandidates(sourceType: string) {
-  // Prefer AVIF when the browser exposes a canvas encoder, then WebP,
-  // then JPEG for maximum compatibility.
-  if (sourceType === 'image/png' || sourceType === 'image/gif') {
-    return ['image/avif', 'image/webp', 'image/jpeg']
-  }
-  return ['image/avif', 'image/webp', 'image/jpeg']
+function getEncoderCandidates() {
+  // Keep the production path compatible with the existing Supabase buckets.
+  // WebP is preferred; JPEG is the universal fallback.
+  return ['image/webp', 'image/jpeg']
 }
 
 async function findBestBlob(
   canvas: HTMLCanvasElement,
-  sourceType: string,
   targetBytes: number,
 ) {
   let best: { blob: Blob; mimeType: string } | null = null
 
-  for (const mimeType of getEncoderCandidates(sourceType)) {
+  for (const mimeType of getEncoderCandidates()) {
     let low = 0.28
     let high = 0.94
     let bestUnderTarget: Blob | null = null
     let smallest: Blob | null = null
 
-    for (let attempt = 0; attempt < 10; attempt += 1) {
+    for (let attempt = 0; attempt < 12; attempt += 1) {
       const quality = (low + high) / 2
       const blob = await encodeCanvas(canvas, mimeType, quality)
       if (!blob) break
 
-      if (!smallest || blob.size < smallest.size) smallest = blob
+      if (!smallest || blob.size < smallest.size) {
+        smallest = blob
+      }
 
       if (blob.size <= targetBytes) {
         bestUnderTarget = blob
@@ -144,11 +143,8 @@ async function findBestBlob(
       best = { blob: candidate, mimeType }
     }
 
-    if (bestUnderTarget && bestUnderTarget.size <= targetBytes) {
-      // Prefer the first modern format that reaches the target at the
-      // highest quality found by binary search.
-      break
-    }
+    // WebP reaching target is normally preferable to a lower-quality JPEG.
+    if (bestUnderTarget && best.blob.size <= targetBytes) break
   }
 
   return best
@@ -177,11 +173,12 @@ export async function optimizeImageFile(
   const decoded = await decodeImage(file)
 
   try {
-    // Never degrade an already-small image just to hit an arbitrary target.
+    // Never degrade an already-small modern image just to hit an arbitrary
+    // target. This preserves user-uploaded quality when it already fits.
     if (
       file.size <= targetBytes &&
       Math.max(decoded.width, decoded.height) <= maxDimension &&
-      ['image/webp', 'image/avif', 'image/jpeg'].includes(file.type)
+      ['image/webp', 'image/jpeg'].includes(file.type)
     ) {
       return {
         file,
@@ -199,7 +196,10 @@ export async function optimizeImageFile(
       maxDimension,
     )
 
-    for (let pass = 0; pass < 9; pass += 1) {
+    // Re-render at progressively smaller resolutions only when the current
+    // resolution cannot reach the target. This protects detail whenever
+    // bitrate alone is enough.
+    for (let pass = 0; pass < 10; pass += 1) {
       const scale = longestSide / Math.max(decoded.width, decoded.height)
       const width = Math.max(1, Math.round(decoded.width * scale))
       const height = Math.max(1, Math.round(decoded.height * scale))
@@ -215,18 +215,21 @@ export async function optimizeImageFile(
 
       context.imageSmoothingEnabled = true
       context.imageSmoothingQuality = 'high'
-      context.drawImage(decoded.source, 0, 0, width, height)
 
-      const result = await findBestBlob(canvas, file.type, targetBytes)
+      // A very gentle finishing pass keeps the optimized image crisp without
+      // amplifying compression artifacts.
+      if ('filter' in context) {
+        context.filter = 'contrast(1.01) saturate(1.01)'
+      }
+      context.drawImage(decoded.source, 0, 0, width, height)
+      if ('filter' in context) {
+        context.filter = 'none'
+      }
+
+      const result = await findBestBlob(canvas, targetBytes)
 
       if (result?.blob && result.blob.size <= HARD_IMAGE_UPLOAD_BYTES) {
-        const extension =
-          result.mimeType === 'image/avif'
-            ? 'avif'
-            : result.mimeType === 'image/webp'
-              ? 'webp'
-              : 'jpg'
-
+        const extension = result.mimeType === 'image/webp' ? 'webp' : 'jpg'
         const optimizedFile = new File(
           [result.blob],
           makeFileName(file.name, extension),
@@ -250,7 +253,7 @@ export async function optimizeImageFile(
       if (longestSide <= minDimension) break
       longestSide = Math.max(
         minDimension,
-        Math.floor(longestSide * 0.80),
+        Math.floor(longestSide * 0.82),
       )
     }
   } finally {
