@@ -1,1 +1,6263 @@
-{"types":"export type Json =\n  | string\n  | number\n  | boolean\n  | null\n  | { [key: string]: Json | undefined }\n  | Json[]\n\nexport type Database = {\n  // Allows to automatically instantiate createClient with right options\n  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)\n  __InternalSupabase: {\n    PostgrestVersion: \"14.5\"\n  }\n  public: {\n    Tables: {\n      business_claim_requests: {\n        Row: {\n          business_id: string\n          claimant_id: string\n          created_at: string\n          id: string\n          note: string\n          review_note: string | null\n          reviewed_at: string | null\n          reviewed_by: string | null\n          status: string\n          updated_at: string\n        }\n        Insert: {\n          business_id: string\n          claimant_id: string\n          created_at?: string\n          id?: string\n          note?: string\n          review_note?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Update: {\n          business_id?: string\n          claimant_id?: string\n          created_at?: string\n          id?: string\n          note?: string\n          review_note?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_claim_requests_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_claim_requests_claimant_id_fkey\"\n            columns: [\"claimant_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"business_claim_requests_claimant_id_fkey\"\n            columns: [\"claimant_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_claim_requests_claimant_id_fkey\"\n            columns: [\"claimant_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_claim_requests_claimant_id_fkey\"\n            columns: [\"claimant_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_claim_requests_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"business_claim_requests_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_claim_requests_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_claim_requests_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_directory_aliases: {\n        Row: {\n          alias: string\n          business_id: string\n          created_at: string\n          id: string\n          language_code: string\n        }\n        Insert: {\n          alias: string\n          business_id: string\n          created_at?: string\n          id?: string\n          language_code?: string\n        }\n        Update: {\n          alias?: string\n          business_id?: string\n          created_at?: string\n          id?: string\n          language_code?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_directory_aliases_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_directory_contacts: {\n        Row: {\n          business_id: string\n          created_at: string\n          facebook_url: string | null\n          is_phone_public: boolean\n          is_website_public: boolean\n          is_whatsapp_public: boolean\n          phone: string | null\n          updated_at: string\n          website_url: string | null\n          whatsapp: string | null\n        }\n        Insert: {\n          business_id: string\n          created_at?: string\n          facebook_url?: string | null\n          is_phone_public?: boolean\n          is_website_public?: boolean\n          is_whatsapp_public?: boolean\n          phone?: string | null\n          updated_at?: string\n          website_url?: string | null\n          whatsapp?: string | null\n        }\n        Update: {\n          business_id?: string\n          created_at?: string\n          facebook_url?: string | null\n          is_phone_public?: boolean\n          is_website_public?: boolean\n          is_whatsapp_public?: boolean\n          phone?: string | null\n          updated_at?: string\n          website_url?: string | null\n          whatsapp?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_directory_contacts_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: true\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_directory_locations: {\n        Row: {\n          address: string | null\n          area: string | null\n          business_id: string\n          created_at: string\n          district: string\n          is_public: boolean\n          latitude: number | null\n          location_source: string | null\n          longitude: number | null\n          map_label: string | null\n          market: string | null\n          postal_code: string | null\n          upazila: string | null\n          updated_at: string\n        }\n        Insert: {\n          address?: string | null\n          area?: string | null\n          business_id: string\n          created_at?: string\n          district?: string\n          is_public?: boolean\n          latitude?: number | null\n          location_source?: string | null\n          longitude?: number | null\n          map_label?: string | null\n          market?: string | null\n          postal_code?: string | null\n          upazila?: string | null\n          updated_at?: string\n        }\n        Update: {\n          address?: string | null\n          area?: string | null\n          business_id?: string\n          created_at?: string\n          district?: string\n          is_public?: boolean\n          latitude?: number | null\n          location_source?: string | null\n          longitude?: number | null\n          map_label?: string | null\n          market?: string | null\n          postal_code?: string | null\n          upazila?: string | null\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_directory_locations_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: true\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_directory_profiles: {\n        Row: {\n          about_bn: string | null\n          about_en: string | null\n          business_id: string\n          business_type: string | null\n          created_at: string\n          last_verified_at: string | null\n          listing_status: string\n          location_verified: boolean\n          owner_claimed: boolean\n          phone_verified: boolean\n          slug: string | null\n          tagline_bn: string | null\n          tagline_en: string | null\n          updated_at: string\n          verification_level: string\n        }\n        Insert: {\n          about_bn?: string | null\n          about_en?: string | null\n          business_id: string\n          business_type?: string | null\n          created_at?: string\n          last_verified_at?: string | null\n          listing_status?: string\n          location_verified?: boolean\n          owner_claimed?: boolean\n          phone_verified?: boolean\n          slug?: string | null\n          tagline_bn?: string | null\n          tagline_en?: string | null\n          updated_at?: string\n          verification_level?: string\n        }\n        Update: {\n          about_bn?: string | null\n          about_en?: string | null\n          business_id?: string\n          business_type?: string | null\n          created_at?: string\n          last_verified_at?: string | null\n          listing_status?: string\n          location_verified?: boolean\n          owner_claimed?: boolean\n          phone_verified?: boolean\n          slug?: string | null\n          tagline_bn?: string | null\n          tagline_en?: string | null\n          updated_at?: string\n          verification_level?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_directory_profiles_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: true\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_reports: {\n        Row: {\n          business_id: string\n          created_at: string\n          details: string\n          id: string\n          reason: string\n          reporter_id: string\n          resolution_note: string | null\n          resolved_at: string | null\n          reviewer_id: string | null\n          status: string\n          updated_at: string\n        }\n        Insert: {\n          business_id: string\n          created_at?: string\n          details: string\n          id?: string\n          reason: string\n          reporter_id: string\n          resolution_note?: string | null\n          resolved_at?: string | null\n          reviewer_id?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Update: {\n          business_id?: string\n          created_at?: string\n          details?: string\n          id?: string\n          reason?: string\n          reporter_id?: string\n          resolution_note?: string | null\n          resolved_at?: string | null\n          reviewer_id?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_reports_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reports_reporter_id_fkey\"\n            columns: [\"reporter_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"business_reports_reporter_id_fkey\"\n            columns: [\"reporter_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reports_reporter_id_fkey\"\n            columns: [\"reporter_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reports_reporter_id_fkey\"\n            columns: [\"reporter_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reports_reviewer_id_fkey\"\n            columns: [\"reviewer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"business_reports_reviewer_id_fkey\"\n            columns: [\"reviewer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reports_reviewer_id_fkey\"\n            columns: [\"reviewer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reports_reviewer_id_fkey\"\n            columns: [\"reviewer_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_reviews: {\n        Row: {\n          admin_note: string | null\n          author_id: string\n          body: string\n          business_id: string\n          created_at: string\n          id: string\n          rating: number\n          reviewed_at: string | null\n          reviewed_by: string | null\n          status: string\n          title: string | null\n          updated_at: string\n        }\n        Insert: {\n          admin_note?: string | null\n          author_id: string\n          body: string\n          business_id: string\n          created_at?: string\n          id?: string\n          rating: number\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          title?: string | null\n          updated_at?: string\n        }\n        Update: {\n          admin_note?: string | null\n          author_id?: string\n          body?: string\n          business_id?: string\n          created_at?: string\n          id?: string\n          rating?: number\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          title?: string | null\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_reviews_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"business_reviews_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reviews_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reviews_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reviews_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reviews_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"business_reviews_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reviews_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_reviews_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_activity: {\n        Row: {\n          action: string\n          actor_id: string | null\n          created_at: string\n          id: string\n          metadata: Json\n          project_id: string\n        }\n        Insert: {\n          action: string\n          actor_id?: string | null\n          created_at?: string\n          id?: string\n          metadata?: Json\n          project_id: string\n        }\n        Update: {\n          action?: string\n          actor_id?: string | null\n          created_at?: string\n          id?: string\n          metadata?: Json\n          project_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_activity_project_id_fkey\"\n            columns: [\"project_id\"]\n            isOneToOne: false\n            referencedRelation: \"business_start_projects\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_documents: {\n        Row: {\n          created_at: string\n          document_type: string\n          id: string\n          owner_id: string\n          project_id: string\n          review_note: string | null\n          reviewed_at: string | null\n          reviewed_by: string | null\n          status: string\n          storage_bucket: string\n          storage_path: string\n          title: string\n          updated_at: string\n          visibility: string\n        }\n        Insert: {\n          created_at?: string\n          document_type: string\n          id?: string\n          owner_id: string\n          project_id: string\n          review_note?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          storage_bucket?: string\n          storage_path: string\n          title: string\n          updated_at?: string\n          visibility?: string\n        }\n        Update: {\n          created_at?: string\n          document_type?: string\n          id?: string\n          owner_id?: string\n          project_id?: string\n          review_note?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          storage_bucket?: string\n          storage_path?: string\n          title?: string\n          updated_at?: string\n          visibility?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_documents_project_id_fkey\"\n            columns: [\"project_id\"]\n            isOneToOne: false\n            referencedRelation: \"business_start_projects\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_finance: {\n        Row: {\n          created_at: string\n          emergency_buffer: number\n          equipment: number\n          estimated_monthly_sales: number\n          gross_margin_pct: number\n          id: string\n          interior: number\n          inventory_cost: number\n          license_cost: number\n          marketing_cost: number\n          monthly_fixed_cost: number\n          other_cost: number\n          project_id: string\n          rent: number\n          staff_cost: number\n          transport_cost: number\n          updated_at: string\n          utility_cost: number\n          working_capital: number\n        }\n        Insert: {\n          created_at?: string\n          emergency_buffer?: number\n          equipment?: number\n          estimated_monthly_sales?: number\n          gross_margin_pct?: number\n          id?: string\n          interior?: number\n          inventory_cost?: number\n          license_cost?: number\n          marketing_cost?: number\n          monthly_fixed_cost?: number\n          other_cost?: number\n          project_id: string\n          rent?: number\n          staff_cost?: number\n          transport_cost?: number\n          updated_at?: string\n          utility_cost?: number\n          working_capital?: number\n        }\n        Update: {\n          created_at?: string\n          emergency_buffer?: number\n          equipment?: number\n          estimated_monthly_sales?: number\n          gross_margin_pct?: number\n          id?: string\n          interior?: number\n          inventory_cost?: number\n          license_cost?: number\n          marketing_cost?: number\n          monthly_fixed_cost?: number\n          other_cost?: number\n          project_id?: string\n          rent?: number\n          staff_cost?: number\n          transport_cost?: number\n          updated_at?: string\n          utility_cost?: number\n          working_capital?: number\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_finance_project_id_fkey\"\n            columns: [\"project_id\"]\n            isOneToOne: true\n            referencedRelation: \"business_start_projects\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_legal_items: {\n        Row: {\n          applicability: string\n          created_at: string\n          guidance_bn: string | null\n          guidance_en: string | null\n          id: string\n          is_active: boolean\n          last_verified_at: string | null\n          official_url: string | null\n          sort_order: number\n          source_name: string | null\n          task_key: string\n          title_bn: string\n          title_en: string\n          updated_at: string\n        }\n        Insert: {\n          applicability?: string\n          created_at?: string\n          guidance_bn?: string | null\n          guidance_en?: string | null\n          id?: string\n          is_active?: boolean\n          last_verified_at?: string | null\n          official_url?: string | null\n          sort_order?: number\n          source_name?: string | null\n          task_key: string\n          title_bn: string\n          title_en: string\n          updated_at?: string\n        }\n        Update: {\n          applicability?: string\n          created_at?: string\n          guidance_bn?: string | null\n          guidance_en?: string | null\n          id?: string\n          is_active?: boolean\n          last_verified_at?: string | null\n          official_url?: string | null\n          sort_order?: number\n          source_name?: string | null\n          task_key?: string\n          title_bn?: string\n          title_en?: string\n          updated_at?: string\n        }\n        Relationships: []\n      }\n      business_start_legal_progress: {\n        Row: {\n          completed_at: string | null\n          created_at: string\n          id: string\n          legal_item_id: string\n          notes: string | null\n          project_id: string\n          status: string\n          updated_at: string\n        }\n        Insert: {\n          completed_at?: string | null\n          created_at?: string\n          id?: string\n          legal_item_id: string\n          notes?: string | null\n          project_id: string\n          status?: string\n          updated_at?: string\n        }\n        Update: {\n          completed_at?: string | null\n          created_at?: string\n          id?: string\n          legal_item_id?: string\n          notes?: string | null\n          project_id?: string\n          status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_legal_progress_legal_item_id_fkey\"\n            columns: [\"legal_item_id\"]\n            isOneToOne: false\n            referencedRelation: \"business_start_legal_items\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_start_legal_progress_project_id_fkey\"\n            columns: [\"project_id\"]\n            isOneToOne: false\n            referencedRelation: \"business_start_projects\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_locations: {\n        Row: {\n          area: string | null\n          created_at: string\n          data_confidence: string\n          district: string\n          id: string\n          market_name: string | null\n          project_id: string\n          selection_reason: string | null\n          upazila: string | null\n          updated_at: string\n        }\n        Insert: {\n          area?: string | null\n          created_at?: string\n          data_confidence?: string\n          district?: string\n          id?: string\n          market_name?: string | null\n          project_id: string\n          selection_reason?: string | null\n          upazila?: string | null\n          updated_at?: string\n        }\n        Update: {\n          area?: string | null\n          created_at?: string\n          data_confidence?: string\n          district?: string\n          id?: string\n          market_name?: string | null\n          project_id?: string\n          selection_reason?: string | null\n          upazila?: string | null\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_locations_project_id_fkey\"\n            columns: [\"project_id\"]\n            isOneToOne: true\n            referencedRelation: \"business_start_projects\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_plans: {\n        Row: {\n          created_at: string\n          customer_profile: string | null\n          id: string\n          marketing: string | null\n          operations: string | null\n          products_services: string | null\n          project_id: string\n          risks: string | null\n          updated_at: string\n          value_proposition: string | null\n        }\n        Insert: {\n          created_at?: string\n          customer_profile?: string | null\n          id?: string\n          marketing?: string | null\n          operations?: string | null\n          products_services?: string | null\n          project_id: string\n          risks?: string | null\n          updated_at?: string\n          value_proposition?: string | null\n        }\n        Update: {\n          created_at?: string\n          customer_profile?: string | null\n          id?: string\n          marketing?: string | null\n          operations?: string | null\n          products_services?: string | null\n          project_id?: string\n          risks?: string | null\n          updated_at?: string\n          value_proposition?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_plans_project_id_fkey\"\n            columns: [\"project_id\"]\n            isOneToOne: true\n            referencedRelation: \"business_start_projects\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_preferences: {\n        Row: {\n          budget_max: number\n          budget_min: number\n          business_summary: string | null\n          category: string | null\n          created_at: string\n          experience_level: string\n          goal: string\n          id: string\n          project_id: string\n          risk_preference: string\n          updated_at: string\n        }\n        Insert: {\n          budget_max?: number\n          budget_min?: number\n          business_summary?: string | null\n          category?: string | null\n          created_at?: string\n          experience_level?: string\n          goal?: string\n          id?: string\n          project_id: string\n          risk_preference?: string\n          updated_at?: string\n        }\n        Update: {\n          budget_max?: number\n          budget_min?: number\n          business_summary?: string | null\n          category?: string | null\n          created_at?: string\n          experience_level?: string\n          goal?: string\n          id?: string\n          project_id?: string\n          risk_preference?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_preferences_project_id_fkey\"\n            columns: [\"project_id\"]\n            isOneToOne: true\n            referencedRelation: \"business_start_projects\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_projects: {\n        Row: {\n          business_id: string | null\n          business_type: string | null\n          completed_at: string | null\n          created_at: string\n          current_step: string\n          id: string\n          status: string\n          title: string\n          updated_at: string\n          user_id: string\n        }\n        Insert: {\n          business_id?: string | null\n          business_type?: string | null\n          completed_at?: string | null\n          created_at?: string\n          current_step?: string\n          id?: string\n          status?: string\n          title?: string\n          updated_at?: string\n          user_id: string\n        }\n        Update: {\n          business_id?: string | null\n          business_type?: string | null\n          completed_at?: string | null\n          created_at?: string\n          current_step?: string\n          id?: string\n          status?: string\n          title?: string\n          updated_at?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_projects_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_tasks: {\n        Row: {\n          completed_at: string | null\n          created_at: string\n          description_bn: string | null\n          description_en: string | null\n          id: string\n          priority: string\n          project_id: string\n          sort_order: number\n          stage: string\n          status: string\n          task_key: string\n          title_bn: string\n          title_en: string\n          updated_at: string\n        }\n        Insert: {\n          completed_at?: string | null\n          created_at?: string\n          description_bn?: string | null\n          description_en?: string | null\n          id?: string\n          priority?: string\n          project_id: string\n          sort_order?: number\n          stage: string\n          status?: string\n          task_key: string\n          title_bn: string\n          title_en: string\n          updated_at?: string\n        }\n        Update: {\n          completed_at?: string | null\n          created_at?: string\n          description_bn?: string | null\n          description_en?: string | null\n          id?: string\n          priority?: string\n          project_id?: string\n          sort_order?: number\n          stage?: string\n          status?: string\n          task_key?: string\n          title_bn?: string\n          title_en?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_tasks_project_id_fkey\"\n            columns: [\"project_id\"]\n            isOneToOne: false\n            referencedRelation: \"business_start_projects\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_start_validation: {\n        Row: {\n          competition_status: string\n          created_at: string\n          data_confidence: string\n          demand_status: string\n          evidence_notes: string | null\n          id: string\n          legal_status: string\n          location_status: string\n          project_id: string\n          risks: string | null\n          supplier_status: string\n          updated_at: string\n        }\n        Insert: {\n          competition_status?: string\n          created_at?: string\n          data_confidence?: string\n          demand_status?: string\n          evidence_notes?: string | null\n          id?: string\n          legal_status?: string\n          location_status?: string\n          project_id: string\n          risks?: string | null\n          supplier_status?: string\n          updated_at?: string\n        }\n        Update: {\n          competition_status?: string\n          created_at?: string\n          data_confidence?: string\n          demand_status?: string\n          evidence_notes?: string | null\n          id?: string\n          legal_status?: string\n          location_status?: string\n          project_id?: string\n          risks?: string | null\n          supplier_status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_start_validation_project_id_fkey\"\n            columns: [\"project_id\"]\n            isOneToOne: true\n            referencedRelation: \"business_start_projects\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      business_verification_requests: {\n        Row: {\n          business_id: string\n          created_at: string\n          evidence_note: string\n          id: string\n          requester_id: string\n          review_note: string | null\n          reviewed_at: string | null\n          reviewed_by: string | null\n          status: string\n          updated_at: string\n          verification_type: string\n        }\n        Insert: {\n          business_id: string\n          created_at?: string\n          evidence_note?: string\n          id?: string\n          requester_id: string\n          review_note?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          updated_at?: string\n          verification_type: string\n        }\n        Update: {\n          business_id?: string\n          created_at?: string\n          evidence_note?: string\n          id?: string\n          requester_id?: string\n          review_note?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          updated_at?: string\n          verification_type?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"business_verification_requests_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_verification_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"business_verification_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_verification_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_verification_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_verification_requests_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"business_verification_requests_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_verification_requests_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"business_verification_requests_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      businesses: {\n        Row: {\n          category: string | null\n          created_at: string\n          description: string | null\n          feni_brain_embedding: string | null\n          id: string\n          name: string\n          owner_id: string | null\n          title_bn: string | null\n          title_en: string | null\n          updated_at: string\n        }\n        Insert: {\n          category?: string | null\n          created_at?: string\n          description?: string | null\n          feni_brain_embedding?: string | null\n          id?: string\n          name: string\n          owner_id?: string | null\n          title_bn?: string | null\n          title_en?: string | null\n          updated_at?: string\n        }\n        Update: {\n          category?: string | null\n          created_at?: string\n          description?: string | null\n          feni_brain_embedding?: string | null\n          id?: string\n          name?: string\n          owner_id?: string | null\n          title_bn?: string | null\n          title_en?: string | null\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"businesses_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"businesses_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"businesses_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"businesses_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      commerce_delivery_rules: {\n        Row: {\n          created_at: string\n          district: string | null\n          fee: number\n          free_shipping_minimum: number | null\n          id: string\n          is_active: boolean\n          sort_order: number\n          upazila: string | null\n          updated_at: string\n        }\n        Insert: {\n          created_at?: string\n          district?: string | null\n          fee?: number\n          free_shipping_minimum?: number | null\n          id?: string\n          is_active?: boolean\n          sort_order?: number\n          upazila?: string | null\n          updated_at?: string\n        }\n        Update: {\n          created_at?: string\n          district?: string | null\n          fee?: number\n          free_shipping_minimum?: number | null\n          id?: string\n          is_active?: boolean\n          sort_order?: number\n          upazila?: string | null\n          updated_at?: string\n        }\n        Relationships: []\n      }\n      commerce_order_vendor_status: {\n        Row: {\n          created_at: string\n          id: string\n          inventory_finalized: boolean\n          order_id: string\n          status: string\n          updated_at: string\n          vendor_id: string\n        }\n        Insert: {\n          created_at?: string\n          id?: string\n          inventory_finalized?: boolean\n          order_id: string\n          status?: string\n          updated_at?: string\n          vendor_id: string\n        }\n        Update: {\n          created_at?: string\n          id?: string\n          inventory_finalized?: boolean\n          order_id?: string\n          status?: string\n          updated_at?: string\n          vendor_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"commerce_order_vendor_status_order_id_fkey\"\n            columns: [\"order_id\"]\n            isOneToOne: false\n            referencedRelation: \"orders\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"commerce_order_vendor_status_vendor_id_fkey\"\n            columns: [\"vendor_id\"]\n            isOneToOne: false\n            referencedRelation: \"vendor_profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      commerce_return_requests: {\n        Row: {\n          created_at: string\n          customer_id: string\n          details: string | null\n          id: string\n          order_id: string\n          order_item_id: string\n          reason: string\n          refund_amount: number | null\n          resolution_note: string | null\n          status: string\n          updated_at: string\n        }\n        Insert: {\n          created_at?: string\n          customer_id: string\n          details?: string | null\n          id?: string\n          order_id: string\n          order_item_id: string\n          reason: string\n          refund_amount?: number | null\n          resolution_note?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Update: {\n          created_at?: string\n          customer_id?: string\n          details?: string | null\n          id?: string\n          order_id?: string\n          order_item_id?: string\n          reason?: string\n          refund_amount?: number | null\n          resolution_note?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"commerce_return_requests_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"commerce_return_requests_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"commerce_return_requests_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"commerce_return_requests_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"commerce_return_requests_order_id_fkey\"\n            columns: [\"order_id\"]\n            isOneToOne: false\n            referencedRelation: \"orders\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"commerce_return_requests_order_item_id_fkey\"\n            columns: [\"order_item_id\"]\n            isOneToOne: false\n            referencedRelation: \"order_items\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_ambulance_providers: {\n        Row: {\n          ac_available: boolean\n          ambulance_type: string\n          available_24_7: boolean\n          base_area: string | null\n          created_at: string\n          display_name: string\n          id: string\n          is_verified: boolean\n          owner_id: string | null\n          oxygen_available: boolean\n          phone: string | null\n          service_area: string | null\n          status: string\n          updated_at: string\n          whatsapp: string | null\n        }\n        Insert: {\n          ac_available?: boolean\n          ambulance_type?: string\n          available_24_7?: boolean\n          base_area?: string | null\n          created_at?: string\n          display_name: string\n          id?: string\n          is_verified?: boolean\n          owner_id?: string | null\n          oxygen_available?: boolean\n          phone?: string | null\n          service_area?: string | null\n          status?: string\n          updated_at?: string\n          whatsapp?: string | null\n        }\n        Update: {\n          ac_available?: boolean\n          ambulance_type?: string\n          available_24_7?: boolean\n          base_area?: string | null\n          created_at?: string\n          display_name?: string\n          id?: string\n          is_verified?: boolean\n          owner_id?: string | null\n          oxygen_available?: boolean\n          phone?: string | null\n          service_area?: string | null\n          status?: string\n          updated_at?: string\n          whatsapp?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_ambulance_providers_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_ambulance_providers_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_ambulance_providers_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_ambulance_providers_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_ambulance_requests: {\n        Row: {\n          ambulance_type: string\n          condition_category: string\n          created_at: string\n          destination_hospital: string | null\n          id: string\n          note: string | null\n          oxygen_needed: boolean\n          pickup_area: string\n          pickup_upazila_id: string | null\n          provider_id: string | null\n          requester_id: string\n          status: string\n          updated_at: string\n        }\n        Insert: {\n          ambulance_type?: string\n          condition_category?: string\n          created_at?: string\n          destination_hospital?: string | null\n          id?: string\n          note?: string | null\n          oxygen_needed?: boolean\n          pickup_area: string\n          pickup_upazila_id?: string | null\n          provider_id?: string | null\n          requester_id: string\n          status?: string\n          updated_at?: string\n        }\n        Update: {\n          ambulance_type?: string\n          condition_category?: string\n          created_at?: string\n          destination_hospital?: string | null\n          id?: string\n          note?: string | null\n          oxygen_needed?: boolean\n          pickup_area?: string\n          pickup_upazila_id?: string | null\n          provider_id?: string | null\n          requester_id?: string\n          status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_ambulance_requests_pickup_upazila_id_fkey\"\n            columns: [\"pickup_upazila_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_locations\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_ambulance_requests_provider_id_fkey\"\n            columns: [\"provider_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_ambulance_providers\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_ambulance_requests_provider_id_fkey\"\n            columns: [\"provider_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_ambulance_providers\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_ambulance_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_ambulance_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_ambulance_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_ambulance_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_answers: {\n        Row: {\n          author_id: string\n          body: string\n          created_at: string\n          deleted_at: string | null\n          id: string\n          question_id: string\n          updated_at: string\n        }\n        Insert: {\n          author_id: string\n          body: string\n          created_at?: string\n          deleted_at?: string | null\n          id?: string\n          question_id: string\n          updated_at?: string\n        }\n        Update: {\n          author_id?: string\n          body?: string\n          created_at?: string\n          deleted_at?: string | null\n          id?: string\n          question_id?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_answers_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_question_id_fkey\"\n            columns: [\"question_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_question_feed\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_question_id_fkey\"\n            columns: [\"question_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_questions\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_blood_donors: {\n        Row: {\n          area_text: string | null\n          availability: string\n          blood_group: string\n          created_at: string\n          is_public: boolean\n          last_donation_date: string | null\n          note: string | null\n          preferred_contact: string\n          upazila_id: string | null\n          updated_at: string\n          user_id: string\n        }\n        Insert: {\n          area_text?: string | null\n          availability?: string\n          blood_group: string\n          created_at?: string\n          is_public?: boolean\n          last_donation_date?: string | null\n          note?: string | null\n          preferred_contact?: string\n          upazila_id?: string | null\n          updated_at?: string\n          user_id: string\n        }\n        Update: {\n          area_text?: string | null\n          availability?: string\n          blood_group?: string\n          created_at?: string\n          is_public?: boolean\n          last_donation_date?: string | null\n          note?: string | null\n          preferred_contact?: string\n          upazila_id?: string | null\n          updated_at?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_blood_donors_upazila_id_fkey\"\n            columns: [\"upazila_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_locations\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_donors_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_donors_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_donors_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_donors_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_blood_requests: {\n        Row: {\n          area_text: string | null\n          blood_group: string\n          contact_method: string\n          created_at: string\n          hospital_area: string | null\n          hospital_name: string\n          id: string\n          needed_at: string | null\n          note: string | null\n          requester_id: string\n          status: string\n          units: number\n          upazila_id: string | null\n          updated_at: string\n          urgency: string\n        }\n        Insert: {\n          area_text?: string | null\n          blood_group: string\n          contact_method?: string\n          created_at?: string\n          hospital_area?: string | null\n          hospital_name: string\n          id?: string\n          needed_at?: string | null\n          note?: string | null\n          requester_id: string\n          status?: string\n          units: number\n          upazila_id?: string | null\n          updated_at?: string\n          urgency?: string\n        }\n        Update: {\n          area_text?: string | null\n          blood_group?: string\n          contact_method?: string\n          created_at?: string\n          hospital_area?: string | null\n          hospital_name?: string\n          id?: string\n          needed_at?: string | null\n          note?: string | null\n          requester_id?: string\n          status?: string\n          units?: number\n          upazila_id?: string | null\n          updated_at?: string\n          urgency?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_blood_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_requests_requester_id_fkey\"\n            columns: [\"requester_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_requests_upazila_id_fkey\"\n            columns: [\"upazila_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_locations\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_blood_responses: {\n        Row: {\n          created_at: string\n          donor_id: string\n          id: string\n          message: string | null\n          request_id: string\n          status: string\n        }\n        Insert: {\n          created_at?: string\n          donor_id: string\n          id?: string\n          message?: string | null\n          request_id: string\n          status?: string\n        }\n        Update: {\n          created_at?: string\n          donor_id?: string\n          id?: string\n          message?: string | null\n          request_id?: string\n          status?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_blood_responses_donor_id_fkey\"\n            columns: [\"donor_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_responses_donor_id_fkey\"\n            columns: [\"donor_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_responses_donor_id_fkey\"\n            columns: [\"donor_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_responses_donor_id_fkey\"\n            columns: [\"donor_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_responses_request_id_fkey\"\n            columns: [\"request_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_blood_requests\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_blood_responses_request_id_fkey\"\n            columns: [\"request_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_blood_requests\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_brain_chunks: {\n        Row: {\n          chunk_index: number\n          content: string\n          created_at: string\n          document_id: string\n          embedding: string | null\n          embedding_model: string | null\n          id: string\n          source_locator: string | null\n          status: string\n          token_count: number | null\n          updated_at: string\n        }\n        Insert: {\n          chunk_index: number\n          content: string\n          created_at?: string\n          document_id: string\n          embedding?: string | null\n          embedding_model?: string | null\n          id?: string\n          source_locator?: string | null\n          status?: string\n          token_count?: number | null\n          updated_at?: string\n        }\n        Update: {\n          chunk_index?: number\n          content?: string\n          created_at?: string\n          document_id?: string\n          embedding?: string | null\n          embedding_model?: string | null\n          id?: string\n          source_locator?: string | null\n          status?: string\n          token_count?: number | null\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_brain_chunks_document_id_fkey\"\n            columns: [\"document_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_documents\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_brain_documents: {\n        Row: {\n          content: string\n          created_at: string\n          document_type: string\n          effective_from: string | null\n          effective_until: string | null\n          id: string\n          language_code: string\n          metadata: Json\n          source_id: string\n          status: string\n          summary: string | null\n          title: string\n          updated_at: string\n        }\n        Insert: {\n          content: string\n          created_at?: string\n          document_type?: string\n          effective_from?: string | null\n          effective_until?: string | null\n          id?: string\n          language_code?: string\n          metadata?: Json\n          source_id: string\n          status?: string\n          summary?: string | null\n          title: string\n          updated_at?: string\n        }\n        Update: {\n          content?: string\n          created_at?: string\n          document_type?: string\n          effective_from?: string | null\n          effective_until?: string | null\n          id?: string\n          language_code?: string\n          metadata?: Json\n          source_id?: string\n          status?: string\n          summary?: string | null\n          title?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_brain_documents_source_id_fkey\"\n            columns: [\"source_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_sources\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_brain_facts: {\n        Row: {\n          confidence: number\n          created_at: string\n          id: string\n          metadata: Json\n          source_id: string\n          status: string\n          subject_key: string\n          subject_location_id: string | null\n          updated_at: string\n          valid_from: string | null\n          valid_until: string | null\n          value_number: number | null\n          value_text: string | null\n          value_unit: string | null\n        }\n        Insert: {\n          confidence?: number\n          created_at?: string\n          id?: string\n          metadata?: Json\n          source_id: string\n          status?: string\n          subject_key: string\n          subject_location_id?: string | null\n          updated_at?: string\n          valid_from?: string | null\n          valid_until?: string | null\n          value_number?: number | null\n          value_text?: string | null\n          value_unit?: string | null\n        }\n        Update: {\n          confidence?: number\n          created_at?: string\n          id?: string\n          metadata?: Json\n          source_id?: string\n          status?: string\n          subject_key?: string\n          subject_location_id?: string | null\n          updated_at?: string\n          valid_from?: string | null\n          valid_until?: string | null\n          value_number?: number | null\n          value_text?: string | null\n          value_unit?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_brain_facts_source_id_fkey\"\n            columns: [\"source_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_sources\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_brain_facts_subject_location_id_fkey\"\n            columns: [\"subject_location_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_locations\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_brain_intents: {\n        Row: {\n          created_at: string\n          description: string | null\n          examples: Json\n          intent_key: string\n          is_active: boolean\n          name_bn: string\n          name_en: string\n          priority: number\n          updated_at: string\n        }\n        Insert: {\n          created_at?: string\n          description?: string | null\n          examples?: Json\n          intent_key: string\n          is_active?: boolean\n          name_bn: string\n          name_en: string\n          priority?: number\n          updated_at?: string\n        }\n        Update: {\n          created_at?: string\n          description?: string | null\n          examples?: Json\n          intent_key?: string\n          is_active?: boolean\n          name_bn?: string\n          name_en?: string\n          priority?: number\n          updated_at?: string\n        }\n        Relationships: []\n      }\n      fenix_brain_location_aliases: {\n        Row: {\n          alias: string\n          alias_type: string\n          created_at: string\n          id: string\n          language_code: string\n          location_id: string\n          normalized_alias: string | null\n        }\n        Insert: {\n          alias: string\n          alias_type?: string\n          created_at?: string\n          id?: string\n          language_code?: string\n          location_id: string\n          normalized_alias?: string | null\n        }\n        Update: {\n          alias?: string\n          alias_type?: string\n          created_at?: string\n          id?: string\n          language_code?: string\n          location_id?: string\n          normalized_alias?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_brain_location_aliases_location_id_fkey\"\n            columns: [\"location_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_locations\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_brain_locations: {\n        Row: {\n          created_at: string\n          id: string\n          is_active: boolean\n          level: string\n          metadata: Json\n          name_bn: string\n          name_en: string | null\n          official_code: string | null\n          parent_id: string | null\n          slug: string\n          source_id: string | null\n          updated_at: string\n        }\n        Insert: {\n          created_at?: string\n          id?: string\n          is_active?: boolean\n          level: string\n          metadata?: Json\n          name_bn: string\n          name_en?: string | null\n          official_code?: string | null\n          parent_id?: string | null\n          slug: string\n          source_id?: string | null\n          updated_at?: string\n        }\n        Update: {\n          created_at?: string\n          id?: string\n          is_active?: boolean\n          level?: string\n          metadata?: Json\n          name_bn?: string\n          name_en?: string | null\n          official_code?: string | null\n          parent_id?: string | null\n          slug?: string\n          source_id?: string | null\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_brain_locations_parent_id_fkey\"\n            columns: [\"parent_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_locations\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_brain_locations_source_id_fkey\"\n            columns: [\"source_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_sources\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_brain_pulse_intents_public: {\n        Row: {\n          intent_key: string\n          searches_30d: number\n          searches_7d: number\n        }\n        Insert: {\n          intent_key: string\n          searches_30d?: number\n          searches_7d?: number\n        }\n        Update: {\n          intent_key?: string\n          searches_30d?: number\n          searches_7d?: number\n        }\n        Relationships: []\n      }\n      fenix_brain_pulse_terms_public: {\n        Row: {\n          searches_30d: number\n          searches_7d: number\n          term: string\n          unique_queries_7d: number\n        }\n        Insert: {\n          searches_30d?: number\n          searches_7d?: number\n          term: string\n          unique_queries_7d?: number\n        }\n        Update: {\n          searches_30d?: number\n          searches_7d?: number\n          term?: string\n          unique_queries_7d?: number\n        }\n        Relationships: []\n      }\n      fenix_brain_query_events: {\n        Row: {\n          created_at: string\n          id: string\n          intent_key: string\n          language_code: string\n          query_hash: string\n          result_count: number\n          term: string\n        }\n        Insert: {\n          created_at?: string\n          id?: string\n          intent_key?: string\n          language_code?: string\n          query_hash: string\n          result_count?: number\n          term: string\n        }\n        Update: {\n          created_at?: string\n          id?: string\n          intent_key?: string\n          language_code?: string\n          query_hash?: string\n          result_count?: number\n          term?: string\n        }\n        Relationships: []\n      }\n      fenix_brain_query_terms: {\n        Row: {\n          created_at: string\n          id: string\n          intent_key: string\n          language_code: string\n          term: string\n          weight: number\n        }\n        Insert: {\n          created_at?: string\n          id?: string\n          intent_key: string\n          language_code?: string\n          term: string\n          weight?: number\n        }\n        Update: {\n          created_at?: string\n          id?: string\n          intent_key?: string\n          language_code?: string\n          term?: string\n          weight?: number\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_brain_query_terms_intent_key_fkey\"\n            columns: [\"intent_key\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_intents\"\n            referencedColumns: [\"intent_key\"]\n          },\n        ]\n      }\n      fenix_brain_source_refresh: {\n        Row: {\n          auto_publish: boolean\n          created_at: string\n          enabled: boolean\n          etag: string | null\n          last_checked_at: string | null\n          last_content_hash: string | null\n          last_error: string | null\n          last_http_status: number | null\n          last_modified: string | null\n          last_success_at: string | null\n          max_bytes: number\n          next_refresh_at: string\n          parser_key: string\n          refresh_interval_hours: number\n          source_id: string\n          updated_at: string\n        }\n        Insert: {\n          auto_publish?: boolean\n          created_at?: string\n          enabled?: boolean\n          etag?: string | null\n          last_checked_at?: string | null\n          last_content_hash?: string | null\n          last_error?: string | null\n          last_http_status?: number | null\n          last_modified?: string | null\n          last_success_at?: string | null\n          max_bytes?: number\n          next_refresh_at?: string\n          parser_key?: string\n          refresh_interval_hours?: number\n          source_id: string\n          updated_at?: string\n        }\n        Update: {\n          auto_publish?: boolean\n          created_at?: string\n          enabled?: boolean\n          etag?: string | null\n          last_checked_at?: string | null\n          last_content_hash?: string | null\n          last_error?: string | null\n          last_http_status?: number | null\n          last_modified?: string | null\n          last_success_at?: string | null\n          max_bytes?: number\n          next_refresh_at?: string\n          parser_key?: string\n          refresh_interval_hours?: number\n          source_id?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_brain_source_refresh_source_id_fkey\"\n            columns: [\"source_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_brain_sources\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_brain_sources: {\n        Row: {\n          content_hash: string | null\n          created_at: string\n          effective_from: string | null\n          effective_until: string | null\n          id: string\n          language_code: string\n          metadata: Json\n          published_at: string | null\n          publisher: string\n          source_type: string\n          status: string\n          title: string\n          trust_tier: number\n          updated_at: string\n          url: string | null\n        }\n        Insert: {\n          content_hash?: string | null\n          created_at?: string\n          effective_from?: string | null\n          effective_until?: string | null\n          id?: string\n          language_code?: string\n          metadata?: Json\n          published_at?: string | null\n          publisher: string\n          source_type: string\n          status?: string\n          title: string\n          trust_tier?: number\n          updated_at?: string\n          url?: string | null\n        }\n        Update: {\n          content_hash?: string | null\n          created_at?: string\n          effective_from?: string | null\n          effective_until?: string | null\n          id?: string\n          language_code?: string\n          metadata?: Json\n          published_at?: string | null\n          publisher?: string\n          source_type?: string\n          status?: string\n          title?: string\n          trust_tier?: number\n          updated_at?: string\n          url?: string | null\n        }\n        Relationships: []\n      }\n      fenix_brain_update_candidates: {\n        Row: {\n          change_summary: string | null\n          content_hash: string\n          discovered_at: string\n          extracted_content: string\n          id: string\n          metadata: Json\n          previous_hash: string | null\n          published_document_id: string | null\n          reviewed_at: string | null\n          reviewed_by: string | null\n          source_id: string\n          source_url: string | null\n          status: string\n          title: string\n        }\n        Insert: {\n          change_summary?: string | null\n          content_hash: string\n          discovered_at?: string\n          extracted_content: string\n          id?: string\n          metadata?: Json\n          previous_hash?: string | null\n          published_document_id?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          source_id: string\n          source_url?: string | null\n          status?: string\n          title: string\n        }\n        Update: {\n          change_summary?: string | null\n          content_hash?: string\n          discovered_at?: string\n          extracted_content?: string\n          id?: string\n          metadata?: Json\n          previous_hash?: string | null\n          published_document_id?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          source_id?: string\n          source_url?: string | null\n          status?: string\n          title?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_brain_update_candidates_published_document_id_fkey\"\n            columns: [\"published_document_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_documents\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_brain_update_candidates_source_id_fkey\"\n            columns: [\"source_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_sources\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_brain_update_runs: {\n        Row: {\n          bytes_read: number | null\n          completed_at: string | null\n          content_hash: string | null\n          error: string | null\n          http_status: number | null\n          id: string\n          metadata: Json\n          source_id: string\n          started_at: string\n          status: string\n        }\n        Insert: {\n          bytes_read?: number | null\n          completed_at?: string | null\n          content_hash?: string | null\n          error?: string | null\n          http_status?: number | null\n          id?: string\n          metadata?: Json\n          source_id: string\n          started_at?: string\n          status?: string\n        }\n        Update: {\n          bytes_read?: number | null\n          completed_at?: string | null\n          content_hash?: string | null\n          error?: string | null\n          http_status?: number | null\n          id?: string\n          metadata?: Json\n          source_id?: string\n          started_at?: string\n          status?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_brain_update_runs_source_id_fkey\"\n            columns: [\"source_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_sources\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_content_bookmarks: {\n        Row: {\n          content_id: string\n          content_type: string\n          created_at: string\n          user_id: string\n        }\n        Insert: {\n          content_id: string\n          content_type: string\n          created_at?: string\n          user_id: string\n        }\n        Update: {\n          content_id?: string\n          content_type?: string\n          created_at?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_content_bookmarks_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_bookmarks_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_bookmarks_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_bookmarks_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_content_comments: {\n        Row: {\n          author_id: string\n          body: string\n          content_id: string\n          content_type: string\n          created_at: string\n          deleted_at: string | null\n          id: string\n          updated_at: string\n        }\n        Insert: {\n          author_id: string\n          body: string\n          content_id: string\n          content_type: string\n          created_at?: string\n          deleted_at?: string | null\n          id?: string\n          updated_at?: string\n        }\n        Update: {\n          author_id?: string\n          body?: string\n          content_id?: string\n          content_type?: string\n          created_at?: string\n          deleted_at?: string | null\n          id?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_content_comments_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_comments_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_comments_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_comments_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_content_reports: {\n        Row: {\n          admin_note: string | null\n          content_id: string\n          content_type: string\n          created_at: string\n          details: string | null\n          id: string\n          reason: string\n          reporter_id: string\n          reviewed_at: string | null\n          reviewed_by: string | null\n          status: string\n        }\n        Insert: {\n          admin_note?: string | null\n          content_id: string\n          content_type: string\n          created_at?: string\n          details?: string | null\n          id?: string\n          reason: string\n          reporter_id: string\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n        }\n        Update: {\n          admin_note?: string | null\n          content_id?: string\n          content_type?: string\n          created_at?: string\n          details?: string | null\n          id?: string\n          reason?: string\n          reporter_id?: string\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_content_reports_reporter_id_fkey\"\n            columns: [\"reporter_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_reports_reporter_id_fkey\"\n            columns: [\"reporter_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_reports_reporter_id_fkey\"\n            columns: [\"reporter_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_reports_reporter_id_fkey\"\n            columns: [\"reporter_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_reports_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_reports_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_reports_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_reports_reviewed_by_fkey\"\n            columns: [\"reviewed_by\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_content_votes: {\n        Row: {\n          content_id: string\n          content_type: string\n          created_at: string\n          user_id: string\n          value: number\n        }\n        Insert: {\n          content_id: string\n          content_type: string\n          created_at?: string\n          user_id: string\n          value?: number\n        }\n        Update: {\n          content_id?: string\n          content_type?: string\n          created_at?: string\n          user_id?: string\n          value?: number\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_content_votes_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_votes_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_votes_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_content_votes_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_direct_messages: {\n        Row: {\n          attachment_name: string | null\n          attachment_path: string | null\n          attachment_size: number | null\n          attachment_type: string | null\n          body: string\n          created_at: string\n          deleted_for_recipient_at: string | null\n          deleted_for_sender_at: string | null\n          edited_at: string | null\n          id: string\n          message_type: string\n          metadata: Json\n          read_at: string | null\n          recipient_id: string\n          reply_to_id: string | null\n          sender_id: string\n        }\n        Insert: {\n          attachment_name?: string | null\n          attachment_path?: string | null\n          attachment_size?: number | null\n          attachment_type?: string | null\n          body: string\n          created_at?: string\n          deleted_for_recipient_at?: string | null\n          deleted_for_sender_at?: string | null\n          edited_at?: string | null\n          id?: string\n          message_type?: string\n          metadata?: Json\n          read_at?: string | null\n          recipient_id: string\n          reply_to_id?: string | null\n          sender_id: string\n        }\n        Update: {\n          attachment_name?: string | null\n          attachment_path?: string | null\n          attachment_size?: number | null\n          attachment_type?: string | null\n          body?: string\n          created_at?: string\n          deleted_for_recipient_at?: string | null\n          deleted_for_sender_at?: string | null\n          edited_at?: string | null\n          id?: string\n          message_type?: string\n          metadata?: Json\n          read_at?: string | null\n          recipient_id?: string\n          reply_to_id?: string | null\n          sender_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_direct_messages_recipient_id_fkey\"\n            columns: [\"recipient_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_direct_messages_recipient_id_fkey\"\n            columns: [\"recipient_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_direct_messages_recipient_id_fkey\"\n            columns: [\"recipient_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_direct_messages_recipient_id_fkey\"\n            columns: [\"recipient_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_direct_messages_reply_to_id_fkey\"\n            columns: [\"reply_to_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_direct_messages\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_direct_messages_sender_id_fkey\"\n            columns: [\"sender_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_direct_messages_sender_id_fkey\"\n            columns: [\"sender_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_direct_messages_sender_id_fkey\"\n            columns: [\"sender_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_direct_messages_sender_id_fkey\"\n            columns: [\"sender_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_dm_blocks: {\n        Row: {\n          blocked_id: string\n          blocker_id: string\n          created_at: string\n        }\n        Insert: {\n          blocked_id: string\n          blocker_id: string\n          created_at?: string\n        }\n        Update: {\n          blocked_id?: string\n          blocker_id?: string\n          created_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_dm_blocks_blocked_id_fkey\"\n            columns: [\"blocked_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_dm_blocks_blocked_id_fkey\"\n            columns: [\"blocked_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_dm_blocks_blocked_id_fkey\"\n            columns: [\"blocked_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_dm_blocks_blocked_id_fkey\"\n            columns: [\"blocked_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_dm_blocks_blocker_id_fkey\"\n            columns: [\"blocker_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_dm_blocks_blocker_id_fkey\"\n            columns: [\"blocker_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_dm_blocks_blocker_id_fkey\"\n            columns: [\"blocker_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_dm_blocks_blocker_id_fkey\"\n            columns: [\"blocker_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_feature_flags: {\n        Row: {\n          description: string | null\n          enabled: boolean\n          key: string\n          updated_at: string\n        }\n        Insert: {\n          description?: string | null\n          enabled?: boolean\n          key: string\n          updated_at?: string\n        }\n        Update: {\n          description?: string | null\n          enabled?: boolean\n          key?: string\n          updated_at?: string\n        }\n        Relationships: []\n      }\n      fenix_job_applications: {\n        Row: {\n          applicant_id: string\n          cover_note: string | null\n          created_at: string\n          employer_note: string | null\n          id: string\n          job_id: string\n          status: string\n          updated_at: string\n        }\n        Insert: {\n          applicant_id: string\n          cover_note?: string | null\n          created_at?: string\n          employer_note?: string | null\n          id?: string\n          job_id: string\n          status?: string\n          updated_at?: string\n        }\n        Update: {\n          applicant_id?: string\n          cover_note?: string | null\n          created_at?: string\n          employer_note?: string | null\n          id?: string\n          job_id?: string\n          status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_job_applications_applicant_id_fkey\"\n            columns: [\"applicant_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_job_applications_applicant_id_fkey\"\n            columns: [\"applicant_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_job_applications_applicant_id_fkey\"\n            columns: [\"applicant_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_job_applications_applicant_id_fkey\"\n            columns: [\"applicant_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_job_applications_job_id_fkey\"\n            columns: [\"job_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_jobs\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_jobs: {\n        Row: {\n          application_deadline: string | null\n          business_id: string | null\n          created_at: string\n          currency: string\n          description: string\n          district: string\n          employment_type: string\n          external_apply_url: string | null\n          id: string\n          location_text: string | null\n          owner_id: string\n          published_at: string | null\n          salary_max: number | null\n          salary_min: number | null\n          status: string\n          title: string\n          upazila: string | null\n          updated_at: string\n          verification_note: string | null\n          verification_status: string\n          workplace_type: string\n        }\n        Insert: {\n          application_deadline?: string | null\n          business_id?: string | null\n          created_at?: string\n          currency?: string\n          description: string\n          district?: string\n          employment_type?: string\n          external_apply_url?: string | null\n          id?: string\n          location_text?: string | null\n          owner_id: string\n          published_at?: string | null\n          salary_max?: number | null\n          salary_min?: number | null\n          status?: string\n          title: string\n          upazila?: string | null\n          updated_at?: string\n          verification_note?: string | null\n          verification_status?: string\n          workplace_type?: string\n        }\n        Update: {\n          application_deadline?: string | null\n          business_id?: string | null\n          created_at?: string\n          currency?: string\n          description?: string\n          district?: string\n          employment_type?: string\n          external_apply_url?: string | null\n          id?: string\n          location_text?: string | null\n          owner_id?: string\n          published_at?: string | null\n          salary_max?: number | null\n          salary_min?: number | null\n          status?: string\n          title?: string\n          upazila?: string | null\n          updated_at?: string\n          verification_note?: string | null\n          verification_status?: string\n          workplace_type?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_jobs_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_jobs_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_jobs_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_jobs_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_jobs_owner_id_fkey\"\n            columns: [\"owner_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_message_pins: {\n        Row: {\n          created_at: string\n          message_id: string\n          user_id: string\n        }\n        Insert: {\n          created_at?: string\n          message_id: string\n          user_id: string\n        }\n        Update: {\n          created_at?: string\n          message_id?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_message_pins_message_id_fkey\"\n            columns: [\"message_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_direct_messages\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_message_pins_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_message_pins_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_message_pins_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_message_pins_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_message_reactions: {\n        Row: {\n          created_at: string\n          message_id: string\n          reaction: string\n          user_id: string\n        }\n        Insert: {\n          created_at?: string\n          message_id: string\n          reaction: string\n          user_id: string\n        }\n        Update: {\n          created_at?: string\n          message_id?: string\n          reaction?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_message_reactions_message_id_fkey\"\n            columns: [\"message_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_direct_messages\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_message_reactions_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_message_reactions_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_message_reactions_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_message_reactions_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_notifications: {\n        Row: {\n          body: string\n          created_at: string\n          href: string | null\n          id: string\n          kind: string\n          read_at: string | null\n          title: string\n          user_id: string\n        }\n        Insert: {\n          body: string\n          created_at?: string\n          href?: string | null\n          id?: string\n          kind?: string\n          read_at?: string | null\n          title: string\n          user_id: string\n        }\n        Update: {\n          body?: string\n          created_at?: string\n          href?: string | null\n          id?: string\n          kind?: string\n          read_at?: string | null\n          title?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_notifications_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_notifications_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_notifications_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_notifications_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_post_media: {\n        Row: {\n          author_id: string\n          byte_size: number\n          created_at: string\n          height: number | null\n          id: string\n          mime_type: string\n          optimization_version: string\n          post_id: string\n          sort_order: number\n          source_byte_size: number | null\n          source_digest: string | null\n          storage_bucket: string\n          storage_path: string\n          width: number | null\n        }\n        Insert: {\n          author_id: string\n          byte_size: number\n          created_at?: string\n          height?: number | null\n          id?: string\n          mime_type: string\n          optimization_version?: string\n          post_id: string\n          sort_order?: number\n          source_byte_size?: number | null\n          source_digest?: string | null\n          storage_bucket?: string\n          storage_path: string\n          width?: number | null\n        }\n        Update: {\n          author_id?: string\n          byte_size?: number\n          created_at?: string\n          height?: number | null\n          id?: string\n          mime_type?: string\n          optimization_version?: string\n          post_id?: string\n          sort_order?: number\n          source_byte_size?: number | null\n          source_digest?: string | null\n          storage_bucket?: string\n          storage_path?: string\n          width?: number | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_post_media_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_post_media_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_post_media_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_post_media_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_post_media_post_id_fkey\"\n            columns: [\"post_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_posts\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_post_media_post_id_fkey\"\n            columns: [\"post_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_posts: {\n        Row: {\n          author_id: string\n          body: string\n          created_at: string\n          deleted_at: string | null\n          id: string\n          updated_at: string\n          visibility: string\n        }\n        Insert: {\n          author_id: string\n          body: string\n          created_at?: string\n          deleted_at?: string | null\n          id?: string\n          updated_at?: string\n          visibility?: string\n        }\n        Update: {\n          author_id?: string\n          body?: string\n          created_at?: string\n          deleted_at?: string | null\n          id?: string\n          updated_at?: string\n          visibility?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_posts_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_posts_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_posts_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_posts_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_profile_follows: {\n        Row: {\n          created_at: string\n          follower_id: string\n          following_id: string\n        }\n        Insert: {\n          created_at?: string\n          follower_id: string\n          following_id: string\n        }\n        Update: {\n          created_at?: string\n          follower_id?: string\n          following_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_profile_follows_follower_id_fkey\"\n            columns: [\"follower_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_profile_follows_follower_id_fkey\"\n            columns: [\"follower_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_profile_follows_follower_id_fkey\"\n            columns: [\"follower_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_profile_follows_follower_id_fkey\"\n            columns: [\"follower_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_profile_follows_following_id_fkey\"\n            columns: [\"following_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_profile_follows_following_id_fkey\"\n            columns: [\"following_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_profile_follows_following_id_fkey\"\n            columns: [\"following_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_profile_follows_following_id_fkey\"\n            columns: [\"following_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_questions: {\n        Row: {\n          author_id: string\n          body: string\n          created_at: string\n          deleted_at: string | null\n          id: string\n          title: string\n          topic_id: string | null\n          updated_at: string\n        }\n        Insert: {\n          author_id: string\n          body: string\n          created_at?: string\n          deleted_at?: string | null\n          id?: string\n          title: string\n          topic_id?: string | null\n          updated_at?: string\n        }\n        Update: {\n          author_id?: string\n          body?: string\n          created_at?: string\n          deleted_at?: string | null\n          id?: string\n          title?: string\n          topic_id?: string | null\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_questions_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_questions_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_questions_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_questions_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_questions_topic_id_fkey\"\n            columns: [\"topic_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_topics\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_topic_follows: {\n        Row: {\n          created_at: string\n          topic_id: string\n          user_id: string\n        }\n        Insert: {\n          created_at?: string\n          topic_id: string\n          user_id: string\n        }\n        Update: {\n          created_at?: string\n          topic_id?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_topic_follows_topic_id_fkey\"\n            columns: [\"topic_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_topics\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_topic_follows_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_topic_follows_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_topic_follows_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_topic_follows_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_topics: {\n        Row: {\n          created_at: string\n          description_bn: string | null\n          description_en: string | null\n          id: string\n          name_bn: string\n          name_en: string\n          slug: string\n        }\n        Insert: {\n          created_at?: string\n          description_bn?: string | null\n          description_en?: string | null\n          id?: string\n          name_bn: string\n          name_en: string\n          slug: string\n        }\n        Update: {\n          created_at?: string\n          description_bn?: string | null\n          description_en?: string | null\n          id?: string\n          name_bn?: string\n          name_en?: string\n          slug?: string\n        }\n        Relationships: []\n      }\n      fenix_user_moderation: {\n        Row: {\n          banned_until: string | null\n          changed_at: string\n          changed_by: string | null\n          reason: string | null\n          status: string\n          user_id: string\n        }\n        Insert: {\n          banned_until?: string | null\n          changed_at?: string\n          changed_by?: string | null\n          reason?: string | null\n          status?: string\n          user_id: string\n        }\n        Update: {\n          banned_until?: string | null\n          changed_at?: string\n          changed_by?: string | null\n          reason?: string | null\n          status?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_user_moderation_changed_by_fkey\"\n            columns: [\"changed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_user_moderation_changed_by_fkey\"\n            columns: [\"changed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_user_moderation_changed_by_fkey\"\n            columns: [\"changed_by\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_user_moderation_changed_by_fkey\"\n            columns: [\"changed_by\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_user_moderation_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_user_moderation_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_user_moderation_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_user_moderation_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      inventory: {\n        Row: {\n          id: string\n          low_stock_threshold: number\n          product_id: string\n          quantity: number\n          reserved_quantity: number\n          updated_at: string\n        }\n        Insert: {\n          id?: string\n          low_stock_threshold?: number\n          product_id: string\n          quantity?: number\n          reserved_quantity?: number\n          updated_at?: string\n        }\n        Update: {\n          id?: string\n          low_stock_threshold?: number\n          product_id?: string\n          quantity?: number\n          reserved_quantity?: number\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"inventory_product_id_fkey\"\n            columns: [\"product_id\"]\n            isOneToOne: true\n            referencedRelation: \"commerce_public_products\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"inventory_product_id_fkey\"\n            columns: [\"product_id\"]\n            isOneToOne: true\n            referencedRelation: \"products\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      investment_audit_logs: {\n        Row: {\n          action: string\n          actor_id: string | null\n          created_at: string\n          details: Json\n          entity_id: string | null\n          entity_type: string\n          id: string\n          opportunity_id: string | null\n        }\n        Insert: {\n          action: string\n          actor_id?: string | null\n          created_at?: string\n          details?: Json\n          entity_id?: string | null\n          entity_type: string\n          id?: string\n          opportunity_id?: string | null\n        }\n        Update: {\n          action?: string\n          actor_id?: string | null\n          created_at?: string\n          details?: Json\n          entity_id?: string | null\n          entity_type?: string\n          id?: string\n          opportunity_id?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"investment_audit_logs_opportunity_id_fkey\"\n            columns: [\"opportunity_id\"]\n            isOneToOne: false\n            referencedRelation: \"investment_opportunities\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      investment_deals: {\n        Row: {\n          agreed_amount: number\n          completed_at: string | null\n          created_at: string\n          funded_at: string | null\n          id: string\n          investor_confirmed_at: string | null\n          investor_id: string\n          opportunity_id: string\n          owner_confirmed_at: string | null\n          ownership_percentage: number | null\n          started_at: string | null\n          status: string\n          structure: string\n          terms_note: string | null\n          updated_at: string\n        }\n        Insert: {\n          agreed_amount: number\n          completed_at?: string | null\n          created_at?: string\n          funded_at?: string | null\n          id?: string\n          investor_confirmed_at?: string | null\n          investor_id: string\n          opportunity_id: string\n          owner_confirmed_at?: string | null\n          ownership_percentage?: number | null\n          started_at?: string | null\n          status?: string\n          structure?: string\n          terms_note?: string | null\n          updated_at?: string\n        }\n        Update: {\n          agreed_amount?: number\n          completed_at?: string | null\n          created_at?: string\n          funded_at?: string | null\n          id?: string\n          investor_confirmed_at?: string | null\n          investor_id?: string\n          opportunity_id?: string\n          owner_confirmed_at?: string | null\n          ownership_percentage?: number | null\n          started_at?: string | null\n          status?: string\n          structure?: string\n          terms_note?: string | null\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"investment_deals_opportunity_id_fkey\"\n            columns: [\"opportunity_id\"]\n            isOneToOne: false\n            referencedRelation: \"investment_opportunities\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      investment_documents: {\n        Row: {\n          created_at: string\n          document_type: string\n          id: string\n          opportunity_id: string\n          owner_id: string\n          review_note: string | null\n          reviewed_at: string | null\n          reviewed_by: string | null\n          status: string\n          storage_bucket: string\n          storage_path: string\n          title: string\n          updated_at: string\n          visibility: string\n        }\n        Insert: {\n          created_at?: string\n          document_type: string\n          id?: string\n          opportunity_id: string\n          owner_id: string\n          review_note?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          storage_bucket?: string\n          storage_path: string\n          title: string\n          updated_at?: string\n          visibility?: string\n        }\n        Update: {\n          created_at?: string\n          document_type?: string\n          id?: string\n          opportunity_id?: string\n          owner_id?: string\n          review_note?: string | null\n          reviewed_at?: string | null\n          reviewed_by?: string | null\n          status?: string\n          storage_bucket?: string\n          storage_path?: string\n          title?: string\n          updated_at?: string\n          visibility?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"investment_documents_opportunity_id_fkey\"\n            columns: [\"opportunity_id\"]\n            isOneToOne: false\n            referencedRelation: \"investment_opportunities\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      investment_due_diligence_checks: {\n        Row: {\n          check_key: string\n          created_at: string\n          id: string\n          investor_id: string\n          note: string | null\n          opportunity_id: string\n          status: string\n          updated_at: string\n        }\n        Insert: {\n          check_key: string\n          created_at?: string\n          id?: string\n          investor_id: string\n          note?: string | null\n          opportunity_id: string\n          status?: string\n          updated_at?: string\n        }\n        Update: {\n          check_key?: string\n          created_at?: string\n          id?: string\n          investor_id?: string\n          note?: string | null\n          opportunity_id?: string\n          status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"investment_due_diligence_checks_investor_id_fkey\"\n            columns: [\"investor_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"investment_due_diligence_checks_investor_id_fkey\"\n            columns: [\"investor_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"investment_due_diligence_checks_investor_id_fkey\"\n            columns: [\"investor_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"investment_due_diligence_checks_investor_id_fkey\"\n            columns: [\"investor_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"investment_due_diligence_checks_opportunity_id_fkey\"\n            columns: [\"opportunity_id\"]\n            isOneToOne: false\n            referencedRelation: \"investment_opportunities\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      investment_interests: {\n        Row: {\n          created_at: string\n          id: string\n          investor_id: string\n          message: string | null\n          offered_amount: number\n          opportunity_id: string\n          owner_note: string | null\n          status: string\n          updated_at: string\n        }\n        Insert: {\n          created_at?: string\n          id?: string\n          investor_id: string\n          message?: string | null\n          offered_amount: number\n          opportunity_id: string\n          owner_note?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Update: {\n          created_at?: string\n          id?: string\n          investor_id?: string\n          message?: string | null\n          offered_amount?: number\n          opportunity_id?: string\n          owner_note?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"investment_interests_opportunity_id_fkey\"\n            columns: [\"opportunity_id\"]\n            isOneToOne: false\n            referencedRelation: \"investment_opportunities\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      investment_messages: {\n        Row: {\n          body: string\n          created_at: string\n          deal_id: string | null\n          id: string\n          opportunity_id: string\n          read_at: string | null\n          recipient_id: string\n          sender_id: string\n        }\n        Insert: {\n          body: string\n          created_at?: string\n          deal_id?: string | null\n          id?: string\n          opportunity_id: string\n          read_at?: string | null\n          recipient_id: string\n          sender_id: string\n        }\n        Update: {\n          body?: string\n          created_at?: string\n          deal_id?: string | null\n          id?: string\n          opportunity_id?: string\n          read_at?: string | null\n          recipient_id?: string\n          sender_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"investment_messages_deal_id_fkey\"\n            columns: [\"deal_id\"]\n            isOneToOne: false\n            referencedRelation: \"investment_deals\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"investment_messages_opportunity_id_fkey\"\n            columns: [\"opportunity_id\"]\n            isOneToOne: false\n            referencedRelation: \"investment_opportunities\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      investment_opportunities: {\n        Row: {\n          business_id: string | null\n          category: string\n          created_at: string\n          description_bn: string\n          description_en: string\n          district: string\n          expected_return_pct: number | null\n          expected_term_months: number | null\n          funding_deadline: string | null\n          id: string\n          location_details: string | null\n          min_investment: number\n          offer_type: string\n          owner_id: string\n          ownership_percentage: number | null\n          raised_amount: number\n          risk_disclosure: string | null\n          risk_level: string\n          shariah_preference: string\n          status: string\n          target_amount: number\n          title_bn: string\n          title_en: string\n          upazila: string | null\n          updated_at: string\n          verification_note: string | null\n          verification_status: string\n          verified_at: string | null\n          verified_by: string | null\n        }\n        Insert: {\n          business_id?: string | null\n          category: string\n          created_at?: string\n          description_bn: string\n          description_en: string\n          district?: string\n          expected_return_pct?: number | null\n          expected_term_months?: number | null\n          funding_deadline?: string | null\n          id?: string\n          location_details?: string | null\n          min_investment: number\n          offer_type?: string\n          owner_id: string\n          ownership_percentage?: number | null\n          raised_amount?: number\n          risk_disclosure?: string | null\n          risk_level?: string\n          shariah_preference?: string\n          status?: string\n          target_amount: number\n          title_bn: string\n          title_en: string\n          upazila?: string | null\n          updated_at?: string\n          verification_note?: string | null\n          verification_status?: string\n          verified_at?: string | null\n          verified_by?: string | null\n        }\n        Update: {\n          business_id?: string | null\n          category?: string\n          created_at?: string\n          description_bn?: string\n          description_en?: string\n          district?: string\n          expected_return_pct?: number | null\n          expected_term_months?: number | null\n          funding_deadline?: string | null\n          id?: string\n          location_details?: string | null\n          min_investment?: number\n          offer_type?: string\n          owner_id?: string\n          ownership_percentage?: number | null\n          raised_amount?: number\n          risk_disclosure?: string | null\n          risk_level?: string\n          shariah_preference?: string\n          status?: string\n          target_amount?: number\n          title_bn?: string\n          title_en?: string\n          upazila?: string | null\n          updated_at?: string\n          verification_note?: string | null\n          verification_status?: string\n          verified_at?: string | null\n          verified_by?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"investment_opportunities_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      investment_profiles: {\n        Row: {\n          bio: string | null\n          created_at: string\n          horizon_months: number | null\n          investor_type: string\n          max_budget: number\n          min_budget: number\n          preferred_sectors: string[]\n          preferred_upazilas: string[]\n          risk_preference: string\n          shariah_preference: string\n          updated_at: string\n          user_id: string\n          verification_note: string | null\n          verification_status: string\n          verified_at: string | null\n          verified_by: string | null\n        }\n        Insert: {\n          bio?: string | null\n          created_at?: string\n          horizon_months?: number | null\n          investor_type?: string\n          max_budget?: number\n          min_budget?: number\n          preferred_sectors?: string[]\n          preferred_upazilas?: string[]\n          risk_preference?: string\n          shariah_preference?: string\n          updated_at?: string\n          user_id: string\n          verification_note?: string | null\n          verification_status?: string\n          verified_at?: string | null\n          verified_by?: string | null\n        }\n        Update: {\n          bio?: string | null\n          created_at?: string\n          horizon_months?: number | null\n          investor_type?: string\n          max_budget?: number\n          min_budget?: number\n          preferred_sectors?: string[]\n          preferred_upazilas?: string[]\n          risk_preference?: string\n          shariah_preference?: string\n          updated_at?: string\n          user_id?: string\n          verification_note?: string | null\n          verification_status?: string\n          verified_at?: string | null\n          verified_by?: string | null\n        }\n        Relationships: []\n      }\n      investment_reports: {\n        Row: {\n          created_at: string\n          details: string\n          id: string\n          opportunity_id: string\n          reason: string\n          reporter_id: string\n          resolution_note: string | null\n          resolved_at: string | null\n          resolved_by: string | null\n          status: string\n          updated_at: string\n        }\n        Insert: {\n          created_at?: string\n          details: string\n          id?: string\n          opportunity_id: string\n          reason: string\n          reporter_id: string\n          resolution_note?: string | null\n          resolved_at?: string | null\n          resolved_by?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Update: {\n          created_at?: string\n          details?: string\n          id?: string\n          opportunity_id?: string\n          reason?: string\n          reporter_id?: string\n          resolution_note?: string | null\n          resolved_at?: string | null\n          resolved_by?: string | null\n          status?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"investment_reports_opportunity_id_fkey\"\n            columns: [\"opportunity_id\"]\n            isOneToOne: false\n            referencedRelation: \"investment_opportunities\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      investment_updates: {\n        Row: {\n          author_id: string\n          body: string\n          created_at: string\n          customers_actual: number | null\n          id: string\n          opportunity_id: string\n          period_label: string | null\n          profit_actual: number | null\n          return_actual_pct: number | null\n          revenue_actual: number | null\n          risk_note: string | null\n          title: string\n          updated_at: string\n        }\n        Insert: {\n          author_id: string\n          body: string\n          created_at?: string\n          customers_actual?: number | null\n          id?: string\n          opportunity_id: string\n          period_label?: string | null\n          profit_actual?: number | null\n          return_actual_pct?: number | null\n          revenue_actual?: number | null\n          risk_note?: string | null\n          title: string\n          updated_at?: string\n        }\n        Update: {\n          author_id?: string\n          body?: string\n          created_at?: string\n          customers_actual?: number | null\n          id?: string\n          opportunity_id?: string\n          period_label?: string | null\n          profit_actual?: number | null\n          return_actual_pct?: number | null\n          revenue_actual?: number | null\n          risk_note?: string | null\n          title?: string\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"investment_updates_opportunity_id_fkey\"\n            columns: [\"opportunity_id\"]\n            isOneToOne: false\n            referencedRelation: \"investment_opportunities\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      news_posts: {\n        Row: {\n          author_id: string | null\n          automation_status: string\n          breaking: boolean\n          category: string\n          content_bn: string\n          content_en: string\n          created_at: string\n          discovered_at: string\n          excerpt_bn: string | null\n          excerpt_en: string | null\n          featured: boolean\n          id: string\n          image_url: string | null\n          published_at: string | null\n          slug: string\n          source_item_key: string | null\n          source_name: string | null\n          source_published_at: string | null\n          source_url: string | null\n          status: string\n          title_bn: string\n          title_en: string\n          updated_at: string\n          verification_status: string\n        }\n        Insert: {\n          author_id?: string | null\n          automation_status?: string\n          breaking?: boolean\n          category: string\n          content_bn: string\n          content_en: string\n          created_at?: string\n          discovered_at?: string\n          excerpt_bn?: string | null\n          excerpt_en?: string | null\n          featured?: boolean\n          id?: string\n          image_url?: string | null\n          published_at?: string | null\n          slug: string\n          source_item_key?: string | null\n          source_name?: string | null\n          source_published_at?: string | null\n          source_url?: string | null\n          status?: string\n          title_bn: string\n          title_en: string\n          updated_at?: string\n          verification_status?: string\n        }\n        Update: {\n          author_id?: string | null\n          automation_status?: string\n          breaking?: boolean\n          category?: string\n          content_bn?: string\n          content_en?: string\n          created_at?: string\n          discovered_at?: string\n          excerpt_bn?: string | null\n          excerpt_en?: string | null\n          featured?: boolean\n          id?: string\n          image_url?: string | null\n          published_at?: string | null\n          slug?: string\n          source_item_key?: string | null\n          source_name?: string | null\n          source_published_at?: string | null\n          source_url?: string | null\n          status?: string\n          title_bn?: string\n          title_en?: string\n          updated_at?: string\n          verification_status?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"news_posts_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"news_posts_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"news_posts_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"news_posts_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      order_items: {\n        Row: {\n          created_at: string\n          discount_amount: number\n          id: string\n          line_total: number\n          order_id: string\n          product_id: string | null\n          product_name: string\n          product_sku: string | null\n          quantity: number\n          unit_price: number\n          vendor_id: string | null\n        }\n        Insert: {\n          created_at?: string\n          discount_amount?: number\n          id?: string\n          line_total: number\n          order_id: string\n          product_id?: string | null\n          product_name: string\n          product_sku?: string | null\n          quantity: number\n          unit_price: number\n          vendor_id?: string | null\n        }\n        Update: {\n          created_at?: string\n          discount_amount?: number\n          id?: string\n          line_total?: number\n          order_id?: string\n          product_id?: string | null\n          product_name?: string\n          product_sku?: string | null\n          quantity?: number\n          unit_price?: number\n          vendor_id?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"order_items_order_id_fkey\"\n            columns: [\"order_id\"]\n            isOneToOne: false\n            referencedRelation: \"orders\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"order_items_product_id_fkey\"\n            columns: [\"product_id\"]\n            isOneToOne: false\n            referencedRelation: \"commerce_public_products\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"order_items_product_id_fkey\"\n            columns: [\"product_id\"]\n            isOneToOne: false\n            referencedRelation: \"products\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"order_items_vendor_id_fkey\"\n            columns: [\"vendor_id\"]\n            isOneToOne: false\n            referencedRelation: \"vendor_profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      orders: {\n        Row: {\n          created_at: string\n          currency: string\n          customer_id: string | null\n          customer_note: string | null\n          delivery_fee: number\n          discount_amount: number\n          guest_email: string | null\n          guest_name: string | null\n          guest_phone: string | null\n          id: string\n          order_number: string\n          payment_method: string\n          payment_status: string\n          shipping_address: string\n          shipping_area: string | null\n          shipping_district: string | null\n          shipping_name: string\n          shipping_phone: string\n          shipping_upazila: string | null\n          status: string\n          subtotal: number\n          total_amount: number\n          updated_at: string\n        }\n        Insert: {\n          created_at?: string\n          currency?: string\n          customer_id?: string | null\n          customer_note?: string | null\n          delivery_fee?: number\n          discount_amount?: number\n          guest_email?: string | null\n          guest_name?: string | null\n          guest_phone?: string | null\n          id?: string\n          order_number?: string\n          payment_method?: string\n          payment_status?: string\n          shipping_address: string\n          shipping_area?: string | null\n          shipping_district?: string | null\n          shipping_name: string\n          shipping_phone: string\n          shipping_upazila?: string | null\n          status?: string\n          subtotal?: number\n          total_amount?: number\n          updated_at?: string\n        }\n        Update: {\n          created_at?: string\n          currency?: string\n          customer_id?: string | null\n          customer_note?: string | null\n          delivery_fee?: number\n          discount_amount?: number\n          guest_email?: string | null\n          guest_name?: string | null\n          guest_phone?: string | null\n          id?: string\n          order_number?: string\n          payment_method?: string\n          payment_status?: string\n          shipping_address?: string\n          shipping_area?: string | null\n          shipping_district?: string | null\n          shipping_name?: string\n          shipping_phone?: string\n          shipping_upazila?: string | null\n          status?: string\n          subtotal?: number\n          total_amount?: number\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"orders_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"orders_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"orders_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"orders_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      product_categories: {\n        Row: {\n          created_at: string\n          description_bn: string | null\n          description_en: string | null\n          id: string\n          image_url: string | null\n          is_active: boolean\n          name_bn: string | null\n          name_en: string | null\n          parent_id: string | null\n          slug: string\n          sort_order: number\n          updated_at: string\n        }\n        Insert: {\n          created_at?: string\n          description_bn?: string | null\n          description_en?: string | null\n          id?: string\n          image_url?: string | null\n          is_active?: boolean\n          name_bn?: string | null\n          name_en?: string | null\n          parent_id?: string | null\n          slug: string\n          sort_order?: number\n          updated_at?: string\n        }\n        Update: {\n          created_at?: string\n          description_bn?: string | null\n          description_en?: string | null\n          id?: string\n          image_url?: string | null\n          is_active?: boolean\n          name_bn?: string | null\n          name_en?: string | null\n          parent_id?: string | null\n          slug?: string\n          sort_order?: number\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"product_categories_parent_id_fkey\"\n            columns: [\"parent_id\"]\n            isOneToOne: false\n            referencedRelation: \"product_categories\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      product_images: {\n        Row: {\n          alt_text_bn: string | null\n          alt_text_en: string | null\n          byte_size: number | null\n          created_at: string\n          height: number | null\n          id: string\n          is_primary: boolean\n          optimization_version: string\n          product_id: string\n          sort_order: number\n          source_byte_size: number | null\n          source_digest: string | null\n          storage_bucket: string\n          storage_path: string\n          width: number | null\n        }\n        Insert: {\n          alt_text_bn?: string | null\n          alt_text_en?: string | null\n          byte_size?: number | null\n          created_at?: string\n          height?: number | null\n          id?: string\n          is_primary?: boolean\n          optimization_version?: string\n          product_id: string\n          sort_order?: number\n          source_byte_size?: number | null\n          source_digest?: string | null\n          storage_bucket?: string\n          storage_path: string\n          width?: number | null\n        }\n        Update: {\n          alt_text_bn?: string | null\n          alt_text_en?: string | null\n          byte_size?: number | null\n          created_at?: string\n          height?: number | null\n          id?: string\n          is_primary?: boolean\n          optimization_version?: string\n          product_id?: string\n          sort_order?: number\n          source_byte_size?: number | null\n          source_digest?: string | null\n          storage_bucket?: string\n          storage_path?: string\n          width?: number | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"product_images_product_id_fkey\"\n            columns: [\"product_id\"]\n            isOneToOne: false\n            referencedRelation: \"commerce_public_products\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"product_images_product_id_fkey\"\n            columns: [\"product_id\"]\n            isOneToOne: false\n            referencedRelation: \"products\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      product_reviews: {\n        Row: {\n          body: string | null\n          created_at: string\n          customer_id: string\n          id: string\n          order_id: string\n          product_id: string\n          rating: number\n          seller_responded_at: string | null\n          seller_response: string | null\n          status: string\n          title: string | null\n          updated_at: string\n        }\n        Insert: {\n          body?: string | null\n          created_at?: string\n          customer_id: string\n          id?: string\n          order_id: string\n          product_id: string\n          rating: number\n          seller_responded_at?: string | null\n          seller_response?: string | null\n          status?: string\n          title?: string | null\n          updated_at?: string\n        }\n        Update: {\n          body?: string | null\n          created_at?: string\n          customer_id?: string\n          id?: string\n          order_id?: string\n          product_id?: string\n          rating?: number\n          seller_responded_at?: string | null\n          seller_response?: string | null\n          status?: string\n          title?: string | null\n          updated_at?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"product_reviews_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"product_reviews_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"product_reviews_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"product_reviews_customer_id_fkey\"\n            columns: [\"customer_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"product_reviews_order_id_fkey\"\n            columns: [\"order_id\"]\n            isOneToOne: false\n            referencedRelation: \"orders\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"product_reviews_product_id_fkey\"\n            columns: [\"product_id\"]\n            isOneToOne: false\n            referencedRelation: \"commerce_public_products\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"product_reviews_product_id_fkey\"\n            columns: [\"product_id\"]\n            isOneToOne: false\n            referencedRelation: \"products\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      products: {\n        Row: {\n          allow_guest_purchase: boolean\n          business_id: string | null\n          category_id: string | null\n          compare_at_price: number | null\n          created_at: string\n          currency: string\n          description_bn: string | null\n          description_en: string | null\n          id: string\n          is_active: boolean\n          is_featured: boolean\n          name_bn: string | null\n          name_en: string | null\n          price: number\n          sku: string | null\n          slug: string\n          status: string\n          updated_at: string\n          vendor_id: string\n        }\n        Insert: {\n          allow_guest_purchase?: boolean\n          business_id?: string | null\n          category_id?: string | null\n          compare_at_price?: number | null\n          created_at?: string\n          currency?: string\n          description_bn?: string | null\n          description_en?: string | null\n          id?: string\n          is_active?: boolean\n          is_featured?: boolean\n          name_bn?: string | null\n          name_en?: string | null\n          price: number\n          sku?: string | null\n          slug: string\n          status?: string\n          updated_at?: string\n          vendor_id: string\n        }\n        Update: {\n          allow_guest_purchase?: boolean\n          business_id?: string | null\n          category_id?: string | null\n          compare_at_price?: number | null\n          created_at?: string\n          currency?: string\n          description_bn?: string | null\n          description_en?: string | null\n          id?: string\n          is_active?: boolean\n          is_featured?: boolean\n          name_bn?: string | null\n          name_en?: string | null\n          price?: number\n          sku?: string | null\n          slug?: string\n          status?: string\n          updated_at?: string\n          vendor_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"products_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"products_category_id_fkey\"\n            columns: [\"category_id\"]\n            isOneToOne: false\n            referencedRelation: \"product_categories\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"products_vendor_id_fkey\"\n            columns: [\"vendor_id\"]\n            isOneToOne: false\n            referencedRelation: \"vendor_profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      profile_contacts: {\n        Row: {\n          created_at: string\n          facebook_public: boolean\n          facebook_url: string | null\n          instagram_public: boolean\n          instagram_url: string | null\n          linkedin_public: boolean\n          linkedin_url: string | null\n          phone_public: boolean\n          public_facebook_url: string | null\n          public_instagram_url: string | null\n          public_linkedin_url: string | null\n          public_whatsapp: string | null\n          public_youtube_url: string | null\n          updated_at: string\n          user_id: string\n          whatsapp: string | null\n          whatsapp_public: boolean\n          youtube_public: boolean\n          youtube_url: string | null\n        }\n        Insert: {\n          created_at?: string\n          facebook_public?: boolean\n          facebook_url?: string | null\n          instagram_public?: boolean\n          instagram_url?: string | null\n          linkedin_public?: boolean\n          linkedin_url?: string | null\n          phone_public?: boolean\n          public_facebook_url?: string | null\n          public_instagram_url?: string | null\n          public_linkedin_url?: string | null\n          public_whatsapp?: string | null\n          public_youtube_url?: string | null\n          updated_at?: string\n          user_id: string\n          whatsapp?: string | null\n          whatsapp_public?: boolean\n          youtube_public?: boolean\n          youtube_url?: string | null\n        }\n        Update: {\n          created_at?: string\n          facebook_public?: boolean\n          facebook_url?: string | null\n          instagram_public?: boolean\n          instagram_url?: string | null\n          linkedin_public?: boolean\n          linkedin_url?: string | null\n          phone_public?: boolean\n          public_facebook_url?: string | null\n          public_instagram_url?: string | null\n          public_linkedin_url?: string | null\n          public_whatsapp?: string | null\n          public_youtube_url?: string | null\n          updated_at?: string\n          user_id?: string\n          whatsapp?: string | null\n          whatsapp_public?: boolean\n          youtube_public?: boolean\n          youtube_url?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"profile_contacts_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"profile_contacts_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"profile_contacts_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"profile_contacts_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      profile_settings: {\n        Row: {\n          feed_visibility: string\n          interests: string[]\n          locale: string\n          message_permissions: string\n          notification_preferences: Json\n          onboarding_completed: boolean\n          onboarding_dismissed: boolean\n          onboarding_step: string\n          profile_visibility: string\n          reduced_motion: boolean\n          theme: string\n          updated_at: string\n          user_id: string\n        }\n        Insert: {\n          feed_visibility?: string\n          interests?: string[]\n          locale?: string\n          message_permissions?: string\n          notification_preferences?: Json\n          onboarding_completed?: boolean\n          onboarding_dismissed?: boolean\n          onboarding_step?: string\n          profile_visibility?: string\n          reduced_motion?: boolean\n          theme?: string\n          updated_at?: string\n          user_id: string\n        }\n        Update: {\n          feed_visibility?: string\n          interests?: string[]\n          locale?: string\n          message_permissions?: string\n          notification_preferences?: Json\n          onboarding_completed?: boolean\n          onboarding_dismissed?: boolean\n          onboarding_step?: string\n          profile_visibility?: string\n          reduced_motion?: boolean\n          theme?: string\n          updated_at?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"profile_settings_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"profile_settings_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"profile_settings_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"profile_settings_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      profiles: {\n        Row: {\n          area_text: string | null\n          avatar_url: string | null\n          bio: string | null\n          country_code: string\n          cover_url: string | null\n          created_at: string\n          district_id: string | null\n          exact_location_visibility: string\n          facebook_url: string | null\n          feed_public: boolean\n          full_name: string | null\n          holding_no: string | null\n          house_details: string | null\n          id: string\n          instagram_url: string | null\n          is_public: boolean\n          locality_id: string | null\n          location_public_level: string\n          location_text: string | null\n          phone: string | null\n          road_text: string | null\n          role: string | null\n          upazila_id: string | null\n          updated_at: string\n          username: string | null\n          website_url: string | null\n          whatsapp_url: string | null\n        }\n        Insert: {\n          area_text?: string | null\n          avatar_url?: string | null\n          bio?: string | null\n          country_code?: string\n          cover_url?: string | null\n          created_at?: string\n          district_id?: string | null\n          exact_location_visibility?: string\n          facebook_url?: string | null\n          feed_public?: boolean\n          full_name?: string | null\n          holding_no?: string | null\n          house_details?: string | null\n          id: string\n          instagram_url?: string | null\n          is_public?: boolean\n          locality_id?: string | null\n          location_public_level?: string\n          location_text?: string | null\n          phone?: string | null\n          road_text?: string | null\n          role?: string | null\n          upazila_id?: string | null\n          updated_at?: string\n          username?: string | null\n          website_url?: string | null\n          whatsapp_url?: string | null\n        }\n        Update: {\n          area_text?: string | null\n          avatar_url?: string | null\n          bio?: string | null\n          country_code?: string\n          cover_url?: string | null\n          created_at?: string\n          district_id?: string | null\n          exact_location_visibility?: string\n          facebook_url?: string | null\n          feed_public?: boolean\n          full_name?: string | null\n          holding_no?: string | null\n          house_details?: string | null\n          id?: string\n          instagram_url?: string | null\n          is_public?: boolean\n          locality_id?: string | null\n          location_public_level?: string\n          location_text?: string | null\n          phone?: string | null\n          road_text?: string | null\n          role?: string | null\n          upazila_id?: string | null\n          updated_at?: string\n          username?: string | null\n          website_url?: string | null\n          whatsapp_url?: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"profiles_district_id_fkey\"\n            columns: [\"district_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_locations\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"profiles_locality_id_fkey\"\n            columns: [\"locality_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_locations\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"profiles_upazila_id_fkey\"\n            columns: [\"upazila_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_brain_locations\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      vendor_profiles: {\n        Row: {\n          business_id: string | null\n          created_at: string\n          description_bn: string | null\n          description_en: string | null\n          display_name: string\n          display_name_bn: string | null\n          display_name_en: string | null\n          id: string\n          is_verified: boolean\n          phone: string | null\n          shop_slug: string | null\n          status: string\n          updated_at: string\n          user_id: string\n        }\n        Insert: {\n          business_id?: string | null\n          created_at?: string\n          description_bn?: string | null\n          description_en?: string | null\n          display_name: string\n          display_name_bn?: string | null\n          display_name_en?: string | null\n          id?: string\n          is_verified?: boolean\n          phone?: string | null\n          shop_slug?: string | null\n          status?: string\n          updated_at?: string\n          user_id: string\n        }\n        Update: {\n          business_id?: string | null\n          created_at?: string\n          description_bn?: string | null\n          description_en?: string | null\n          display_name?: string\n          display_name_bn?: string | null\n          display_name_en?: string | null\n          id?: string\n          is_verified?: boolean\n          phone?: string | null\n          shop_slug?: string | null\n          status?: string\n          updated_at?: string\n          user_id?: string\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"vendor_profiles_business_id_fkey\"\n            columns: [\"business_id\"]\n            isOneToOne: false\n            referencedRelation: \"businesses\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"vendor_profiles_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"vendor_profiles_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"vendor_profiles_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"vendor_profiles_user_id_fkey\"\n            columns: [\"user_id\"]\n            isOneToOne: true\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n    }\n    Views: {\n      commerce_public_products: {\n        Row: {\n          allow_guest_purchase: boolean | null\n          category_id: string | null\n          compare_at_price: number | null\n          created_at: string | null\n          currency: string | null\n          description_bn: string | null\n          description_en: string | null\n          id: string | null\n          image_alt_bn: string | null\n          image_alt_en: string | null\n          image_bucket: string | null\n          image_id: string | null\n          image_path: string | null\n          is_featured: boolean | null\n          name_bn: string | null\n          name_en: string | null\n          price: number | null\n          shop_slug: string | null\n          sku: string | null\n          slug: string | null\n          vendor_display_name: string | null\n          vendor_display_name_bn: string | null\n          vendor_display_name_en: string | null\n          vendor_id: string | null\n          vendor_is_verified: boolean | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"products_category_id_fkey\"\n            columns: [\"category_id\"]\n            isOneToOne: false\n            referencedRelation: \"product_categories\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"products_vendor_id_fkey\"\n            columns: [\"vendor_id\"]\n            isOneToOne: false\n            referencedRelation: \"vendor_profiles\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_brain_pulse_intents: {\n        Row: {\n          intent_key: string | null\n          searches_30d: number | null\n          searches_7d: number | null\n        }\n        Relationships: []\n      }\n      fenix_brain_pulse_terms: {\n        Row: {\n          searches_30d: number | null\n          searches_7d: number | null\n          term: string | null\n          unique_queries_7d: number | null\n        }\n        Relationships: []\n      }\n      fenix_public_ambulance_providers: {\n        Row: {\n          ac_available: boolean | null\n          ambulance_type: string | null\n          available_24_7: boolean | null\n          base_area: string | null\n          display_name: string | null\n          id: string | null\n          is_verified: boolean | null\n          oxygen_available: boolean | null\n          phone: string | null\n          service_area: string | null\n          whatsapp: string | null\n        }\n        Insert: {\n          ac_available?: boolean | null\n          ambulance_type?: string | null\n          available_24_7?: boolean | null\n          base_area?: string | null\n          display_name?: string | null\n          id?: string | null\n          is_verified?: boolean | null\n          oxygen_available?: boolean | null\n          phone?: string | null\n          service_area?: string | null\n          whatsapp?: string | null\n        }\n        Update: {\n          ac_available?: boolean | null\n          ambulance_type?: string | null\n          available_24_7?: boolean | null\n          base_area?: string | null\n          display_name?: string | null\n          id?: string | null\n          is_verified?: boolean | null\n          oxygen_available?: boolean | null\n          phone?: string | null\n          service_area?: string | null\n          whatsapp?: string | null\n        }\n        Relationships: []\n      }\n      fenix_public_answer_feed: {\n        Row: {\n          author_avatar_url: string | null\n          author_id: string | null\n          author_name: string | null\n          author_username: string | null\n          body: string | null\n          created_at: string | null\n          id: string | null\n          question_id: string | null\n          score: number | null\n          updated_at: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_answers_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_question_id_fkey\"\n            columns: [\"question_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_question_feed\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_answers_question_id_fkey\"\n            columns: [\"question_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_questions\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n      fenix_public_blood_donors: {\n        Row: {\n          area_text: string | null\n          availability: string | null\n          avatar_url: string | null\n          blood_group: string | null\n          full_name: string | null\n          last_donation_date: string | null\n          preferred_contact: string | null\n          upazila_bn: string | null\n          upazila_en: string | null\n          username: string | null\n        }\n        Relationships: []\n      }\n      fenix_public_blood_requests: {\n        Row: {\n          area_text: string | null\n          blood_group: string | null\n          created_at: string | null\n          hospital_area: string | null\n          hospital_name: string | null\n          id: string | null\n          needed_at: string | null\n          status: string | null\n          units: number | null\n          upazila_bn: string | null\n          upazila_en: string | null\n          urgency: string | null\n        }\n        Relationships: []\n      }\n      fenix_public_feed: {\n        Row: {\n          author_avatar_url: string | null\n          author_id: string | null\n          author_name: string | null\n          author_username: string | null\n          body: string | null\n          created_at: string | null\n          id: string | null\n          updated_at: string | null\n        }\n        Relationships: []\n      }\n      fenix_public_profiles: {\n        Row: {\n          avatar_url: string | null\n          bio: string | null\n          cover_url: string | null\n          created_at: string | null\n          facebook_url: string | null\n          full_name: string | null\n          id: string | null\n          instagram_url: string | null\n          location_text: string | null\n          username: string | null\n          website_url: string | null\n          whatsapp_url: string | null\n        }\n        Relationships: []\n      }\n      fenix_public_profiles_v2: {\n        Row: {\n          avatar_url: string | null\n          bio: string | null\n          cover_url: string | null\n          created_at: string | null\n          facebook_url: string | null\n          full_name: string | null\n          id: string | null\n          instagram_url: string | null\n          location_text: string | null\n          username: string | null\n          website_url: string | null\n          whatsapp_url: string | null\n        }\n        Relationships: []\n      }\n      fenix_public_question_feed: {\n        Row: {\n          answer_count: number | null\n          author_avatar_url: string | null\n          author_id: string | null\n          author_name: string | null\n          author_username: string | null\n          body: string | null\n          created_at: string | null\n          id: string | null\n          score: number | null\n          title: string | null\n          topic_id: string | null\n          topic_name_bn: string | null\n          topic_name_en: string | null\n          topic_slug: string | null\n          updated_at: string | null\n        }\n        Relationships: [\n          {\n            foreignKeyName: \"fenix_questions_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_feed\"\n            referencedColumns: [\"author_id\"]\n          },\n          {\n            foreignKeyName: \"fenix_questions_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_questions_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_public_profiles_v2\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_questions_author_id_fkey\"\n            columns: [\"author_id\"]\n            isOneToOne: false\n            referencedRelation: \"profiles\"\n            referencedColumns: [\"id\"]\n          },\n          {\n            foreignKeyName: \"fenix_questions_topic_id_fkey\"\n            columns: [\"topic_id\"]\n            isOneToOne: false\n            referencedRelation: \"fenix_topics\"\n            referencedColumns: [\"id\"]\n          },\n        ]\n      }\n    }\n    Functions: {\n      admin_delete_delivery_rule: {\n        Args: { p_rule_id: string }\n        Returns: boolean\n      }\n      admin_set_order_payment_status: {\n        Args: { p_order_id: string; p_payment_status: string }\n        Returns: boolean\n      }\n      admin_set_review_status: {\n        Args: { p_review_id: string; p_status: string }\n        Returns: boolean\n      }\n      admin_set_vendor_status: {\n        Args: { p_is_verified?: boolean; p_status: string; p_vendor_id: string }\n        Returns: boolean\n      }\n      admin_upsert_delivery_rule: {\n        Args: {\n          p_district?: string\n          p_fee?: number\n          p_free_shipping_minimum?: number\n          p_is_active?: boolean\n          p_rule_id?: string\n          p_sort_order?: number\n          p_upazila?: string\n        }\n        Returns: string\n      }\n      calculate_commerce_delivery_fee: {\n        Args: { p_district: string; p_subtotal: number; p_upazila: string }\n        Returns: number\n      }\n      claim_due_feni_brain_sources: {\n        Args: { p_limit?: number }\n        Returns: {\n          auto_publish: boolean\n          etag: string\n          last_modified: string\n          max_bytes: number\n          parser_key: string\n          publisher: string\n          source_id: string\n          title: string\n          trust_tier: number\n          url: string\n        }[]\n      }\n      claim_due_feni_brain_sources_v2: {\n        Args: { p_limit?: number }\n        Returns: {\n          auto_publish: boolean\n          etag: string\n          last_modified: string\n          max_bytes: number\n          parser_key: string\n          publisher: string\n          refresh_interval_hours: number\n          source_id: string\n          title: string\n          trust_tier: number\n          url: string\n        }[]\n      }\n      create_commerce_order: {\n        Args: {\n          p_customer_id?: string\n          p_customer_note?: string\n          p_guest_email?: string\n          p_guest_name?: string\n          p_guest_phone?: string\n          p_items: Json\n          p_shipping_address?: string\n          p_shipping_area?: string\n          p_shipping_district?: string\n          p_shipping_name?: string\n          p_shipping_phone?: string\n          p_shipping_upazila?: string\n        }\n        Returns: {\n          order_id: string\n          order_number: string\n          total_amount: number\n        }[]\n      }\n      create_commerce_return_request: {\n        Args: { p_details?: string; p_order_item_id: string; p_reason: string }\n        Returns: string\n      }\n      create_product_review: {\n        Args: {\n          p_body?: string\n          p_product_id: string\n          p_rating: number\n          p_title?: string\n        }\n        Returns: string\n      }\n      fenix_brain_internal_refresh_secret: { Args: never; Returns: string }\n      generate_commerce_order_number: { Args: never; Returns: string }\n      get_public_vendor_shop: {\n        Args: { p_slug: string }\n        Returns: {\n          business_id: string\n          description_bn: string\n          description_en: string\n          display_name: string\n          display_name_bn: string\n          display_name_en: string\n          id: string\n          is_verified: boolean\n          shop_slug: string\n        }[]\n      }\n      investor_confirm_investment_deal: {\n        Args: { p_deal_id: string }\n        Returns: boolean\n      }\n      is_fenix_admin: { Args: never; Returns: boolean }\n      is_fenix_username_available: {\n        Args: { p_exclude_user_id?: string; p_username: string }\n        Returns: boolean\n      }\n      keyword_feni_brain_chunks: {\n        Args: { match_count?: number; query_text: string }\n        Returns: {\n          content: string\n          document_id: string\n          document_title: string\n          id: string\n          similarity: number\n          source_id: string\n          source_title: string\n          source_url: string\n          trust_tier: number\n        }[]\n      }\n      list_directory_categories: {\n        Args: never\n        Returns: {\n          business_count: number\n          category: string\n        }[]\n      }\n      list_directory_upazilas: {\n        Args: never\n        Returns: {\n          business_count: number\n          upazila: string\n        }[]\n      }\n      mark_investment_message_read: {\n        Args: { p_message_id: string }\n        Returns: boolean\n      }\n      match_businesses: {\n        Args: {\n          match_count: number\n          match_threshold: number\n          query_embedding: string\n        }\n        Returns: {\n          description: string\n          id: string\n          name: string\n          similarity: number\n        }[]\n      }\n      match_feni_brain_chunks: {\n        Args: {\n          match_count?: number\n          match_threshold?: number\n          query_embedding: string\n        }\n        Returns: {\n          content: string\n          document_id: string\n          document_title: string\n          id: string\n          similarity: number\n          source_id: string\n          source_title: string\n          source_url: string\n          trust_tier: number\n        }[]\n      }\n      match_investment_opportunities: {\n        Args: { p_limit?: number }\n        Returns: {\n          category: string\n          district: string\n          match_reasons: string[]\n          match_score: number\n          min_investment: number\n          opportunity_id: string\n          raised_amount: number\n          risk_level: string\n          target_amount: number\n          title_bn: string\n          title_en: string\n          upazila: string\n          verification_status: string\n        }[]\n      }\n      owner_confirm_investment_deal: {\n        Args: { p_deal_id: string }\n        Returns: boolean\n      }\n      owner_progress_investment_deal: {\n        Args: {\n          p_agreed_amount?: number\n          p_deal_id: string\n          p_ownership_percentage?: number\n          p_status: string\n          p_terms_note?: string\n        }\n        Returns: boolean\n      }\n      owner_update_investment_interest: {\n        Args: { p_interest_id: string; p_owner_note?: string; p_status: string }\n        Returns: boolean\n      }\n      record_feni_brain_events: {\n        Args: {\n          p_intent_key: string\n          p_language_code: string\n          p_query_hash: string\n          p_result_count?: number\n          p_terms: string[]\n        }\n        Returns: number\n      }\n      save_business_embedding: {\n        Args: { p_business_id: string; p_embedding: string }\n        Returns: boolean\n      }\n      search_directory_businesses: {\n        Args: {\n          p_category?: string\n          p_limit?: number\n          p_offset?: number\n          p_query?: string\n          p_upazila?: string\n        }\n        Returns: {\n          address: string\n          area: string\n          category: string\n          created_at: string\n          description: string\n          district: string\n          facebook_url: string\n          has_investment: boolean\n          id: string\n          latitude: number\n          listing_status: string\n          location_verified: boolean\n          longitude: number\n          map_label: string\n          market: string\n          name: string\n          owner_claimed: boolean\n          phone: string\n          phone_verified: boolean\n          product_count: number\n          tagline_bn: string\n          tagline_en: string\n          title_bn: string\n          title_en: string\n          upazila: string\n          updated_at: string\n          verification_level: string\n          website_url: string\n          whatsapp: string\n        }[]\n      }\n      search_feni_brain_facts: {\n        Args: { match_count?: number; query_text: string }\n        Returns: {\n          content: string\n          document_id: string\n          document_title: string\n          id: string\n          name_bn: string\n          name_en: string\n          similarity: number\n          source_id: string\n          source_title: string\n          source_url: string\n          subject_key: string\n          trust_tier: number\n          value_number: number\n          value_text: string\n          value_unit: string\n        }[]\n      }\n      search_feni_brain_locations: {\n        Args: { match_count?: number; query_text: string }\n        Returns: {\n          alias: string\n          id: string\n          level: string\n          match_type: string\n          name_bn: string\n          name_en: string\n          slug: string\n        }[]\n      }\n      seller_reply_to_product_review: {\n        Args: { p_response: string; p_review_id: string }\n        Returns: boolean\n      }\n      set_commerce_return_status: {\n        Args: {\n          p_refund_amount?: number\n          p_request_id: string\n          p_resolution_note?: string\n          p_status: string\n        }\n        Returns: boolean\n      }\n      set_product_primary_image: {\n        Args: { p_image_id: string }\n        Returns: boolean\n      }\n      set_vendor_order_status: {\n        Args: { p_order_id: string; p_status: string }\n        Returns: boolean\n      }\n      submit_investment_opportunity: {\n        Args: { p_opportunity_id: string }\n        Returns: boolean\n      }\n      update_vendor_product: {\n        Args: {\n          p_allow_guest_purchase?: boolean\n          p_category_id?: string\n          p_compare_at_price?: number\n          p_description_bn?: string\n          p_description_en?: string\n          p_name_bn: string\n          p_name_en: string\n          p_price?: number\n          p_product_id: string\n          p_sku?: string\n          p_slug: string\n        }\n        Returns: boolean\n      }\n      update_vendor_profile: {\n        Args: {\n          p_description_bn?: string\n          p_description_en?: string\n          p_display_name: string\n          p_display_name_bn?: string\n          p_display_name_en?: string\n          p_phone?: string\n          p_shop_slug?: string\n        }\n        Returns: boolean\n      }\n    }\n    Enums: {\n      [_ in never]: never\n    }\n    CompositeTypes: {\n      [_ in never]: never\n    }\n  }\n}\n\ntype DatabaseWithoutInternals = Omit<Database, \"__InternalSupabase\">\n\ntype DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, \"public\">]\n\nexport type Tables<\n  DefaultSchemaTableNameOrOptions extends\n    | keyof (DefaultSchema[\"Tables\"] & DefaultSchema[\"Views\"])\n    | { schema: keyof DatabaseWithoutInternals },\n  TableName extends (DefaultSchemaTableNameOrOptions extends {\n    schema: keyof DatabaseWithoutInternals\n  }\n    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions[\"schema\"]][\"Tables\"] &\n        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions[\"schema\"]][\"Views\"])\n    : never) = never,\n> = DefaultSchemaTableNameOrOptions extends {\n  schema: keyof DatabaseWithoutInternals\n}\n  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions[\"schema\"]][\"Tables\"] &\n      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions[\"schema\"]][\"Views\"])[TableName] extends {\n      Row: infer R\n    }\n    ? R\n    : never\n  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema[\"Tables\"] &\n        DefaultSchema[\"Views\"])\n    ? (DefaultSchema[\"Tables\"] &\n        DefaultSchema[\"Views\"])[DefaultSchemaTableNameOrOptions] extends {\n        Row: infer R\n      }\n      ? R\n      : never\n    : never\n\nexport type TablesInsert<\n  DefaultSchemaTableNameOrOptions extends\n    | keyof DefaultSchema[\"Tables\"]\n    | { schema: keyof DatabaseWithoutInternals },\n  TableName extends (DefaultSchemaTableNameOrOptions extends {\n    schema: keyof DatabaseWithoutInternals\n  }\n    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions[\"schema\"]][\"Tables\"]\n    : never) = never,\n> = DefaultSchemaTableNameOrOptions extends {\n  schema: keyof DatabaseWithoutInternals\n}\n  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions[\"schema\"]][\"Tables\"][TableName] extends {\n      Insert: infer I\n    }\n    ? I\n    : never\n  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema[\"Tables\"]\n    ? DefaultSchema[\"Tables\"][DefaultSchemaTableNameOrOptions] extends {\n        Insert: infer I\n      }\n      ? I\n      : never\n    : never\n\nexport type TablesUpdate<\n  DefaultSchemaTableNameOrOptions extends\n    | keyof DefaultSchema[\"Tables\"]\n    | { schema: keyof DatabaseWithoutInternals },\n  TableName extends (DefaultSchemaTableNameOrOptions extends {\n    schema: keyof DatabaseWithoutInternals\n  }\n    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions[\"schema\"]][\"Tables\"]\n    : never) = never,\n> = DefaultSchemaTableNameOrOptions extends {\n  schema: keyof DatabaseWithoutInternals\n}\n  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions[\"schema\"]][\"Tables\"][TableName] extends {\n      Update: infer U\n    }\n    ? U\n    : never\n  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema[\"Tables\"]\n    ? DefaultSchema[\"Tables\"][DefaultSchemaTableNameOrOptions] extends {\n        Update: infer U\n      }\n      ? U\n      : never\n    : never\n\nexport type Enums<\n  DefaultSchemaEnumNameOrOptions extends\n    | keyof DefaultSchema[\"Enums\"]\n    | { schema: keyof DatabaseWithoutInternals },\n  EnumName extends (DefaultSchemaEnumNameOrOptions extends {\n    schema: keyof DatabaseWithoutInternals\n  }\n    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions[\"schema\"]][\"Enums\"]\n    : never) = never,\n> = DefaultSchemaEnumNameOrOptions extends {\n  schema: keyof DatabaseWithoutInternals\n}\n  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions[\"schema\"]][\"Enums\"][EnumName]\n  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema[\"Enums\"]\n    ? DefaultSchema[\"Enums\"][DefaultSchemaEnumNameOrOptions]\n    : never\n\nexport type CompositeTypes<\n  PublicCompositeTypeNameOrOptions extends\n    | keyof DefaultSchema[\"CompositeTypes\"]\n    | { schema: keyof DatabaseWithoutInternals },\n  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {\n    schema: keyof DatabaseWithoutInternals\n  }\n    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions[\"schema\"]][\"CompositeTypes\"]\n    : never) = never,\n> = PublicCompositeTypeNameOrOptions extends {\n  schema: keyof DatabaseWithoutInternals\n}\n  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions[\"schema\"]][\"CompositeTypes\"][CompositeTypeName]\n  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema[\"CompositeTypes\"]\n    ? DefaultSchema[\"CompositeTypes\"][PublicCompositeTypeNameOrOptions]\n    : never\n\nexport const Constants = {\n  public: {\n    Enums: {},\n  },\n} as const\n"}
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
+  public: {
+    Tables: {
+      business_claim_requests: {
+        Row: {
+          business_id: string
+          claimant_id: string
+          created_at: string
+          id: string
+          note: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          claimant_id: string
+          created_at?: string
+          id?: string
+          note?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          claimant_id?: string
+          created_at?: string
+          id?: string
+          note?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_claim_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_claimant_id_fkey"
+            columns: ["claimant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_claimant_id_fkey"
+            columns: ["claimant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_claimant_id_fkey"
+            columns: ["claimant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_claimant_id_fkey"
+            columns: ["claimant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_directory_aliases: {
+        Row: {
+          alias: string
+          business_id: string
+          created_at: string
+          id: string
+          language_code: string
+        }
+        Insert: {
+          alias: string
+          business_id: string
+          created_at?: string
+          id?: string
+          language_code?: string
+        }
+        Update: {
+          alias?: string
+          business_id?: string
+          created_at?: string
+          id?: string
+          language_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_directory_aliases_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_directory_contacts: {
+        Row: {
+          business_id: string
+          created_at: string
+          facebook_url: string | null
+          is_phone_public: boolean
+          is_website_public: boolean
+          is_whatsapp_public: boolean
+          phone: string | null
+          updated_at: string
+          website_url: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          facebook_url?: string | null
+          is_phone_public?: boolean
+          is_website_public?: boolean
+          is_whatsapp_public?: boolean
+          phone?: string | null
+          updated_at?: string
+          website_url?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          facebook_url?: string | null
+          is_phone_public?: boolean
+          is_website_public?: boolean
+          is_whatsapp_public?: boolean
+          phone?: string | null
+          updated_at?: string
+          website_url?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_directory_contacts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_directory_locations: {
+        Row: {
+          address: string | null
+          area: string | null
+          business_id: string
+          created_at: string
+          district: string
+          is_public: boolean
+          latitude: number | null
+          location_source: string | null
+          longitude: number | null
+          map_label: string | null
+          market: string | null
+          postal_code: string | null
+          upazila: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          area?: string | null
+          business_id: string
+          created_at?: string
+          district?: string
+          is_public?: boolean
+          latitude?: number | null
+          location_source?: string | null
+          longitude?: number | null
+          map_label?: string | null
+          market?: string | null
+          postal_code?: string | null
+          upazila?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          area?: string | null
+          business_id?: string
+          created_at?: string
+          district?: string
+          is_public?: boolean
+          latitude?: number | null
+          location_source?: string | null
+          longitude?: number | null
+          map_label?: string | null
+          market?: string | null
+          postal_code?: string | null
+          upazila?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_directory_locations_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_directory_profiles: {
+        Row: {
+          about_bn: string | null
+          about_en: string | null
+          business_id: string
+          business_type: string | null
+          created_at: string
+          last_verified_at: string | null
+          listing_status: string
+          location_verified: boolean
+          owner_claimed: boolean
+          phone_verified: boolean
+          slug: string | null
+          tagline_bn: string | null
+          tagline_en: string | null
+          updated_at: string
+          verification_level: string
+        }
+        Insert: {
+          about_bn?: string | null
+          about_en?: string | null
+          business_id: string
+          business_type?: string | null
+          created_at?: string
+          last_verified_at?: string | null
+          listing_status?: string
+          location_verified?: boolean
+          owner_claimed?: boolean
+          phone_verified?: boolean
+          slug?: string | null
+          tagline_bn?: string | null
+          tagline_en?: string | null
+          updated_at?: string
+          verification_level?: string
+        }
+        Update: {
+          about_bn?: string | null
+          about_en?: string | null
+          business_id?: string
+          business_type?: string | null
+          created_at?: string
+          last_verified_at?: string | null
+          listing_status?: string
+          location_verified?: boolean
+          owner_claimed?: boolean
+          phone_verified?: boolean
+          slug?: string | null
+          tagline_bn?: string | null
+          tagline_en?: string | null
+          updated_at?: string
+          verification_level?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_directory_profiles_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_reports: {
+        Row: {
+          business_id: string
+          created_at: string
+          details: string
+          id: string
+          reason: string
+          reporter_id: string
+          resolution_note: string | null
+          resolved_at: string | null
+          reviewer_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          details: string
+          id?: string
+          reason: string
+          reporter_id: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          details?: string
+          id?: string
+          reason?: string
+          reporter_id?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_reports_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_reports_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_reviews: {
+        Row: {
+          admin_note: string | null
+          author_id: string
+          body: string
+          business_id: string
+          created_at: string
+          id: string
+          rating: number
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          author_id: string
+          body: string
+          business_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          author_id?: string
+          body?: string
+          business_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_reviews_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_reviews_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_reviews_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_activity: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          project_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          project_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_activity_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "business_start_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          id: string
+          owner_id: string
+          project_id: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          storage_bucket: string
+          storage_path: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          id?: string
+          owner_id: string
+          project_id: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          storage_bucket?: string
+          storage_path: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          id?: string
+          owner_id?: string
+          project_id?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          storage_bucket?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_documents_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "business_start_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_finance: {
+        Row: {
+          created_at: string
+          emergency_buffer: number
+          equipment: number
+          estimated_monthly_sales: number
+          gross_margin_pct: number
+          id: string
+          interior: number
+          inventory_cost: number
+          license_cost: number
+          marketing_cost: number
+          monthly_fixed_cost: number
+          other_cost: number
+          project_id: string
+          rent: number
+          staff_cost: number
+          transport_cost: number
+          updated_at: string
+          utility_cost: number
+          working_capital: number
+        }
+        Insert: {
+          created_at?: string
+          emergency_buffer?: number
+          equipment?: number
+          estimated_monthly_sales?: number
+          gross_margin_pct?: number
+          id?: string
+          interior?: number
+          inventory_cost?: number
+          license_cost?: number
+          marketing_cost?: number
+          monthly_fixed_cost?: number
+          other_cost?: number
+          project_id: string
+          rent?: number
+          staff_cost?: number
+          transport_cost?: number
+          updated_at?: string
+          utility_cost?: number
+          working_capital?: number
+        }
+        Update: {
+          created_at?: string
+          emergency_buffer?: number
+          equipment?: number
+          estimated_monthly_sales?: number
+          gross_margin_pct?: number
+          id?: string
+          interior?: number
+          inventory_cost?: number
+          license_cost?: number
+          marketing_cost?: number
+          monthly_fixed_cost?: number
+          other_cost?: number
+          project_id?: string
+          rent?: number
+          staff_cost?: number
+          transport_cost?: number
+          updated_at?: string
+          utility_cost?: number
+          working_capital?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_finance_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "business_start_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_legal_items: {
+        Row: {
+          applicability: string
+          created_at: string
+          guidance_bn: string | null
+          guidance_en: string | null
+          id: string
+          is_active: boolean
+          last_verified_at: string | null
+          official_url: string | null
+          sort_order: number
+          source_name: string | null
+          task_key: string
+          title_bn: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          applicability?: string
+          created_at?: string
+          guidance_bn?: string | null
+          guidance_en?: string | null
+          id?: string
+          is_active?: boolean
+          last_verified_at?: string | null
+          official_url?: string | null
+          sort_order?: number
+          source_name?: string | null
+          task_key: string
+          title_bn: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          applicability?: string
+          created_at?: string
+          guidance_bn?: string | null
+          guidance_en?: string | null
+          id?: string
+          is_active?: boolean
+          last_verified_at?: string | null
+          official_url?: string | null
+          sort_order?: number
+          source_name?: string | null
+          task_key?: string
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      business_start_legal_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          legal_item_id: string
+          notes: string | null
+          project_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          legal_item_id: string
+          notes?: string | null
+          project_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          legal_item_id?: string
+          notes?: string | null
+          project_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_legal_progress_legal_item_id_fkey"
+            columns: ["legal_item_id"]
+            isOneToOne: false
+            referencedRelation: "business_start_legal_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_start_legal_progress_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "business_start_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_locations: {
+        Row: {
+          area: string | null
+          created_at: string
+          data_confidence: string
+          district: string
+          id: string
+          market_name: string | null
+          project_id: string
+          selection_reason: string | null
+          upazila: string | null
+          updated_at: string
+        }
+        Insert: {
+          area?: string | null
+          created_at?: string
+          data_confidence?: string
+          district?: string
+          id?: string
+          market_name?: string | null
+          project_id: string
+          selection_reason?: string | null
+          upazila?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area?: string | null
+          created_at?: string
+          data_confidence?: string
+          district?: string
+          id?: string
+          market_name?: string | null
+          project_id?: string
+          selection_reason?: string | null
+          upazila?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_locations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "business_start_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_plans: {
+        Row: {
+          created_at: string
+          customer_profile: string | null
+          id: string
+          marketing: string | null
+          operations: string | null
+          products_services: string | null
+          project_id: string
+          risks: string | null
+          updated_at: string
+          value_proposition: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_profile?: string | null
+          id?: string
+          marketing?: string | null
+          operations?: string | null
+          products_services?: string | null
+          project_id: string
+          risks?: string | null
+          updated_at?: string
+          value_proposition?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_profile?: string | null
+          id?: string
+          marketing?: string | null
+          operations?: string | null
+          products_services?: string | null
+          project_id?: string
+          risks?: string | null
+          updated_at?: string
+          value_proposition?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_plans_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "business_start_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_preferences: {
+        Row: {
+          budget_max: number
+          budget_min: number
+          business_summary: string | null
+          category: string | null
+          created_at: string
+          experience_level: string
+          goal: string
+          id: string
+          project_id: string
+          risk_preference: string
+          updated_at: string
+        }
+        Insert: {
+          budget_max?: number
+          budget_min?: number
+          business_summary?: string | null
+          category?: string | null
+          created_at?: string
+          experience_level?: string
+          goal?: string
+          id?: string
+          project_id: string
+          risk_preference?: string
+          updated_at?: string
+        }
+        Update: {
+          budget_max?: number
+          budget_min?: number
+          business_summary?: string | null
+          category?: string | null
+          created_at?: string
+          experience_level?: string
+          goal?: string
+          id?: string
+          project_id?: string
+          risk_preference?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_preferences_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "business_start_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_projects: {
+        Row: {
+          business_id: string | null
+          business_type: string | null
+          completed_at: string | null
+          created_at: string
+          current_step: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id?: string | null
+          business_type?: string | null
+          completed_at?: string | null
+          created_at?: string
+          current_step?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string | null
+          business_type?: string | null
+          completed_at?: string | null
+          created_at?: string
+          current_step?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_projects_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_tasks: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          description_bn: string | null
+          description_en: string | null
+          id: string
+          priority: string
+          project_id: string
+          sort_order: number
+          stage: string
+          status: string
+          task_key: string
+          title_bn: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          priority?: string
+          project_id: string
+          sort_order?: number
+          stage: string
+          status?: string
+          task_key: string
+          title_bn: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          priority?: string
+          project_id?: string
+          sort_order?: number
+          stage?: string
+          status?: string
+          task_key?: string
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "business_start_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_start_validation: {
+        Row: {
+          competition_status: string
+          created_at: string
+          data_confidence: string
+          demand_status: string
+          evidence_notes: string | null
+          id: string
+          legal_status: string
+          location_status: string
+          project_id: string
+          risks: string | null
+          supplier_status: string
+          updated_at: string
+        }
+        Insert: {
+          competition_status?: string
+          created_at?: string
+          data_confidence?: string
+          demand_status?: string
+          evidence_notes?: string | null
+          id?: string
+          legal_status?: string
+          location_status?: string
+          project_id: string
+          risks?: string | null
+          supplier_status?: string
+          updated_at?: string
+        }
+        Update: {
+          competition_status?: string
+          created_at?: string
+          data_confidence?: string
+          demand_status?: string
+          evidence_notes?: string | null
+          id?: string
+          legal_status?: string
+          location_status?: string
+          project_id?: string
+          risks?: string | null
+          supplier_status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_start_validation_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "business_start_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_verification_requests: {
+        Row: {
+          business_id: string
+          created_at: string
+          evidence_note: string
+          id: string
+          requester_id: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          verification_type: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          evidence_note?: string
+          id?: string
+          requester_id: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          verification_type: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          evidence_note?: string
+          id?: string
+          requester_id?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          verification_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_verification_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          feni_brain_embedding: string | null
+          id: string
+          name: string
+          owner_id: string | null
+          title_bn: string | null
+          title_en: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          feni_brain_embedding?: string | null
+          id?: string
+          name: string
+          owner_id?: string | null
+          title_bn?: string | null
+          title_en?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          feni_brain_embedding?: string | null
+          id?: string
+          name?: string
+          owner_id?: string | null
+          title_bn?: string | null
+          title_en?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_delivery_rules: {
+        Row: {
+          created_at: string
+          district: string | null
+          fee: number
+          free_shipping_minimum: number | null
+          id: string
+          is_active: boolean
+          sort_order: number
+          upazila: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          district?: string | null
+          fee?: number
+          free_shipping_minimum?: number | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          upazila?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          district?: string | null
+          fee?: number
+          free_shipping_minimum?: number | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          upazila?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      commerce_order_vendor_status: {
+        Row: {
+          created_at: string
+          id: string
+          inventory_finalized: boolean
+          order_id: string
+          status: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inventory_finalized?: boolean
+          order_id: string
+          status?: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inventory_finalized?: boolean
+          order_id?: string
+          status?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_order_vendor_status_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_order_vendor_status_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commerce_return_requests: {
+        Row: {
+          created_at: string
+          customer_id: string
+          details: string | null
+          id: string
+          order_id: string
+          order_item_id: string
+          reason: string
+          refund_amount: number | null
+          resolution_note: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          details?: string | null
+          id?: string
+          order_id: string
+          order_item_id: string
+          reason: string
+          refund_amount?: number | null
+          resolution_note?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          details?: string | null
+          id?: string
+          order_id?: string
+          order_item_id?: string
+          reason?: string
+          refund_amount?: number | null
+          resolution_note?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commerce_return_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "commerce_return_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_return_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_return_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_return_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_return_requests_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_ambulance_providers: {
+        Row: {
+          ac_available: boolean
+          ambulance_type: string
+          available_24_7: boolean
+          base_area: string | null
+          created_at: string
+          display_name: string
+          id: string
+          is_verified: boolean
+          owner_id: string | null
+          oxygen_available: boolean
+          phone: string | null
+          service_area: string | null
+          status: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          ac_available?: boolean
+          ambulance_type?: string
+          available_24_7?: boolean
+          base_area?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          is_verified?: boolean
+          owner_id?: string | null
+          oxygen_available?: boolean
+          phone?: string | null
+          service_area?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          ac_available?: boolean
+          ambulance_type?: string
+          available_24_7?: boolean
+          base_area?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_verified?: boolean
+          owner_id?: string | null
+          oxygen_available?: boolean
+          phone?: string | null
+          service_area?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_ambulance_requests: {
+        Row: {
+          ambulance_type: string
+          condition_category: string
+          created_at: string
+          destination_hospital: string | null
+          id: string
+          note: string | null
+          oxygen_needed: boolean
+          pickup_area: string
+          pickup_upazila_id: string | null
+          provider_id: string | null
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ambulance_type?: string
+          condition_category?: string
+          created_at?: string
+          destination_hospital?: string | null
+          id?: string
+          note?: string | null
+          oxygen_needed?: boolean
+          pickup_area: string
+          pickup_upazila_id?: string | null
+          provider_id?: string | null
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ambulance_type?: string
+          condition_category?: string
+          created_at?: string
+          destination_hospital?: string | null
+          id?: string
+          note?: string | null
+          oxygen_needed?: boolean
+          pickup_area?: string
+          pickup_upazila_id?: string | null
+          provider_id?: string | null
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_ambulance_requests_pickup_upazila_id_fkey"
+            columns: ["pickup_upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_ambulance_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_ambulance_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_answers: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          question_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          question_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          question_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_question_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_blood_donors: {
+        Row: {
+          area_text: string | null
+          availability: string
+          blood_group: string
+          created_at: string
+          is_public: boolean
+          last_donation_date: string | null
+          note: string | null
+          preferred_contact: string
+          upazila_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area_text?: string | null
+          availability?: string
+          blood_group: string
+          created_at?: string
+          is_public?: boolean
+          last_donation_date?: string | null
+          note?: string | null
+          preferred_contact?: string
+          upazila_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area_text?: string | null
+          availability?: string
+          blood_group?: string
+          created_at?: string
+          is_public?: boolean
+          last_donation_date?: string | null
+          note?: string | null
+          preferred_contact?: string
+          upazila_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_blood_donors_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_blood_requests: {
+        Row: {
+          area_text: string | null
+          blood_group: string
+          contact_method: string
+          created_at: string
+          hospital_area: string | null
+          hospital_name: string
+          id: string
+          needed_at: string | null
+          note: string | null
+          requester_id: string
+          status: string
+          units: number
+          upazila_id: string | null
+          updated_at: string
+          urgency: string
+        }
+        Insert: {
+          area_text?: string | null
+          blood_group: string
+          contact_method?: string
+          created_at?: string
+          hospital_area?: string | null
+          hospital_name: string
+          id?: string
+          needed_at?: string | null
+          note?: string | null
+          requester_id: string
+          status?: string
+          units: number
+          upazila_id?: string | null
+          updated_at?: string
+          urgency?: string
+        }
+        Update: {
+          area_text?: string | null
+          blood_group?: string
+          contact_method?: string
+          created_at?: string
+          hospital_area?: string | null
+          hospital_name?: string
+          id?: string
+          needed_at?: string | null
+          note?: string | null
+          requester_id?: string
+          status?: string
+          units?: number
+          upazila_id?: string | null
+          updated_at?: string
+          urgency?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_blood_responses: {
+        Row: {
+          created_at: string
+          donor_id: string
+          id: string
+          message: string | null
+          request_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          donor_id: string
+          id?: string
+          message?: string | null
+          request_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          donor_id?: string
+          id?: string
+          message?: string | null
+          request_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_blood_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_blood_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_brain_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string
+          document_id: string
+          embedding: string | null
+          embedding_model: string | null
+          id: string
+          source_locator: string | null
+          status: string
+          token_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          created_at?: string
+          document_id: string
+          embedding?: string | null
+          embedding_model?: string | null
+          id?: string
+          source_locator?: string | null
+          status?: string
+          token_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          document_id?: string
+          embedding?: string | null
+          embedding_model?: string | null
+          id?: string
+          source_locator?: string | null
+          status?: string
+          token_count?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_brain_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_brain_documents: {
+        Row: {
+          content: string
+          created_at: string
+          document_type: string
+          effective_from: string | null
+          effective_until: string | null
+          id: string
+          language_code: string
+          metadata: Json
+          source_id: string
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          document_type?: string
+          effective_from?: string | null
+          effective_until?: string | null
+          id?: string
+          language_code?: string
+          metadata?: Json
+          source_id: string
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          document_type?: string
+          effective_from?: string | null
+          effective_until?: string | null
+          id?: string
+          language_code?: string
+          metadata?: Json
+          source_id?: string
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_brain_documents_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_brain_facts: {
+        Row: {
+          confidence: number
+          created_at: string
+          id: string
+          metadata: Json
+          source_id: string
+          status: string
+          subject_key: string
+          subject_location_id: string | null
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+          value_number: number | null
+          value_text: string | null
+          value_unit: string | null
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          source_id: string
+          status?: string
+          subject_key: string
+          subject_location_id?: string | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+          value_number?: number | null
+          value_text?: string | null
+          value_unit?: string | null
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          source_id?: string
+          status?: string
+          subject_key?: string
+          subject_location_id?: string | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+          value_number?: number | null
+          value_text?: string | null
+          value_unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_brain_facts_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_brain_facts_subject_location_id_fkey"
+            columns: ["subject_location_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_brain_intents: {
+        Row: {
+          created_at: string
+          description: string | null
+          examples: Json
+          intent_key: string
+          is_active: boolean
+          name_bn: string
+          name_en: string
+          priority: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          examples?: Json
+          intent_key: string
+          is_active?: boolean
+          name_bn: string
+          name_en: string
+          priority?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          examples?: Json
+          intent_key?: string
+          is_active?: boolean
+          name_bn?: string
+          name_en?: string
+          priority?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fenix_brain_location_aliases: {
+        Row: {
+          alias: string
+          alias_type: string
+          created_at: string
+          id: string
+          language_code: string
+          location_id: string
+          normalized_alias: string | null
+        }
+        Insert: {
+          alias: string
+          alias_type?: string
+          created_at?: string
+          id?: string
+          language_code?: string
+          location_id: string
+          normalized_alias?: string | null
+        }
+        Update: {
+          alias?: string
+          alias_type?: string
+          created_at?: string
+          id?: string
+          language_code?: string
+          location_id?: string
+          normalized_alias?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_brain_location_aliases_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_brain_locations: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          level: string
+          metadata: Json
+          name_bn: string
+          name_en: string | null
+          official_code: string | null
+          parent_id: string | null
+          slug: string
+          source_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level: string
+          metadata?: Json
+          name_bn: string
+          name_en?: string | null
+          official_code?: string | null
+          parent_id?: string | null
+          slug: string
+          source_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level?: string
+          metadata?: Json
+          name_bn?: string
+          name_en?: string | null
+          official_code?: string | null
+          parent_id?: string | null
+          slug?: string
+          source_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_brain_locations_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_brain_locations_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_brain_pulse_intents_public: {
+        Row: {
+          intent_key: string
+          searches_30d: number
+          searches_7d: number
+        }
+        Insert: {
+          intent_key: string
+          searches_30d?: number
+          searches_7d?: number
+        }
+        Update: {
+          intent_key?: string
+          searches_30d?: number
+          searches_7d?: number
+        }
+        Relationships: []
+      }
+      fenix_brain_pulse_terms_public: {
+        Row: {
+          searches_30d: number
+          searches_7d: number
+          term: string
+          unique_queries_7d: number
+        }
+        Insert: {
+          searches_30d?: number
+          searches_7d?: number
+          term: string
+          unique_queries_7d?: number
+        }
+        Update: {
+          searches_30d?: number
+          searches_7d?: number
+          term?: string
+          unique_queries_7d?: number
+        }
+        Relationships: []
+      }
+      fenix_brain_query_events: {
+        Row: {
+          created_at: string
+          id: string
+          intent_key: string
+          language_code: string
+          query_hash: string
+          result_count: number
+          term: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intent_key?: string
+          language_code?: string
+          query_hash: string
+          result_count?: number
+          term: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intent_key?: string
+          language_code?: string
+          query_hash?: string
+          result_count?: number
+          term?: string
+        }
+        Relationships: []
+      }
+      fenix_brain_query_terms: {
+        Row: {
+          created_at: string
+          id: string
+          intent_key: string
+          language_code: string
+          term: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intent_key: string
+          language_code?: string
+          term: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intent_key?: string
+          language_code?: string
+          term?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_brain_query_terms_intent_key_fkey"
+            columns: ["intent_key"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_intents"
+            referencedColumns: ["intent_key"]
+          },
+        ]
+      }
+      fenix_brain_source_refresh: {
+        Row: {
+          auto_publish: boolean
+          created_at: string
+          enabled: boolean
+          etag: string | null
+          last_checked_at: string | null
+          last_content_hash: string | null
+          last_error: string | null
+          last_http_status: number | null
+          last_modified: string | null
+          last_success_at: string | null
+          max_bytes: number
+          next_refresh_at: string
+          parser_key: string
+          refresh_interval_hours: number
+          source_id: string
+          updated_at: string
+        }
+        Insert: {
+          auto_publish?: boolean
+          created_at?: string
+          enabled?: boolean
+          etag?: string | null
+          last_checked_at?: string | null
+          last_content_hash?: string | null
+          last_error?: string | null
+          last_http_status?: number | null
+          last_modified?: string | null
+          last_success_at?: string | null
+          max_bytes?: number
+          next_refresh_at?: string
+          parser_key?: string
+          refresh_interval_hours?: number
+          source_id: string
+          updated_at?: string
+        }
+        Update: {
+          auto_publish?: boolean
+          created_at?: string
+          enabled?: boolean
+          etag?: string | null
+          last_checked_at?: string | null
+          last_content_hash?: string | null
+          last_error?: string | null
+          last_http_status?: number | null
+          last_modified?: string | null
+          last_success_at?: string | null
+          max_bytes?: number
+          next_refresh_at?: string
+          parser_key?: string
+          refresh_interval_hours?: number
+          source_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_brain_source_refresh_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_brain_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_brain_sources: {
+        Row: {
+          content_hash: string | null
+          created_at: string
+          effective_from: string | null
+          effective_until: string | null
+          id: string
+          language_code: string
+          metadata: Json
+          published_at: string | null
+          publisher: string
+          source_type: string
+          status: string
+          title: string
+          trust_tier: number
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          content_hash?: string | null
+          created_at?: string
+          effective_from?: string | null
+          effective_until?: string | null
+          id?: string
+          language_code?: string
+          metadata?: Json
+          published_at?: string | null
+          publisher: string
+          source_type: string
+          status?: string
+          title: string
+          trust_tier?: number
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          content_hash?: string | null
+          created_at?: string
+          effective_from?: string | null
+          effective_until?: string | null
+          id?: string
+          language_code?: string
+          metadata?: Json
+          published_at?: string | null
+          publisher?: string
+          source_type?: string
+          status?: string
+          title?: string
+          trust_tier?: number
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      fenix_brain_update_candidates: {
+        Row: {
+          change_summary: string | null
+          content_hash: string
+          discovered_at: string
+          extracted_content: string
+          id: string
+          metadata: Json
+          previous_hash: string | null
+          published_document_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source_id: string
+          source_url: string | null
+          status: string
+          title: string
+        }
+        Insert: {
+          change_summary?: string | null
+          content_hash: string
+          discovered_at?: string
+          extracted_content: string
+          id?: string
+          metadata?: Json
+          previous_hash?: string | null
+          published_document_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_id: string
+          source_url?: string | null
+          status?: string
+          title: string
+        }
+        Update: {
+          change_summary?: string | null
+          content_hash?: string
+          discovered_at?: string
+          extracted_content?: string
+          id?: string
+          metadata?: Json
+          previous_hash?: string | null
+          published_document_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_id?: string
+          source_url?: string | null
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_brain_update_candidates_published_document_id_fkey"
+            columns: ["published_document_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_brain_update_candidates_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_brain_update_runs: {
+        Row: {
+          bytes_read: number | null
+          completed_at: string | null
+          content_hash: string | null
+          error: string | null
+          http_status: number | null
+          id: string
+          metadata: Json
+          source_id: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          bytes_read?: number | null
+          completed_at?: string | null
+          content_hash?: string | null
+          error?: string | null
+          http_status?: number | null
+          id?: string
+          metadata?: Json
+          source_id: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          bytes_read?: number | null
+          completed_at?: string | null
+          content_hash?: string | null
+          error?: string | null
+          http_status?: number | null
+          id?: string
+          metadata?: Json
+          source_id?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_brain_update_runs_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_content_bookmarks: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_content_comments: {
+        Row: {
+          author_id: string
+          body: string
+          content_id: string
+          content_type: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          content_id: string
+          content_type: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_content_reports: {
+        Row: {
+          admin_note: string | null
+          content_id: string
+          content_type: string
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          admin_note?: string | null
+          content_id: string
+          content_type: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          admin_note?: string | null
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_content_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_content_votes: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          user_id: string
+          value?: number
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_direct_messages: {
+        Row: {
+          attachment_name: string | null
+          attachment_path: string | null
+          attachment_size: number | null
+          attachment_type: string | null
+          body: string
+          created_at: string
+          deleted_for_recipient_at: string | null
+          deleted_for_sender_at: string | null
+          edited_at: string | null
+          id: string
+          message_type: string
+          metadata: Json
+          read_at: string | null
+          recipient_id: string
+          reply_to_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
+          body: string
+          created_at?: string
+          deleted_for_recipient_at?: string | null
+          deleted_for_sender_at?: string | null
+          edited_at?: string | null
+          id?: string
+          message_type?: string
+          metadata?: Json
+          read_at?: string | null
+          recipient_id: string
+          reply_to_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          attachment_name?: string | null
+          attachment_path?: string | null
+          attachment_size?: number | null
+          attachment_type?: string | null
+          body?: string
+          created_at?: string
+          deleted_for_recipient_at?: string | null
+          deleted_for_sender_at?: string | null
+          edited_at?: string | null
+          id?: string
+          message_type?: string
+          metadata?: Json
+          read_at?: string | null
+          recipient_id?: string
+          reply_to_id?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_direct_messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_direct_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_dm_blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_feature_flags: {
+        Row: {
+          description: string | null
+          enabled: boolean
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          description?: string | null
+          enabled?: boolean
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fenix_job_applications: {
+        Row: {
+          applicant_id: string
+          cover_note: string | null
+          created_at: string
+          employer_note: string | null
+          id: string
+          job_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          cover_note?: string | null
+          created_at?: string
+          employer_note?: string | null
+          id?: string
+          job_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          cover_note?: string | null
+          created_at?: string
+          employer_note?: string | null
+          id?: string
+          job_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_jobs: {
+        Row: {
+          application_deadline: string | null
+          business_id: string | null
+          created_at: string
+          currency: string
+          description: string
+          district: string
+          employment_type: string
+          external_apply_url: string | null
+          id: string
+          location_text: string | null
+          owner_id: string
+          published_at: string | null
+          salary_max: number | null
+          salary_min: number | null
+          status: string
+          title: string
+          upazila: string | null
+          updated_at: string
+          verification_note: string | null
+          verification_status: string
+          workplace_type: string
+        }
+        Insert: {
+          application_deadline?: string | null
+          business_id?: string | null
+          created_at?: string
+          currency?: string
+          description: string
+          district?: string
+          employment_type?: string
+          external_apply_url?: string | null
+          id?: string
+          location_text?: string | null
+          owner_id: string
+          published_at?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
+          title: string
+          upazila?: string | null
+          updated_at?: string
+          verification_note?: string | null
+          verification_status?: string
+          workplace_type?: string
+        }
+        Update: {
+          application_deadline?: string | null
+          business_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string
+          district?: string
+          employment_type?: string
+          external_apply_url?: string | null
+          id?: string
+          location_text?: string | null
+          owner_id?: string
+          published_at?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
+          title?: string
+          upazila?: string | null
+          updated_at?: string
+          verification_note?: string | null
+          verification_status?: string
+          workplace_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_jobs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_message_pins: {
+        Row: {
+          created_at: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_message_pins_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_direct_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_message_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_message_reactions: {
+        Row: {
+          created_at: string
+          message_id: string
+          reaction: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          message_id: string
+          reaction: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          message_id?: string
+          reaction?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_direct_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          href: string | null
+          id: string
+          kind: string
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          href?: string | null
+          id?: string
+          kind?: string
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          href?: string | null
+          id?: string
+          kind?: string
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_post_media: {
+        Row: {
+          author_id: string
+          byte_size: number
+          created_at: string
+          height: number | null
+          id: string
+          mime_type: string
+          optimization_version: string
+          post_id: string
+          sort_order: number
+          source_byte_size: number | null
+          source_digest: string | null
+          storage_bucket: string
+          storage_path: string
+          width: number | null
+        }
+        Insert: {
+          author_id: string
+          byte_size: number
+          created_at?: string
+          height?: number | null
+          id?: string
+          mime_type: string
+          optimization_version?: string
+          post_id: string
+          sort_order?: number
+          source_byte_size?: number | null
+          source_digest?: string | null
+          storage_bucket?: string
+          storage_path: string
+          width?: number | null
+        }
+        Update: {
+          author_id?: string
+          byte_size?: number
+          created_at?: string
+          height?: number | null
+          id?: string
+          mime_type?: string
+          optimization_version?: string
+          post_id?: string
+          sort_order?: number
+          source_byte_size?: number | null
+          source_digest?: string | null
+          storage_bucket?: string
+          storage_path?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_posts: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_profile_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_questions: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          title: string
+          topic_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          title: string
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          title?: string
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_topic_follows: {
+        Row: {
+          created_at: string
+          topic_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          topic_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          topic_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_topic_follows_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_topics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_topics: {
+        Row: {
+          created_at: string
+          description_bn: string | null
+          description_en: string | null
+          id: string
+          name_bn: string
+          name_en: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          name_bn: string
+          name_en: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          name_bn?: string
+          name_en?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      fenix_user_moderation: {
+        Row: {
+          banned_until: string | null
+          changed_at: string
+          changed_by: string | null
+          reason: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          banned_until?: string | null
+          changed_at?: string
+          changed_by?: string | null
+          reason?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          banned_until?: string | null
+          changed_at?: string
+          changed_by?: string | null
+          reason?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_user_moderation_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory: {
+        Row: {
+          id: string
+          low_stock_threshold: number
+          product_id: string
+          quantity: number
+          reserved_quantity: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          low_stock_threshold?: number
+          product_id: string
+          quantity?: number
+          reserved_quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          low_stock_threshold?: number
+          product_id?: string
+          quantity?: number
+          reserved_quantity?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "commerce_public_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json
+          entity_id: string | null
+          entity_type: string
+          id: string
+          opportunity_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          opportunity_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          opportunity_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_audit_logs_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_deals: {
+        Row: {
+          agreed_amount: number
+          completed_at: string | null
+          created_at: string
+          funded_at: string | null
+          id: string
+          investor_confirmed_at: string | null
+          investor_id: string
+          opportunity_id: string
+          owner_confirmed_at: string | null
+          ownership_percentage: number | null
+          started_at: string | null
+          status: string
+          structure: string
+          terms_note: string | null
+          updated_at: string
+        }
+        Insert: {
+          agreed_amount: number
+          completed_at?: string | null
+          created_at?: string
+          funded_at?: string | null
+          id?: string
+          investor_confirmed_at?: string | null
+          investor_id: string
+          opportunity_id: string
+          owner_confirmed_at?: string | null
+          ownership_percentage?: number | null
+          started_at?: string | null
+          status?: string
+          structure?: string
+          terms_note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agreed_amount?: number
+          completed_at?: string | null
+          created_at?: string
+          funded_at?: string | null
+          id?: string
+          investor_confirmed_at?: string | null
+          investor_id?: string
+          opportunity_id?: string
+          owner_confirmed_at?: string | null
+          ownership_percentage?: number | null
+          started_at?: string | null
+          status?: string
+          structure?: string
+          terms_note?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_deals_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          id: string
+          opportunity_id: string
+          owner_id: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          storage_bucket: string
+          storage_path: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          id?: string
+          opportunity_id: string
+          owner_id: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          storage_bucket?: string
+          storage_path: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          id?: string
+          opportunity_id?: string
+          owner_id?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          storage_bucket?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_documents_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_due_diligence_checks: {
+        Row: {
+          check_key: string
+          created_at: string
+          id: string
+          investor_id: string
+          note: string | null
+          opportunity_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          check_key: string
+          created_at?: string
+          id?: string
+          investor_id: string
+          note?: string | null
+          opportunity_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          check_key?: string
+          created_at?: string
+          id?: string
+          investor_id?: string
+          note?: string | null
+          opportunity_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_interests: {
+        Row: {
+          created_at: string
+          id: string
+          investor_id: string
+          message: string | null
+          offered_amount: number
+          opportunity_id: string
+          owner_note: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          investor_id: string
+          message?: string | null
+          offered_amount: number
+          opportunity_id: string
+          owner_note?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          investor_id?: string
+          message?: string | null
+          offered_amount?: number
+          opportunity_id?: string
+          owner_note?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_interests_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_messages: {
+        Row: {
+          body: string
+          created_at: string
+          deal_id: string | null
+          id: string
+          opportunity_id: string
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          deal_id?: string | null
+          id?: string
+          opportunity_id: string
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          deal_id?: string | null
+          id?: string
+          opportunity_id?: string
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_messages_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "investment_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_messages_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_opportunities: {
+        Row: {
+          business_id: string | null
+          category: string
+          created_at: string
+          description_bn: string
+          description_en: string
+          district: string
+          expected_return_pct: number | null
+          expected_term_months: number | null
+          funding_deadline: string | null
+          id: string
+          location_details: string | null
+          min_investment: number
+          offer_type: string
+          owner_id: string
+          ownership_percentage: number | null
+          raised_amount: number
+          risk_disclosure: string | null
+          risk_level: string
+          shariah_preference: string
+          status: string
+          target_amount: number
+          title_bn: string
+          title_en: string
+          upazila: string | null
+          updated_at: string
+          verification_note: string | null
+          verification_status: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          business_id?: string | null
+          category: string
+          created_at?: string
+          description_bn: string
+          description_en: string
+          district?: string
+          expected_return_pct?: number | null
+          expected_term_months?: number | null
+          funding_deadline?: string | null
+          id?: string
+          location_details?: string | null
+          min_investment: number
+          offer_type?: string
+          owner_id: string
+          ownership_percentage?: number | null
+          raised_amount?: number
+          risk_disclosure?: string | null
+          risk_level?: string
+          shariah_preference?: string
+          status?: string
+          target_amount: number
+          title_bn: string
+          title_en: string
+          upazila?: string | null
+          updated_at?: string
+          verification_note?: string | null
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          business_id?: string | null
+          category?: string
+          created_at?: string
+          description_bn?: string
+          description_en?: string
+          district?: string
+          expected_return_pct?: number | null
+          expected_term_months?: number | null
+          funding_deadline?: string | null
+          id?: string
+          location_details?: string | null
+          min_investment?: number
+          offer_type?: string
+          owner_id?: string
+          ownership_percentage?: number | null
+          raised_amount?: number
+          risk_disclosure?: string | null
+          risk_level?: string
+          shariah_preference?: string
+          status?: string
+          target_amount?: number
+          title_bn?: string
+          title_en?: string
+          upazila?: string | null
+          updated_at?: string
+          verification_note?: string | null
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_opportunities_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          horizon_months: number | null
+          investor_type: string
+          max_budget: number
+          min_budget: number
+          preferred_sectors: string[]
+          preferred_upazilas: string[]
+          risk_preference: string
+          shariah_preference: string
+          updated_at: string
+          user_id: string
+          verification_note: string | null
+          verification_status: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          horizon_months?: number | null
+          investor_type?: string
+          max_budget?: number
+          min_budget?: number
+          preferred_sectors?: string[]
+          preferred_upazilas?: string[]
+          risk_preference?: string
+          shariah_preference?: string
+          updated_at?: string
+          user_id: string
+          verification_note?: string | null
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          horizon_months?: number | null
+          investor_type?: string
+          max_budget?: number
+          min_budget?: number
+          preferred_sectors?: string[]
+          preferred_upazilas?: string[]
+          risk_preference?: string
+          shariah_preference?: string
+          updated_at?: string
+          user_id?: string
+          verification_note?: string | null
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
+      investment_reports: {
+        Row: {
+          created_at: string
+          details: string
+          id: string
+          opportunity_id: string
+          reason: string
+          reporter_id: string
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          details: string
+          id?: string
+          opportunity_id: string
+          reason: string
+          reporter_id: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string
+          id?: string
+          opportunity_id?: string
+          reason?: string
+          reporter_id?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_reports_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_updates: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          customers_actual: number | null
+          id: string
+          opportunity_id: string
+          period_label: string | null
+          profit_actual: number | null
+          return_actual_pct: number | null
+          revenue_actual: number | null
+          risk_note: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          customers_actual?: number | null
+          id?: string
+          opportunity_id: string
+          period_label?: string | null
+          profit_actual?: number | null
+          return_actual_pct?: number | null
+          revenue_actual?: number | null
+          risk_note?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          customers_actual?: number | null
+          id?: string
+          opportunity_id?: string
+          period_label?: string | null
+          profit_actual?: number | null
+          return_actual_pct?: number | null
+          revenue_actual?: number | null
+          risk_note?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_updates_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      news_posts: {
+        Row: {
+          author_id: string | null
+          automation_status: string
+          breaking: boolean
+          category: string
+          content_bn: string
+          content_en: string
+          created_at: string
+          discovered_at: string
+          excerpt_bn: string | null
+          excerpt_en: string | null
+          featured: boolean
+          id: string
+          image_url: string | null
+          published_at: string | null
+          slug: string
+          source_item_key: string | null
+          source_name: string | null
+          source_published_at: string | null
+          source_url: string | null
+          status: string
+          title_bn: string
+          title_en: string
+          updated_at: string
+          verification_status: string
+        }
+        Insert: {
+          author_id?: string | null
+          automation_status?: string
+          breaking?: boolean
+          category: string
+          content_bn: string
+          content_en: string
+          created_at?: string
+          discovered_at?: string
+          excerpt_bn?: string | null
+          excerpt_en?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          slug: string
+          source_item_key?: string | null
+          source_name?: string | null
+          source_published_at?: string | null
+          source_url?: string | null
+          status?: string
+          title_bn: string
+          title_en: string
+          updated_at?: string
+          verification_status?: string
+        }
+        Update: {
+          author_id?: string | null
+          automation_status?: string
+          breaking?: boolean
+          category?: string
+          content_bn?: string
+          content_en?: string
+          created_at?: string
+          discovered_at?: string
+          excerpt_bn?: string | null
+          excerpt_en?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          slug?: string
+          source_item_key?: string | null
+          source_name?: string | null
+          source_published_at?: string | null
+          source_url?: string | null
+          status?: string
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+          verification_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          discount_amount: number
+          id: string
+          line_total: number
+          order_id: string
+          product_id: string | null
+          product_name: string
+          product_sku: string | null
+          quantity: number
+          unit_price: number
+          vendor_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          line_total: number
+          order_id: string
+          product_id?: string | null
+          product_name: string
+          product_sku?: string | null
+          quantity: number
+          unit_price: number
+          vendor_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          line_total?: number
+          order_id?: string
+          product_id?: string | null
+          product_name?: string
+          product_sku?: string | null
+          quantity?: number
+          unit_price?: number
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_public_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          currency: string
+          customer_id: string | null
+          customer_note: string | null
+          delivery_fee: number
+          discount_amount: number
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          id: string
+          order_number: string
+          payment_method: string
+          payment_status: string
+          shipping_address: string
+          shipping_area: string | null
+          shipping_district: string | null
+          shipping_name: string
+          shipping_phone: string
+          shipping_upazila: string | null
+          status: string
+          subtotal: number
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          customer_note?: string | null
+          delivery_fee?: number
+          discount_amount?: number
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          id?: string
+          order_number?: string
+          payment_method?: string
+          payment_status?: string
+          shipping_address: string
+          shipping_area?: string | null
+          shipping_district?: string | null
+          shipping_name: string
+          shipping_phone: string
+          shipping_upazila?: string | null
+          status?: string
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          customer_note?: string | null
+          delivery_fee?: number
+          discount_amount?: number
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          id?: string
+          order_number?: string
+          payment_method?: string
+          payment_status?: string
+          shipping_address?: string
+          shipping_area?: string | null
+          shipping_district?: string | null
+          shipping_name?: string
+          shipping_phone?: string
+          shipping_upazila?: string | null
+          status?: string
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_categories: {
+        Row: {
+          created_at: string
+          description_bn: string | null
+          description_en: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name_bn: string | null
+          name_en: string | null
+          parent_id: string | null
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name_bn?: string | null
+          name_en?: string | null
+          parent_id?: string | null
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name_bn?: string | null
+          name_en?: string | null
+          parent_id?: string | null
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_images: {
+        Row: {
+          alt_text_bn: string | null
+          alt_text_en: string | null
+          byte_size: number | null
+          created_at: string
+          height: number | null
+          id: string
+          is_primary: boolean
+          optimization_version: string
+          product_id: string
+          sort_order: number
+          source_byte_size: number | null
+          source_digest: string | null
+          storage_bucket: string
+          storage_path: string
+          width: number | null
+        }
+        Insert: {
+          alt_text_bn?: string | null
+          alt_text_en?: string | null
+          byte_size?: number | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          is_primary?: boolean
+          optimization_version?: string
+          product_id: string
+          sort_order?: number
+          source_byte_size?: number | null
+          source_digest?: string | null
+          storage_bucket?: string
+          storage_path: string
+          width?: number | null
+        }
+        Update: {
+          alt_text_bn?: string | null
+          alt_text_en?: string | null
+          byte_size?: number | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          is_primary?: boolean
+          optimization_version?: string
+          product_id?: string
+          sort_order?: number
+          source_byte_size?: number | null
+          source_digest?: string | null
+          storage_bucket?: string
+          storage_path?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_public_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_reviews: {
+        Row: {
+          body: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          order_id: string
+          product_id: string
+          rating: number
+          seller_responded_at: string | null
+          seller_response: string | null
+          status: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          order_id: string
+          product_id: string
+          rating: number
+          seller_responded_at?: string | null
+          seller_response?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          order_id?: string
+          product_id?: string
+          rating?: number
+          seller_responded_at?: string | null
+          seller_response?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "product_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "commerce_public_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          allow_guest_purchase: boolean
+          business_id: string | null
+          category_id: string | null
+          compare_at_price: number | null
+          created_at: string
+          currency: string
+          description_bn: string | null
+          description_en: string | null
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          name_bn: string | null
+          name_en: string | null
+          price: number
+          sku: string | null
+          slug: string
+          status: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          allow_guest_purchase?: boolean
+          business_id?: string | null
+          category_id?: string | null
+          compare_at_price?: number | null
+          created_at?: string
+          currency?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          name_bn?: string | null
+          name_en?: string | null
+          price: number
+          sku?: string | null
+          slug: string
+          status?: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          allow_guest_purchase?: boolean
+          business_id?: string | null
+          category_id?: string | null
+          compare_at_price?: number | null
+          created_at?: string
+          currency?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          name_bn?: string | null
+          name_en?: string | null
+          price?: number
+          sku?: string | null
+          slug?: string
+          status?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_contacts: {
+        Row: {
+          created_at: string
+          facebook_public: boolean
+          facebook_url: string | null
+          instagram_public: boolean
+          instagram_url: string | null
+          linkedin_public: boolean
+          linkedin_url: string | null
+          phone_public: boolean
+          public_facebook_url: string | null
+          public_instagram_url: string | null
+          public_linkedin_url: string | null
+          public_whatsapp: string | null
+          public_youtube_url: string | null
+          updated_at: string
+          user_id: string
+          whatsapp: string | null
+          whatsapp_public: boolean
+          youtube_public: boolean
+          youtube_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          facebook_public?: boolean
+          facebook_url?: string | null
+          instagram_public?: boolean
+          instagram_url?: string | null
+          linkedin_public?: boolean
+          linkedin_url?: string | null
+          phone_public?: boolean
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_whatsapp?: string | null
+          public_youtube_url?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp?: string | null
+          whatsapp_public?: boolean
+          youtube_public?: boolean
+          youtube_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          facebook_public?: boolean
+          facebook_url?: string | null
+          instagram_public?: boolean
+          instagram_url?: string | null
+          linkedin_public?: boolean
+          linkedin_url?: string | null
+          phone_public?: boolean
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_whatsapp?: string | null
+          public_youtube_url?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string | null
+          whatsapp_public?: boolean
+          youtube_public?: boolean
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_settings: {
+        Row: {
+          feed_visibility: string
+          interests: string[]
+          locale: string
+          message_permissions: string
+          notification_preferences: Json
+          onboarding_completed: boolean
+          onboarding_dismissed: boolean
+          onboarding_step: string
+          profile_visibility: string
+          reduced_motion: boolean
+          theme: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          feed_visibility?: string
+          interests?: string[]
+          locale?: string
+          message_permissions?: string
+          notification_preferences?: Json
+          onboarding_completed?: boolean
+          onboarding_dismissed?: boolean
+          onboarding_step?: string
+          profile_visibility?: string
+          reduced_motion?: boolean
+          theme?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          feed_visibility?: string
+          interests?: string[]
+          locale?: string
+          message_permissions?: string
+          notification_preferences?: Json
+          onboarding_completed?: boolean
+          onboarding_dismissed?: boolean
+          onboarding_step?: string
+          profile_visibility?: string
+          reduced_motion?: boolean
+          theme?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "profile_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          area_text: string | null
+          avatar_url: string | null
+          bio: string | null
+          country_code: string
+          cover_url: string | null
+          created_at: string
+          district_id: string | null
+          exact_location_visibility: string
+          facebook_url: string | null
+          feed_public: boolean
+          full_name: string | null
+          holding_no: string | null
+          house_details: string | null
+          id: string
+          instagram_url: string | null
+          is_public: boolean
+          locality_id: string | null
+          location_public_level: string
+          location_text: string | null
+          phone: string | null
+          road_text: string | null
+          role: string | null
+          upazila_id: string | null
+          updated_at: string
+          username: string | null
+          website_url: string | null
+          whatsapp_url: string | null
+        }
+        Insert: {
+          area_text?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          country_code?: string
+          cover_url?: string | null
+          created_at?: string
+          district_id?: string | null
+          exact_location_visibility?: string
+          facebook_url?: string | null
+          feed_public?: boolean
+          full_name?: string | null
+          holding_no?: string | null
+          house_details?: string | null
+          id: string
+          instagram_url?: string | null
+          is_public?: boolean
+          locality_id?: string | null
+          location_public_level?: string
+          location_text?: string | null
+          phone?: string | null
+          road_text?: string | null
+          role?: string | null
+          upazila_id?: string | null
+          updated_at?: string
+          username?: string | null
+          website_url?: string | null
+          whatsapp_url?: string | null
+        }
+        Update: {
+          area_text?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          country_code?: string
+          cover_url?: string | null
+          created_at?: string
+          district_id?: string | null
+          exact_location_visibility?: string
+          facebook_url?: string | null
+          feed_public?: boolean
+          full_name?: string | null
+          holding_no?: string | null
+          house_details?: string | null
+          id?: string
+          instagram_url?: string | null
+          is_public?: boolean
+          locality_id?: string | null
+          location_public_level?: string
+          location_text?: string | null
+          phone?: string | null
+          road_text?: string | null
+          role?: string | null
+          upazila_id?: string | null
+          updated_at?: string
+          username?: string | null
+          website_url?: string | null
+          whatsapp_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_locality_id_fkey"
+            columns: ["locality_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_profiles: {
+        Row: {
+          business_id: string | null
+          created_at: string
+          description_bn: string | null
+          description_en: string | null
+          display_name: string
+          display_name_bn: string | null
+          display_name_en: string | null
+          id: string
+          is_verified: boolean
+          phone: string | null
+          shop_slug: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id?: string | null
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          display_name: string
+          display_name_bn?: string | null
+          display_name_en?: string | null
+          id?: string
+          is_verified?: boolean
+          phone?: string | null
+          shop_slug?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string | null
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          display_name?: string
+          display_name_bn?: string | null
+          display_name_en?: string | null
+          id?: string
+          is_verified?: boolean
+          phone?: string | null
+          shop_slug?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_profiles_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "vendor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      commerce_public_products: {
+        Row: {
+          allow_guest_purchase: boolean | null
+          category_id: string | null
+          compare_at_price: number | null
+          created_at: string | null
+          currency: string | null
+          description_bn: string | null
+          description_en: string | null
+          id: string | null
+          image_alt_bn: string | null
+          image_alt_en: string | null
+          image_bucket: string | null
+          image_id: string | null
+          image_path: string | null
+          is_featured: boolean | null
+          name_bn: string | null
+          name_en: string | null
+          price: number | null
+          shop_slug: string | null
+          sku: string | null
+          slug: string | null
+          vendor_display_name: string | null
+          vendor_display_name_bn: string | null
+          vendor_display_name_en: string | null
+          vendor_id: string | null
+          vendor_is_verified: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_brain_pulse_intents: {
+        Row: {
+          intent_key: string | null
+          searches_30d: number | null
+          searches_7d: number | null
+        }
+        Relationships: []
+      }
+      fenix_brain_pulse_terms: {
+        Row: {
+          searches_30d: number | null
+          searches_7d: number | null
+          term: string | null
+          unique_queries_7d: number | null
+        }
+        Relationships: []
+      }
+      fenix_public_ambulance_providers: {
+        Row: {
+          ac_available: boolean | null
+          ambulance_type: string | null
+          available_24_7: boolean | null
+          base_area: string | null
+          display_name: string | null
+          id: string | null
+          is_verified: boolean | null
+          oxygen_available: boolean | null
+          phone: string | null
+          service_area: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          ac_available?: boolean | null
+          ambulance_type?: string | null
+          available_24_7?: boolean | null
+          base_area?: string | null
+          display_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          oxygen_available?: boolean | null
+          phone?: string | null
+          service_area?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          ac_available?: boolean | null
+          ambulance_type?: string | null
+          available_24_7?: boolean | null
+          base_area?: string | null
+          display_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          oxygen_available?: boolean | null
+          phone?: string | null
+          service_area?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_answer_feed: {
+        Row: {
+          author_avatar_url: string | null
+          author_id: string | null
+          author_name: string | null
+          author_username: string | null
+          body: string | null
+          created_at: string | null
+          id: string | null
+          question_id: string | null
+          score: number | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_question_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_public_blood_donors: {
+        Row: {
+          area_text: string | null
+          availability: string | null
+          avatar_url: string | null
+          blood_group: string | null
+          full_name: string | null
+          last_donation_date: string | null
+          preferred_contact: string | null
+          upazila_bn: string | null
+          upazila_en: string | null
+          username: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_blood_requests: {
+        Row: {
+          area_text: string | null
+          blood_group: string | null
+          created_at: string | null
+          hospital_area: string | null
+          hospital_name: string | null
+          id: string | null
+          needed_at: string | null
+          status: string | null
+          units: number | null
+          upazila_bn: string | null
+          upazila_en: string | null
+          urgency: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_feed: {
+        Row: {
+          author_avatar_url: string | null
+          author_id: string | null
+          author_name: string | null
+          author_username: string | null
+          body: string | null
+          created_at: string | null
+          id: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          cover_url: string | null
+          created_at: string | null
+          facebook_url: string | null
+          full_name: string | null
+          id: string | null
+          instagram_url: string | null
+          location_text: string | null
+          username: string | null
+          website_url: string | null
+          whatsapp_url: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_profiles_v2: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          cover_url: string | null
+          created_at: string | null
+          facebook_url: string | null
+          full_name: string | null
+          id: string | null
+          instagram_url: string | null
+          location_text: string | null
+          username: string | null
+          website_url: string | null
+          whatsapp_url: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_question_feed: {
+        Row: {
+          answer_count: number | null
+          author_avatar_url: string | null
+          author_id: string | null
+          author_name: string | null
+          author_username: string | null
+          body: string | null
+          created_at: string | null
+          id: string | null
+          score: number | null
+          title: string | null
+          topic_id: string | null
+          topic_name_bn: string | null
+          topic_name_en: string | null
+          topic_slug: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Functions: {
+      admin_delete_delivery_rule: {
+        Args: { p_rule_id: string }
+        Returns: boolean
+      }
+      admin_set_order_payment_status: {
+        Args: { p_order_id: string; p_payment_status: string }
+        Returns: boolean
+      }
+      admin_set_review_status: {
+        Args: { p_review_id: string; p_status: string }
+        Returns: boolean
+      }
+      admin_set_vendor_status: {
+        Args: { p_is_verified?: boolean; p_status: string; p_vendor_id: string }
+        Returns: boolean
+      }
+      admin_upsert_delivery_rule: {
+        Args: {
+          p_district?: string
+          p_fee?: number
+          p_free_shipping_minimum?: number
+          p_is_active?: boolean
+          p_rule_id?: string
+          p_sort_order?: number
+          p_upazila?: string
+        }
+        Returns: string
+      }
+      calculate_commerce_delivery_fee: {
+        Args: { p_district: string; p_subtotal: number; p_upazila: string }
+        Returns: number
+      }
+      claim_due_feni_brain_sources: {
+        Args: { p_limit?: number }
+        Returns: {
+          auto_publish: boolean
+          etag: string
+          last_modified: string
+          max_bytes: number
+          parser_key: string
+          publisher: string
+          source_id: string
+          title: string
+          trust_tier: number
+          url: string
+        }[]
+      }
+      claim_due_feni_brain_sources_v2: {
+        Args: { p_limit?: number }
+        Returns: {
+          auto_publish: boolean
+          etag: string
+          last_modified: string
+          max_bytes: number
+          parser_key: string
+          publisher: string
+          refresh_interval_hours: number
+          source_id: string
+          title: string
+          trust_tier: number
+          url: string
+        }[]
+      }
+      create_commerce_order: {
+        Args: {
+          p_customer_id?: string
+          p_customer_note?: string
+          p_guest_email?: string
+          p_guest_name?: string
+          p_guest_phone?: string
+          p_items: Json
+          p_shipping_address?: string
+          p_shipping_area?: string
+          p_shipping_district?: string
+          p_shipping_name?: string
+          p_shipping_phone?: string
+          p_shipping_upazila?: string
+        }
+        Returns: {
+          order_id: string
+          order_number: string
+          total_amount: number
+        }[]
+      }
+      create_commerce_return_request: {
+        Args: { p_details?: string; p_order_item_id: string; p_reason: string }
+        Returns: string
+      }
+      create_product_review: {
+        Args: {
+          p_body?: string
+          p_product_id: string
+          p_rating: number
+          p_title?: string
+        }
+        Returns: string
+      }
+      fenix_brain_internal_refresh_secret: { Args: never; Returns: string }
+      generate_commerce_order_number: { Args: never; Returns: string }
+      get_public_vendor_shop: {
+        Args: { p_slug: string }
+        Returns: {
+          business_id: string
+          description_bn: string
+          description_en: string
+          display_name: string
+          display_name_bn: string
+          display_name_en: string
+          id: string
+          is_verified: boolean
+          shop_slug: string
+        }[]
+      }
+      investor_confirm_investment_deal: {
+        Args: { p_deal_id: string }
+        Returns: boolean
+      }
+      is_fenix_admin: { Args: never; Returns: boolean }
+      is_fenix_username_available: {
+        Args: { p_exclude_user_id?: string; p_username: string }
+        Returns: boolean
+      }
+      keyword_feni_brain_chunks: {
+        Args: { match_count?: number; query_text: string }
+        Returns: {
+          content: string
+          document_id: string
+          document_title: string
+          id: string
+          similarity: number
+          source_id: string
+          source_title: string
+          source_url: string
+          trust_tier: number
+        }[]
+      }
+      list_directory_categories: {
+        Args: never
+        Returns: {
+          business_count: number
+          category: string
+        }[]
+      }
+      list_directory_upazilas: {
+        Args: never
+        Returns: {
+          business_count: number
+          upazila: string
+        }[]
+      }
+      mark_investment_message_read: {
+        Args: { p_message_id: string }
+        Returns: boolean
+      }
+      match_businesses: {
+        Args: {
+          match_count: number
+          match_threshold: number
+          query_embedding: string
+        }
+        Returns: {
+          description: string
+          id: string
+          name: string
+          similarity: number
+        }[]
+      }
+      match_feni_brain_chunks: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          content: string
+          document_id: string
+          document_title: string
+          id: string
+          similarity: number
+          source_id: string
+          source_title: string
+          source_url: string
+          trust_tier: number
+        }[]
+      }
+      match_investment_opportunities: {
+        Args: { p_limit?: number }
+        Returns: {
+          category: string
+          district: string
+          match_reasons: string[]
+          match_score: number
+          min_investment: number
+          opportunity_id: string
+          raised_amount: number
+          risk_level: string
+          target_amount: number
+          title_bn: string
+          title_en: string
+          upazila: string
+          verification_status: string
+        }[]
+      }
+      owner_confirm_investment_deal: {
+        Args: { p_deal_id: string }
+        Returns: boolean
+      }
+      owner_progress_investment_deal: {
+        Args: {
+          p_agreed_amount?: number
+          p_deal_id: string
+          p_ownership_percentage?: number
+          p_status: string
+          p_terms_note?: string
+        }
+        Returns: boolean
+      }
+      owner_update_investment_interest: {
+        Args: { p_interest_id: string; p_owner_note?: string; p_status: string }
+        Returns: boolean
+      }
+      record_feni_brain_events: {
+        Args: {
+          p_intent_key: string
+          p_language_code: string
+          p_query_hash: string
+          p_result_count?: number
+          p_terms: string[]
+        }
+        Returns: number
+      }
+      save_business_embedding: {
+        Args: { p_business_id: string; p_embedding: string }
+        Returns: boolean
+      }
+      search_directory_businesses: {
+        Args: {
+          p_category?: string
+          p_limit?: number
+          p_offset?: number
+          p_query?: string
+          p_upazila?: string
+        }
+        Returns: {
+          address: string
+          area: string
+          category: string
+          created_at: string
+          description: string
+          district: string
+          facebook_url: string
+          has_investment: boolean
+          id: string
+          latitude: number
+          listing_status: string
+          location_verified: boolean
+          longitude: number
+          map_label: string
+          market: string
+          name: string
+          owner_claimed: boolean
+          phone: string
+          phone_verified: boolean
+          product_count: number
+          tagline_bn: string
+          tagline_en: string
+          title_bn: string
+          title_en: string
+          upazila: string
+          updated_at: string
+          verification_level: string
+          website_url: string
+          whatsapp: string
+        }[]
+      }
+      search_feni_brain_facts: {
+        Args: { match_count?: number; query_text: string }
+        Returns: {
+          content: string
+          document_id: string
+          document_title: string
+          id: string
+          name_bn: string
+          name_en: string
+          similarity: number
+          source_id: string
+          source_title: string
+          source_url: string
+          subject_key: string
+          trust_tier: number
+          value_number: number
+          value_text: string
+          value_unit: string
+        }[]
+      }
+      search_feni_brain_locations: {
+        Args: { match_count?: number; query_text: string }
+        Returns: {
+          alias: string
+          id: string
+          level: string
+          match_type: string
+          name_bn: string
+          name_en: string
+          slug: string
+        }[]
+      }
+      seller_reply_to_product_review: {
+        Args: { p_response: string; p_review_id: string }
+        Returns: boolean
+      }
+      set_commerce_return_status: {
+        Args: {
+          p_refund_amount?: number
+          p_request_id: string
+          p_resolution_note?: string
+          p_status: string
+        }
+        Returns: boolean
+      }
+      set_product_primary_image: {
+        Args: { p_image_id: string }
+        Returns: boolean
+      }
+      set_vendor_order_status: {
+        Args: { p_order_id: string; p_status: string }
+        Returns: boolean
+      }
+      submit_investment_opportunity: {
+        Args: { p_opportunity_id: string }
+        Returns: boolean
+      }
+      update_vendor_product: {
+        Args: {
+          p_allow_guest_purchase?: boolean
+          p_category_id?: string
+          p_compare_at_price?: number
+          p_description_bn?: string
+          p_description_en?: string
+          p_name_bn: string
+          p_name_en: string
+          p_price?: number
+          p_product_id: string
+          p_sku?: string
+          p_slug: string
+        }
+        Returns: boolean
+      }
+      update_vendor_profile: {
+        Args: {
+          p_description_bn?: string
+          p_description_en?: string
+          p_display_name: string
+          p_display_name_bn?: string
+          p_display_name_en?: string
+          p_phone?: string
+          p_shop_slug?: string
+        }
+        Returns: boolean
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const
