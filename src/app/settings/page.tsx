@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
-  Bell, BookmarkSimple, ChatCircleDots, Check, GearSix, Globe, Lock, Moon, Palette, ShieldCheck,
+  Bell, BookmarkSimple, ChatCircleDots, GearSix, Globe, Lock, Moon, Palette, ShieldCheck,
   SignOut, Sun, UserCircle, Users, WarningCircle,
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
@@ -46,7 +46,8 @@ export default function SettingsPage() {
   const [notice, setNotice] = useState('')
 
   useEffect(() => {
-    if (!user) {
+    const currentUser = user
+    if (!currentUser) {
       window.location.replace('/login?next=/settings')
       return
     }
@@ -56,7 +57,7 @@ export default function SettingsPage() {
       const { data } = await s
         .from('profile_settings')
         .select('profile_visibility,message_permissions,feed_visibility,reduced_motion,notification_preferences')
-        .eq('user_id', user.id)
+        .eq('user_id', currentUser.id)
         .maybeSingle()
       if (!active) return
       if (data?.profile_visibility === 'private') setProfileVisibility('private')
