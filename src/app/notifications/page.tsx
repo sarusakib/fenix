@@ -68,6 +68,7 @@ export default function NotificationsPage() {
     const { data: auth } = await s.auth.getSession()
     if (!auth.session?.user?.id) return
     await s.from('fenix_notifications').update({ read_at: now }).eq('id', id).eq('user_id', auth.session.user.id)
+    window.dispatchEvent(new Event('fenix:notifications-changed'))
   }
 
   async function markAll() {
@@ -78,6 +79,7 @@ export default function NotificationsPage() {
     const now = new Date().toISOString()
     setItems(value => value.map(item => item.read_at ? item : { ...item, read_at: now }))
     await s.from('fenix_notifications').update({ read_at: now }).eq('user_id', uid).is('read_at', null)
+    window.dispatchEvent(new Event('fenix:notifications-changed'))
   }
 
   const tabs: Array<[Filter,string]> = [
