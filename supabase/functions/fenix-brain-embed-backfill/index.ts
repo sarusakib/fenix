@@ -10,7 +10,7 @@ async function getDb() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
-async function authorized(req: Request, db: ReturnType<typeof createClient>) {
+async function authorized(req: Request, db: any) {
   const supplied = req.headers.get("x-fenix-refresh-secret");
   const { data, error } = await db.rpc("fenix_brain_internal_refresh_secret");
   return !error && Boolean(supplied) && supplied === data;
