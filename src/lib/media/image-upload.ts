@@ -35,6 +35,7 @@ type OptimizeOptions = {
   maxDimension?: number
   targetBytes?: number
   minDimension?: number
+  hardLimitBytes?: number
 }
 
 type DecodedImage = {
@@ -175,9 +176,10 @@ export async function optimizeImageFile(
     throw new Error('Please choose an image file.')
   }
 
+  const hardLimitBytes = Math.max(16 * 1024, options.hardLimitBytes ?? HARD_IMAGE_UPLOAD_BYTES)
   const targetBytes = Math.min(
-    HARD_IMAGE_UPLOAD_BYTES,
-    Math.max(TARGET_IMAGE_BYTES, options.targetBytes ?? TARGET_IMAGE_BYTES),
+    hardLimitBytes - Math.min(8 * 1024, Math.floor(hardLimitBytes * 0.08)),
+    Math.max(8 * 1024, options.targetBytes ?? TARGET_IMAGE_BYTES),
   )
   const maxDimension = Math.max(360, options.maxDimension ?? 2560)
   const minDimension = options.minDimension ?? 360
@@ -185,10 +187,10 @@ export async function optimizeImageFile(
   const decoded = await decodeImage(file)
 
   try {
-    // Never degrade an already-small modern image just to hit an arbitrary
-    // target. This preserves user-uploaded quality when it already fits.
+    // Keep small, already-optimized JPEG/WebP files untouched when they fit
+    // the requested hard ceiling.
     if (
-      file.size <= targetBytes &&
+      file.size <= hardLimitBytes &&
       Math.max(decoded.width, decoded.height) <= maxDimension &&
       ['image/webp', 'image/jpeg'].includes(file.type)
     ) {
@@ -241,7 +243,7 @@ export async function optimizeImageFile(
 
       const result = await findBestBlob(canvas, targetBytes)
 
-      if (result?.blob && result.blob.size <= HARD_IMAGE_UPLOAD_BYTES) {
+      if (result?.blob && result.blob.size <= hardLimitBytes) {
         const extension = result.mimeType === 'image/webp' ? 'webp' : 'jpg'
         const optimizedFile = new File(
           [result.blob],
@@ -284,8 +286,9 @@ export async function uploadOptimizedPublicImage(
   bucket: string,
   path: string,
   optimized: OptimizedImage,
+  maxBytes = HARD_IMAGE_UPLOAD_BYTES,
 ) {
-  if (optimized.byteSize > HARD_IMAGE_UPLOAD_BYTES) {
+  if (optimized.byteSize > maxBytes) {
     throw new Error('The optimized image is still above the FeniX storage limit.')
   }
   if (!optimized.mimeType || !['image/jpeg', 'image/webp'].includes(optimized.mimeType)) {
