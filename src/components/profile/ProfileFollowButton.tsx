@@ -34,6 +34,7 @@ export default function ProfileFollowButton({ profileId, nextPath = '/feed' }: {
   if (userId === profileId) return null
 
   async function toggle() {
+    if (!userId) return
     setBusy(true)
     const s = createClient()
     const result = following
