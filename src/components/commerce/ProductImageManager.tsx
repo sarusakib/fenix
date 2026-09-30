@@ -120,7 +120,7 @@ export default function ProductImageManager({
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 className="flex items-center gap-2 font-black"><ImageSquare size={20}/> Product images</h2>
-        <p className="mt-1 text-xs opacity-50">JPG, PNG, WebP and supported image formats · no user-facing source-size cap · auto-composed toward ~100KB · up to 5 at a time</p>
+        <p className="mt-1 text-xs opacity-50">JPG, PNG, WebP and supported image formats · no user-facing source-size cap · auto-composed toward ~300KB, maximum 400KB · up to 5 at a time</p>
       </div>
 
       <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#008080] px-4 py-3 text-sm font-bold text-white">
