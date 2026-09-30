@@ -3739,6 +3739,9 @@ export type Database = {
           updated_at: string
           username: string | null
           website_url: string | null
+          whatsapp_url: string | null
+          facebook_url: string | null
+          instagram_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -3753,6 +3756,9 @@ export type Database = {
           updated_at?: string
           username?: string | null
           website_url?: string | null
+          whatsapp_url?: string | null
+          facebook_url?: string | null
+          instagram_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -4100,6 +4106,7 @@ export type Database = {
         Returns: boolean
       }
       is_fenix_admin: { Args: never; Returns: boolean }
+      is_fenix_username_available: { Args: { p_exclude_user_id?: string; p_username: string }; Returns: boolean }
       is_fenix_user_active: { Args: { p_user_id?: string }; Returns: boolean }
       keyword_feni_brain_chunks: {
         Args: { match_count?: number; query_text: string }
