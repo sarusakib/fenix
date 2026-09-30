@@ -1,6 +1,10 @@
 -- FeniX social graph and notification preference hardening.
+
 -- Follow relationships are private to authenticated participants; notification
 -- preference is respected by trust/verification emitters.
+
+alter table public.profile_settings
+  add column if not exists notification_preferences jsonb not null default '{"push":true,"messages":true,"social":true,"trust":true,"news":true}'::jsonb;
 
 create table if not exists public.fenix_profile_follows (
   follower_id uuid not null references public.profiles(id) on delete cascade,
