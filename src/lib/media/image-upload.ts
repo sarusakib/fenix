@@ -8,10 +8,9 @@ import { createClient } from '@/utils/supabase/client'
  * There is no product-level source-size cap here. Very large files should be
  * transported with resumable/chunked upload by the caller before decoding.
  *
- * The stored image targets ~300 KB while keeping the best perceptual quality
- * the browser encoder can achieve at that size. If 100 KB would be too
- * destructive, the optimizer can fall back up to 400 KB rather than creating
- * a visibly broken image.
+ * The default stored image target is ~300 KB. Callers can request a smaller
+ * target for compact media such as profile photos while keeping the same
+ * hard safety ceiling for other image classes.
  */
 export const TARGET_IMAGE_BYTES = 300 * 1024
 export const MAX_IMAGE_UPLOAD_BYTES = TARGET_IMAGE_BYTES
@@ -177,7 +176,7 @@ export async function optimizeImageFile(
 
   const targetBytes = Math.min(
     HARD_IMAGE_UPLOAD_BYTES,
-    Math.max(TARGET_IMAGE_BYTES, options.targetBytes ?? TARGET_IMAGE_BYTES),
+    Math.max(16 * 1024, options.targetBytes ?? TARGET_IMAGE_BYTES),
   )
   const maxDimension = Math.max(360, options.maxDimension ?? 2560)
   const minDimension = options.minDimension ?? 360
