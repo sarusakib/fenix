@@ -81,6 +81,7 @@ export default function ProfilePage() {
   const [tab, setTab] = useState<Tab>('posts')
 
   const [posts, setPosts] = useState<PostPreview[]>([])
+  const [postCount, setPostCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [imageBusy, setImageBusy] = useState<'avatar' | 'cover' | null>(null)
@@ -101,7 +102,7 @@ export default function ProfilePage() {
         return
       }
 
-      const [{ data: profile }, { data: settings }, { data: userPosts }] = await Promise.all([
+      const [{ data: profile }, { data: settings }, { data: userPosts, count: userPostCount }] = await Promise.all([
         s.from('profiles')
           .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url')
           .eq('id', auth.user.id)
@@ -111,7 +112,7 @@ export default function ProfilePage() {
           .eq('user_id', auth.user.id)
           .maybeSingle(),
         s.from('fenix_posts')
-          .select('id,body,created_at')
+          .select('id,body,created_at', { count: 'exact' })
           .eq('author_id', auth.user.id)
           .is('deleted_at', null)
           .order('created_at', { ascending: false })
@@ -141,6 +142,7 @@ export default function ProfilePage() {
       setAvatarUrl(profile?.avatar_url ?? providerAvatar)
       setCoverUrl(profile?.cover_url ?? '')
       setPosts((userPosts ?? []) as PostPreview[])
+      setPostCount(userPostCount ?? 0)
 
       if (settings?.locale === 'bn' || settings?.locale === 'en') setLocale(settings.locale)
       if (settings?.theme === 'light' || settings?.theme === 'dark' || settings?.theme === 'system') setTheme(settings.theme as HomeTheme)
@@ -415,7 +417,7 @@ export default function ProfilePage() {
                 </button>
               </div>
               <div className="mt-5 flex items-center gap-7 text-sm">
-                <span><strong className="font-black">{posts.length}</strong> {bn ? 'পোস্ট' : 'posts'}</span>
+                <span><strong className="font-black">{postCount}</strong> {bn ? 'পোস্ট' : 'posts'}</span>
                 <span className="text-[var(--fx-muted)]"><strong className="text-[var(--fx-text)]">FeniX</strong> {bn ? 'member' : 'member'}</span>
               </div>
             </div>
@@ -529,7 +531,7 @@ export default function ProfilePage() {
               <SettingRow icon={<Gear size={18}/>} title={bn ? 'Account & safety' : 'Account & safety'} onClick={() => setSettingsSection('account')} />
             </div>
           ) : (
-            <SettingsDetail section={settingsSection} bn={bn} email={email} websiteUrl={websiteUrl} instagramUrl={instagramUrl} facebookUrl={facebookUrl} whatsappUrl={whatsappUrl} setWebsiteUrl={setWebsiteUrl} setInstagramUrl={setInstagramUrl} setFacebookUrl={setFacebookUrl} setWhatsappUrl={setWhatsappUrl} visibility={visibility} messagePermissions={messagePermissions} feedVisibility={feedVisibility} reducedMotion={reducedMotion} theme={theme} onTheme={changeTheme} onLocale={changeLocale} onSetting={changeSetting} setVisibility={setVisibility} setMessagePermissions={setMessagePermissions} setFeedVisibility={setFeedVisibility} setReducedMotion={setReducedMotion} onBack={() => setSettingsSection(null)} copy={copyProfileLink} copied={copied} publicUrl={publicUrl} signOut={signOut} />
+            <SettingsDetail section={settingsSection} bn={bn} email={email} websiteUrl={websiteUrl} instagramUrl={instagramUrl} facebookUrl={facebookUrl} whatsappUrl={whatsappUrl} setWebsiteUrl={setWebsiteUrl} setInstagramUrl={setInstagramUrl} setFacebookUrl={setFacebookUrl} setWhatsappUrl={setWhatsappUrl} visibility={visibility} messagePermissions={messagePermissions} feedVisibility={feedVisibility} reducedMotion={reducedMotion} theme={theme} onTheme={changeTheme} onLocale={changeLocale} onSetting={changeSetting} setVisibility={setVisibility} setMessagePermissions={setMessagePermissions} setFeedVisibility={setFeedVisibility} setReducedMotion={setReducedMotion} onBack={() => setSettingsSection(null)} copy={copyProfileLink} copied={copied} publicUrl={publicUrl} signOut={signOut} save={saveProfile} />
           )}
         </Sheet>
       )}
@@ -576,7 +578,7 @@ function SettingsDetail(props: {
   onTheme:(v:HomeTheme)=>void; onLocale:(v:'bn'|'en')=>void
   onSetting:(patch:Record<string,unknown>,apply:()=>void)=>void
   setVisibility:(v:Visibility)=>void; setMessagePermissions:(v:MessagePermission)=>void; setFeedVisibility:(v:FeedVisibility)=>void; setReducedMotion:(v:boolean)=>void
-  onBack:()=>void; copy:()=>void; copied:boolean; publicUrl:string; signOut:()=>void
+  onBack:()=>void; copy:()=>void; copied:boolean; publicUrl:string; signOut:()=>void; save:()=>void
 }) {
   const p=props
   return <div>
@@ -587,7 +589,7 @@ function SettingsDetail(props: {
       <Field label="Instagram" value={p.instagramUrl} onChange={p.setInstagramUrl} maxLength={500}/>
       <Field label="Facebook" value={p.facebookUrl} onChange={p.setFacebookUrl} maxLength={500}/>
       <Field label="WhatsApp" value={p.whatsappUrl} onChange={p.setWhatsappUrl} maxLength={500}/>
-      <button type="button" onClick={() => p.onBack()} className="min-h-11 w-full rounded-xl bg-[var(--fx-primary-strong)] text-xs font-bold text-white">{p.bn ? 'Save করতে Edit profile ব্যবহার করুন' : 'Save from Edit profile'}</button>
+      <button type="button" onClick={p.save} className="min-h-11 w-full rounded-xl bg-[var(--fx-primary-strong)] text-xs font-bold text-white">{p.bn ? 'Save links' : 'Save links'}</button>
     </div>}
 
     {p.section === 'privacy' && <div className="space-y-3">
