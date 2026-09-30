@@ -62,9 +62,9 @@ begin
   if tg_table_name = 'fenix_profile_follows' then
     recipient_id := new.following_id;
     actor_id := new.follower_id;
-    target_path := '/profile';
-    select coalesce(nullif(full_name, ''), nullif(username, ''), 'FeniX user')
-      into actor_name from public.profiles where id = actor_id;
+    select coalesce(nullif(full_name, ''), nullif(username, ''), 'FeniX user'), username
+      into actor_name, actor_username from public.profiles where id = actor_id;
+    target_path := case when actor_username is not null then '/profile/' || actor_username else '/profile' end;
     title_text := 'New follower';
     body_text := coalesce(actor_name, 'A FeniX user') || ' started following you.';
     pref_key := 'social';
