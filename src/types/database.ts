@@ -2515,6 +2515,9 @@ export type Database = {
           storage_bucket: string
           storage_path: string
           width: number | null
+          source_byte_size: number | null
+          source_digest: string | null
+          optimization_version: string
         }
         Insert: {
           author_id: string
@@ -2528,6 +2531,9 @@ export type Database = {
           storage_bucket?: string
           storage_path: string
           width?: number | null
+          source_byte_size?: number | null
+          source_digest?: string | null
+          optimization_version?: string
         }
         Update: {
           author_id?: string
@@ -2541,6 +2547,9 @@ export type Database = {
           storage_bucket?: string
           storage_path?: string
           width?: number | null
+          source_byte_size?: number | null
+          source_digest?: string | null
+          optimization_version?: string
         }
         Relationships: [
           {
@@ -3438,6 +3447,12 @@ export type Database = {
           sort_order?: number
           storage_bucket?: string
           storage_path: string
+          byte_size?: number | null
+          height?: number | null
+          source_byte_size?: number | null
+          source_digest?: string | null
+          optimization_version?: string
+          width?: number | null
         }
         Update: {
           alt_text_bn?: string | null
