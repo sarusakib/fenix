@@ -1,2 +1,2 @@
-import FenixRouteSkeleton from '@/components/loading/FenixRouteSkeleton
+import FenixRouteSkeleton from '@/components/loading/FenixRouteSkeleton'
 export default function Loading(){return <FenixRouteSkeleton variant="feed" />}
