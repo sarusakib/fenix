@@ -40,12 +40,11 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const facebook = profile.facebook_url && /^https?:\/\//i.test(profile.facebook_url) ? profile.facebook_url : null
   const instagram = profile.instagram_url && /^https?:\/\//i.test(profile.instagram_url) ? profile.instagram_url : null
 
-  const { data: publicPosts } = await s
-    .from('fenix_public_feed')
-    .select('id,body,created_at')
-    .eq('author_id', profileId)
-    .order('created_at', { ascending: false })
-    .limit(12)
+  const [{ data: publicPosts }, { count: followerCount }, { count: followingCount }] = await Promise.all([
+    s.from('fenix_public_feed').select('id,body,created_at').eq('author_id', profileId).order('created_at', { ascending: false }).limit(12),
+    s.from('fenix_profile_follows').select('follower_id', { count: 'exact', head: true }).eq('following_id', profileId),
+    s.from('fenix_profile_follows').select('following_id', { count: 'exact', head: true }).eq('follower_id', profileId),
+  ])
 
   const postIds = (publicPosts ?? []).map(post => post.id).filter((id): id is string => Boolean(id))
   const { data: publicMedia } = postIds.length
@@ -81,6 +80,11 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             <div className="mt-5">
               <h1 className="text-3xl font-black tracking-[-.05em] sm:text-4xl">{safeName}</h1>
               <p className="mt-1 text-sm text-[var(--fx-muted)]">@{profileUsername}</p>
+              <div className="mt-4 flex flex-wrap gap-4 text-xs">
+                <span><strong className="font-black">{publicPosts?.length ?? 0}</strong> Posts</span>
+                <span><strong className="font-black">{followerCount ?? 0}</strong> Followers</span>
+                <span><strong className="font-black">{followingCount ?? 0}</strong> Following</span>
+              </div>
               {profile.bio && <p className="mt-5 max-w-3xl whitespace-pre-wrap text-sm leading-7">{profile.bio}</p>}
               <div className="mt-5 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">
                 {profile.location_text && <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5"><MapPin size={14}/>{profile.location_text}</span>}
