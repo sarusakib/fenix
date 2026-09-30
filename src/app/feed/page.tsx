@@ -65,7 +65,7 @@ export default function FeedPage(){
       setFollowedProfiles(nextFollowedProfiles)
 
       let nextPosts:PostRow[]=[]
-      if(tab==='latest'){
+      if(tab!=='questions' && tab!=='news'){
         const postRows=(p??[]) as unknown as PostRow[]
         const postIds=postRows.map(row=>row.id)
         let nextPostMedia:Array<Omit<PostMediaRow,'public_url'>>=[]
@@ -73,7 +73,7 @@ export default function FeedPage(){
         let commentRows:{content_id:string}[]=[]
         let bookmarkRows:{content_id:string}[]=[]
         if(postIds.length){
-          const [mediaResult,voteResult,commentResult]=await Promise.all([
+          const [mediaResult,voteResult,commentResult,bookmarkResult]=await Promise.all([
             s.from('fenix_post_media')
               .select('id,post_id,storage_bucket,storage_path,mime_type,width,height,sort_order,byte_size,source_byte_size,source_digest')
               .in('post_id',postIds).order('sort_order',{ascending:true}),
@@ -82,7 +82,7 @@ export default function FeedPage(){
             uid ? s.from('fenix_content_bookmarks').select('content_id').eq('user_id',uid).eq('content_type','post').in('content_id',postIds) : Promise.resolve({data:null}),
           ])
           nextPostMedia=(mediaResult.data??[]) as Array<Omit<PostMediaRow,'public_url'>>
-          voteRows=(voteResult.data??[]) as {content_id:string;value:number}[]
+          voteRows=(voteResult.data??[]) as {content_id:string;value:number;user_id:string|null}[]
           commentRows=(commentResult.data??[]) as {content_id:string}[]
           bookmarkRows=(bookmarkResult.data??[]) as {content_id:string}[]
         }
