@@ -275,7 +275,7 @@ export default function ProfileEditorPage() {
           <div className="fenix-surface-strong overflow-hidden rounded-[2rem]">
             <div className="relative h-36 overflow-hidden bg-[var(--fx-primary-soft)] sm:h-48">
               <label className="absolute right-3 top-3 z-10 inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-xl bg-black/55 px-3 text-xs font-bold text-white backdrop-blur">
-                <ImageSquare size={15}/>{imageBusy==='cover' ? 'Uploading…' : 'Cover photo'}
+                <ImageSquare size={15}/>{imageBusy==='cover' ? 'Uploading '+imageProgress+'%' : 'Cover photo'}
                 <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('cover',file)}}/>
               </label>
               {coverUrl ? <img src={coverUrl} alt="" className="h-full w-full object-cover"/> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,128,128,.22),transparent_42%),linear-gradient(135deg,rgba(11,23,54,.02),rgba(0,128,128,.10))]"/>}
@@ -285,7 +285,7 @@ export default function ProfileEditorPage() {
                 <div className="flex items-end gap-3">
                   {avatarUrl ? <img src={avatarUrl} alt="" className="h-24 w-24 rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover sm:h-28 sm:w-28"/> : <div className="grid h-24 w-24 place-items-center rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)] sm:h-28 sm:w-28"><UserCircle size={58} className="text-[var(--fx-primary-strong)]"/></div>}
                   <label className="mb-1 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-xs font-bold shadow-sm">
-                    <UploadSimple size={16}/><span>{imageBusy==='avatar' ? 'Uploading…' : 'Gallery'}</span>
+                    <UploadSimple size={16}/><span>{imageBusy==='avatar' ? 'Uploading '+imageProgress+'%' : 'Gallery'}</span>
                     <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('avatar',file)}}/>
                   </label>
                 </div>
@@ -293,6 +293,7 @@ export default function ProfileEditorPage() {
               </div>
               <div className="mt-4"><h1 className="text-3xl font-black tracking-[-.045em] sm:text-4xl">{fullName || 'Your FeniX profile'}</h1><p className="mt-1 text-sm text-[var(--fx-muted)]">@{username || 'username'} · {email}</p>{bio && <p className="mt-4 max-w-2xl whitespace-pre-wrap text-sm leading-7 text-[var(--fx-muted)]">{bio}</p>}<div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">{locationText && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><MapPin size={14}/>{locationText}</span>}{websiteUrl && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><Globe size={14}/>Website</span>}</div></div>
             </div>
+            {imageBusy && <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[var(--fx-border)]"><div className="h-full rounded-full bg-[var(--fx-primary-strong)] transition-all" style={{width:imageProgress+'%'}}/></div>}
           </div>
 
           <aside className="fenix-surface-strong rounded-[2rem] p-5 sm:p-6">
