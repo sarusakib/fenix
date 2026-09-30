@@ -3,7 +3,8 @@
  * Keep navigation paths in one place so feature routes remain consistent.
  */
 export const ROUTES = {
-  home: '/',
+  home: '/feed',
+  legacyHome: '/',
   services: '/services',
   help: '/help',
   emergency: '/emergency',
