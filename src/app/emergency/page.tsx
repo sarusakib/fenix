@@ -1,6 +1,6 @@
-import Link from 'next/link'
+'use client'\n\nimport Link from 'next/link'
 import { ArrowLeft, ArrowRight, Drop, FirstAidKit, MapPin, Phone, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/Navbar'\nimport { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 
 const ACTIONS = [
   {
@@ -43,14 +43,14 @@ export default function EmergencyPage() {
           href="/"
           className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold"
         >
-          <ArrowLeft size={16} /> Home
+          <ArrowLeft size={16} /> {bn ? 'হোম' : 'Home'}
         </Link>
 
         <header className="mt-7 overflow-hidden rounded-[2.2rem] border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-6 sm:p-9">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full bg-red-500/[.07] px-3 py-1.5 text-[10px] font-black uppercase tracking-[.16em] text-red-700 dark:text-red-300">
-                <FirstAidKit size={15} /> Emergency help
+                <FirstAidKit size={15} /> {bn ? 'জরুরি সহায়তা' : 'Emergency help'}
               </div>
               <h1 className="mt-4 text-4xl font-black tracking-[-.055em] sm:text-6xl">
                 জরুরি সময়ে দ্রুত সঠিক তথ্যের কাছে পৌঁছান।
@@ -73,7 +73,7 @@ export default function EmergencyPage() {
         </header>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          {ACTIONS.map(({ title, titleBn, body, href, icon: Icon }) => (
+          {ACTIONS.map(({ title, titleBn, body, bodyBn, href, icon: Icon }) => (
             <Link
               key={href}
               href={href}
