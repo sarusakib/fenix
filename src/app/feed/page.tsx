@@ -14,8 +14,8 @@ type QuestionRow = {
   topic_id:string|null; author_name:string|null; author_username:string|null; author_avatar_url:string|null;
   topic_name:string|null; answer_count?:number; score?:number;
 }
-type NewsRow = { id:string; slug:string; title_bn:string; title_en:string; excerpt_bn:string|null; excerpt_en:string|null; category:string; verification_status:string; featured:boolean; breaking:boolean; published_at:string|null; source_name:string|null }
-type PostMediaRow = { id:string; post_id:string; storage_bucket:string; storage_path:string; mime_type:string; width:number|null; height:number|null; sort_order:number; byte_size:number; source_byte_size:number|null; source_digest:string|null }
+type NewsRow = { id:string; slug:string; title_bn:string; title_en:string; excerpt_bn:string|null; excerpt_en:string|null; category:string; verification_status:string; featured:boolean; breaking:boolean; published_at:string|null; source_name:string|null; image_url:string|null }
+type PostMediaRow = { id:string; post_id:string; storage_bucket:string; storage_path:string; mime_type:string; width:number|null; height:number|null; sort_order:number; byte_size:number; source_byte_size:number|null; source_digest:string|null; public_url:string }
 type PostRow = { id:string; body:string; created_at:string; author_id:string; author_name:string|null; author_username:string|null; author_avatar_url:string|null; media:PostMediaRow[] }
 
 const fmt=(v:string,locale:string)=>new Date(v).toLocaleString(locale==='bn'?'bn-BD':'en-BD',{dateStyle:'medium',timeStyle:'short'})
@@ -38,36 +38,85 @@ export default function FeedPage(){
   const [message,setMessage]=useState('')
   const [postImages,setPostImages]=useState<Array<{id:string;file:File;previewUrl:string;width:number;height:number;byteSize:number;sourceByteSize:number;sourceDigest:string}>>([])
   const [imageBusy,setImageBusy]=useState(false)
+  const [loading,setLoading]=useState(true)
+  const [loadedTab,setLoadedTab]=useState<string|null>(null)
 
   const load=useCallback(async()=>{
+    setLoading(true)
+    setMessage('')
     const s=createClient()
-    const [{data:auth},{data:q},{data:n},{data:p},{data:t}]=await Promise.all([
-      s.auth.getUser(),
-      s.from('fenix_public_question_feed').select('*').order('created_at',{ascending:false}).limit(50),
-      s.from('news_posts').select('id,slug,title_bn,title_en,excerpt_bn,excerpt_en,category,verification_status,featured,breaking,published_at,source_name').eq('status','published').order('published_at',{ascending:false}).limit(30),
-      s.from('fenix_public_feed').select('*').order('created_at',{ascending:false}).limit(30),
-      s.from('fenix_topics').select('id,slug,name_bn,name_en').order('name_en'),
-    ])
-    const uid=auth.user?.id??null
-    setUserId(uid)
-    const postIds=((p??[]) as any[]).map(row=>row.id as string)
-    const mediaByPost:Record<string,PostMediaRow[]>={}
-    if(postIds.length){
-      const {data:media}=await s.from('fenix_post_media').select('id,post_id,storage_bucket,storage_path,mime_type,width,height,sort_order,byte_size,source_byte_size,source_digest').in('post_id',postIds).order('sort_order',{ascending:true})
-      for(const row of (media??[]) as PostMediaRow[]) (mediaByPost[row.post_id]??=[]).push(row)
+    try {
+      const questionPromise = tab === 'news' ? Promise.resolve({data:null}) : s.from('fenix_public_question_feed')
+        .select('id,title,body,created_at,author_id,topic_id,author_name,author_username,author_avatar_url,topic_slug,topic_name_bn,topic_name_en,answer_count,score')
+        .order('created_at',{ascending:false}).limit(40)
+      const newsPromise = tab === 'questions' || tab === 'following' ? Promise.resolve({data:null}) : s.from('news_posts')
+        .select('id,slug,title_bn,title_en,excerpt_bn,excerpt_en,category,verification_status,featured,breaking,published_at,source_name,image_url')
+        .eq('status','published').order('published_at',{ascending:false}).limit(24)
+      const postsPromise = tab === 'latest' ? s.from('fenix_public_feed').select('*').order('created_at',{ascending:false}).limit(20) : Promise.resolve({data:null})
+
+      const [{data:auth},{data:q},{data:n},{data:p}] = await Promise.all([
+        s.auth.getUser(), questionPromise, newsPromise, postsPromise,
+      ])
+
+      const uid=auth.user?.id??null
+      setUserId(uid)
+
+      let nextPosts:PostRow[]=[]
+      if(tab==='latest'){
+        const postRows=(p??[]) as unknown as PostRow[]
+        const postIds=postRows.map(row=>row.id)
+        const mediaByPost:Record<string,PostMediaRow[]>={}
+        if(postIds.length){
+          const {data:media}=await s.from('fenix_post_media')
+            .select('id,post_id,storage_bucket,storage_path,mime_type,width,height,sort_order,byte_size,source_byte_size,source_digest')
+            .in('post_id',postIds).order('sort_order',{ascending:true})
+          for(const row of (media??[]) as Array<Omit<PostMediaRow,'public_url'>>){
+            const public_url=s.storage.from(row.storage_bucket).getPublicUrl(row.storage_path).data.publicUrl
+            ;(mediaByPost[row.post_id]??=[]).push({...row,public_url})
+          }
+        }
+        nextPosts=postRows.map(row=>({...row,media:mediaByPost[row.id]??[]}))
+      }
+
+      const qq=(q??[]).map((x:any)=>({
+        ...x,
+        author_name:x.author_name??null,
+        author_username:x.author_username??null,
+        author_avatar_url:x.author_avatar_url??null,
+        topic_name:locale==='bn'?(x.topic_name_bn??x.topic_name_en):(x.topic_name_en??x.topic_name_bn),
+      })) as QuestionRow[]
+
+      setQuestions(tab==='news'?[]:qq)
+      setNews((n??[]) as NewsRow[])
+      setPosts(nextPosts)
+      setLoadedTab(tab)
+
+      if(tab==='following' && uid){
+        const {data:f}=await s.from('fenix_topic_follows').select('topic_id').eq('user_id',uid)
+        setFollowed((f??[]).map(x=>x.topic_id))
+      } else if(tab!=='following'){
+        setFollowed([])
+      }
+    } catch {
+      setMessage(locale==='bn'?'Feed লোড করা যায়নি।':'Could not load the feed.')
+      setQuestions([])
+      setNews([])
+      setPosts([])
+    } finally {
+      setLoadedTab(tab)
+      setLoading(false)
     }
-    if(uid){
-      const {data:f}=await s.from('fenix_topic_follows').select('topic_id').eq('user_id',uid)
-      setFollowed((f??[]).map(x=>x.topic_id))
-    } else setFollowed([])
-    const qq=(q??[]).map((x:any)=>({
-      ...x,author_name:x.profiles?.full_name??null,author_username:x.profiles?.username??null,author_avatar_url:x.profiles?.avatar_url??null,
-      topic_name:x.fenix_topics?.name_en??null,
-    })) as QuestionRow[]
-    setQuestions(qq); setNews((n??[]) as NewsRow[]); setPosts(((p??[]) as any[]).map(row=>({...row,media:mediaByPost[row.id]??[]})) as PostRow[]); setTopics((t??[]) as Topic[])
-  },[])
+  },[tab,locale])
 
   useEffect(()=>{void load()},[load])
+
+  useEffect(()=>{
+    if(!userId || topics.length) return
+    const s=createClient()
+    void s.from('fenix_topics').select('id,slug,name_bn,name_en').order('name_en').then(({data})=>{
+      if(data) setTopics(data as Topic[])
+    })
+  },[userId,topics.length])
 
   async function ask(){
     const cleanTitle=title.trim(), cleanBody=body.trim()
@@ -162,9 +211,16 @@ export default function FeedPage(){
     if(!userId){setMessage(locale==='bn'?'Vote দিতে Login করুন।':'Sign in to vote.');return}
     const s=createClient()
     const {data:old}=await s.from('fenix_content_votes').select('value').eq('user_id',userId).eq('content_type','question').eq('content_id',contentId).maybeSingle()
-    if(old) await s.from('fenix_content_votes').delete().eq('user_id',userId).eq('content_type','question').eq('content_id',contentId)
-    else await s.from('fenix_content_votes').insert({user_id:userId,content_type:'question',content_id:contentId,value:1})
-    await load()
+    let error:string|null=null
+    if(old) {
+      const result=await s.from('fenix_content_votes').delete().eq('user_id',userId).eq('content_type','question').eq('content_id',contentId)
+      error=result.error?.message??null
+    } else {
+      const result=await s.from('fenix_content_votes').insert({user_id:userId,content_type:'question',content_id:contentId,value:1})
+      error=result.error?.message??null
+    }
+    if(error){setMessage(locale==='bn'?'Vote আপডেট করা যায়নি।':'Could not update vote.');return}
+    setQuestions(value=>value.map(q=>q.id===contentId?{...q,score:Math.max(0,(q.score??0)+(old?-1:1))}:q))
   }
 
   const visibleQuestions=useMemo(()=>{
@@ -198,9 +254,14 @@ export default function FeedPage(){
     {!userId&&<Link href="/login?next=/feed" className="mt-4 flex min-h-12 items-center justify-center rounded-2xl bg-[var(--fx-primary-soft)] text-sm font-bold text-[var(--fx-primary-strong)]">{copy.login}</Link>}
     {message&&<p className="mt-3 rounded-xl bg-[var(--fx-primary-soft)] p-3 text-xs">{message}</p>}
 
-    <div className="mt-5 space-y-3">{feedItems.length?feedItems.map(item=>item.kind==='question'?<QuestionCard key={'q'+item.data.id} q={item.data} locale={locale} onVote={vote} onFollow={toggleFollow} followed={followed}/>:item.kind==='news'?<NewsCard key={'n'+item.data.id} n={item.data} locale={locale}/>:<PostCard key={'p'+item.data.id} p={item.data} locale={locale}/>):<div className="rounded-[1.7rem] border border-dashed border-[var(--fx-border)] p-10 text-center text-sm text-[var(--fx-muted)]">{copy.empty}</div>}</div>
+    <div className="mt-5" aria-busy={loading}>
+      {loading && loadedTab!==tab ? <FeedSkeleton /> : feedItems.length ? <div className="space-y-3">{feedItems.map(item=>item.kind==='question'?<QuestionCard key={'q'+item.data.id} q={item.data} locale={locale} onVote={vote} onFollow={toggleFollow} followed={followed}/>:item.kind==='news'?<NewsCard key={'n'+item.data.id} n={item.data} locale={locale}/>:<PostCard key={'p'+item.data.id} p={item.data} locale={locale}/>)}</div> : <div className="rounded-[1.7rem] border border-dashed border-[var(--fx-border)] p-10 text-center text-sm text-[var(--fx-muted)]">{copy.empty}</div>}
+      {loading && loadedTab===tab && <div className="mt-3 text-center text-[10px] font-semibold text-[var(--fx-muted)]">Refreshing…</div>}
+    </div></div>
   </section></main>
 }
+function FeedSkeleton(){return <div className="space-y-3" aria-hidden="true">{Array.from({length:4},(_,i)=><div key={i} className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5"><div className="h-4 w-28 animate-pulse rounded bg-[var(--fx-primary-soft)]"/><div className="mt-4 h-5 w-3/4 animate-pulse rounded bg-[var(--fx-primary-soft)]"/><div className="mt-3 h-4 w-full animate-pulse rounded bg-[var(--fx-primary-soft)]"/><div className="mt-2 h-4 w-5/6 animate-pulse rounded bg-[var(--fx-primary-soft)]"/></div>)}</div>}
+
 
 function QuestionCard({q,locale,onVote,onFollow,followed}:{q:QuestionRow;locale:string;onVote:(id:string)=>void;onFollow:(id:string)=>void;followed:string[]}){
   return <article className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5">
@@ -214,9 +275,12 @@ function QuestionCard({q,locale,onVote,onFollow,followed}:{q:QuestionRow;locale:
 }
 
 function NewsCard({n,locale}:{n:NewsRow;locale:string}){
-  return <article className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5"><div className="flex items-center gap-2 text-[11px] font-bold text-[var(--fx-primary-strong)]"><Newspaper size={16}/><span>FeniX News</span>{n.breaking&&<span className="rounded-full bg-red-500/10 px-2 py-1 text-red-600">Breaking</span>}<span className="ml-auto text-[var(--fx-muted)]">{n.category}</span></div><Link href={`/news/${n.slug}`} className="mt-3 block text-lg font-black leading-7 hover:underline">{locale==='bn'?n.title_bn:n.title_en}</Link><p className="mt-2 line-clamp-2 text-sm leading-7 text-[var(--fx-muted)]">{locale==='bn'?(n.excerpt_bn||n.excerpt_en):(n.excerpt_en||n.excerpt_bn)}</p><div className="mt-4 flex items-center gap-3 text-[11px] text-[var(--fx-muted)]"><span>{n.verification_status.replaceAll('_',' ')}</span>{n.source_name&&<span>· {n.source_name}</span>}<Link href={`/news/${n.slug}`} className="ml-auto font-bold text-[var(--fx-primary-strong)]">Read News →</Link></div></article>
-}
-
-function PostCard({p,locale}:{p:PostRow;locale:string}){
-  return <article className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5"><div className="flex items-center gap-3">{p.author_avatar_url?<img src={p.author_avatar_url} alt="" className="h-9 w-9 rounded-full object-cover"/>:<UserCircle size={36} className="opacity-40"/>}<div><p className="text-sm font-bold">{p.author_name||p.author_username||'FeniX user'}</p><time className="text-[11px] text-[var(--fx-muted)]">{fmt(p.created_at,locale)}</time></div></div>{p.body&&<p className="mt-3 whitespace-pre-wrap text-sm leading-7">{p.body}</p>}{p.media?.length>0&&<div className={`mt-4 grid gap-2 ${p.media.length===1?'grid-cols-1':'grid-cols-2'}`}>{p.media.map(media=>{const url=createClient().storage.from(media.storage_bucket).getPublicUrl(media.storage_path).data.publicUrl;return <div key={media.id} className="overflow-hidden rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)]"><img src={url} alt="FeniX post" className="max-h-[520px] w-full object-cover"/></div>})}</div>}</article>
+  return <article className="overflow-hidden rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)]">
+    <div className="flex items-center gap-2 p-5 pb-0 text-[11px] font-bold text-[var(--fx-primary-strong)]"><Newspaper size={16}/><span>FeniX News</span>{n.breaking&&<span className="rounded-full bg-red-500/10 px-2 py-1 text-red-600">Breaking</span>}<span className="ml-auto text-[var(--fx-muted)]">{n.category}</span></div>
+    {n.image_url&&<img src={n.image_url} alt="" loading="lazy" decoding="async" className="mt-4 aspect-[16/7] w-full object-cover"/>}
+    <div className="p-5 pt-3">
+      <Link href={`/news/${n.slug}`} className="block text-lg font-black leading-7 hover:underline">{locale==='bn'?n.title_bn:n.title_en}</Link>
+      <p className="mt-2 line-clamp-2 text-sm leading-7 text-[var(--fx-muted)]">{locale==='bn'?(n.excerpt_bn||n.excerpt_en):(n.excerpt_en||n.excerpt_bn)}</p>
+      <div className="mt-4 flex items-center gap-3 text-[11px] text-[var(--fx-muted)]"><span>{n.verification_statufunction PostCard({p,locale}:{p:PostRow;locale:string}){
+  return <article className="rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5"><div className="flex items-center gap-3">{p.author_avatar_url?<img src={p.author_avatar_url} alt="" loading="lazy" decoding="async" className="h-9 w-9 rounded-full object-cover"/>:<UserCircle size={36} className="opacity-40"/>}<div><p className="text-sm font-bold">{p.author_name||p.author_username||'FeniX user'}</p><time className="text-[11px] text-[var(--fx-muted)]">{fmt(p.created_at,locale)}</time></div></div>{p.body&&<p className="mt-3 whitespace-pre-wrap text-sm leading-7">{p.body}</p>}{p.media?.length>0&&<div className={`mt-4 grid gap-2 ${p.media.length===1?'grid-cols-1':'grid-cols-2'}`}>{p.media.map(media=><div key={media.id} className="overflow-hidden rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)]"><img src={media.public_url} alt="" loading="lazy" decoding="async" width={media.width??1200} height={media.height??800} className="max-h-[520px] w-full object-cover"/></div>)}</div>}</article>
 }
