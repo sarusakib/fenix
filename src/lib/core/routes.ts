@@ -89,7 +89,7 @@ export const ROUTES = {
   dashboard: {
     root: '/dashboard',
     business: '/dashboard/business',
-    settings: '/dashboard/settings',
+    settings: '/settings',
   },
 } as const
 
