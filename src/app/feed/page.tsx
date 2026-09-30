@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { BookmarkSimple, ChatCircle, Check, DotsThreeVertical, ImageSquare, LinkSimple, Newspaper, PaperPlaneRight, Plus, Question, ShareNetwork, ThumbsUp, UploadSimple, UserCircle, UserPlus, WarningCircle, X } from '@phosphor-icons/react'
+import { BookmarkSimple, ChatCircle, DotsThreeVertical, ImageSquare, LinkSimple, Newspaper, PaperPlaneRight, Plus, Question, ShareNetwork, ThumbsUp, UploadSimple, UserCircle, UserPlus, WarningCircle, X } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
@@ -274,7 +274,7 @@ export default function FeedPage(){
       ? await s.from('fenix_content_votes').delete().eq('user_id',userId).eq('content_type','post').eq('content_id',contentId)
       : await s.from('fenix_content_votes').insert({user_id:userId,content_type:'post',content_id:contentId,value:1})
     if(result.error){setMessage(locale==='bn'?'Like আপডেট করা যায়নি।':'Could not update like.');return}
-    setPosts(value=>value.map(p=>p.id===contentId?{...p,score:Math.max(0,p.score+(old?-1:1))}:p))
+    setPosts(value=>value.map(p=>p.id===contentId?{...p,liked:!old,score:Math.max(0,p.score+(old?-1:1))}:p))
   }
 
   async function vote(contentId:string){
