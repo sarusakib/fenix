@@ -200,7 +200,16 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
         const params = new URLSearchParams(window.location.search)
         const targetId = params.get('to') || ''
         if (targetId && targetId !== authId) {
-          window.setTimeout(() => window.dispatchEvent(new CustomEvent('fenix:open-message', { detail: { userId: targetId } })), 0)
+          const { data: targetProfile } = await supabase
+            .from('fenix_public_profiles')
+            .select('id,full_name,username,avatar_url')
+            .eq('id', targetId)
+            .maybeSingle()
+          if (targetProfile && !disposed) {
+            await openConversation(targetProfile as Person)
+          } else if (!disposed) {
+            setError('This profile is not available for messaging.')
+          }
         }
       }
 
@@ -775,7 +784,10 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
         <button
           type="button"
           aria-label="Open FeniX messages"
-          onClick={() => { setOpen(true); setMinimized(false) }}
+          onClick={() => {
+            if (fullPage) return
+            window.location.assign('/messages')
+          }}
           className="fixed bottom-[calc(92px+env(safe-area-inset-bottom))] right-4 z-[80] grid h-14 w-14 place-items-center rounded-full border border-white/20 bg-[var(--fx-navy)] text-white shadow-[0_18px_55px_rgba(0,128,128,.30)] transition-transform hover:scale-105 sm:bottom-5 sm:right-5"
         >
           <span className="grid h-10 w-10 place-items-center rounded-2xl border border-white/20 bg-white/10"><PaperPlaneRight size={20} weight="fill"/></span>
