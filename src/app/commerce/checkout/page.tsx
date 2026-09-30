@@ -12,7 +12,6 @@ import { createClient } from '@/utils/supabase/client'
 export default function CommerceCheckoutPage() {
   const router = useRouter()
   const [cart, setCart] = useState<CartItem[]>([])
-  const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -35,7 +34,6 @@ export default function CommerceCheckoutPage() {
       const supabase = createClient()
       const { data } = await supabase.auth.getUser()
       if (active) {
-        setUserId(data.user?.id ?? null)
         setLoading(false)
       }
     }
