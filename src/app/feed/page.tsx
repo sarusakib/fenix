@@ -299,10 +299,11 @@ export default function FeedPage(){
   },[tab,questions,followed,followedProfiles])
 
   const feedItems=useMemo(()=>{
-    if(tab==='questions'||tab==='following')return visibleQuestions.map(q=>({kind:'question' as const,time:q.created_at,data:q}))
-    if(tab==='news')return news.map(n=>({kind:'news' as const,time:n.published_at??'',data:n}))
+    if(tab==='questions') return visibleQuestions.map(q=>({kind:'question' as const,time:q.created_at,data:q}))
+    if(tab==='news') return news.map(n=>({kind:'news' as const,time:n.published_at??'',data:n}))
     const availablePosts=tab==='following' ? posts.filter(p=>followedProfiles.includes(p.author_id)) : posts
-    const all=[...visibleQuestions.map(q=>({kind:'question' as const,time:q.created_at,data:q})),...(tab==='for-you'||tab==='latest'?news.map(n=>({kind:'news' as const,time:n.published_at??'',data:n})):[]),...availablePosts.map(p=>({kind:'post' as const,time:p.created_at,data:p}))]
+    const questionsForTab=tab==='following' ? visibleQuestions : visibleQuestions
+    const all=[...questionsForTab.map(q=>({kind:'question' as const,time:q.created_at,data:q})),...(tab==='for-you'||tab==='latest'?news.map(n=>({kind:'news' as const,time:n.published_at??'',data:n})):[]),...availablePosts.map(p=>({kind:'post' as const,time:p.created_at,data:p}))]
     return all.sort((a,b)=>new Date(b.time).getTime()-new Date(a.time).getTime())
   },[tab,visibleQuestions,news,posts,followedProfiles])
 
