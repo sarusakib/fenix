@@ -3670,6 +3670,80 @@ export type Database = {
           },
         ]
       }
+      profile_contacts: {
+        Row: {
+          user_id: string
+          whatsapp: string | null
+          facebook_url: string | null
+          instagram_url: string | null
+          linkedin_url: string | null
+          youtube_url: string | null
+          phone_public: boolean
+          whatsapp_public: boolean
+          facebook_public: boolean
+          instagram_public: boolean
+          linkedin_public: boolean
+          youtube_public: boolean
+          created_at: string
+          updated_at: string
+          public_whatsapp: string | null
+          public_facebook_url: string | null
+          public_instagram_url: string | null
+          public_linkedin_url: string | null
+          public_youtube_url: string | null
+        }
+        Insert: {
+          user_id: string
+          whatsapp?: string | null
+          facebook_url?: string | null
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          youtube_url?: string | null
+          phone_public?: boolean
+          whatsapp_public?: boolean
+          facebook_public?: boolean
+          instagram_public?: boolean
+          linkedin_public?: boolean
+          youtube_public?: boolean
+          created_at?: string
+          updated_at?: string
+          public_whatsapp?: string | null
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_youtube_url?: string | null
+        }
+        Update: {
+          user_id?: string
+          whatsapp?: string | null
+          facebook_url?: string | null
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          youtube_url?: string | null
+          phone_public?: boolean
+          whatsapp_public?: boolean
+          facebook_public?: boolean
+          instagram_public?: boolean
+          linkedin_public?: boolean
+          youtube_public?: boolean
+          created_at?: string
+          updated_at?: string
+          public_whatsapp?: string | null
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_settings: {
         Row: {
           feed_visibility: string
@@ -3977,6 +4051,14 @@ export type Database = {
       }
       fenix_public_profiles: {
         Row: {
+          facebook_url: string | null
+          instagram_url: string | null
+          linkedin_url: string | null
+          youtube_url: string | null
+          whatsapp: string | null
+          public_location: string | null
+          phone: string | null
+
           avatar_url: string | null
           bio: string | null
           cover_url: string | null
