@@ -152,7 +152,8 @@ export default function ProfileEditorPage() {
     }
   }
 
-  async function save() {    setBusy(true)
+  async function save() {
+    setBusy(true)
     setMessage('')
     const cleanUsername = username.trim().toLowerCase()
     if (!/^[a-z0-9_]{3,32}$/.test(cleanUsername)) {
@@ -160,17 +161,13 @@ export default function ProfileEditorPage() {
       setBusy(false)
       return
     }
+
     const website = cleanPublicUrl(websiteUrl)
-    const whatsapp = cleanOptionalUrl(whatsappUrl)
-    const facebook = cleanOptionalUrl(facebookUrl)
-    const instagram = cleanOptionalUrl(instagramUrl)
-    if (websiteUrl.trim() && !website) {
-      setMessage(locale === 'bn' ? 'Website-এর ক্ষেত্রে https:// বা http:// URL দিন।' : 'Use a full http:// or https:// website URL.')
-      setBusy(false)
-      return
-    }
-    if ((whatsappUrl.trim() && !whatsapp) || (facebookUrl.trim() && !facebook) || (instagramUrl.trim() && !instagram)) {
-      setMessage(locale === 'bn' ? 'Social link-এ পূর্ণ http:// অথবা https:// URL দিন।' : 'Use a full http:// or https:// URL for social links.')
+    const whatsapp = cleanPublicUrl(whatsappUrl)
+    const facebook = cleanPublicUrl(facebookUrl)
+    const instagram = cleanPublicUrl(instagramUrl)
+    if ((websiteUrl.trim() && !website) || (whatsappUrl.trim() && !whatsapp) || (facebookUrl.trim() && !facebook) || (instagramUrl.trim() && !instagram)) {
+      setMessage(locale === 'bn' ? 'সব link-এ পূর্ণ http:// অথবা https:// URL দিন।' : 'Use a full http:// or https:// URL for each link.')
       setBusy(false)
       return
     }
@@ -178,15 +175,28 @@ export default function ProfileEditorPage() {
     const s = createClient()
     const { data: auth } = await s.auth.getUser()
     if (!auth.user) { setBusy(false); return }
+
     const [{ error: profileError }, { error: settingError }] = await Promise.all([
-s.from('profiles').update({
-        full_name: fullName.trim().slice(0,160) || null,
+      s.from('profiles').update({
+        full_name: fullName.trim().slice(0, 160) || null,
         username: cleanUsername,
-        bio: bio.trim().slice(0,1000) || null,
+        bio: bio.trim().slice(0, 1000) || null,
         avatar_url: cleanPublicUrl(avatarUrl),
         cover_url: cleanPublicUrl(coverUrl),
-        location_text: locationText.trim().slice(0,160) || null,
+        location_text: locationText.trim().slice(0, 500) || null,
         website_url: website,
+        whatsapp_url: whatsapp,
+        facebook_url: facebook,
+        instagram_url: instagram,
+        district_id: districtId || null,
+        upazila_id: upazilaId || null,
+        locality_id: localityId || null,
+        area_text: areaText.trim().slice(0, 160) || null,
+        road_text: roadText.trim().slice(0, 160) || null,
+        house_details: houseDetails.trim().slice(0, 200) || null,
+        holding_no: holdingNo.trim().slice(0, 80) || null,
+        location_public_level: locationPublicLevel,
+        exact_location_visibility: exactLocationVisibility,
         updated_at: new Date().toISOString(),
       }).eq('id', auth.user.id),
       s.from('profile_settings').upsert({
@@ -197,12 +207,14 @@ s.from('profiles').update({
         feed_visibility: feedVisibility,
       }, { onConflict: 'user_id' }),
     ])
+
     if (profileError || settingError) {
       setMessage(locale === 'bn'
         ? 'Profile save করা যায়নি। Username আগে থেকে ব্যবহার হয়ে থাকলে অন্যটা দিন।'
         : 'Could not save the profile. The username may already be taken.')
+    } else {
+      setMessage(locale === 'bn' ? 'Profile সফলভাবে সংরক্ষণ হয়েছে।' : 'Profile successfully updated.')
     }
-    else setMessage(locale === 'bn' ? 'Profile successfully updated.' : 'Profile successfully updated.')
     setBusy(false)
   }
 
@@ -259,12 +271,11 @@ s.from('profiles').update({
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <Field label={locale==='bn'?'নাম':'Name'} value={fullName} onChange={setFullName} maxLength={160}/>
             <Field label="Username" value={username} onChange={v=>setUsername(v.replace(/[^a-zA-Z0-9_]/g,'').toLowerCase())} maxLength={32} prefix="@"/>
-            <Field label={locale==='bn'?'এলাকা':'Location'} value={locationText} onChange={setLocationText} maxLength={160} icon={<MapPin size={15}/>}/>
-            <Field label="Website" value={websiteUrl} onChange={setWebsiteUrl} maxLength={500} icon={<Globe size={15}/>} placeholder="https://example.com"/>
+            <Field label={locale==='bn'?'ওয়েবসাইট':'Website'} value={websiteUrl} onChange={setWebsiteUrl} maxLength={500} icon={<Globe size={15}/>} placeholder="https://example.com"/>
             <Field label={locale==='bn'?'WhatsApp link':'WhatsApp link'} value={whatsappUrl} onChange={setWhatsappUrl} maxLength={500} icon={<WhatsappLogo size={15}/>} placeholder="https://wa.me/…"/>
             <Field label={locale==='bn'?'Facebook link':'Facebook link'} value={facebookUrl} onChange={setFacebookUrl} maxLength={500} icon={<FacebookLogo size={15}/>} placeholder="https://facebook.com/…"/>
             <Field label={locale==='bn'?'Instagram link':'Instagram link'} value={instagramUrl} onChange={setInstagramUrl} maxLength={500} icon={<InstagramLogo size={15}/>} placeholder="https://instagram.com/…"/>
-            <Field label="Website" value={websiteUrl} onChange={setWebsiteUrl} maxLength={500} icon={<Globe size={15}/>} placeholder="https://example.com"/>
+            <div className="md:col-span-2"><FeniLocationPicker districtId={districtId} upazilaId={upazilaId} localityId={localityId} areaText={areaText} roadText={roadText} houseDetails={houseDetails} holdingNo={holdingNo} publicLevel={locationPublicLevel} exactVisibility={exactLocationVisibility} onChange={(patch)=>{if(patch.districtId!==undefined)setDistrictId(patch.districtId);if(patch.upazilaId!==undefined)setUpazilaId(patch.upazilaId);if(patch.localityId!==undefined)setLocalityId(patch.localityId);if(patch.areaText!==undefined)setAreaText(patch.areaText);if(patch.roadText!==undefined)setRoadText(patch.roadText);if(patch.houseDetails!==undefined)setHouseDetails(patch.houseDetails);if(patch.holdingNo!==undefined)setHoldingNo(patch.holdingNo);if(patch.publicLevel!==undefined)setLocationPublicLevel(patch.publicLevel);if(patch.exactVisibility!==undefined)setExactLocationVisibility(patch.exactVisibility);if(patch.locationText!==undefined)setLocationText(patch.locationText)}}/></div>
           </div>
           <label className="mt-4 block"><span className="text-xs font-bold">Bio</span><textarea value={bio} onChange={e=>setBio(e.target.value)} maxLength={1000} rows={5} className="mt-2 w-full rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-3 text-sm leading-7 outline-none" placeholder={locale==='bn'?'আপনি কী করেন? কী নিয়ে কাজ করেন?':'What do you do and what are you building?'}/><span className="mt-1 block text-[10px] text-[var(--fx-muted)]">{bio.length}/1000</span></label>
         </section>
