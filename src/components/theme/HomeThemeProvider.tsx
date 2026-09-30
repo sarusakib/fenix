@@ -71,10 +71,6 @@ function applyTheme(theme: ResolvedTheme) {
   )
 }
 
-function resolveTheme(theme: HomeTheme): ResolvedTheme {
-  return theme === 'system' ? getSystemTheme() : theme
-}
-
 export default function HomeThemeProvider({
   children,
 }: {
