@@ -3,7 +3,7 @@
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowLeft, Check, CheckCircle, DotsThreeVertical, File as FileIcon, FileImage,
-  Heart, MagnifyingGlass, MapPin, Minus, Paperclip, PaperPlaneRight,
+  MagnifyingGlass, MapPin, Minus, Paperclip, PaperPlaneRight,
   PencilSimple, PushPin, Smiley, Stop, Trash, UserCircle, X, Microphone,
 } from '@phosphor-icons/react'
 import { usePathname } from 'next/navigation'
