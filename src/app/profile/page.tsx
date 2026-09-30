@@ -351,7 +351,10 @@ export default function ProfilePage() {
   async function changeSetting(patch: Record<string, unknown>, apply: () => void) {
     apply()
     const s = createClient()
-    const { error } = await s.from('profile_settings').update({ ...patch, updated_at: new Date().toISOString() }).eq('user_id', userId)
+    const { error } = await s.from('profile_settings').upsert(
+      { user_id: userId, ...patch, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' },
+    )
     if (error) setMessage(bn ? 'Setting save করা যায়নি।' : 'Setting could not be saved.')
   }
 
