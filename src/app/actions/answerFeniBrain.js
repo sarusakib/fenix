@@ -226,12 +226,10 @@ export async function answerFeniBrain(query) {
 
   try {
     const hf = new HfInference(token)
-    const controller = new AbortController()
-    const aiTimeout = setTimeout(() => controller.abort(), AI_TIMEOUT_MS)
     const context = buildContext(retrieval.results || [], liveSources)
-    const response = await hf.chatCompletion({
+    const responsePromise = hf.chatCompletion({
       model: MODEL,
-      provider: 'auto',
+      provider: PROVIDER,
       messages: [
         {
           role: 'system',
@@ -248,12 +246,12 @@ export async function answerFeniBrain(query) {
       ],
       max_tokens: MAX_ANSWER_TOKENS,
       temperature: 0.2,
-    }, {
-      retry_on_error: false,
-      signal: controller.signal,
     })
 
-    clearTimeout(aiTimeout)
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Feni Brain AI timeout.')), AI_TIMEOUT_MS)
+    })
+    const response = await Promise.race([responsePromise, timeoutPromise])
 
     const answer = response?.choices?.[0]?.message?.content?.trim()
     if (!answer) throw new Error('Empty Feni Brain response.')
@@ -268,8 +266,7 @@ export async function answerFeniBrain(query) {
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
     }
   } catch (error) {
-    clearTimeout(aiTimeout)
-    console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status })
+    console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status, provider: PROVIDER, model: MODEL, message: error?.message?.slice?.(0, 240) })
     return {
       success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(cleanQuery, retrieval), intent: retrieval.intent,
       locations: retrieval.locations, childLocations: retrieval.childLocations, sources: retrieval.sources,
