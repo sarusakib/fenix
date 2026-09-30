@@ -27,6 +27,8 @@ export type OptimizedImage = {
   mimeType: string
   sourceByteSize?: number
   compressionRatio?: number
+  /** SHA-256 of the original source bytes; useful for duplicate detection and media observability. */
+  sourceDigest?: string
 }
 
 type OptimizeOptions = {
@@ -40,6 +42,12 @@ type DecodedImage = {
   width: number
   height: number
   cleanup: () => void
+}
+
+async function sha256File(file: File) {
+  const bytes = await file.arrayBuffer()
+  const digest = await crypto.subtle.digest('SHA-256', bytes)
+  return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, '0')).join('')
 }
 
 async function decodeImage(file: File): Promise<DecodedImage> {
@@ -145,8 +153,6 @@ async function findBestBlob(
       best = { blob: candidate, mimeType }
     }
 
-    // WebP reaching target is normally preferable to a lower-quality JPEG.
-    if (bestUnderTarget && best.blob.size <= targetBytes) break
   }
 
   return best
@@ -169,9 +175,13 @@ export async function optimizeImageFile(
     throw new Error('Please choose an image file.')
   }
 
-  const targetBytes = options.targetBytes ?? TARGET_IMAGE_BYTES
-  const maxDimension = options.maxDimension ?? 2560
+  const targetBytes = Math.min(
+    HARD_IMAGE_UPLOAD_BYTES,
+    Math.max(TARGET_IMAGE_BYTES, options.targetBytes ?? TARGET_IMAGE_BYTES),
+  )
+  const maxDimension = Math.max(360, options.maxDimension ?? 2560)
   const minDimension = options.minDimension ?? 360
+  const sourceDigest = await sha256File(file)
   const decoded = await decodeImage(file)
 
   try {
@@ -190,6 +200,7 @@ export async function optimizeImageFile(
         mimeType: file.type,
         sourceByteSize: file.size,
         compressionRatio: 1,
+        sourceDigest,
       }
     }
 
@@ -249,6 +260,7 @@ export async function optimizeImageFile(
           mimeType: result.mimeType,
           sourceByteSize: file.size,
           compressionRatio: file.size / Math.max(1, optimizedFile.size),
+          sourceDigest,
         }
       }
 
@@ -275,6 +287,9 @@ export async function uploadOptimizedPublicImage(
 ) {
   if (optimized.byteSize > HARD_IMAGE_UPLOAD_BYTES) {
     throw new Error('The optimized image is still above the FeniX storage limit.')
+  }
+  if (!optimized.mimeType || !['image/jpeg', 'image/webp'].includes(optimized.mimeType)) {
+    throw new Error('Unsupported optimized image format.')
   }
 
   const { error } = await client.storage.from(bucket).upload(
