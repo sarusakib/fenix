@@ -89,7 +89,7 @@ export default function NotFound() {
         </p>
 
         <Link
-          href="/"
+          href="/feed"
           className="
             mt-7
             inline-flex
