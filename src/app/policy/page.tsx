@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, CheckCircle, ShieldCheck, Sparkle, Newspaper } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, ArrowRight, CheckCircle, ShieldCheck, Newspaper } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '../../components/Navbar'
 
 export const metadata = {
