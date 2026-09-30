@@ -102,13 +102,14 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           </div>
           {publicPosts?.length ? (
             <div className="mt-5 grid gap-3">
-              {publicPosts.map((post: {id:string;body:string|null;created_at:string}) => (
-                <Link key={post.id} href={'/feed/post/'+post.id} className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-bg)]/35 p-4 hover:bg-[var(--fx-bg)]">
+              {publicPosts.map(post => {
+                if (!post.id || !post.created_at) return null
+                return <Link key={post.id} href={'/feed/post/'+post.id} className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-bg)]/35 p-4 hover:bg-[var(--fx-bg)]">
                   <div className="flex items-center justify-between gap-3"><time className="text-[10px] text-[var(--fx-muted)]">{new Date(post.created_at).toLocaleString('en-BD')}</time><span className="text-[10px] font-bold text-[var(--fx-primary-strong)]">Open post →</span></div>
                   {post.body && <p className="mt-2 line-clamp-4 whitespace-pre-wrap text-sm leading-6">{post.body}</p>}
                   {(mediaByPost[post.id]?.length ?? 0) > 0 && <div className="mt-3 grid grid-cols-2 gap-1.5">{mediaByPost[post.id].slice(0,4).map(media => <img key={media.id} src={media.url} alt="" loading="lazy" decoding="async" width={media.width ?? 800} height={media.height ?? 600} className="aspect-square w-full rounded-xl object-cover"/>)}</div>}
                 </Link>
-              ))}
+              })}
             </div>
           ) : <div className="mt-5 rounded-2xl border border-dashed border-[var(--fx-border)] p-8 text-center text-sm text-[var(--fx-muted)]">No public posts yet.</div>}
         </section>
