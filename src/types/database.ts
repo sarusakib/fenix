@@ -3739,6 +3739,9 @@ export type Database = {
           updated_at: string
           username: string | null
           website_url: string | null
+          whatsapp_url: string | null
+          facebook_url: string | null
+          instagram_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -3753,6 +3756,9 @@ export type Database = {
           updated_at?: string
           username?: string | null
           website_url?: string | null
+          whatsapp_url?: string | null
+          facebook_url?: string | null
+          instagram_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -3767,6 +3773,9 @@ export type Database = {
           updated_at?: string
           username?: string | null
           website_url?: string | null
+          whatsapp_url?: string | null
+          facebook_url?: string | null
+          instagram_url?: string | null
         }
         Relationships: []
       }
@@ -3977,6 +3986,9 @@ export type Database = {
           location_text: string | null
           username: string | null
           website_url: string | null
+          whatsapp_url: string | null
+          facebook_url: string | null
+          instagram_url: string | null
         }
         Relationships: []
       }
