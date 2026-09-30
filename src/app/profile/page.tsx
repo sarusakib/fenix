@@ -415,7 +415,7 @@ export default function ProfilePage() {
             </div>
             <div className="mt-4 rounded-xl bg-[var(--fx-primary-soft)] p-3 text-xs">
               <p className="font-bold">{bn ? 'Public profile URL' : 'Public profile URL'}</p>
-              <p className="mt-1 break-all text-[var(--fx-muted)]">{window.location.origin}{publicUrl}</p>
+              <p className="mt-1 break-all text-[var(--fx-muted)]">{publicUrl}</p>
             </div>
             <button type="button" disabled={busy || usernameStatus !== 'available'} onClick={() => void saveProfile()} className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-xs font-bold text-white disabled:opacity-40"><Check size={16}/>{busy ? (bn ? 'Saving…' : 'Saving…') : (bn ? 'Save changes' : 'Save changes')}</button>
           </div>}
