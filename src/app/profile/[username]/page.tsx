@@ -42,7 +42,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   const [{ data: publicPosts }, { data: stats }] = await Promise.all([
     s.from('fenix_public_feed').select('id,body,created_at').eq('author_id', profileId).order('created_at', { ascending: false }).limit(12),
-    s.rpc('fenix_public_profile_stats', { p_profile_id: profileId }),
+    s.from('fenix_public_profile_stats').select('posts,followers,following').eq('id', profileId).maybeSingle(),
   ])
 
   const profileStats = stats && typeof stats === 'object' ? stats as { posts?: number; followers?: number; following?: number } : null
