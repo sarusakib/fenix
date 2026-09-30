@@ -23,7 +23,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const s = await createClient()
   const { data: profile } = await s
     .from('fenix_public_profiles')
-    .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,created_at')
+    .select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,facebook_url,instagram_url,whatsapp,created_at')
     .eq('username', decodeURIComponent(username).toLowerCase())
     .maybeSingle()
 
@@ -58,6 +58,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               <div className="mt-5 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">
                 {profile.location_text && <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5"><MapPin size={14}/>{profile.location_text}</span>}
                 {website && <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5 hover:underline"><Globe size={14}/>Website</a>}
+                {profile.facebook_url && <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5 hover:underline"><span className="font-black">f</span>Facebook</a>}
+                {profile.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5 hover:underline"><span className="font-black">◎</span>Instagram</a>}
+                {profile.whatsapp && <a href={profile.whatsapp.startsWith('http') ? profile.whatsapp : 'https://wa.me/' + profile.whatsapp.replace(/[^0-9+]/g, '')} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-1.5 hover:underline"><span className="font-black">◉</span>WhatsApp</a>}
               </div>
               <ProfileReportButton profileId={profileId} locale="bn" />
               <p className="mt-5 text-[11px] text-[var(--fx-muted)]">FeniX member since {new Date(createdAt).toLocaleDateString('en-BD')}</p>
