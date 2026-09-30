@@ -6,7 +6,7 @@ import { UserPlus, UserMinus } from '@phosphor-icons/react'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 
-export default function ProfileFollowButton({ profileId }: { profileId: string }) {
+export default function ProfileFollowButton({ profileId, nextPath = '/feed' }: { profileId: string; nextPath?: string }) {
   const { locale } = useFenixLocale()
   const [userId, setUserId] = useState<string | null>(null)
   const [following, setFollowing] = useState(false)
@@ -29,7 +29,7 @@ export default function ProfileFollowButton({ profileId }: { profileId: string }
   }, [profileId])
 
   if (!userId) {
-    return <Link href={'/login?next='+encodeURIComponent('/profile/'+profileId)} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-3.5 text-xs font-bold text-white"><UserPlus size={16}/>{locale==='bn'?'অনুসরণ':'Follow'}</Link>
+    return <Link href={'/login?next='+encodeURIComponent(nextPath)} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-3.5 text-xs font-bold text-white"><UserPlus size={16}/>{locale==='bn'?'অনুসরণ':'Follow'}</Link>
   }
   if (userId === profileId) return null
 
