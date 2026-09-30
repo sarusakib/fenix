@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Clock, Newspaper, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, ArrowRight, Clock, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
 import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
