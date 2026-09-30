@@ -44,6 +44,9 @@ export default function SettingsPage() {
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULT_PREFS)
   const [savingKey, setSavingKey] = useState('')
   const [notice, setNotice] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [securityBusy, setSecurityBusy] = useState(false)
 
   useEffect(() => {
     const currentUserId = user?.id
@@ -110,6 +113,35 @@ export default function SettingsPage() {
   const chooseTheme = (next: HomeTheme) => {
     setTheme(next)
     void save({ theme: next }, 'theme')
+  }
+
+  async function changePassword() {
+    if (newPassword.length < 8) {
+      setNotice(bn ? 'Password কমপক্ষে 8 অক্ষরের হতে হবে।' : 'Password must be at least 8 characters.')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setNotice(bn ? 'Password confirmation মিলছে না।' : 'Password confirmation does not match.')
+      return
+    }
+    setSecurityBusy(true)
+    setNotice('')
+    const s = createClient()
+    const { error } = await s.auth.updateUser({ password: newPassword })
+    setSecurityBusy(false)
+    setNewPassword('')
+    setConfirmPassword('')
+    setNotice(error
+      ? (bn ? 'Password পরিবর্তন করা যায়নি। প্রয়োজনে আবার Login করে চেষ্টা করুন।' : 'Password could not be changed. Please sign in again and retry.')
+      : (bn ? 'Password পরিবর্তন হয়েছে।' : 'Password changed successfully.'))
+  }
+
+  async function signOutAllSessions() {
+    setSecurityBusy(true)
+    const s = createClient()
+    await s.auth.signOut({ scope: 'global' })
+    setSecurityBusy(false)
+    window.location.replace('/login')
   }
 
   const chooseMotion = (next: boolean) => {
@@ -218,6 +250,24 @@ export default function SettingsPage() {
               <button type="button" onClick={() => { setLocale('en'); void save({locale:'en'}, 'locale', 'Language set to English.') }} aria-pressed={locale === 'en'} className={'min-h-12 rounded-xl border text-sm font-bold ' + (locale === 'en' ? 'border-[var(--fx-primary)]/25 bg-[var(--fx-primary-soft)]' : 'border-[var(--fx-border)] bg-[var(--fx-bg)]/40')}>English</button>
             </div>
             <SettingRow title={bn ? 'Reduced motion' : 'Reduced motion'} body={bn ? 'Animation ও transition কমিয়ে দিন।' : 'Reduce extra transitions and animation.'} control={<Switch enabled={reducedMotion} busy={savingKey === 'motion'} onToggle={() => chooseMotion(!reducedMotion)} />} />
+          </SettingsSection>
+
+
+          <SettingsSection icon={<Lock size={20}/>} title={bn ? 'Security & login' : 'Security & login'} text={bn ? 'Password এবং session access নিয়ন্ত্রণ করুন।' : 'Control password and session access.'}>
+            <div className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-bg)]/40 p-4">
+              <p className="text-sm font-bold">{bn ? 'Password পরিবর্তন' : 'Change password'}</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--fx-muted)]">{bn ? 'কমপক্ষে 8 অক্ষরের নতুন password দিন। Supabase সাম্প্রতিক authentication চাইতে পারে।' : 'Choose a new password of at least 8 characters. Supabase may require recent authentication.'}</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <input type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} autoComplete="new-password" placeholder={bn?'নতুন password':'New password'} className="h-11 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-sm outline-none"/>
+                <input type="password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} autoComplete="new-password" placeholder={bn?'আবার password দিন':'Confirm password'} className="h-11 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-sm outline-none"/>
+              </div>
+              <button type="button" onClick={()=>void changePassword()} disabled={securityBusy || !newPassword || !confirmPassword} className="mt-3 min-h-10 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-xs font-bold text-white disabled:opacity-40">{securityBusy ? (bn?'কাজ হচ্ছে…':'Working…') : (bn?'Password আপডেট করুন':'Update password')}</button>
+            </div>
+            <div className="rounded-2xl border border-red-500/15 bg-red-500/[.035] p-4">
+              <p className="text-sm font-bold">{bn ? 'সব session থেকে Sign out' : 'Sign out all sessions'}</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--fx-muted)]">{bn ? 'এই account-এর অন্য device/browser session-ও বন্ধ হবে।' : 'End every active FeniX session for this account.'}</p>
+              <button type="button" onClick={()=>void signOutAllSessions()} disabled={securityBusy} className="mt-3 min-h-10 rounded-xl border border-red-500/20 bg-red-500/[.07] px-4 text-xs font-bold text-red-700 dark:text-red-300 disabled:opacity-40">{bn?'সব session বন্ধ করুন':'Sign out all sessions'}</button>
+            </div>
           </SettingsSection>
 
           <SettingsSection icon={<ShieldCheck size={20}/>} title={bn ? 'Safety, support & trust' : 'Safety, support & trust'} text={bn ? 'Report, verification, policy ও help-এর direct access।' : 'Direct access to reporting, verification, policy and help.'}>
