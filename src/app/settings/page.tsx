@@ -52,12 +52,12 @@ export default function SettingsPage() {
       return
     }
     let active = true
-    async function load() {
+    async function load(uid: string) {
       const s = createClient()
       const { data } = await s
         .from('profile_settings')
         .select('profile_visibility,message_permissions,feed_visibility,reduced_motion,notification_preferences')
-         .eq('user_id', currentUserId)
+        .eq('user_id', uid)
         .maybeSingle()
       if (!active) return
       if (data?.profile_visibility === 'private') setProfileVisibility('private')
@@ -74,7 +74,7 @@ export default function SettingsPage() {
         } as NotificationPrefs)
       }
     }
-    void load()
+    void load(currentUserId)
     return () => { active = false }
   }, [user])
 
