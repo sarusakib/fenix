@@ -104,6 +104,7 @@ export default function Navbar() {
               <MobileLink href="/invest" onClick={closeMenus} emphasized icon={<TrendUp size={18}/>}>{bn ? 'ইনভেস্ট' : 'Invest'}</MobileLink>
               <MobileLink href="/emergency" onClick={closeMenus} icon={<ShieldCheck size={18}/>}>{bn ? 'জরুরি' : 'Emergency'}</MobileLink>
               {user && <MobileLink href="/settings" onClick={closeMenus} icon={<GearSix size={18}/>}>{bn ? 'সেটিংস' : 'Settings'}</MobileLink>}
+              {user && <MobileLink href="/saved" onClick={closeMenus} icon={<BookmarkSimple size={18}/>}>{bn ? 'Saved' : 'Saved'}</MobileLink>}
               {user && <MobileLink href="/profile" onClick={closeMenus} icon={<UserCircle size={18}/>}>{bn ? 'প্রোফাইল' : 'Profile'}</MobileLink>}
             </div>
             {user ? (
