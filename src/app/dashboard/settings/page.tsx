@@ -32,7 +32,7 @@ export default function DashboardSettingsPage(){
    if(data.locale==='bn'||data.locale==='en') setLocale(data.locale)
   }
   void load(); return ()=>{active=false}
- },[setTheme])
+ },[setTheme,setLocale])
 
  const update=async(patch:Record<string,unknown>,success?:string)=>{
   if(!userId)return
@@ -97,4 +97,3 @@ export default function DashboardSettingsPage(){
 
 function SectionHead({icon,title,text}:{icon:React.ReactNode;title:string;text:string}){return <div className="flex items-start gap-3"><div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]">{icon}</div><div><h2 className="text-lg font-black">{title}</h2><p className="mt-1 text-sm leading-6 text-[var(--fx-muted)]">{text}</p></div></div>}
 function Action({href,title,body}:{href:string;title:string;body:string}){return <Link href={href} className="rounded-2xl border border-[var(--fx-border)] p-4 transition hover:bg-black/[.02] dark:hover:bg-white/[.03]"><p className="font-bold">{title}</p><p className="mt-1 text-xs leading-5 text-[var(--fx-muted)]">{body}</p></Link>}
-function Select({label,value,onChange,options}:{label:string;value:string;onChange:(v:string)=>void;options:string[][]}){return <label className="block"><span className="text-xs font-bold">{label}</span><select value={value} onChange={e=>onChange(e.target.value)} className="mt-2 h-11 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-sm">{options.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></label>}
