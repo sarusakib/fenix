@@ -9,7 +9,7 @@ import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 
 type Post={id:string;body:string;created_at:string;author_id:string;author_name:string|null;author_username:string|null;author_avatar_url:string|null}
-type Media={id:string;post_id:string;storage_bucket:string;storage_path:string;width:number|null;height:number|null;sort_order:number}
+type Media={id:string;post_id:string;storage_bucket:string;storage_path:string;width:number|null;height:number|null;sort_order:number;public_url:string}
 type Comment={id:string;author_id:string;body:string;created_at:string;author_name:string|null;author_username:string|null;author_avatar_url:string|null}
 
 export default function PostPage({params}:{params:Promise<{id:string}>}){
@@ -39,7 +39,7 @@ export default function PostPage({params}:{params:Promise<{id:string}>}){
      const uid=auth.session?.user?.id??null
      setUserId(uid)
      setPost((pv??null) as Post|null)
-     setMedia((mv??[]) as Media[])
+     setMedia(((mv??[]) as Array<Omit<Media,'public_url'>>).map(item=>({...item,public_url:s.storage.from(item.storage_bucket).getPublicUrl(item.storage_path).data.publicUrl})))
      const raw=(cv??[]) as Array<{id:string;author_id:string;body:string;created_at:string}>
      if(raw.length){
        const ids=Array.from(new Set(raw.map(x=>x.author_id)))
@@ -88,7 +88,7 @@ export default function PostPage({params}:{params:Promise<{id:string}>}){
   <article className="mt-5 rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-5 sm:p-7">
    <div className="flex items-center gap-3">{post.author_avatar_url?<img src={post.author_avatar_url} alt="" loading="lazy" decoding="async" width={40} height={40} className="h-10 w-10 rounded-full object-cover"/>:<UserCircle size={40} className="opacity-40"/>}<div><p className="text-sm font-bold">{post.author_name||post.author_username||'FeniX user'}</p><time className="text-[11px] text-[var(--fx-muted)]">{new Date(post.created_at).toLocaleString(locale==='bn'?'bn-BD':'en-BD')}</time></div></div>
    {post.body&&<p className="mt-5 whitespace-pre-wrap text-sm leading-8">{post.body}</p>}
-   {media.length>0&&<div className={`mt-5 grid gap-2 ${media.length===1?'grid-cols-1':'grid-cols-2'}`}>{media.map(item=><img key={item.id} src={createClient().storage.from(item.storage_bucket).getPublicUrl(item.storage_path).data.publicUrl} alt="" loading="lazy" decoding="async" width={item.width??1200} height={item.height??800} className="max-h-[620px] w-full rounded-2xl object-cover"/>)}</div>}
+   {media.length>0&&<div className={`mt-5 grid gap-2 ${media.length===1?'grid-cols-1':'grid-cols-2'}`}>{media.map(item=><img key={item.id} src={item.public_url} alt="" loading="lazy" decoding="async" width={item.width??1200} height={item.height??800} className="max-h-[620px] w-full rounded-2xl object-cover"/>)}</div>}
    <div className="mt-5 flex flex-wrap items-center gap-2"><button onClick={()=>void toggleLike()} className={`inline-flex min-h-10 items-center gap-1.5 rounded-xl border px-3 text-xs font-bold ${liked?'border-[var(--fx-primary)]/20 bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]':'border-[var(--fx-border)]'}`}><ThumbsUp size={16}/>{locale==='bn'?'Like':'Like'} · {score}</button><button onClick={()=>document.getElementById('comments')?.scrollIntoView({behavior:'smooth'})} className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ChatCircle size={16}/>{locale==='bn'?'মন্তব্য':'Comments'} · {comments.length}</button><button onClick={()=>void navigator.share?.({title:post.author_name||'FeniX post',url:location.href})} className="ml-auto inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ShareNetwork size={16}/>{locale==='bn'?'শেয়ার':'Share'}</button></div>
   </article>
 
