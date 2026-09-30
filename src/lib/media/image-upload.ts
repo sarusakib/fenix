@@ -8,14 +8,16 @@ import { createClient } from '@/utils/supabase/client'
  * There is no product-level source-size cap here. Very large files should be
  * transported with resumable/chunked upload by the caller before decoding.
  *
- * The stored image targets ~100 KB while keeping the best perceptual quality
+ * The stored image targets ~300 KB while keeping the best perceptual quality
  * the browser encoder can achieve at that size. If 100 KB would be too
- * destructive, the optimizer can fall back up to 200 KB rather than creating
+ * destructive, the optimizer can fall back up to 400 KB rather than creating
  * a visibly broken image.
  */
-export const TARGET_IMAGE_BYTES = 100 * 1024
+export const TARGET_IMAGE_BYTES = 300 * 1024
 export const MAX_IMAGE_UPLOAD_BYTES = TARGET_IMAGE_BYTES
-export const HARD_IMAGE_UPLOAD_BYTES = 200 * 1024
+export const HARD_IMAGE_UPLOAD_BYTES = 400 * 1024
+
+// Adaptive quality: prefer ~300 KB, but never exceed 400 KB for stored delivery images.
 
 export type OptimizedImage = {
   file: File
@@ -113,7 +115,7 @@ async function findBestBlob(
     let bestUnderTarget: Blob | null = null
     let smallest: Blob | null = null
 
-    for (let attempt = 0; attempt < 12; attempt += 1) {
+    for (let attempt = 0; attempt < 14; attempt += 1) {
       const quality = (low + high) / 2
       const blob = await encodeCanvas(canvas, mimeType, quality)
       if (!blob) break
@@ -168,7 +170,7 @@ export async function optimizeImageFile(
   }
 
   const targetBytes = options.targetBytes ?? TARGET_IMAGE_BYTES
-  const maxDimension = options.maxDimension ?? 2048
+  const maxDimension = options.maxDimension ?? 2560
   const minDimension = options.minDimension ?? 360
   const decoded = await decodeImage(file)
 
@@ -253,7 +255,7 @@ export async function optimizeImageFile(
       if (longestSide <= minDimension) break
       longestSide = Math.max(
         minDimension,
-        Math.floor(longestSide * 0.82),
+        Math.floor(longestSide * 0.88),
       )
     }
   } finally {
