@@ -11,11 +11,6 @@ type OrderItem = {
   quantity: number
 }
 
-type ReviewActionProps = {
-  orderId: string
-  item: OrderItem
-}
-
 export default function CustomerOrderActions({ orderId: _orderId, items }: { orderId: string; items: OrderItem[] }) {
   const [active, setActive] = useState<string | null>(null)
   const [rating, setRating] = useState('5')
