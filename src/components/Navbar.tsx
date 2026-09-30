@@ -15,10 +15,9 @@ export default function Navbar() {
   const { locale } = useFenixLocale()
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [moreOpen, setMoreOpen] = useState(false)
   const bn = locale === 'bn'
 
-  const closeMenus = () => { setMenuOpen(false); setMoreOpen(false) }
+  const closeMenus = () => setMenuOpen(false)
   const toggleTheme = () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
 
   useEffect(() => {
