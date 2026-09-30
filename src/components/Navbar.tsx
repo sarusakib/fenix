@@ -39,7 +39,18 @@ export default function Navbar() {
       setUnreadNotifications(notifications.count ?? 0)
       setUnreadMessages(messages.count ?? 0)
     })
-    return () => { active = false }
+    const refresh = () => {
+      void Promise.all([
+        s.from('fenix_notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).is('read_at', null),
+        s.from('fenix_direct_messages').select('id', { count: 'exact', head: true }).eq('recipient_id', user.id).is('read_at', null).is('deleted_for_recipient_at', null),
+      ]).then(([notifications, messages]) => {
+        if (!active) return
+        setUnreadNotifications(notifications.count ?? 0)
+        setUnreadMessages(messages.count ?? 0)
+      })
+    }
+    window.addEventListener('fenix:notifications-changed', refresh)
+    return () => { active = false; window.removeEventListener('fenix:notifications-changed', refresh) }
   }, [user?.id])
 
   useEffect(() => {
