@@ -132,10 +132,10 @@ export default function FenixSearchPage() {
 
       <section className="mx-auto max-w-7xl px-4 pb-28 pt-8 sm:px-6 lg:px-8">
         <Link
-          href="/"
+          href="/feed"
           className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-4 text-sm font-bold"
         >
-          <ArrowLeft size={17} /> Home
+          <ArrowLeft size={17} /> Feed
         </Link>
 
         <div className="mt-7 max-w-4xl">
