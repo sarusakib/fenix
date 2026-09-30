@@ -77,6 +77,7 @@ export default function Navbar() {
               {user && <MobileLink href="/messages" onClick={closeMenus} emphasized icon={<ChatCircleDots size={18}/>}>{bn ? 'বার্তা' : 'Messages'}</MobileLink>}
               <MobileLink href="/invest" onClick={closeMenus} emphasized icon={<TrendUp size={18}/>}>{bn ? 'ইনভেস্ট' : 'Invest'}</MobileLink>
               <MobileLink href="/services" onClick={closeMenus} icon={<List size={18}/>}>{bn ? 'নেটওয়ার্ক' : 'Network'}</MobileLink>
+              <MobileLink href="/emergency" onClick={closeMenus} icon={<ShieldCheck size={18}/>}>{bn ? 'জরুরি' : 'Emergency'}</MobileLink>
               {user && <MobileLink href="/profile" onClick={closeMenus} icon={<UserCircle size={18}/>}>{bn ? 'প্রোফাইল' : 'Profile'}</MobileLink>}
               {user && <MobileLink href="/notifications" onClick={closeMenus} icon={<Bell size={18}/>}>{bn ? 'নোটিফিকেশন' : 'Notifications'}</MobileLink>}
             </div>
