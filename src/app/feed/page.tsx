@@ -121,7 +121,7 @@ export default function FeedPage(){
     setBusy(true);setMessage('')
     const s=createClient()
     const postId=crypto.randomUUID()
-    const uploaded:Array<{path:string;publicUrl:string;width:number;height:number;byteSize:number;mimeType:string}> = []
+    const uploaded:Array<{path:string;publicUrl:string;width:number;height:number;byteSize:number;mimeType:string;sourceByteSize?:number;sourceDigest?:string}> = []
     let postCreated=false
     try{
       for(let index=0;index<postImages.length;index++){
@@ -137,7 +137,7 @@ export default function FeedPage(){
       postCreated=true
 
       if(uploaded.length){
-        const {error:mediaError}=await s.from('fenix_post_media').insert(uploaded.map((item,index)=>({post_id:postId,author_id:userId,storage_bucket:'fenix-post-media',storage_path:item.path,mime_type:item.mimeType,byte_size:item.byteSize,width:item.width,height:item.height,sort_order:index})))
+        const {error:mediaError}=await s.from('fenix_post_media').insert(uploaded.map((item,index)=>({post_id:postId,author_id:userId,storage_bucket:'fenix-post-media',storage_path:item.path,mime_type:item.mimeType,byte_size:item.byteSize,width:item.width,height:item.height,source_byte_size:item.sourceByteSize ?? null,source_digest:item.sourceDigest ?? null,optimization_version:'fenix-image-v2',sort_order:index})))
         if(mediaError)throw mediaError
       }
 
