@@ -70,6 +70,13 @@ export type Database = {
             foreignKeyName: "business_claim_requests_claimant_id_fkey"
             columns: ["claimant_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_claimant_id_fkey"
+            columns: ["claimant_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -93,6 +100,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "business_claim_requests_reviewed_by_fkey"
@@ -376,6 +390,13 @@ export type Database = {
             foreignKeyName: "business_reports_reporter_id_fkey"
             columns: ["reporter_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -399,6 +420,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_reports_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "business_reports_reviewer_id_fkey"
@@ -478,6 +506,13 @@ export type Database = {
             foreignKeyName: "business_reviews_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -508,6 +543,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_reviews_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "business_reviews_reviewed_by_fkey"
@@ -1161,6 +1203,13 @@ export type Database = {
             foreignKeyName: "business_verification_requests_requester_id_fkey"
             columns: ["requester_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -1184,6 +1233,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "business_verification_requests_reviewed_by_fkey"
@@ -1252,6 +1308,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "businesses_owner_id_fkey"
@@ -1409,6 +1472,13 @@ export type Database = {
             foreignKeyName: "commerce_return_requests_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_return_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -1501,6 +1571,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
@@ -1604,6 +1681,13 @@ export type Database = {
             foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
             columns: ["requester_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -1658,6 +1742,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_answers_author_id_fkey"
@@ -1755,6 +1846,13 @@ export type Database = {
             foreignKeyName: "fenix_blood_donors_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -1838,6 +1936,13 @@ export type Database = {
             foreignKeyName: "fenix_blood_requests_requester_id_fkey"
             columns: ["requester_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -1896,6 +2001,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_blood_responses_donor_id_fkey"
@@ -2607,6 +2719,13 @@ export type Database = {
             foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -2664,6 +2783,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_content_comments_author_id_fkey"
@@ -2740,6 +2866,13 @@ export type Database = {
             foreignKeyName: "fenix_content_reports_reporter_id_fkey"
             columns: ["reporter_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -2763,6 +2896,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
@@ -2816,6 +2956,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_content_votes_user_id_fkey"
@@ -2907,6 +3054,13 @@ export type Database = {
             foreignKeyName: "fenix_direct_messages_recipient_id_fkey"
             columns: ["recipient_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -2937,6 +3091,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_direct_messages_sender_id_fkey"
@@ -2989,6 +3150,13 @@ export type Database = {
             foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
             columns: ["blocked_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -3012,6 +3180,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
@@ -3095,6 +3270,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_job_applications_applicant_id_fkey"
@@ -3215,6 +3397,13 @@ export type Database = {
             foreignKeyName: "fenix_jobs_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -3264,6 +3453,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_message_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_message_pins_user_id_fkey"
@@ -3326,6 +3522,13 @@ export type Database = {
             foreignKeyName: "fenix_message_reactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -3383,6 +3586,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_notifications_user_id_fkey"
@@ -3468,6 +3678,13 @@ export type Database = {
             foreignKeyName: "fenix_post_media_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -3541,6 +3758,13 @@ export type Database = {
             foreignKeyName: "fenix_posts_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -3588,6 +3812,13 @@ export type Database = {
             foreignKeyName: "fenix_profile_follows_follower_id_fkey"
             columns: ["follower_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -3611,6 +3842,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_profile_follows_following_id_fkey"
@@ -3678,6 +3916,13 @@ export type Database = {
             foreignKeyName: "fenix_questions_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -3734,6 +3979,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_topic_follows_user_id_fkey"
@@ -3825,6 +4077,13 @@ export type Database = {
             foreignKeyName: "fenix_user_moderation_changed_by_fkey"
             columns: ["changed_by"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -3848,6 +4107,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_user_moderation_user_id_fkey"
@@ -4114,6 +4380,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
@@ -4595,6 +4868,13 @@ export type Database = {
             foreignKeyName: "news_posts_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -4768,6 +5048,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "orders_customer_id_fkey"
@@ -4964,6 +5251,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "product_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "product_reviews_customer_id_fkey"
@@ -5173,6 +5467,13 @@ export type Database = {
             foreignKeyName: "profile_contacts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -5245,6 +5546,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "profile_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "profile_settings_user_id_fkey"
@@ -5449,6 +5757,13 @@ export type Database = {
             foreignKeyName: "vendor_profiles_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -5599,6 +5914,13 @@ export type Database = {
             foreignKeyName: "fenix_answers_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -5677,6 +5999,15 @@ export type Database = {
         }
         Relationships: []
       }
+      fenix_public_profile_stats: {
+        Row: {
+          followers: number | null
+          following: number | null
+          id: string | null
+          posts: number | null
+        }
+        Relationships: []
+      }
       fenix_public_profiles: {
         Row: {
           avatar_url: string | null
@@ -5736,6 +6067,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fenix_public_feed"
             referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_questions_author_id_fkey"
@@ -5890,10 +6228,6 @@ export type Database = {
       is_fenix_username_available: {
         Args: { p_exclude_user_id?: string; p_username: string }
         Returns: boolean
-      }
-      fenix_public_profile_stats: {
-        Args: { p_profile_id: string }
-        Returns: Json
       }
       keyword_feni_brain_chunks: {
         Args: { match_count?: number; query_text: string }
