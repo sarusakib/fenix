@@ -206,7 +206,6 @@ export default function InvestmentOpportunityPage() {
     interest &&
     ['due_diligence', 'terms', 'agreed'].includes(interest.status),
   )
-  const investorDocuments = documents.filter((document) => document.status === 'approved' && document.visibility === 'private_shared')
 
   return (
     <main className="min-h-dvh bg-[#f7faf9] text-[#0b1736] dark:bg-[#030506] dark:text-white">
