@@ -60,24 +60,30 @@ export default function FeedPage(){
       if(tab==='latest'){
         const postRows=(p??[]) as unknown as PostRow[]
         const postIds=postRows.map(row=>row.id)
-        const mediaByPost:Record<string,PostMediaRow[]>={}
+        let nextPostMedia:PostMediaRow[]=[]
+        let voteRows:{content_id:string;value:number}[]=[]
+        let commentRows:{content_id:string}[]=[]
         if(postIds.length){
-          const {data:media}=await s.from('fenix_post_media')
-            .select('id,post_id,storage_bucket,storage_path,mime_type,width,height,sort_order,byte_size,source_byte_size,source_digest')
-            .in('post_id',postIds).order('sort_order',{ascending:true})
-          for(const row of (media??[]) as Array<Omit<PostMediaRow,'public_url'>>){
-            const public_url=s.storage.from(row.storage_bucket).getPublicUrl(row.storage_path).data.publicUrl
-            ;(mediaByPost[row.post_id]??=[]).push({...row,public_url})
-          }
+          const [mediaResult,voteResult,commentResult]=await Promise.all([
+            s.from('fenix_post_media')
+              .select('id,post_id,storage_bucket,storage_path,mime_type,width,height,sort_order,byte_size,source_byte_size,source_digest')
+              .in('post_id',postIds).order('sort_order',{ascending:true}),
+            s.from('fenix_content_votes').select('content_id,value').eq('content_type','post').in('content_id',postIds),
+            s.from('fenix_content_comments').select('content_id').eq('content_type','post').in('content_id',postIds).is('deleted_at',null),
+          ])
+          nextPostMedia=(mediaResult.data??[]) as Array<Omit<PostMediaRow,'public_url'>>
+          voteRows=(voteResult.data??[]) as {content_id:string;value:number}[]
+          commentRows=(commentResult.data??[]) as {content_id:string}[]
         }
-        const [voteRows,commentRows]=await Promise.all([
-          s.from('fenix_content_votes').select('content_id,value').eq('content_type','post').in('content_id',postIds),
-          s.from('fenix_content_comments').select('content_id').eq('content_type','post').in('content_id',postIds).is('deleted_at',null),
-        ])
+        const mediaByPost:Record<string,PostMediaRow[]>={}
+        for(const row of nextPostMedia){
+          const public_url=s.storage.from(row.storage_bucket).getPublicUrl(row.storage_path).data.publicUrl
+          ;(mediaByPost[row.post_id]??[]).push({...row,public_url})
+        }
         const scoreByPost:Record<string,number>={}
-        for(const row of voteRows.data??[]) scoreByPost[row.content_id]=(scoreByPost[row.content_id]??0)+Number(row.value??0)
+        for(const row of voteRows) scoreByPost[row.content_id]=(scoreByPost[row.content_id]??0)+Number(row.value??0)
         const commentsByPost:Record<string,number>={}
-        for(const row of commentRows.data??[]) commentsByPost[row.content_id]=(commentsByPost[row.content_id]??0)+1
+        for(const row of commentRows) commentsByPost[row.content_id]=(commentsByPost[row.content_id]??0)+1
         nextPosts=postRows.map(row=>({...row,media:mediaByPost[row.id]??[],score:scoreByPost[row.id]??0,comment_count:commentsByPost[row.id]??0}))
       }
       const qq=(q??[]).map((x:any)=>({
