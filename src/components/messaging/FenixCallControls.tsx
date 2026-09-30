@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Phone, VideoCamera, PhoneDisconnect, Microphone, MicrophoneSlash, VideoCameraSlash, ShieldCheck, X } from '@phosphor-icons/react'
+import { Phone, VideoCamera, PhoneDisconnect, Microphone, MicrophoneSlash, VideoCameraSlash, ShieldCheck } from '@phosphor-icons/react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 type Person = { id: string; full_name: string | null; username: string | null; avatar_url: string | null }
