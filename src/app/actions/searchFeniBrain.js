@@ -246,7 +246,8 @@ async function safeDirectorySearch(supabase, parsed, locations) {
   const upazila = locationUpazila(locations)
   const merged = new Map()
 
-  for (const query of [...new Set(queries)]) {
+  const uniqueQueries=[...new Set(queries)].slice(0, 4)
+  const batches=await Promise.all(uniqueQueries.map(async (query)=>{
     try {
       const { data, error } = await supabase.rpc('search_directory_businesses', {
         p_query: query,
@@ -255,20 +256,19 @@ async function safeDirectorySearch(supabase, parsed, locations) {
         p_limit: 12,
         p_offset: 0,
       })
-
-      if (error) {
+      if(error){
         console.error('Feni Brain directory retrieval failed:', { code: error.code, query })
-        continue
+        return []
       }
-
-      for (const row of data || []) {
-        if (row?.id) merged.set(row.id, row)
-      }
-
-      if (merged.size >= 12) break
-    } catch (error) {
+      return Array.isArray(data) ? data : []
+    } catch(error) {
       console.error('Feni Brain directory retrieval exception:', { name: error?.name, query })
+      return []
     }
+  }))
+  for(const rows of batches){
+    for(const row of rows) if(row?.id) merged.set(row.id,row)
+    if(merged.size>=12) break
   }
 
   return [...merged.values()].slice(0, 12)
@@ -349,15 +349,20 @@ export async function searchFeniBrain(query) {
     if (keywordOriginal.error) console.error('Feni Brain original keyword retrieval failed:', { code: keywordOriginal.error.code })
 
     let locations = Array.isArray(locationResult.data) ? locationResult.data : []
-    if (locations.length < 2) {
-      const fallbackLocations = await safeStructuredLocationSearch(supabase, normalizedQuery || cleanQuery)
-      if (fallbackLocations.length > locations.length) locations = fallbackLocations
-    }
-
     let rawFacts = Array.isArray(factResult.data) ? factResult.data : []
-    if (rawFacts.length === 0) {
-      rawFacts = await safeFactFallback(supabase, parsed)
-    }
+
+    const [fallbackLocations, fallbackFacts] = await Promise.all([
+      locations.length < 2
+        ? safeStructuredLocationSearch(supabase, normalizedQuery || cleanQuery)
+        : Promise.resolve([]),
+      rawFacts.length === 0
+        ? safeFactFallback(supabase, parsed)
+        : Promise.resolve([]),
+    ])
+
+    if (fallbackLocations.length > locations.length) locations = fallbackLocations
+    if (rawFacts.length === 0 && fallbackFacts.length) rawFacts = fallbackFacts
+
     const facts = rawFacts.map((row) => ({
       ...row,
       retrieval_method: 'fact',
@@ -375,64 +380,72 @@ export async function searchFeniBrain(query) {
       keywordSimilarity: Number(row.similarity || 0),
     }))
 
-    const directoryRows = wantsDirectory(canonicalIntent, questionClass)
-      ? await safeDirectorySearch(supabase, parsed, locations)
-      : []
-    const businesses = buildBusinessResults(directoryRows, parsed, 10)
-
     const articles = buildArticleResults(FENI_ARTICLES, parsed, 6)
-    const products = await safeCommerceSearch(supabase, parsed)
+    const directoryPromise = wantsDirectory(canonicalIntent, questionClass)
+      ? safeDirectorySearch(supabase, parsed, locations)
+      : Promise.resolve([])
+    const productsPromise = safeCommerceSearch(supabase, parsed)
 
-    let semantic = []
-    try {
-      const embeddingInput = [cleanQuery, normalizedQuery].filter(Boolean).join('\n').slice(0, 1200)
-      const embedding = await generateEmbedding(embeddingInput)
-      if (Array.isArray(embedding) && embedding.length === 384) {
-        const semanticResult = await supabase.rpc('match_feni_brain_chunks', {
-          query_embedding: embedding,
-          match_threshold: 0.30,
-          match_count: MAX_RESULTS,
-        })
-        if (!semanticResult.error && Array.isArray(semanticResult.data)) {
-          semantic = semanticResult.data.map((row) => ({
-            ...row,
-            retrieval_method: 'semantic',
-            semanticSimilarity: Number(row.similarity || 0),
-            keywordSimilarity: 0,
-          }))
-        } else if (semanticResult.error) {
-          console.error('Feni Brain semantic retrieval failed:', { code: semanticResult.error.code })
+    const semanticPromise = (async () => {
+      let semantic = []
+      try {
+        const embeddingInput = [cleanQuery, normalizedQuery].filter(Boolean).join('\n').slice(0, 1200)
+        const embedding = await generateEmbedding(embeddingInput)
+        if (Array.isArray(embedding) && embedding.length === 384) {
+          const semanticResult = await supabase.rpc('match_feni_brain_chunks', {
+            query_embedding: embedding,
+            match_threshold: 0.30,
+            match_count: MAX_RESULTS,
+          })
+          if (!semanticResult.error && Array.isArray(semanticResult.data)) {
+            semantic = semanticResult.data.map((row) => ({
+              ...row,
+              retrieval_method: 'semantic',
+              semanticSimilarity: Number(row.similarity || 0),
+              keywordSimilarity: 0,
+            }))
+          } else if (semanticResult.error) {
+            console.error('Feni Brain semantic retrieval failed:', { code: semanticResult.error.code })
+          }
         }
+      } catch (error) {
+        console.error('Feni Brain embedding unavailable:', { name: error?.name })
       }
-    } catch (error) {
-      console.error('Feni Brain embedding unavailable:', { name: error?.name })
-    }
+      return semantic
+    })()
 
-    let childLocations = []
-    const childLevel = requestedChildLevel(normalizedQuery)
-    if (childLevel && (wantsNamedList(normalizedQuery) || requestedFactSubject === childLevel + '_count')) {
+    const childLocationPromise = (async () => {
+      const requestedLevel = requestedChildLevel(normalizedQuery)
+      if (!requestedLevel || !(wantsNamedList(normalizedQuery) || requestedFactSubject === requestedLevel + '_count')) {
+        return []
+      }
       const parent =
         locations.find((location) => location.level === 'district') ||
-        locations.find((location) => location.level !== childLevel) ||
+        locations.find((location) => location.level !== requestedLevel) ||
         locations[0]
-
-      if (parent?.id) {
-        const { data: children, error: childError } = await supabase
-          .from('fenix_brain_locations')
-          .select('id, level, name_bn, name_en, slug, official_code')
-          .eq('parent_id', parent.id)
-          .eq('level', childLevel)
-          .eq('is_active', true)
-          .order('name_bn', { ascending: true })
-          .limit(MAX_CHILD_LOCATIONS)
-
-        if (childError) {
-          console.error('Feni Brain child location retrieval failed:', { code: childError.code })
-        } else {
-          childLocations = children || []
-        }
+      if (!parent?.id) return []
+      const { data: children, error: childError } = await supabase
+        .from('fenix_brain_locations')
+        .select('id, level, name_bn, name_en, slug, official_code')
+        .eq('parent_id', parent.id)
+        .eq('level', requestedLevel)
+        .eq('is_active', true)
+        .order('name_bn', { ascending: true })
+        .limit(MAX_CHILD_LOCATIONS)
+      if (childError) {
+        console.error('Feni Brain child location retrieval failed:', { code: childError.code })
+        return []
       }
-    }
+      return children || []
+    })()
+
+    const [directoryRows, products, semantic, childLocations] = await Promise.all([
+      directoryPromise,
+      productsPromise,
+      semanticPromise,
+      childLocationPromise,
+    ])
+    const businesses = buildBusinessResults(directoryRows, parsed, 10)
 
     const ranked = mergeRows(
       [facts, semantic, keyword, articles, businesses, products],
