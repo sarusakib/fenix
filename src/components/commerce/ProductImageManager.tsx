@@ -13,6 +13,9 @@ type ImageRow = {
   alt_text_en:string|null
   sort_order:number
   is_primary:boolean
+  byte_size?:number|null
+  source_byte_size?:number|null
+  source_digest?:string|null
 }
 
 export default function ProductImageManager({
@@ -64,8 +67,11 @@ export default function ProductImageManager({
             storage_path:path,
             sort_order:images.length+added.length,
             is_primary:images.length===0&&added.length===0,
+            byte_size:optimized.byteSize,
+            source_byte_size:optimized.sourceByteSize ?? file.size,
+            source_digest:optimized.sourceDigest ?? null,
           })
-          .select('id,storage_bucket,storage_path,alt_text_bn,alt_text_en,sort_order,is_primary')
+          .select('id,storage_bucket,storage_path,alt_text_bn,alt_text_en,sort_order,is_primary,byte_size,source_byte_size,source_digest')
           .single()
 
         if(re||!row)throw re??new Error('Image metadata failed')
@@ -120,7 +126,7 @@ export default function ProductImageManager({
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 className="flex items-center gap-2 font-black"><ImageSquare size={20}/> Product images</h2>
-        <p className="mt-1 text-xs opacity-50">JPG, PNG, WebP and supported image formats · no user-facing source-size cap · auto-composed toward ~300KB, maximum 400KB · up to 5 at a time</p>
+        <p className="mt-1 text-xs opacity-50">JPG, PNG, WebP and supported browser formats · source-size cap নেই · smart resize/compression toward ~300KB · hard maximum 400KB · up to 5 at a time</p>
       </div>
 
       <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#008080] px-4 py-3 text-sm font-bold text-white">
