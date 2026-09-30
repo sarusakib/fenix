@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Bell, ChatCircleDots, GearSix, House, Lightbulb, List, MagnifyingGlass, Moon, ShieldCheck, SignIn, SignOut, Sun, TrendUp, X, UserCircle } from '@phosphor-icons/react'
+import { Bell, BookmarkSimple, ChatCircleDots, GearSix, House, Lightbulb, List, MagnifyingGlass, Moon, ShieldCheck, SignIn, SignOut, Sun, TrendUp, X, UserCircle } from '@phosphor-icons/react'
 import { useAuthStore } from '../store/useAuthStore'
 import { useHomeTheme } from './theme/HomeThemeProvider'
 import { useFenixLocale } from './i18n/FenixLocaleProvider'
