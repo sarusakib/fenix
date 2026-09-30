@@ -268,6 +268,7 @@ export async function answerFeniBrain(query) {
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
     }
   } catch (error) {
+    clearTimeout(aiTimeout)
     console.error('Feni Brain AI answer failed:', { name: error?.name, status: error?.status })
     return {
       success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(cleanQuery, retrieval), intent: retrieval.intent,
