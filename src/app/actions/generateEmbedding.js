@@ -23,7 +23,7 @@ export async function generateEmbedding(text) {
     const result = await hf.featureExtraction({
       model: MODEL,
       inputs: cleanText,
-      provider: 'auto',
+      provider: 'hf-inference',
     })
 
     const embedding = Array.isArray(result?.[0]) ? result[0] : result
