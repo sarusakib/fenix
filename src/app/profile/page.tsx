@@ -191,7 +191,7 @@ export default function ProfilePage() {
     setSettingsOpen(false)
   }
 
-  function openSettings(section: Exclude<SettingsSection, null> = null) {
+  function openSettings(section: SettingsSection = null) {
     setMessage('')
     setSettingsSection(section)
     setSettingsOpen(true)
