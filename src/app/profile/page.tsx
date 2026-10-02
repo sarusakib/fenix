@@ -192,10 +192,21 @@ export default function ProfileEditorPage() {
     setMessage('')
     const cleanUsername = username.trim().toLowerCase()
     if (!/^[a-z0-9._]{3,30}$/.test(cleanUsername) || cleanUsername.startsWith('.') || cleanUsername.endsWith('.') || cleanUsername.includes('..')) {
-      setMessage(locale === 'bn' ? 'Username 3–30 অক্ষরের lowercase letter/number/underscore হতে হবে।' : 'Username must be 3–30 lowercase letters, numbers, dots or underscores.')
+      setMessage(locale === 'bn' ? 'Username 3–30 অক্ষরের lowercase letter/number/dot/underscore হতে হবে।' : 'Username must be 3–30 lowercase letters, numbers, dots or underscores.')
       setBusy(false)
       return
     }
+    const RESERVED_USERNAMES = new Set([
+      'admin','administrator','api','contact','directory','emergency','fenix','fenixx','guide','help',
+      'invest','login','messages','news','notifications','official','profile','search','security',
+      'services','settings','signup','staff','support','system','user',
+    ])
+    if (RESERVED_USERNAMES.has(cleanUsername)) {
+      setMessage(locale === 'bn' ? 'এই username FeniX-এর জন্য সংরক্ষিত। অন্য username দিন।' : 'This username is reserved by FeniX. Choose another username.')
+      setBusy(false)
+      return
+    }
+
     if (usernameStatus === 'checking' || usernameStatus === 'taken' || usernameStatus === 'invalid') {
       setMessage(locale === 'bn' ? 'এই username ব্যবহার করা যাবে না।' : 'This username is not available.')
       setBusy(false)
