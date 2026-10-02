@@ -59,13 +59,14 @@ export default function SettingsPage() {
       const s = createClient()
       const { data } = await s
         .from('profile_settings')
-        .select('profile_visibility,message_permissions,feed_visibility,reduced_motion,notification_preferences')
+        .select('profile_visibility,message_permissions,feed_visibility,reduced_motion,notification_preferences,theme')
         .eq('user_id', uid)
         .maybeSingle()
       if (!active) return
       if (data?.profile_visibility === 'private') setProfileVisibility('private')
       if (data?.message_permissions === 'authenticated' || data?.message_permissions === 'nobody') setMessagePermissions(data.message_permissions)
       if (data?.feed_visibility === 'authenticated') setFeedVisibility('authenticated')
+      if (data?.theme === 'light' || data?.theme === 'dark' || data?.theme === 'system') setTheme(data.theme)
       setReducedMotion(Boolean(data?.reduced_motion))
       const stored = data?.notification_preferences
       if (stored && typeof stored === 'object') {
@@ -79,7 +80,7 @@ export default function SettingsPage() {
     }
     void load(currentUserId)
     return () => { active = false }
-  }, [user])
+  }, [setTheme, user])
 
   async function save(patch: Record<string, unknown>, key: string, success = locale === 'bn' ? 'সংরক্ষণ হয়েছে।' : 'Saved') {
     if (!user) return
