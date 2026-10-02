@@ -6,6 +6,7 @@ import ProfileReportButton from '@/components/profile/ProfileReportButton'
 import ProfileFollowButton from '@/components/profile/ProfileFollowButton'
 import MessageButton from '@/components/messaging/MessageButton'
 import { createClient } from '@/utils/supabase/server'
+import { ROUTES } from '@/lib/core/routes'
 
 export const dynamic = 'force-dynamic'
 
@@ -66,7 +67,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     <main className="fenix-shell min-h-dvh">
       <Navbar />
       <section className="mx-auto max-w-4xl px-4 pb-28 pt-7 sm:px-6 lg:px-8">
-        <Link href="/feed" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> Feed</Link>
+        <Link href={ROUTES.feed} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> Feed</Link>
         <article className="fenix-surface-strong mt-6 overflow-hidden rounded-[2rem]">
           <div className="relative h-36 bg-[var(--fx-primary-soft)] sm:h-52">{profile.cover_url ? <img src={profile.cover_url} alt="" className="h-full w-full object-cover"/> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(0,128,128,.25),transparent_38%),linear-gradient(135deg,rgba(11,23,54,.02),rgba(0,128,128,.09))]"/>}</div>
           <div className="p-5 sm:p-8">
@@ -74,7 +75,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" className="h-28 w-28 rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover"/> : <div className="grid h-28 w-28 place-items-center rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)]"><UserCircle size={62} className="text-[var(--fx-primary-strong)]"/></div>}
               <div className="flex flex-wrap gap-2">
                 <span className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-[var(--fx-primary-soft)] px-3 text-xs font-bold text-[var(--fx-primary-strong)]">Public profile</span>
-                <ProfileFollowButton profileId={profileId} nextPath={'/profile/'+encodeURIComponent(profileUsername)} />
+                <ProfileFollowButton profileId={profileId} nextPath={ROUTES.core.profile+'/'+encodeURIComponent(profileUsername)} />
                 <MessageButton userId={profileId} name={safeName} />
               </div>
             </div>
@@ -109,7 +110,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             <div className="mt-5 grid gap-3">
               {publicPosts.map(post => {
                 if (!post.id || !post.created_at) return null
-                return <Link key={post.id} href={'/feed/post/'+post.id} className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-bg)]/35 p-4 hover:bg-[var(--fx-bg)]">
+                return <Link key={post.id} href={ROUTES.feed+'/post/'+post.id} className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-bg)]/35 p-4 hover:bg-[var(--fx-bg)]">
                   <div className="flex items-center justify-between gap-3"><time className="text-[10px] text-[var(--fx-muted)]">{new Date(post.created_at).toLocaleString('en-BD')}</time><span className="text-[10px] font-bold text-[var(--fx-primary-strong)]">Open post →</span></div>
                   {post.body && <p className="mt-2 line-clamp-4 whitespace-pre-wrap text-sm leading-6">{post.body}</p>}
                   {(mediaByPost[post.id]?.length ?? 0) > 0 && <div className="mt-3 grid grid-cols-2 gap-1.5">{mediaByPost[post.id].slice(0,4).map(media => <img key={media.id} src={media.url} alt="" loading="lazy" decoding="async" width={media.width ?? 800} height={media.height ?? 600} className="aspect-square w-full rounded-xl object-cover"/>)}</div>}
