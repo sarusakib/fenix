@@ -20,6 +20,10 @@ type NewsRow = { id:string; slug:string; title_bn:string; title_en:string; excer
 type PostMediaRow = { id:string; post_id:string; storage_bucket:string; storage_path:string; mime_type:string; width:number|null; height:number|null; sort_order:number; byte_size:number; source_byte_size:number|null; source_digest:string|null; public_url:string }
 type PostRow = { id:string; body:string; created_at:string; author_id:string; author_name:string|null; author_username:string|null; author_avatar_url:string|null; media:PostMediaRow[]; score:number; comment_count:number; liked:boolean; saved:boolean }
 type FeedTab = 'for-you'|'following'|'latest'|'questions'|'news'
+type FeedItem =
+  | {kind:'question';time:string;data:QuestionRow}
+  | {kind:'post';time:string;data:PostRow}
+  | {kind:'news';time:string;data:NewsRow}
 const FEED_TABS = ['for-you','following','latest','questions','news'] as const
 const normalizeFeedTab=(value:string|null):FeedTab=>FEED_TABS.includes(value as FeedTab)?value as FeedTab:'for-you'
 
@@ -63,12 +67,16 @@ export default function FeedPage(){
     setLoading(true)
     const s=createClient()
     try {
-      const questionPromise = tab === 'questions' || tab === 'following' ? s.from('fenix_public_question_feed') : Promise.resolve({data:null})
-        .select('id,title,body,created_at,author_id,topic_id,author_name,author_username,author_avatar_url,topic_slug,topic_name_bn,topic_name_en,answer_count,score')
-        .order('created_at',{ascending:false}).limit(40)
-      const newsPromise = tab === 'news' ? s.from('news_posts') : Promise.resolve({data:null})
-        .select('id,slug,title_bn,title_en,excerpt_bn,excerpt_en,category,verification_status,featured,breaking,published_at,source_name,image_url')
-        .eq('status','published').order('published_at',{ascending:false}).limit(24)
+      const questionPromise = tab === 'questions' || tab === 'following'
+        ? s.from('fenix_public_question_feed')
+            .select('id,title,body,created_at,author_id,topic_id,author_name,author_username,author_avatar_url,topic_slug,topic_name_bn,topic_name_en,answer_count,score')
+            .order('created_at',{ascending:false}).limit(40)
+        : Promise.resolve({data:null})
+      const newsPromise = tab === 'news'
+        ? s.from('news_posts')
+            .select('id,slug,title_bn,title_en,excerpt_bn,excerpt_en,category,verification_status,featured,breaking,published_at,source_name,image_url')
+            .eq('status','published').order('published_at',{ascending:false}).limit(24)
+        : Promise.resolve({data:null})
       const postsPromise = tab === 'questions' || tab === 'news' ? Promise.resolve({data:null}) : s.from('fenix_public_feed').select('id,body,created_at,author_id,author_name,author_username,author_avatar_url').order('created_at',{ascending:false}).limit(30)
       const [{data:auth},{data:q},{data:n},{data:p}] = await Promise.all([s.auth.getSession(),questionPromise,newsPromise,postsPromise])
       const uid=auth.session?.user?.id??null
@@ -314,11 +322,11 @@ export default function FeedPage(){
     return questions
   },[tab,questions,followed,followedProfiles])
 
-  const feedItems=useMemo(()=>{
+  const feedItems=useMemo<FeedItem[]>(()=>{
     if(tab==='questions') return visibleQuestions.map(q=>({kind:'question' as const,time:q.created_at,data:q}))
     if(tab==='news') return news.map(n=>({kind:'news' as const,time:n.published_at??'',data:n}))
     const availablePosts=tab==='following' ? posts.filter(p=>followedProfiles.includes(p.author_id)) : posts
-    const all=[] as Array<{kind:'post'|'question';time:string;data:PostRow|QuestionRow}>
+    const all:FeedItem[]=[]
     if(tab==='following') all.push(...visibleQuestions.map(q=>({kind:'question' as const,time:q.created_at,data:q})))
     all.push(...availablePosts.map(p=>({kind:'post' as const,time:p.created_at,data:p})))
     return all.sort((a,b)=>new Date(b.time).getTime()-new Date(a.time).getTime())
