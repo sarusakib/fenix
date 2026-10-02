@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ROUTES } from '@/lib/core/routes'
 
 type FenixBrandProps = {
   compact?: boolean
@@ -7,7 +8,7 @@ type FenixBrandProps = {
   light?: boolean
 }
 
-export default function FenixBrand({ compact = false, onClick, href = '/', light = false }: FenixBrandProps) {
+export default function FenixBrand({ compact = false, onClick, href = ROUTES.feed, light = false }: FenixBrandProps) {
   return (
     <Link href={href} onClick={onClick} className="group inline-flex min-h-11 items-center gap-2.5" aria-label="FeniX home">
       <span className="relative grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-[13px] bg-[var(--fx-navy)] shadow-[0_8px_30px_rgba(11,23,54,.18)]">
