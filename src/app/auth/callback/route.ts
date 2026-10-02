@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { ROUTES } from '@/lib/core/routes'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
     requestedNext.startsWith('/') &&
     !requestedNext.startsWith('//')
       ? requestedNext
-      : '/'
+      : ROUTES.feed
 
   if (code) {
     const supabase = await createClient()
@@ -30,7 +31,7 @@ export async function GET(request: Request) {
     }
   }
 
-  const errorUrl = new URL('/login', requestUrl.origin)
+  const errorUrl = new URL(ROUTES.auth.login, requestUrl.origin)
   errorUrl.searchParams.set(
     'error',
     'Could not authenticate user',
