@@ -8,6 +8,7 @@ import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 import { optimizeImageFile, removePublicImage, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
 import FeniLocationPicker from '@/components/profile/FeniLocationPicker'
+import { ROUTES } from '@/lib/core/routes'
 
 type Visibility = 'public' | 'private'
 type MessagePermission = 'everyone' | 'authenticated' | 'nobody'
@@ -88,7 +89,7 @@ export default function ProfileEditorPage() {
     async function load() {
       const s = createClient()
       const { data: auth } = await s.auth.getUser()
-      if (!auth.user) { window.location.replace('/login?next=/profile'); return }
+      if (!auth.user) { window.location.replace(ROUTES.auth.login + '?next=' + encodeURIComponent(ROUTES.core.profile)); return }
       const [{ data: profile }, { data: settings }] = await Promise.all([
         s.from('profiles').select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url,district_id,upazila_id,locality_id,area_text,road_text,house_details,holding_no,location_public_level,exact_location_visibility').eq('id', auth.user.id).maybeSingle(),
         s.from('profile_settings').select('locale,profile_visibility,message_permissions,feed_visibility').eq('user_id', auth.user.id).maybeSingle(),
@@ -133,7 +134,7 @@ export default function ProfileEditorPage() {
     return Math.round(values.filter(Boolean).length / values.length * 100)
   }, [avatarUrl, bio, fullName, locationText, username, visibility, websiteUrl])
 
-  const publicUrl = username ? '/profile/' + encodeURIComponent(username) : '/profile'
+  const publicUrl = username ? ROUTES.core.profile + '/' + encodeURIComponent(username) : ROUTES.core.profile
 
   async function copyProfileLink() {
     try {
@@ -191,7 +192,7 @@ export default function ProfileEditorPage() {
     setMessage('')
     const cleanUsername = username.trim().toLowerCase()
     if (!/^[a-z0-9._]{3,30}$/.test(cleanUsername) || cleanUsername.startsWith('.') || cleanUsername.endsWith('.') || cleanUsername.includes('..')) {
-      setMessage(locale === 'bn' ? 'Username 3–32 অক্ষরের lowercase letter/number/underscore হতে হবে।' : 'Username must be 3–32 lowercase letters, numbers or underscores.')
+      setMessage(locale === 'bn' ? 'Username 3–32 অক্ষরের lowercase letter/number/underscore হতে হবে।' : 'Username must be 3–30 lowercase letters, numbers, dots or underscores.')
       setBusy(false)
       return
     }
@@ -264,10 +265,10 @@ export default function ProfileEditorPage() {
       <Navbar/>
       <section className="mx-auto max-w-5xl px-4 pb-28 pt-7 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link href="/settings" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> {locale==='bn'?'সেটিংস':'Settings'}</Link>
+          <Link href={ROUTES.settings} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> {locale==='bn'?'সেটিংস':'Settings'}</Link>
           <div className="flex flex-wrap gap-2">
-            <Link href={publicUrl} target="_blank" className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--fx-primary-soft)] px-3.5 text-xs font-bold text-[var(--fx-primary-strong)]"><LinkSimple size={15}/> View public profile</Link>
-            <button type="button" onClick={()=>void copyProfileLink()} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold">{copied?<Check size={15}/>:<Copy size={15}/>} {copied?'Copied':'Copy link'}</button>
+            <Link href={publicUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--fx-primary-soft)] px-3.5 text-xs font-bold text-[var(--fx-primary-strong)]"><LinkSimple size={15}/> {locale==='bn'?'Public profile দেখুন':'View public profile'}</Link>
+            <button type="button" onClick={()=>void copyProfileLink()} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold">{copied?<Check size={15}/>:<Copy size={15}/>} {copied?(locale==='bn'?'কপি হয়েছে':'Copied'):(locale==='bn'?'লিংক কপি':'Copy link')}</button>
           </div>
         </div>
 
@@ -275,7 +276,7 @@ export default function ProfileEditorPage() {
           <div className="fenix-surface-strong overflow-hidden rounded-[2rem]">
             <div className="relative h-36 overflow-hidden bg-[var(--fx-primary-soft)] sm:h-48">
               <label className="absolute right-3 top-3 z-10 inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-xl bg-black/55 px-3 text-xs font-bold text-white backdrop-blur">
-                <ImageSquare size={15}/>{imageBusy==='cover' ? 'Uploading '+imageProgress+'%' : 'Cover photo'}
+                <ImageSquare size={15}/>{imageBusy==='cover' ? '(locale==='bn'?'আপলোড হচ্ছে ':'Uploading ')+imageProgress+'%' : (locale==='bn'?'Cover photo':'Cover photo')}
                 <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('cover',file)}}/>
               </label>
               {coverUrl ? <img src={coverUrl} alt="" className="h-full w-full object-cover"/> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,128,128,.22),transparent_42%),linear-gradient(135deg,rgba(11,23,54,.02),rgba(0,128,128,.10))]"/>}
@@ -285,11 +286,11 @@ export default function ProfileEditorPage() {
                 <div className="flex items-end gap-3">
                   {avatarUrl ? <img src={avatarUrl} alt="" className="h-24 w-24 rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover sm:h-28 sm:w-28"/> : <div className="grid h-24 w-24 place-items-center rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)] sm:h-28 sm:w-28"><UserCircle size={58} className="text-[var(--fx-primary-strong)]"/></div>}
                   <label className="mb-1 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-xs font-bold shadow-sm">
-                    <UploadSimple size={16}/><span>{imageBusy==='avatar' ? 'Uploading '+imageProgress+'%' : 'Gallery'}</span>
+                    <UploadSimple size={16}/><span>{imageBusy==='avatar' ? '(locale==='bn'?'আপলোড হচ্ছে ':'Uploading ')+imageProgress+'%' : (locale==='bn'?'Gallery':'Gallery')}</span>
                     <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('avatar',file)}}/>
                   </label>
                 </div>
-                <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--fx-primary-soft)] px-3 py-1.5 text-[10px] font-bold text-[var(--fx-primary-strong)]"><ShieldCheck size={14}/> Profile controls active</span>
+                <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--fx-primary-soft)] px-3 py-1.5 text-[10px] font-bold text-[var(--fx-primary-strong)]"><ShieldCheck size={14}/> {locale==='bn'?'Profile control সক্রিয়':'Profile controls active'}</span>
               </div>
               <div className="mt-4"><h1 className="text-3xl font-black tracking-[-.045em] sm:text-4xl">{fullName || 'Your FeniX profile'}</h1><p className="mt-1 text-sm text-[var(--fx-muted)]">@{username || 'username'} · {email}</p>{bio && <p className="mt-4 max-w-2xl whitespace-pre-wrap text-sm leading-7 text-[var(--fx-muted)]">{bio}</p>}<div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">{locationText && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><MapPin size={14}/>{locationText}</span>}{websiteUrl && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><Globe size={14}/>Website</span>}</div></div>
             </div>
@@ -297,17 +298,17 @@ export default function ProfileEditorPage() {
           </div>
 
           <aside className="fenix-surface-strong rounded-[2rem] p-5 sm:p-6">
-            <p className="fenix-kicker">Profile health</p>
-            <div className="mt-2 flex items-end justify-between gap-3"><h2 className="text-3xl font-black">{completion}%</h2><span className="text-xs text-[var(--fx-muted)]">ready to share</span></div>
+            <p className="fenix-kicker">{locale==='bn'?'প্রোফাইল অগ্রগতি':'Profile health'}</p>
+            <div className="mt-2 flex items-end justify-between gap-3"><h2 className="text-3xl font-black">{completion}%</h2><span className="text-xs text-[var(--fx-muted)]">{locale==='bn'?'শেয়ার করার জন্য প্রস্তুত':'ready to share'}</span></div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--fx-border)]"><div className="h-full rounded-full bg-[var(--fx-primary-strong)] transition-all" style={{width: completion + '%'}}/></div>
-            <div className="mt-5 space-y-2 text-xs">{[['Name',!!fullName],['Username',!!username],['Bio',!!bio],['Location',!!locationText],['Website',!!websiteUrl],['Profile photo',!!avatarUrl],['Public visibility',visibility==='public']].map(([label,done])=><div key={String(label)} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-2.5"><span>{String(label)}</span><span className={done?'text-[var(--fx-primary-strong)]':'text-[var(--fx-muted)]'}>{done?'Ready':'Add'}</span></div>)}</div>
+            <div className="mt-5 space-y-2 text-xs">{[[locale==='bn'?'নাম':'Name',!!fullName],[locale==='bn'?'Username':'Username',!!username],[locale==='bn'?'Bio':'Bio',!!bio],[locale==='bn'?'Location':'Location',!!locationText],[locale==='bn'?'Website':'Website',!!websiteUrl],[locale==='bn'?'Profile photo':'Profile photo',!!avatarUrl],[locale==='bn'?'Public visibility':'Public visibility',visibility==='public']].map(([label,done])=><div key={String(label)} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-2.5"><span>{String(label)}</span><span className={done?'text-[var(--fx-primary-strong)]':'text-[var(--fx-muted)]'}>{done?'Ready':'Add'}</span></div>)}</div>
           </aside>
         </div>
 
         <section className="mt-5 fenix-surface-strong rounded-[2rem] p-5 sm:p-7">
-          <p className="fenix-kicker">Identity</p>
-          <h2 className="mt-2 text-2xl font-black">Make the profile useful.</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">These details power your public identity across eligible FeniX features. Private account information is never turned into public profile content.</p>
+          <p className="fenix-kicker">{locale==='bn'?'পরিচয়':'Identity'}</p>
+          <h2 className="mt-2 text-2xl font-black">{locale==='bn'?'প্রোফাইলকে আরও কার্যকর করুন।':'Make the profile useful.'}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">{locale==='bn'?'এই তথ্যগুলো FeniX-এর প্রাসঙ্গিক ফিচারে আপনার public identity তৈরি করে। Private account information কখনো public profile content হয় না।':'These details power your public identity across eligible FeniX features. Private account information is never turned into public profile content.'}</p>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <Field label={locale==='bn'?'নাম':'Name'} value={fullName} onChange={setFullName} maxLength={160}/>
             <div><Field label="Username" value={username} onChange={v=>setUsername(v.replace(/[^a-zA-Z0-9._]/g,'').toLowerCase())} maxLength={30} prefix="@"/><p className={'mt-1 text-[10px] '+(usernameStatus==='available'?'text-[var(--fx-primary-strong)]':usernameStatus==='taken'||usernameStatus==='invalid'?'text-red-600':'text-[var(--fx-muted)]')}>{usernameStatus==='checking'?(locale==='bn'?'Username যাচাই হচ্ছে…':'Checking username…'):usernameStatus==='available'?(locale==='bn'?'Username পাওয়া যাচ্ছে':'Username available'):usernameStatus==='taken'?(locale==='bn'?'এই username ইতিমধ্যে নেওয়া হয়েছে':'Username already taken'):usernameStatus==='invalid'?(locale==='bn'?'3–30 অক্ষর, a-z/0-9/._ এবং শুরু/শেষে dot নয়':'Use 3–30 lowercase letters, numbers, dot or underscore; no leading/trailing dot'):(locale==='bn'?'Username 3–30 অক্ষর':'Username 3–30 characters')}</p></div>
@@ -321,19 +322,19 @@ export default function ProfileEditorPage() {
         </section>
 
         <section className="mt-5 fenix-surface-strong rounded-[2rem] p-5 sm:p-7">
-          <p className="fenix-kicker">Privacy & preferences</p>
+          <p className="fenix-kicker">{locale==='bn'?'Privacy ও preference':'Privacy & preferences'}</p>
           <h2 className="mt-2 text-2xl font-black">{locale==='bn'?'আপনার visibility আপনি ঠিক করবেন।':'You control your visibility.'}</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
-            <Select label="Profile visibility" value={visibility} onChange={v=>setVisibility(v as Visibility)} options={[['public','Public'],['private','Private']]}/>
+            <Select label="{locale==='bn'?'Profile visibility':'Profile visibility'}" value={visibility} onChange={v=>setVisibility(v as Visibility)} options={[['public','Public'],['private','Private']]}/>
             <Select label={locale==='bn'?'কে message করতে পারবে':'Who can message you'} value={messagePermissions} onChange={v=>setMessagePermissions(v as MessagePermission)} options={[['everyone',locale==='bn'?'সবাই':'Everyone'],['authenticated',locale==='bn'?'শুধু logged-in user':'Authenticated users'],['nobody',locale==='bn'?'কেউ না':'Nobody']]}/>
-            <Select label="Feed visibility" value={feedVisibility} onChange={v=>setFeedVisibility(v as FeedVisibility)} options={[['public','Public'],['authenticated',locale==='bn'?'Logged-in users':'Authenticated users']]}/>
+            <Select label="{locale==='bn'?'Feed visibility':'Feed visibility'}" value={feedVisibility} onChange={v=>setFeedVisibility(v as FeedVisibility)} options={[['public','Public'],['authenticated',locale==='bn'?'Logged-in users':'Authenticated users']]}/>
             <div><span className="text-xs font-bold">Language</span><div className="mt-2 grid grid-cols-2 gap-2"><button type="button" onClick={()=>setLocale('bn')} className={'min-h-11 rounded-xl border text-xs font-bold '+(locale==='bn'?'border-[var(--fx-primary)]/25 bg-[var(--fx-primary-soft)]':'border-[var(--fx-border)]')}>বাংলা</button><button type="button" onClick={()=>setLocale('en')} className={'min-h-11 rounded-xl border text-xs font-bold '+(locale==='en'?'border-[var(--fx-primary)]/25 bg-[var(--fx-primary-soft)]':'border-[var(--fx-border)]')}>English</button></div></div>
           </div>
         </section>
 
         {message && <p className="mt-4 rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)] p-4 text-sm">{message}</p>}
         <div className="sticky bottom-20 z-20 mt-5 rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-2 shadow-xl backdrop-blur-xl sm:bottom-5">
-          <button type="button" disabled={busy} onClick={()=>void save()} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-5 text-sm font-bold text-white disabled:opacity-45"><Check size={17}/>{busy?'Saving…':(locale==='bn'?'Profile save করুন':'Save profile')}</button>
+          <button type="button" disabled={busy} onClick={()=>void save()} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-5 text-sm font-bold text-white disabled:opacity-45"><Check size={17}/>{busy?(locale==='bn'?'সংরক্ষণ হচ্ছে…':'Saving…'):(locale==='bn'?'Profile save করুন':'Save profile')}</button>
         </div>
       </section>
     </main>
