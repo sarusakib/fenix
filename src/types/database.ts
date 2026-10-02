@@ -6612,6 +6612,12 @@ export type InvestmentReport = Database["public"]["Tables"]["investment_reports"
 export type InvestmentDeal = Database["public"]["Tables"]["investment_deals"]["Row"]
 export type InvestmentUpdate = Database["public"]["Tables"]["investment_updates"]["Row"]
 export type InvestmentMessage = Database["public"]["Tables"]["investment_messages"]["Row"]
+export type ProfileSettings = Database["public"]["Tables"]["profile_settings"]["Row"]
+export type ProfileContact = Database["public"]["Tables"]["profile_contacts"]["Row"]
+export type ProfileFollow = Database["public"]["Tables"]["fenix_profile_follows"]["Row"]
+export type FenixNotification = Database["public"]["Tables"]["fenix_notifications"]["Row"]
+export type ContentVote = Database["public"]["Tables"]["fenix_content_votes"]["Row"]
+export type ContentComment = Database["public"]["Tables"]["fenix_content_comments"]["Row"]
 
 export const Constants = {
   public: {
