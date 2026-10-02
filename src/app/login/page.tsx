@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { createClient } from '../../utils/supabase/client'
+import { ROUTES } from '@/lib/core/routes'
 import { useAuthStore } from '../../store/useAuthStore'
 import {
   type AuthMode,
@@ -29,11 +30,11 @@ import SecurityNotice from './components/SecurityNotice'
 
 function getSafeNextDestination() {
   const value = new URLSearchParams(window.location.search).get('next')
-  return value && value.startsWith('/') && !value.startsWith('//') ? value : '/'
+  return value && value.startsWith('/') && !value.startsWith('//') ? value : ROUTES.feed
 }
 
 function getAuthCallbackUrl(next: string) {
-  const callback = new URL('/auth/callback', window.location.origin)
+  const callback = new URL(ROUTES.auth.callback, window.location.origin)
   callback.searchParams.set('next', next)
   return callback.toString()
 }
