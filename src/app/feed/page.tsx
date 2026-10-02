@@ -1,12 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BookmarkSimple, ChatCircle, DotsThreeVertical, ImageSquare, LinkSimple, Newspaper, PaperPlaneRight, Plus, Question, ShareNetwork, ThumbsUp, UploadSimple, UserCircle, UserPlus, WarningCircle, X } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 import { optimizeImageFile, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
+import { ROUTES } from '@/lib/core/routes'
 
 type Topic = { id:string; slug:string; name_bn:string; name_en:string }
 type QuestionRow = {
@@ -17,13 +19,18 @@ type QuestionRow = {
 type NewsRow = { id:string; slug:string; title_bn:string; title_en:string; excerpt_bn:string|null; excerpt_en:string|null; category:string; verification_status:string; featured:boolean; breaking:boolean; published_at:string|null; source_name:string|null; image_url:string|null }
 type PostMediaRow = { id:string; post_id:string; storage_bucket:string; storage_path:string; mime_type:string; width:number|null; height:number|null; sort_order:number; byte_size:number; source_byte_size:number|null; source_digest:string|null; public_url:string }
 type PostRow = { id:string; body:string; created_at:string; author_id:string; author_name:string|null; author_username:string|null; author_avatar_url:string|null; media:PostMediaRow[]; score:number; comment_count:number; liked:boolean; saved:boolean }
+type FeedTab = 'for-you'|'following'|'latest'|'questions'|'news'
+const FEED_TABS = ['for-you','following','latest','questions','news'] as const
+const normalizeFeedTab=(value:string|null):FeedTab=>FEED_TABS.includes(value as FeedTab)?value as FeedTab:'for-you'
 
 const fmt=(v:string,locale:string)=>new Date(v).toLocaleString(locale==='bn'?'bn-BD':'en-BD',{dateStyle:'medium',timeStyle:'short'})
 const label=(t:Topic,locale:string)=>locale==='bn'?t.name_bn:t.name_en
 
 export default function FeedPage(){
   const {locale}=useFenixLocale()
-  const [tab,setTab]=useState<'for-you'|'following'|'latest'|'questions'|'news'>('for-you')
+  const router=useRouter()
+  const searchParams=useSearchParams()
+  const tab=normalizeFeedTab(searchParams.get('tab'))
   const [questions,setQuestions]=useState<QuestionRow[]>([])
   const [news,setNews]=useState<NewsRow[]>([])
   const [posts,setPosts]=useState<PostRow[]>([])
@@ -41,7 +48,16 @@ export default function FeedPage(){
   const [postImages,setPostImages]=useState<Array<{id:string;file:File;previewUrl:string;width:number;height:number;byteSize:number;sourceByteSize:number;sourceDigest:string}>>([])
   const [imageBusy,setImageBusy]=useState(false)
   const [loading,setLoading]=useState(true)
-  const [loadedTab,setLoadedTab]=useState<string|null>(null)
+  const [loadedTab,setLoadedTab]=useState<FeedTab|null>(null)
+
+  const changeTab=useCallback((next:FeedTab)=>{
+    const params=new URLSearchParams(searchParams.toString())
+    if(next==='for-you') params.delete('tab')
+    else params.set('tab',next)
+    const query=params.toString()
+    router.replace(query?`${ROUTES.feed}?${query}`:ROUTES.feed,{scroll:false})
+    window.scrollTo({top:0,behavior:'smooth'})
+  },[router,searchParams])
 
   const load=useCallback(async()=>{
     setLoading(true)
@@ -323,10 +339,10 @@ export default function FeedPage(){
       {composer==='question'?<div className="mt-3 space-y-2"><input value={title} onChange={e=>setTitle(e.target.value)} maxLength={240} placeholder={copy.placeholderTitle} className="w-full rounded-xl border border-[var(--fx-border)] bg-transparent p-3 text-sm font-bold outline-none"/><textarea value={body} onChange={e=>setBody(e.target.value)} maxLength={12000} rows={4} placeholder={copy.placeholderBody} className="w-full rounded-xl border border-[var(--fx-border)] bg-transparent p-3 text-sm leading-7 outline-none"/><div className="flex flex-wrap items-center gap-2"><select value={topicId} onChange={e=>setTopicId(e.target.value)} className="rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 py-2 text-xs"><option value="">{copy.topic}</option>{topics.map(t=><option key={t.id} value={t.id}>{label(t,locale)}</option>)}</select><button disabled={busy||title.trim().length<8||!body.trim()} onClick={()=>void ask()} className="ml-auto rounded-xl bg-[var(--fx-primary-strong)] px-4 py-2.5 text-xs font-bold text-white disabled:opacity-40"><Plus size={15} className="mr-1 inline"/>{copy.submit}</button></div></div>
       :<div className="mt-3"><textarea value={body} onChange={e=>setBody(e.target.value)} maxLength={5000} rows={4} placeholder={locale==='bn'?'আপনি কী শেয়ার করতে চান?':'What would you like to share?'} className="w-full rounded-xl border border-[var(--fx-border)] bg-transparent p-3 text-sm leading-7"/>{postImages.length>0&&<div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{postImages.map(image=><div key={image.id} className="relative overflow-hidden rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-primary-soft)]"><img src={image.previewUrl} alt="" className="aspect-square h-full w-full object-cover"/><button type="button" onClick={()=>removePostImage(image.id)} className="absolute right-1.5 top-1.5 grid h-8 w-8 place-items-center rounded-full bg-black/60 text-white"><X size={15}/></button><span className="absolute bottom-1.5 left-1.5 rounded-full bg-black/60 px-2 py-1 text-[10px] font-bold text-white">{Math.round(image.byteSize/1024)}KB</span></div>)}</div>}<div className="mt-2 flex flex-wrap items-center gap-2"><label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3 text-xs font-bold"><ImageSquare size={16}/>{imageBusy?'Preparing…':'Add photos'}<input type="file" accept="image/*" multiple disabled={busy||imageBusy||postImages.length>=4} className="sr-only" onChange={e=>{void selectPostImages(e.target.files);e.currentTarget.value=''}}/></label><span className="text-[10px] text-[var(--fx-muted)]">JPG/PNG/WebP + supported browser formats · smart-composed toward ~300KB · max 400KB · up to 4</span><button disabled={busy||imageBusy||(!body.trim()&&!postImages.length)} onClick={()=>void publishPost()} className="ml-auto rounded-xl bg-[var(--fx-primary-strong)] px-4 py-2.5 text-xs font-bold text-white disabled:opacity-40"><UploadSimple size={15} className="mr-1 inline"/>{copy.submit}</button></div></div>}
     </section>}
-    {!userId&&<Link href="/login?next=/feed" className="mt-4 flex min-h-12 items-center justify-center rounded-2xl bg-[var(--fx-primary-soft)] text-sm font-bold text-[var(--fx-primary-strong)]">{copy.login}</Link>}
+    {!userId&&<Link href={`${ROUTES.auth.login}?next=${encodeURIComponent(ROUTES.feed)}`} className="mt-4 flex min-h-12 items-center justify-center rounded-2xl bg-[var(--fx-primary-soft)] text-sm font-bold text-[var(--fx-primary-strong)]">{copy.login}</Link>}
     {message&&<p className="mt-3 rounded-xl bg-[var(--fx-primary-soft)] p-3 text-xs">{message}</p>}
 
-    <div className="mt-5" aria-busy={loading}>
+    <div id={`feed-panel-${tab}`} role="tabpanel" aria-labelledby={`feed-tab-${tab}`} tabIndex={0} className="mt-5 outline-none" aria-busy={loading}>
       {loading && loadedTab!==tab ? <FeedSkeleton /> : feedItems.length ? <div className="space-y-3">{feedItems.map(item=>item.kind==='question'?<QuestionCard key={'q'+item.data.id} q={item.data} locale={locale} userId={userId} followedProfiles={followedProfiles} onProfileFollow={toggleProfileFollow} onVote={vote} onFollow={toggleFollow} followed={followed}/>:item.kind==='news'?<NewsCard key={'n'+item.data.id} n={item.data} locale={locale}/>:<PostCard key={'p'+item.data.id} p={item.data} locale={locale} userId={userId} followedProfiles={followedProfiles} onVote={votePost} onFollow={toggleProfileFollow} onSave={togglePostSave} onShare={sharePost} menuOpen={postMenuId===item.data.id} onMenu={()=>setPostMenuId(postMenuId===item.data.id?null:item.data.id)} onCopy={copyPostLink} onReport={reportPost}/>)}</div> : <div className="rounded-[1.7rem] border border-dashed border-[var(--fx-border)] p-10 text-center text-sm text-[var(--fx-muted)]">{copy.empty}</div>}
       {loading && loadedTab===tab && <div className="mt-3 text-center text-[10px] font-semibold text-[var(--fx-muted)]">Refreshing…</div>}
     </div>
