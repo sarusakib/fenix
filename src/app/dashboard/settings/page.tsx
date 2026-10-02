@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
+import { ROUTES } from '@/lib/core/routes'
 
 export default function LegacySettingsRedirect() {
-  redirect('/settings')
+  redirect(ROUTES.settings)
 }
