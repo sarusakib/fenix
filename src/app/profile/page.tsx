@@ -192,7 +192,7 @@ export default function ProfileEditorPage() {
     setMessage('')
     const cleanUsername = username.trim().toLowerCase()
     if (!/^[a-z0-9._]{3,30}$/.test(cleanUsername) || cleanUsername.startsWith('.') || cleanUsername.endsWith('.') || cleanUsername.includes('..')) {
-      setMessage(locale === 'bn' ? 'Username 3–32 অক্ষরের lowercase letter/number/underscore হতে হবে।' : 'Username must be 3–30 lowercase letters, numbers, dots or underscores.')
+      setMessage(locale === 'bn' ? 'Username 3–30 অক্ষরের lowercase letter/number/underscore হতে হবে।' : 'Username must be 3–30 lowercase letters, numbers, dots or underscores.')
       setBusy(false)
       return
     }
