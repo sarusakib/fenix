@@ -35,7 +35,7 @@ export default function FeedPage(){
   const [title,setTitle]=useState('')
   const [body,setBody]=useState('')
   const [topicId,setTopicId]=useState('')
-  const [composer,setComposer]=useState<'question'|'post'>('question')
+  const [composer,setComposer]=useState<'question'|'post'>('post')
   const [busy,setBusy]=useState(false)
   const [message,setMessage]=useState('')
   const [postImages,setPostImages]=useState<Array<{id:string;file:File;previewUrl:string;width:number;height:number;byteSize:number;sourceByteSize:number;sourceDigest:string}>>([])
@@ -47,10 +47,10 @@ export default function FeedPage(){
     setLoading(true)
     const s=createClient()
     try {
-      const questionPromise = tab === 'news' ? Promise.resolve({data:null}) : s.from('fenix_public_question_feed')
+      const questionPromise = tab === 'questions' || tab === 'following' ? s.from('fenix_public_question_feed') : Promise.resolve({data:null})
         .select('id,title,body,created_at,author_id,topic_id,author_name,author_username,author_avatar_url,topic_slug,topic_name_bn,topic_name_en,answer_count,score')
         .order('created_at',{ascending:false}).limit(40)
-      const newsPromise = tab === 'questions' || tab === 'following' ? Promise.resolve({data:null}) : s.from('news_posts')
+      const newsPromise = tab === 'news' ? s.from('news_posts') : Promise.resolve({data:null})
         .select('id,slug,title_bn,title_en,excerpt_bn,excerpt_en,category,verification_status,featured,breaking,published_at,source_name,image_url')
         .eq('status','published').order('published_at',{ascending:false}).limit(24)
       const postsPromise = tab === 'questions' || tab === 'news' ? Promise.resolve({data:null}) : s.from('fenix_public_feed').select('id,body,created_at,author_id,author_name,author_username,author_avatar_url').order('created_at',{ascending:false}).limit(30)
@@ -302,13 +302,14 @@ export default function FeedPage(){
     if(tab==='questions') return visibleQuestions.map(q=>({kind:'question' as const,time:q.created_at,data:q}))
     if(tab==='news') return news.map(n=>({kind:'news' as const,time:n.published_at??'',data:n}))
     const availablePosts=tab==='following' ? posts.filter(p=>followedProfiles.includes(p.author_id)) : posts
-    const questionsForTab=tab==='following' ? visibleQuestions : visibleQuestions
-    const all=[...questionsForTab.map(q=>({kind:'question' as const,time:q.created_at,data:q})),...(tab==='for-you'||tab==='latest'?news.map(n=>({kind:'news' as const,time:n.published_at??'',data:n})):[]),...availablePosts.map(p=>({kind:'post' as const,time:p.created_at,data:p}))]
+    const all=[] as Array<{kind:'post'|'question';time:string;data:PostRow|QuestionRow}>
+    if(tab==='following') all.push(...visibleQuestions.map(q=>({kind:'question' as const,time:q.created_at,data:q})))
+    all.push(...availablePosts.map(p=>({kind:'post' as const,time:p.created_at,data:p})))
     return all.sort((a,b)=>new Date(b.time).getTime()-new Date(a.time).getTime())
   },[tab,visibleQuestions,news,posts,followedProfiles])
 
-  const copy=locale==='bn'?{title:'FeniX Feed',intro:'Quora-এর মতো প্রশ্ন করুন, জ্ঞান শেয়ার করুন, উত্তর পড়ুন—সাথে FeniX News একই feed-এ।',ask:'প্রশ্ন করুন',post:'Post',placeholderTitle:'আপনার প্রশ্ন কী?',placeholderBody:'প্রশ্নটি বিস্তারিত লিখুন…',submit:'Publish',empty:'এখনও কোনো content নেই।',following:'Following',latest:'Latest',questions:'Questions',news:'News',forYou:'For You',follow:'Follow',followingLabel:'Following',answers:'উত্তর',vote:'Helpful',read:'Read News',login:'Login করে প্রশ্ন/উত্তর করুন',topic:'Topic',share:'Share',save:'Save'}
-  :{title:'FeniX Feed',intro:'A Quora-style knowledge feed for questions, answers, local knowledge and FeniX News.',ask:'Ask Question',post:'Post',placeholderTitle:'What is your question?',placeholderBody:'Add context, details or your experience…',submit:'Publish',empty:'No content yet.',following:'Following',latest:'Latest',questions:'Questions',news:'News',forYou:'For You',follow:'Follow',followingLabel:'Following',answers:'answers',vote:'Helpful',read:'Read News',login:'Sign in to ask or answer',topic:'Topic',share:'Share',save:'Save'}
+  const copy=locale==='bn'?{title:'FeniX Feed',intro:'আপনার FeniX community-এর post দেখুন, নিজের update শেয়ার করুন এবং local people-এর সাথে connected থাকুন।',ask:'প্রশ্ন করুন',post:'Post',placeholderTitle:'আপনার প্রশ্ন কী?',placeholderBody:'প্রশ্নটি বিস্তারিত লিখুন…',submit:'Publish',empty:'এখনও কোনো content নেই।',following:'Following',latest:'Latest',questions:'Questions',news:'News',forYou:'For You',follow:'Follow',followingLabel:'Following',answers:'উত্তর',vote:'Helpful',read:'Read News',login:'Login করে প্রশ্ন/উত্তর করুন',topic:'Topic',share:'Share',save:'Save'}
+  :{title:'FeniX Feed',intro:'Your social home for FeniX posts, local people and community activity.',ask:'Ask Question',post:'Post',placeholderTitle:'What is your question?',placeholderBody:'Add context, details or your experience…',submit:'Publish',empty:'No content yet.',following:'Following',latest:'Latest',questions:'Questions',news:'News',forYou:'For You',follow:'Follow',followingLabel:'Following',answers:'answers',vote:'Helpful',read:'Read News',login:'Sign in to ask or answer',topic:'Topic',share:'Share',save:'Save'}
 
   return <main className="min-h-dvh"><Navbar/><section className="mx-auto max-w-4xl px-4 pb-28 pt-7 sm:px-6">
     <header><p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">FeniX Knowledge Network</p><h1 className="mt-2 text-3xl font-black sm:text-5xl">{copy.title}</h1><p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--fx-muted)]">{copy.intro}</p></header>
