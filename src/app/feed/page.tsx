@@ -330,8 +330,8 @@ export default function FeedPage(){
   return <main className="min-h-dvh"><Navbar/><section className="mx-auto max-w-4xl px-4 pb-28 pt-7 sm:px-6">
     <header><p className="text-xs font-bold uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">FeniX Knowledge Network</p><h1 className="mt-2 text-3xl font-black sm:text-5xl">{copy.title}</h1><p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--fx-muted)]">{copy.intro}</p></header>
 
-    <div className="sticky top-16 z-20 mt-6 overflow-x-auto rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-1"><div className="flex min-w-max gap-1">
-      {([['for-you',copy.forYou],['following',copy.following],['latest',copy.latest],['questions',copy.questions],['news',copy.news]] as const).map(([id,text])=><button key={id} type="button" onClick={()=>setTab(id)} className={`rounded-xl px-3 py-2.5 text-xs font-bold ${tab===id?'bg-[var(--fx-primary-strong)] text-white':'text-[var(--fx-muted)]'}`}>{text}</button>)}
+    <div className="sticky top-16 z-20 mt-6 overflow-x-auto rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-1" role="tablist" aria-label={locale==='bn'?'ফিডের ধরন':'Feed views'}><div className="flex min-w-max gap-1">
+      {([['for-you',copy.forYou],['following',copy.following],['latest',copy.latest],['questions',copy.questions],['news',copy.news]] as const).map(([id,text])=><button key={id} id={`feed-tab-${id}`} type="button" role="tab" aria-selected={tab===id} aria-controls={`feed-panel-${id}`} onClick={()=>changeTab(id)} className={`rounded-xl px-3 py-2.5 text-xs font-bold transition ${tab===id?'bg-[var(--fx-primary-strong)] text-white':'text-[var(--fx-muted)] hover:bg-[var(--fx-primary-soft)] hover:text-[var(--fx-primary-strong)]'}`}>{text}</button>)}
     </div></div>
 
     {userId&&<section className="mt-4 rounded-[1.7rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4">
