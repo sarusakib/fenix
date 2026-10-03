@@ -67,14 +67,6 @@ export default function ResetPasswordPage() {
       return
     }
 
-    if (updateError) {
-      setError(
-        updateError.message ||
-          'Unable to update your password. Please try again.'
-      )
-      setLoading(false)
-      return
-    }
 
     setMessage(
       'Password updated successfully. Redirecting to login...'
