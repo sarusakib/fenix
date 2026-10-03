@@ -16,7 +16,7 @@ export default async function FeniArticlePage({params}:{params:Promise<{slug:str
  const nonce = (await headers()).get('x-fenix-nonce') ?? undefined
  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://fenix-saru-sakib.vercel.app'
  const jsonLd={'@context':'https://schema.org','@type':'Article','headline':article.titleEn,'description':article.descriptionEn,'datePublished':article.updated,'dateModified':article.updated,'author':{'@type':'Organization','name':'FeniX','url':base + '/'},'publisher':{'@type':'Organization','name':'FeniX'},'mainEntityOfPage':`${base}/feni/${article.slug}`, 'keywords':article.tags}
- const crumbs={'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':1,'name':'FeniX','item':base + '/'},{'@type':'ListItem','position':2,'name':'Feni Knowledge','item':base + '/feni'},{'@type':'ListItem','position':3,'name':article.titleEn,'item':`https://fenix-saru.vercel.app/feni/${article.slug}`}]}
+ const crumbs={'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':1,'name':'FeniX','item':base + '/'},{'@type':'ListItem','position':2,'name':'Feni Knowledge','item':base + '/feni'},{'@type':'ListItem','position':3,'name':article.titleEn,'item':`${base}/feni/${article.slug}`}]}
  const related=article.slug==='feni-district-guide'?'/feni/feni-services-directory':'/feni/feni-district-guide'
  return <main className="min-h-dvh">
   <Navbar/>
