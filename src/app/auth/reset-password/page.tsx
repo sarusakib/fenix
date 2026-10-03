@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { ROUTES } from '@/lib/core/routes'
+import { getPasswordPolicyError, isPasswordCompromised } from '@/lib/auth/auth-utils'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -20,8 +21,9 @@ export default function ResetPasswordPage() {
     setError('')
     setMessage('')
 
-    if (password.length < 12) {
-      setError('Password must be at least 12 characters.')
+    const passwordPolicyError = getPasswordPolicyError(password)
+    if (passwordPolicyError) {
+      setError(passwordPolicyError)
       return
     }
 
@@ -34,10 +36,36 @@ export default function ResetPasswordPage() {
 
     const supabase = createClient()
 
-    const { error: updateError } =
-      await supabase.auth.updateUser({
-        password,
-      })
+    try {
+      const compromised = await isPasswordCompromised(password)
+      if (compromised) {
+        setError('This password has appeared in a data breach. Choose a different password.')
+        setLoading(false)
+        return
+      }
+
+      const { error: updateError } =
+        await supabase.auth.updateUser({
+          password,
+        })
+
+      if (updateError) {
+        setError(
+          updateError.message ||
+            'Unable to update your password. Please try again.'
+        )
+        setLoading(false)
+        return
+      }
+    } catch (securityError) {
+      setError(
+        securityError instanceof Error
+          ? securityError.message
+          : 'Password security check is temporarily unavailable.'
+      )
+      setLoading(false)
+      return
+    }
 
     if (updateError) {
       setError(
@@ -70,7 +98,7 @@ export default function ResetPasswordPage() {
           </h1>
 
           <p className="mt-2 text-sm text-white/60">
-            Create a new password for your account.
+            Create a strong password with at least 12 characters, including upper/lowercase letters, a number and a special character.
           </p>
         </div>
 
@@ -118,7 +146,7 @@ export default function ResetPasswordPage() {
                 setConfirmPassword(event.target.value)
               }
               required
-              minLength={6}
+              minLength={12}
               className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
               placeholder="Confirm new password"
             />
