@@ -45,8 +45,6 @@ export default function NotificationsPage() {
     if (e) setError(bn ? 'নোটিফিকেশন লোড করা যায়নি।' : 'Notifications could not be loaded.')
     else setItems((data ?? []) as Notification[])
     setLoading(false)
-  }
-
   }, [bn])
 
   useEffect(() => { void load() }, [load])
