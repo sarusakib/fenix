@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ArrowClockwise, CheckCircle, ChatCircleDots, MapPin, PlusCircle, ShieldCheck, WarningCircle, WhatsappLogo } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import MessageButton from '@/components/messaging/MessageButton'
-import { createClient } from '@/utils/supabase/client'
+import { createClient, createPublicClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 import { ROUTES } from '@/lib/core/routes'
 
@@ -111,12 +111,13 @@ export default function CareBloodPage() {
 
   async function load() {
     const s=createClient()
+    const publicClient=createPublicClient()
     const {data:auth}=await s.auth.getUser()
     if(!auth.user){window.location.replace(ROUTES.auth.login+'?next='+encodeURIComponent('/care/blood'));return}
     const [p,d,ds,rs,ls]=await Promise.all([
       s.from('profiles').select('id,full_name,phone,date_of_birth,upazila_id,area_text').eq('id',auth.user.id).maybeSingle(),
       s.from('fenix_blood_donors').select('user_id,blood_group,upazila_id,area_text,availability,last_donation_date,preferred_contact,is_public,note,gender,emergency_available').eq('user_id',auth.user.id).maybeSingle(),
-      s.from('fenix_public_blood_donors').select('user_id,username,full_name,avatar_url,blood_group,area_text,upazila_bn,upazila_en,availability,last_donation_date,preferred_contact,gender,emergency_available,public_whatsapp').order('emergency_available',{ascending:false}).order('full_name',{ascending:true}).limit(60),
+      publicClient.from('fenix_public_blood_donors').select('user_id,username,full_name,avatar_url,blood_group,area_text,upazila_bn,upazila_en,availability,last_donation_date,preferred_contact,gender,emergency_available,public_whatsapp').order('emergency_available',{ascending:false}).order('full_name',{ascending:true}).limit(60),
       s.from('fenix_public_blood_requests').select('id,blood_group,units,hospital_name,hospital_area,upazila_bn,upazila_en,area_text,needed_at,urgency,status,created_at').order('created_at',{ascending:false}).limit(60),
       s.from('fenix_brain_locations').select('id,name_bn,name_en').eq('is_active',true).eq('level','upazila').order('name_en'),
     ])
