@@ -26,10 +26,11 @@ export default function InvestPage() {
       const supabase = createClient()
       const { data, error: listError } = await supabase
         .from('investment_opportunities')
-        .select('*')
+        .select('id,category,status,title_bn,title_en,description_en,target_amount,min_investment,upazila,district,risk_level,raised_amount,expected_return_pct')
         .in('status', ['approved', 'fully_funded'])
         .eq('verification_status', 'verified')
         .order('created_at', { ascending: false })
+        .limit(60)
 
       if (!active) return
       const opportunityRows = (data ?? []) as InvestmentOpportunity[]
