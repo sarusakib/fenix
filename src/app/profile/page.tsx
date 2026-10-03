@@ -32,6 +32,7 @@ export default function ProfileEditorPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [originalUsername, setOriginalUsername] = useState('')
   const [fullName, setFullName] = useState('')
+  const [dateOfBirth, setDateOfBirth] = useState('')
   const [username, setUsername] = useState('')
   const [bio, setBio] = useState('')
   const [locationText, setLocationText] = useState('')
@@ -93,7 +94,7 @@ export default function ProfileEditorPage() {
       const { data: auth } = await s.auth.getUser()
       if (!auth.user) { window.location.replace(ROUTES.auth.login + '?next=' + encodeURIComponent(ROUTES.core.profile)); return }
       const [{ data: profile }, { data: settings }] = await Promise.all([
-        s.from('profiles').select('id,full_name,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url,district_id,upazila_id,locality_id,area_text,road_text,house_details,holding_no,location_public_level,exact_location_visibility').eq('id', auth.user.id).maybeSingle(),
+        s.from('profiles').select('id,full_name,date_of_birth,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url,district_id,upazila_id,locality_id,area_text,road_text,house_details,holding_no,location_public_level,exact_location_visibility').eq('id', auth.user.id).maybeSingle(),
         s.from('profile_settings').select('locale,profile_visibility,message_permissions,feed_visibility').eq('user_id', auth.user.id).maybeSingle(),
       ])
       if (!active) return
@@ -102,6 +103,8 @@ export default function ProfileEditorPage() {
       setUserId(auth.user.id)
       setEmail(auth.user.email ?? '')
       setFullName(profile?.full_name ?? auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? '')
+      const providerDob = typeof auth.user.user_metadata?.date_of_birth === 'string' ? auth.user.user_metadata.date_of_birth : typeof auth.user.user_metadata?.birthdate === 'string' ? auth.user.user_metadata.birthdate : typeof auth.user.user_metadata?.birthday === 'string' ? auth.user.user_metadata.birthday : ''
+      setDateOfBirth(profile?.date_of_birth ?? providerDob)
       const loadedUsername = profile?.username ?? makeUsername(auth.user.email ?? 'user')
       setUsername(loadedUsername)
       setOriginalUsername(loadedUsername)
@@ -133,9 +136,9 @@ export default function ProfileEditorPage() {
   }, [setLocale])
 
   const completion = useMemo(() => {
-    const values = [fullName, username, bio, locationText, websiteUrl, avatarUrl, visibility === 'public' ? 'public' : '']
+    const values = [fullName, dateOfBirth, username, bio, locationText, websiteUrl, avatarUrl, visibility === 'public' ? 'public' : '']
     return Math.round(values.filter(Boolean).length / values.length * 100)
-  }, [avatarUrl, bio, fullName, locationText, username, visibility, websiteUrl])
+  }, [avatarUrl, bio, dateOfBirth, fullName, locationText, username, visibility, websiteUrl])
 
   const publicUrl = username ? ROUTES.core.profile + '/' + encodeURIComponent(username) : ROUTES.core.profile
 
@@ -216,6 +219,17 @@ export default function ProfileEditorPage() {
       return
     }
 
+    if (dateOfBirth && !/^\\d{4}-\\d{2}-\\d{2}$/.test(dateOfBirth)) {
+      setMessage(locale === 'bn' ? 'জন্মতারিখ সঠিকভাবে দিন।' : 'Enter a valid date of birth.')
+      setBusy(false)
+      return
+    }
+    if (dateOfBirth && dateOfBirth > new Date().toISOString().slice(0, 10)) {
+      setMessage(locale === 'bn' ? 'জন্মতারিখ ভবিষ্যতের হতে পারবে না।' : 'Date of birth cannot be in the future.')
+      setBusy(false)
+      return
+    }
+
     if (usernameStatus === 'checking' || usernameStatus === 'taken' || usernameStatus === 'invalid') {
       setMessage(locale === 'bn' ? 'এই username ব্যবহার করা যাবে না।' : 'This username is not available.')
       setBusy(false)
@@ -239,6 +253,7 @@ export default function ProfileEditorPage() {
     const [{ error: profileError }, { error: settingError }] = await Promise.all([
       s.from('profiles').update({
         full_name: fullName.trim().slice(0, 160) || null,
+        date_of_birth: dateOfBirth || null,
         username: cleanUsername,
         bio: bio.trim().slice(0, 1000) || null,
         avatar_url: cleanPublicUrl(avatarUrl),
@@ -344,6 +359,7 @@ export default function ProfileEditorPage() {
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--fx-muted)]">{locale==='bn'?'এই তথ্যগুলো FeniX-এর প্রাসঙ্গিক ফিচারে আপনার public identity তৈরি করে। Private account information কখনো public profile content হয় না।':'These details power your public identity across eligible FeniX features. Private account information is never turned into public profile content.'}</p>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <Field label={locale==='bn'?'নাম':'Name'} value={fullName} onChange={setFullName} maxLength={160}/>
+            <div><span className="text-xs font-bold">{locale==='bn'?'জন্মতারিখ':'Date of birth'}</span><input type="date" value={dateOfBirth} max={new Date().toISOString().slice(0,10)} onChange={e=>setDateOfBirth(e.target.value)} className="mt-2 h-11 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-sm"/><p className="mt-1 text-[10px] text-[var(--fx-muted)]">{locale==='bn'?'এটি private profile তথ্য; Donor/অন্যান্য form-এ auto-fill হতে পারবে।':'Private profile data used to auto-fill eligible FeniX forms.'}</p></div>
             <div><Field label="Username" value={username} onChange={v=>setUsername(v.replace(/[^a-zA-Z0-9._]/g,'').toLowerCase())} maxLength={30} prefix="@"/><p className={'mt-1 text-[10px] '+(usernameStatus==='available'?'text-[var(--fx-primary-strong)]':usernameStatus==='taken'||usernameStatus==='invalid'?'text-red-600':'text-[var(--fx-muted)]')}>{usernameStatus==='checking'?(locale==='bn'?'Username যাচাই হচ্ছে…':'Checking username…'):usernameStatus==='available'?(locale==='bn'?'Username পাওয়া যাচ্ছে':'Username available'):usernameStatus==='taken'?(locale==='bn'?'এই username ইতিমধ্যে নেওয়া হয়েছে':'Username already taken'):usernameStatus==='invalid'?(locale==='bn'?'3–30 অক্ষর, a-z/0-9/._ এবং শুরু/শেষে dot নয়':'Use 3–30 lowercase letters, numbers, dot or underscore; no leading/trailing dot'):(locale==='bn'?'Username 3–30 অক্ষর':'Username 3–30 characters')}</p></div>
             <Field label={locale==='bn'?'ওয়েবসাইট':'Website'} value={websiteUrl} onChange={setWebsiteUrl} maxLength={500} icon={<Globe size={15}/>} placeholder="https://example.com"/>
             <Field label={locale==='bn'?'WhatsApp link':'WhatsApp link'} value={whatsappUrl} onChange={setWhatsappUrl} maxLength={500} icon={<WhatsappLogo size={15}/>} placeholder="https://wa.me/…"/>
