@@ -6,7 +6,7 @@ import { ArrowLeft, Check, Copy, FacebookLogo, Globe, ImageSquare, InstagramLogo
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
-import { optimizeImageFile, removePublicImage, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
+import { optimizeImageFile, PROFILE_IMAGE_HARD_LIMIT_BYTES, PROFILE_IMAGE_TARGET_BYTES, removePublicImage, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
 import ImageCropEditor from '@/components/profile/ImageCropEditor'
 import FeniLocationPicker from '@/components/profile/FeniLocationPicker'
 import { ROUTES } from '@/lib/core/routes'
@@ -170,11 +170,11 @@ export default function ProfileEditorPage() {
       setImageProgress(15)
       // The source can be very large (for example 10 MB+). The optimizer decodes it locally,
       // crops it to the Facebook-style frame, and stores only an image up to 200 KB.
-      const optimized = await optimizeImageFile(file, { maxDimension: kind === 'avatar' ? 1200 : 1800, targetBytes: 190 * 1024, hardLimitBytes: 200 * 1024 })
+      const optimized = await optimizeImageFile(file, { maxDimension: kind === 'avatar' ? 1200 : 1800, targetBytes: PROFILE_IMAGE_TARGET_BYTES, hardLimitBytes: PROFILE_IMAGE_HARD_LIMIT_BYTES })
       setImageProgress(55)
       const extension = optimized.mimeType === 'image/webp' ? 'webp' : 'jpg'
       const path = auth.user.id + '/' + kind + '/' + crypto.randomUUID() + '.' + extension
-      const uploaded = await uploadOptimizedPublicImage(s, 'avatars', path, optimized, 200 * 1024)
+      const uploaded = await uploadOptimizedPublicImage(s, 'avatars', path, optimized, PROFILE_IMAGE_HARD_LIMIT_BYTES)
       setImageProgress(80)
       const patch = kind === 'avatar' ? { avatar_url: uploaded.publicUrl } : { cover_url: uploaded.publicUrl }
       const { data: updatedProfile, error } = await s.from('profiles').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', auth.user.id).select('id').maybeSingle()
