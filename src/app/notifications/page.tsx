@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Bell, ChatCircleDots, CheckCircle, FunnelSimple, ShieldCheck, Users } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
@@ -28,7 +28,7 @@ export default function NotificationsPage() {
 
   const bn = locale === 'bn'
 
-  async function load() {
+  const load = useCallback(async () => {
     const s = createClient()
     const { data: auth } = await s.auth.getSession()
     const uid = auth.session?.user?.id
@@ -47,7 +47,9 @@ export default function NotificationsPage() {
     setLoading(false)
   }
 
-  useEffect(() => { void load() }, [bn])
+  }, [bn])
+
+  useEffect(() => { void load() }, [load])
 
   const visible = useMemo(() => {
     return items.filter(item => {
