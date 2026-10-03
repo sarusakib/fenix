@@ -12,9 +12,10 @@ export const metadata: Metadata = {
 }
 
 export default async function FeniKnowledgeHub(){
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://fenix-saru-sakib.vercel.app'
   const nonce = (await headers()).get('x-fenix-nonce') ?? undefined
   const itemList=FENI_ARTICLES.map((article,index)=>({
-    '@type':'ListItem',position:index+1,url:`https://fenix-saru.vercel.app/feni/${article.slug}`,name:article.titleEn,
+    '@type':'ListItem',position:index+1,url:`${base}/feni/${article.slug}`,name:article.titleEn,
   }))
   return <main className="min-h-dvh">
     <Navbar/>
@@ -34,7 +35,7 @@ export default async function FeniKnowledgeHub(){
           <Link href={`/feni/${article.slug}`} className="mt-5 inline-flex min-h-10 items-center gap-2 text-sm font-bold text-[var(--fx-primary-strong)]">Read guide <ArrowRight size={15}/></Link>
         </article>)}
       </div>
-      <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({'@context':'https://schema.org','@type':'CollectionPage','name':'Feni District Guide | FeniX','description':'Public FeniX knowledge hub for Feni district.','url':'https://fenix-saru.vercel.app/feni','mainEntity':{'@type':'ItemList','itemListElement':itemList}})}}/>
+      <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({'@context':'https://schema.org','@type':'CollectionPage','name':'Feni District Guide | FeniX','description':'Public FeniX knowledge hub for Feni district.','url':base + '/feni','mainEntity':{'@type':'ItemList','itemListElement':itemList}})}}/>
     </section>
   </main>
 }
