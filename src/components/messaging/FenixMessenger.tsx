@@ -480,15 +480,25 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
       } else if (file.type === 'application/pdf') {
         if (file.size > MAX_FILE_BYTES) throw new Error('PDF must be 10MB or smaller.')
         messageType = 'file'
+      } else if (
+        file.type === 'audio/webm' ||
+        file.type === 'audio/ogg' ||
+        file.type === 'audio/mpeg' ||
+        file.type.startsWith('audio/webm;') ||
+        file.type.startsWith('audio/ogg;')
+      ) {
+        if (file.size > MAX_FILE_BYTES) throw new Error('Audio must be 10MB or smaller.')
+        messageType = 'audio'
       } else {
-        throw new Error('Supported chat files are photos, MP4/WebM video, and PDF.')
+        throw new Error('Supported chat files are photos, audio, MP4/WebM video, and PDF.')
       }
 
+      const uploadContentType = uploadFile.type.split(';')[0].trim().toLowerCase()
       const extension = uploadFile.name.split('.').pop()?.toLowerCase() || 'bin'
       const path = userId + '/' + crypto.randomUUID() + '.' + extension
       const { error: uploadError } = await supabase.storage.from('chat-media').upload(path, uploadFile, {
         cacheControl: '3600',
-        contentType: uploadFile.type,
+        contentType: uploadContentType,
         upsert: false,
       })
       if (uploadError) throw uploadError
@@ -500,7 +510,7 @@ export default function FenixMessenger({ fullPage = false }: { fullPage?: boolea
         reply_to_id: replyingTo?.id || null,
         attachment_path: path,
         attachment_name: uploadFile.name.slice(0, 180),
-        attachment_type: uploadFile.type,
+        attachment_type: uploadContentType,
         attachment_size: uploadFile.size,
         message_type: messageType,
         metadata: optimizedMeta ? {
