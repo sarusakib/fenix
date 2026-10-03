@@ -56,7 +56,7 @@ export function getPasswordPolicyError(password: string): string | null {
     return 'Password must include an uppercase letter.'
   }
 
-  if (!/d/.test(password)) {
+  if (!/\d/.test(password)) {
     return 'Password must include a number.'
   }
 
