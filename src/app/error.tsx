@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ArrowClockwise,
   WarningCircle,
@@ -17,6 +17,15 @@ export default function ErrorPage({
   error,
   reset,
 }: ErrorPageProps) {
+  const [locale, setLocale] = useState<'bn' | 'en'>('bn')
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem('fenix-locale')
+      if (saved === 'en' || saved === 'bn') setLocale(saved)
+    } catch {}
+  }, [])
+
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       console.error(
@@ -101,12 +110,13 @@ export default function ErrorPage({
         </p>
 
         <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-          Something went wrong
+          {locale === 'bn' ? 'কিছু একটা সমস্যা হয়েছে' : 'Something went wrong'}
         </h1>
 
         <p className="mt-3 text-sm leading-6 text-black/55 dark:text-white/55">
-          The page could not be loaded correctly.
-          Please try again.
+          {locale === 'bn'
+            ? 'পেজটি সঠিকভাবে লোড হয়নি। আবার চেষ্টা করুন।'
+            : 'The page could not be loaded correctly. Please try again.'}
         </p>
 
         <button
@@ -141,7 +151,7 @@ export default function ErrorPage({
             size={17}
             weight="bold"
           />
-          Try again
+          {locale === 'bn' ? 'আবার চেষ্টা করুন' : 'Try again'}
         </button>
       </section>
     </main>
