@@ -137,14 +137,15 @@ export default function SettingsPage() {
     setSecurityBusy(true)
     setNotice('')
     const s = createClient()
-    if (!user.email) {
+    const email = user?.email
+    if (!email) {
       setSecurityBusy(false)
       setNotice(bn ? 'এই account-এ email password সেট করা নেই।' : 'This account does not have an email password sign-in.')
       return
     }
 
     const { error: verifyError } = await s.auth.signInWithPassword({
-      email: user.email,
+      email,
       password: currentPassword,
     })
     if (verifyError) {
