@@ -137,7 +137,24 @@ export default function SettingsPage() {
     setSecurityBusy(true)
     setNotice('')
     const s = createClient()
-    const { error } = await s.auth.updateUser({ password: newPassword, current_password: currentPassword })
+    if (!user.email) {
+      setSecurityBusy(false)
+      setNotice(bn ? 'এই account-এ email password সেট করা নেই।' : 'This account does not have an email password sign-in.')
+      return
+    }
+
+    const { error: verifyError } = await s.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    })
+    if (verifyError) {
+      setSecurityBusy(false)
+      setCurrentPassword('')
+      setNotice(bn ? 'বর্তমান password সঠিক নয়।' : 'Current password is incorrect.')
+      return
+    }
+
+    const { error } = await s.auth.updateUser({ password: newPassword })
     setSecurityBusy(false)
     setCurrentPassword('')
     setNewPassword('')
