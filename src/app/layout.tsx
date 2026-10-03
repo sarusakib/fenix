@@ -1,4 +1,5 @@
 import './globals.css'
+import type { Metadata, Viewport } from 'next'
 
 import { headers } from 'next/headers'
 import Script from 'next/script'
@@ -13,9 +14,35 @@ import FenixMessenger from '../components/messaging/FenixMessenger'
 import { FenixLocaleProvider } from '../components/i18n/FenixLocaleProvider'
 import FenixUiTranslator from '../components/i18n/FenixUiTranslator'
 
-export const metadata = {
+const SITE_URL = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://fenix-saru-sakib.vercel.app')
+  } catch {
+    return new URL('https://fenix-saru-sakib.vercel.app')
+  }
+})()
+
+export const metadata: Metadata = {
+  metadataBase: SITE_URL,
   title: 'FeniX | Feni Business Ecosystem',
   description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'bn_BD',
+    siteName: 'FeniX',
+    title: 'FeniX | Feni Business Ecosystem',
+    description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
+    url: '/',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'FeniX | Feni Business Ecosystem',
+    description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
+  },
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
   manifest: '/manifest.json',
   icons: {
     icon: '/fenix-logo.svg',
@@ -25,7 +52,7 @@ export const metadata = {
   applicationName: 'FeniX',
 }
 
-export const viewport = {
+export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
