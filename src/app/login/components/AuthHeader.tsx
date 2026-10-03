@@ -1,3 +1,4 @@
+import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 import type { AuthMode } from '../../../lib/auth/auth-utils'
 
 interface AuthHeaderProps {
@@ -7,10 +8,12 @@ interface AuthHeaderProps {
 export default function AuthHeader({
   mode,
 }: AuthHeaderProps) {
+  const { locale } = useFenixLocale()
+  const bn = locale === 'bn'
   return (
     <div className="mb-8">
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#008080]">
-        {mode === 'login' ? 'Welcome back' : 'Join FeniX'}
+        {bn ? (mode === 'login' ? 'আবার স্বাগতম' : 'FeniX-এ যোগ দিন') : (mode === 'login' ? 'Welcome back' : 'Join FeniX')}
       </p>
 
       <h2 className="text-3xl font-black tracking-[-0.04em] sm:text-4xl 2xl:text-5xl">

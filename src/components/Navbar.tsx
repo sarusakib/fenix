@@ -63,7 +63,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-[80] border-b border-[var(--fx-border)] bg-[var(--fx-bg)]/88 text-[var(--fx-text)] backdrop-blur-2xl">
-      <nav aria-label="Primary navigation" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <nav aria-label={bn ? 'প্রধান নেভিগেশন' : 'Primary navigation' } className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex min-h-[72px] items-center justify-between gap-3">
           <FenixBrand onClick={closeMenus} />
 
@@ -81,7 +81,7 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-2 md:flex">
             <Link href={ROUTES.investment.root} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--fx-primary-soft)] px-3.5 text-sm font-bold text-[var(--fx-primary-strong)]"><TrendUp size={17}/>{bn ? 'ইনভেস্ট' : 'Invest'}</Link>
-            <button type="button" onClick={toggleTheme} aria-label="Toggle theme" className="grid h-11 w-11 place-items-center rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] text-[var(--fx-muted)]">{resolvedTheme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}</button>
+            <button type="button" onClick={toggleTheme} aria-label={bn ? 'থিম পরিবর্তন করুন' : 'Toggle theme'} className="grid h-11 w-11 place-items-center rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] text-[var(--fx-muted)]">{resolvedTheme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}</button>
             {user && <Link href={ROUTES.core.notifications} aria-label={bn ? 'নোটিফিকেশন' : 'Notifications'} className={'relative grid h-11 w-11 place-items-center rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] ' + (pathname === ROUTES.core.notifications ? 'text-[var(--fx-primary-strong)]' : 'text-[var(--fx-muted)]')}><Bell size={18}/>{unreadNotifications > 0 && <span className="absolute right-1 top-1 grid min-h-4 min-w-4 place-items-center rounded-full bg-red-500 px-1 text-[8px] font-black text-white">{unreadNotifications > 99 ? '99+' : unreadNotifications}</span>}</Link>}
             {role === 'admin' && user && <Link href={ROUTES.admin} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--fx-primary-soft)] px-3.5 text-sm font-bold text-[var(--fx-primary-strong)]"><ShieldCheck size={17}/>{bn ? 'অ্যাডমিন' : 'Admin'}</Link>}
             {user ? (
@@ -116,7 +116,7 @@ export default function Navbar() {
               <MobileLink href={ROUTES.investment.root} onClick={closeMenus} emphasized icon={<TrendUp size={18}/>}>{bn ? 'ইনভেস্ট' : 'Invest'}</MobileLink>
               <MobileLink href={ROUTES.emergency} onClick={closeMenus} icon={<ShieldCheck size={18}/>}>{bn ? 'জরুরি' : 'Emergency'}</MobileLink>
               {user && <MobileLink href={ROUTES.settings} onClick={closeMenus} icon={<GearSix size={18}/>}>{bn ? 'সেটিংস' : 'Settings'}</MobileLink>}
-              {user && <MobileLink href={ROUTES.ecosystem.saved} onClick={closeMenus} icon={<BookmarkSimple size={18}/>}>{bn ? 'Saved' : 'Saved'}</MobileLink>}
+              {user && <MobileLink href={ROUTES.ecosystem.saved} onClick={closeMenus} icon={<BookmarkSimple size={18}/>}>{bn ? 'সংরক্ষিত' : 'Saved'}</MobileLink>}
               {user && <MobileLink href={ROUTES.core.profile} onClick={closeMenus} icon={<UserCircle size={18}/>}>{bn ? 'প্রোফাইল' : 'Profile'}</MobileLink>}
             </div>
             {user ? (
