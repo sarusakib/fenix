@@ -44,6 +44,7 @@ export default function SettingsPage() {
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULT_PREFS)
   const [savingKey, setSavingKey] = useState('')
   const [notice, setNotice] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [securityBusy, setSecurityBusy] = useState(false)
@@ -121,15 +122,24 @@ export default function SettingsPage() {
       setNotice(bn ? 'Password কমপক্ষে 8 অক্ষরের হতে হবে।' : 'Password must be at least 8 characters.')
       return
     }
+    if (!currentPassword) {
+      setNotice(bn ? 'বর্তমান password দিন।' : 'Enter your current password.')
+      return
+    }
     if (newPassword !== confirmPassword) {
       setNotice(bn ? 'Password confirmation মিলছে না।' : 'Password confirmation does not match.')
+      return
+    }
+    if (currentPassword === newPassword) {
+      setNotice(bn ? 'নতুন password অবশ্যই আলাদা হতে হবে।' : 'New password must be different from the current password.')
       return
     }
     setSecurityBusy(true)
     setNotice('')
     const s = createClient()
-    const { error } = await s.auth.updateUser({ password: newPassword })
+    const { error } = await s.auth.updateUser({ password: newPassword, current_password: currentPassword })
     setSecurityBusy(false)
+    setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
     setNotice(error
@@ -258,11 +268,12 @@ export default function SettingsPage() {
             <div className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-bg)]/40 p-4">
               <p className="text-sm font-bold">{bn ? 'Password পরিবর্তন' : 'Change password'}</p>
               <p className="mt-1 text-xs leading-5 text-[var(--fx-muted)]">{bn ? 'কমপক্ষে 8 অক্ষরের নতুন password দিন। Supabase সাম্প্রতিক authentication চাইতে পারে।' : 'Choose a new password of at least 8 characters. Supabase may require recent authentication.'}</p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                <input type="password" value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} autoComplete="current-password" placeholder={bn?'বর্তমান password':'Current password'} className="h-11 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-sm outline-none"/>
                 <input type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} autoComplete="new-password" placeholder={bn?'নতুন password':'New password'} className="h-11 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-sm outline-none"/>
                 <input type="password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} autoComplete="new-password" placeholder={bn?'আবার password দিন':'Confirm password'} className="h-11 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-sm outline-none"/>
               </div>
-              <button type="button" onClick={()=>void changePassword()} disabled={securityBusy || !newPassword || !confirmPassword} className="mt-3 min-h-10 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-xs font-bold text-white disabled:opacity-40">{securityBusy ? (bn?'কাজ হচ্ছে…':'Working…') : (bn?'Password আপডেট করুন':'Update password')}</button>
+              <button type="button" onClick={()=>void changePassword()} disabled={securityBusy || !currentPassword || !newPassword || !confirmPassword} className="mt-3 min-h-10 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-xs font-bold text-white disabled:opacity-40">{securityBusy ? (bn?'কাজ হচ্ছে…':'Working…') : (bn?'Password আপডেট করুন':'Update password')}</button>
             </div>
             <div className="rounded-2xl border border-red-500/15 bg-red-500/[.035] p-4">
               <p className="text-sm font-bold">{bn ? 'সব session থেকে Sign out' : 'Sign out all sessions'}</p>
