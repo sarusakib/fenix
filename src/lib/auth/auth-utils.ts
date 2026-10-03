@@ -194,6 +194,7 @@ export async function signInWithOAuth({
     provider,
     options: {
       redirectTo: callback.toString(),
+      ...(provider === 'facebook' ? { scopes: 'email,public_profile' } : {}),
     },
   })
 }

@@ -6,7 +6,8 @@ import { ArrowLeft, Check, Copy, FacebookLogo, Globe, ImageSquare, InstagramLogo
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
-import { optimizeImageFile, removePublicImage, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
+import { optimizeImageFile, PROFILE_IMAGE_HARD_LIMIT_BYTES, PROFILE_IMAGE_TARGET_BYTES, removePublicImage, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
+import ImageCropEditor from '@/components/profile/ImageCropEditor'
 import FeniLocationPicker from '@/components/profile/FeniLocationPicker'
 import { ROUTES } from '@/lib/core/routes'
 
@@ -58,6 +59,7 @@ export default function ProfileEditorPage() {
   const [copied, setCopied] = useState(false)
   const [imageBusy, setImageBusy] = useState<'avatar' | 'cover' | null>(null)
   const [imageProgress, setImageProgress] = useState(0)
+  const [cropTarget, setCropTarget] = useState<{ kind: 'avatar' | 'cover'; file: File } | null>(null)
   const [usernameStatus, setUsernameStatus] = useState<'idle'|'checking'|'available'|'taken'|'invalid'>('idle')
 
   useEffect(() => {
@@ -96,6 +98,7 @@ export default function ProfileEditorPage() {
       ])
       if (!active) return
       const providerAvatar = typeof auth.user.user_metadata?.avatar_url === 'string' ? auth.user.user_metadata.avatar_url : typeof auth.user.user_metadata?.picture === 'string' ? auth.user.user_metadata.picture : ''
+      const providerCover = typeof auth.user.user_metadata?.cover_url === 'string' ? auth.user.user_metadata.cover_url : typeof auth.user.user_metadata?.cover === 'string' ? auth.user.user_metadata.cover : typeof auth.user.user_metadata?.cover_photo === 'string' ? auth.user.user_metadata.cover_photo : ''
       setUserId(auth.user.id)
       setEmail(auth.user.email ?? '')
       setFullName(profile?.full_name ?? auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? '')
@@ -106,7 +109,7 @@ export default function ProfileEditorPage() {
       setLocationText(profile?.location_text ?? '')
       setWebsiteUrl(profile?.website_url ?? '')
       setAvatarUrl(profile?.avatar_url ?? providerAvatar)
-      setCoverUrl(profile?.cover_url ?? '')
+      setCoverUrl(profile?.cover_url ?? providerCover)
       setWhatsappUrl(profile?.whatsapp_url ?? '')
       setFacebookUrl(profile?.facebook_url ?? '')
       setInstagramUrl(profile?.instagram_url ?? '')
@@ -152,6 +155,10 @@ export default function ProfileEditorPage() {
     return index >= 0 ? decodeURIComponent(value.slice(index + marker.length)) : ''
   }
 
+  function openImageCrop(kind: 'avatar' | 'cover', file: File) {
+    setCropTarget({ kind, file })
+  }
+
   async function uploadProfileImage(kind: 'avatar' | 'cover', file: File) {
     setImageBusy(kind)
     setMessage('')
@@ -161,17 +168,19 @@ export default function ProfileEditorPage() {
       if (!auth.user) throw new Error('Please sign in again.')
       const previousUrl = kind === 'avatar' ? avatarUrl : coverUrl
       setImageProgress(15)
-      const optimized = await optimizeImageFile(file, { maxDimension: kind === 'avatar' ? 960 : 1800, targetBytes: 138 * 1024, hardLimitBytes: 150 * 1024 })
+      // The source can be very large (for example 10 MB+). The optimizer decodes it locally,
+      // crops it to the Facebook-style frame, and stores only an image up to 200 KB.
+      const optimized = await optimizeImageFile(file, { maxDimension: kind === 'avatar' ? 1200 : 1800, targetBytes: PROFILE_IMAGE_TARGET_BYTES, hardLimitBytes: PROFILE_IMAGE_HARD_LIMIT_BYTES })
       setImageProgress(55)
       const extension = optimized.mimeType === 'image/webp' ? 'webp' : 'jpg'
       const path = auth.user.id + '/' + kind + '/' + crypto.randomUUID() + '.' + extension
-      const uploaded = await uploadOptimizedPublicImage(s, 'avatars', path, optimized, 150 * 1024)
+      const uploaded = await uploadOptimizedPublicImage(s, 'avatars', path, optimized, PROFILE_IMAGE_HARD_LIMIT_BYTES)
       setImageProgress(80)
       const patch = kind === 'avatar' ? { avatar_url: uploaded.publicUrl } : { cover_url: uploaded.publicUrl }
-      const { error } = await s.from('profiles').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', auth.user.id)
-      if (error) {
+      const { data: updatedProfile, error } = await s.from('profiles').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', auth.user.id).select('id').maybeSingle()
+      if (error || !updatedProfile) {
         await removePublicImage(s, 'avatars', path)
-        throw error
+        throw error ?? new Error(locale === 'bn' ? 'Profile record পাওয়া যায়নি। আবার login করুন।' : 'Your profile record was not found. Please sign in again.')
       }
       if (kind === 'avatar') setAvatarUrl(uploaded.publicUrl)
       else setCoverUrl(uploaded.publicUrl)
@@ -274,6 +283,19 @@ export default function ProfileEditorPage() {
   return (
     <main className="fenix-shell min-h-dvh">
       <Navbar/>
+      {cropTarget && (
+        <ImageCropEditor
+          file={cropTarget.file}
+          kind={cropTarget.kind}
+          locale={locale}
+          onCancel={() => setCropTarget(null)}
+          onConfirm={async (croppedFile) => {
+            const target = cropTarget
+            setCropTarget(null)
+            await uploadProfileImage(target.kind, croppedFile)
+          }}
+        />
+      )}
       <section className="mx-auto max-w-5xl px-4 pb-28 pt-7 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href={ROUTES.settings} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold"><ArrowLeft size={16}/> {locale==='bn'?'সেটিংস':'Settings'}</Link>
@@ -288,7 +310,7 @@ export default function ProfileEditorPage() {
             <div className="relative h-36 overflow-hidden bg-[var(--fx-primary-soft)] sm:h-48">
               <label className="absolute right-3 top-3 z-10 inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-xl bg-black/55 px-3 text-xs font-bold text-white backdrop-blur">
                 <ImageSquare size={15}/>{imageBusy==='cover' ? (locale==='bn' ? 'আপলোড হচ্ছে ' : 'Uploading ') + imageProgress + '%' : (locale==='bn' ? 'কভার ছবি' : 'Cover photo')}
-                <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('cover',file)}}/>
+                <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy || cropTarget!==null} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) openImageCrop('cover',file)}}/>
               </label>
               {coverUrl ? <img src={coverUrl} alt="" className="h-full w-full object-cover"/> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,128,128,.22),transparent_42%),linear-gradient(135deg,rgba(11,23,54,.02),rgba(0,128,128,.10))]"/>}
             </div>
@@ -298,7 +320,7 @@ export default function ProfileEditorPage() {
                   {avatarUrl ? <img src={avatarUrl} alt="" className="h-24 w-24 rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-bg)] object-cover sm:h-28 sm:w-28"/> : <div className="grid h-24 w-24 place-items-center rounded-3xl border-4 border-[var(--fx-surface-strong)] bg-[var(--fx-primary-soft)] sm:h-28 sm:w-28"><UserCircle size={58} className="text-[var(--fx-primary-strong)]"/></div>}
                   <label className="mb-1 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-xs font-bold shadow-sm">
                     <UploadSimple size={16}/><span>{imageBusy==='avatar' ? (locale==='bn' ? 'আপলোড হচ্ছে ' : 'Uploading ') + imageProgress + '%' : (locale==='bn' ? 'গ্যালারি' : 'Gallery')}</span>
-                    <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) void uploadProfileImage('avatar',file)}}/>
+                    <input type="file" accept="image/*" className="sr-only" disabled={imageBusy!==null || busy || cropTarget!==null} onChange={e=>{const file=e.target.files?.[0]; e.currentTarget.value=''; if(file) openImageCrop('avatar',file)}}/>
                   </label>
                 </div>
                 <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--fx-primary-soft)] px-3 py-1.5 text-[10px] font-bold text-[var(--fx-primary-strong)]"><ShieldCheck size={14}/> {locale==='bn'?'প্রোফাইল নিয়ন্ত্রণ সক্রিয়':'Profile controls active'}</span>

@@ -17,6 +17,10 @@ export const TARGET_IMAGE_BYTES = 300 * 1024
 export const MAX_IMAGE_UPLOAD_BYTES = TARGET_IMAGE_BYTES
 export const HARD_IMAGE_UPLOAD_BYTES = 400 * 1024
 
+// Profile photos and covers have a tighter product-level budget.
+export const PROFILE_IMAGE_TARGET_BYTES = 190 * 1024
+export const PROFILE_IMAGE_HARD_LIMIT_BYTES = 200 * 1024
+
 // Adaptive quality: prefer ~300 KB, but never exceed 400 KB for stored delivery images.
 
 export type OptimizedImage = {
