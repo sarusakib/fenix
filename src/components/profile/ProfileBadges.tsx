@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { createPublicClient, createClient } from '@/utils/supabase/client'
 
 type Props = {
   userId: string
@@ -18,8 +18,9 @@ export default function ProfileBadges({ userId, role, locale = 'bn' }: Props) {
     let active = true
     async function load() {
       const s = createClient()
+      const publicClient = createPublicClient()
       const [donor, business, seller] = await Promise.all([
-        s.from('fenix_public_blood_donors').select('user_id').eq('user_id', userId).maybeSingle(),
+        publicClient.from('fenix_public_blood_donors').select('user_id').eq('user_id', userId).maybeSingle(),
         s.from('businesses').select('id').eq('owner_id', userId).limit(1),
         s.from('vendor_profiles').select('id').eq('user_id', userId).eq('status','approved').limit(1),
       ])
