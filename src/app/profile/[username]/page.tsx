@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import ProfileReportButton from '@/components/profile/ProfileReportButton'
 import ProfileFollowButton from '@/components/profile/ProfileFollowButton'
 import MessageButton from '@/components/messaging/MessageButton'
+import ProfileBadges from '@/components/profile/ProfileBadges'
 import { createClient } from '@/utils/supabase/server'
 import { ROUTES } from '@/lib/core/routes'
 
@@ -82,6 +83,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             <div className="mt-5">
               <h1 className="text-3xl font-black tracking-[-.05em] sm:text-4xl">{safeName}</h1>
               <p className="mt-1 text-sm text-[var(--fx-muted)]">@{profileUsername}</p>
+              <ProfileBadges userId={profileId} locale="bn" />
               <div className="mt-4 flex flex-wrap gap-4 text-xs">
                 <span><strong className="font-black">{Number(profileStats?.posts ?? 0)}</strong> Posts</span>
                 <span><strong className="font-black">{Number(profileStats?.followers ?? 0)}</strong> Followers</span>

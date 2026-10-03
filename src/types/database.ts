@@ -1792,7 +1792,9 @@ export type Database = {
           area_text: string | null
           availability: string
           blood_group: string
+          gender: string | null
           created_at: string
+          emergency_available: boolean
           is_public: boolean
           last_donation_date: string | null
           note: string | null
@@ -1804,7 +1806,9 @@ export type Database = {
         Insert: {
           area_text?: string | null
           availability?: string
+          emergency_available?: boolean
           blood_group: string
+          gender?: string | null
           created_at?: string
           is_public?: boolean
           last_donation_date?: string | null
@@ -1818,6 +1822,7 @@ export type Database = {
           area_text?: string | null
           availability?: string
           blood_group?: string
+          gender?: string | null
           created_at?: string
           is_public?: boolean
           last_donation_date?: string | null
@@ -5964,8 +5969,13 @@ export type Database = {
           avatar_url: string | null
           blood_group: string | null
           full_name: string | null
+          gender: string | null
+          emergency_available: boolean | null
           last_donation_date: string | null
           preferred_contact: string | null
+          public_phone: string | null
+          public_whatsapp: string | null
+          user_id: string
           upazila_bn: string | null
           upazila_en: string | null
           username: string | null

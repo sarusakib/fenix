@@ -15,6 +15,7 @@ export const ROUTES = {
   settings: '/settings',
   help: '/help',
   emergency: '/emergency',
+  blood: '/care/blood',
   admin: '/admin',
   policy: '/policy',
 
