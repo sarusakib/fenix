@@ -60,6 +60,7 @@ select
   d.user_id,
   d.gender,
   d.emergency_available,
+  null::text as public_phone,
   case
     when coalesce(pc.whatsapp_public,false)
       then coalesce(nullif(pc.public_whatsapp,''), p.whatsapp_url)
