@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Phone, VideoCamera, PhoneDisconnect, Microphone, MicrophoneSlash, VideoCameraSlash, ShieldCheck } from '@phosphor-icons/react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -44,14 +44,14 @@ export default function FenixCallControls({
 
   const inboxTopic = useMemo(() => userId ? 'call-inbox:' + userId : '', [userId])
 
-  function stopMedia() {
+  const stopMedia = useCallback(() => {
     localRef.current?.getTracks().forEach(track => track.stop())
     localRef.current = null
     remoteRef.current?.getTracks().forEach(track => track.stop())
     remoteRef.current = null
-  }
+  }, [])
 
-  function cleanup() {
+  const cleanup = useCallback(() => {
     pcRef.current?.close()
     pcRef.current = null
     const channel = sessionChannelRef.current
@@ -62,7 +62,7 @@ export default function FenixCallControls({
     setIncomingOffer(null)
     setMuted(false)
     setCameraOff(false)
-  }
+  }, [stopMedia, supabase])
 
   async function sendSignal(signal: Signal) {
     const channel = sessionChannelRef.current
@@ -206,7 +206,7 @@ export default function FenixCallControls({
     return () => { void supabase.removeChannel(inbox) }
   }, [inboxTopic, supabase, userId, call, incomingOffer, person])
 
-  useEffect(() => () => cleanup(), [])
+  useEffect(() => () => cleanup(), [cleanup])
 
   function hangup() {
     if (call && sessionChannelRef.current) void sendSignal({ type: 'hangup', callId: call.id, from: userId, to: call.peer.id })
