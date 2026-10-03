@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowClockwise, CheckCircle, ChatCircleDots, MapPin, Phone, PlusCircle, ShieldCheck, WarningCircle, WhatsappLogo } from '@phosphor-icons/react'
+import { ArrowClockwise, CheckCircle, ChatCircleDots, MapPin, PlusCircle, ShieldCheck, WarningCircle, WhatsappLogo } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import MessageButton from '@/components/messaging/MessageButton'
 import { createClient } from '@/utils/supabase/client'
@@ -28,7 +28,6 @@ type PublicDonor = {
   preferred_contact: PreferredContact | null
   gender: Gender | null
   emergency_available: boolean | null
-  public_phone: string | null
   public_whatsapp: string | null
 }
 
@@ -118,7 +117,7 @@ export default function CareBloodPage() {
     const [p,d,ds,rs,ls]=await Promise.all([
       s.from('profiles').select('id,full_name,phone,date_of_birth,upazila_id,area_text').eq('id',auth.user.id).maybeSingle(),
       s.from('fenix_blood_donors').select('user_id,blood_group,upazila_id,area_text,availability,last_donation_date,preferred_contact,is_public,note,gender,emergency_available').eq('user_id',auth.user.id).maybeSingle(),
-      s.from('fenix_public_blood_donors').select('user_id,username,full_name,avatar_url,blood_group,area_text,upazila_bn,upazila_en,availability,last_donation_date,preferred_contact,gender,emergency_available,public_phone,public_whatsapp').order('emergency_available',{ascending:false}).order('full_name',{ascending:true}).limit(60),
+      s.from('fenix_public_blood_donors').select('user_id,username,full_name,avatar_url,blood_group,area_text,upazila_bn,upazila_en,availability,last_donation_date,preferred_contact,gender,emergency_available,public_whatsapp').order('emergency_available',{ascending:false}).order('full_name',{ascending:true}).limit(60),
       s.from('fenix_public_blood_requests').select('id,blood_group,units,hospital_name,hospital_area,upazila_bn,upazila_en,area_text,needed_at,urgency,status,created_at').order('created_at',{ascending:false}).limit(60),
       s.from('fenix_brain_locations').select('id,name_bn,name_en').eq('is_active',true).eq('level','upazila').order('name_en'),
     ])
@@ -145,12 +144,11 @@ export default function CareBloodPage() {
     if(dateOfBirth>new Date().toISOString().slice(0,10)){setNotice(bn?'জন্মতারিখ ভবিষ্যতের হতে পারবে না।':'Date of birth cannot be in the future.');return}
     setSavingDonor(true);setNotice('')
     const s=createClient()
-    const [{error:pe},{error:de}]=await Promise.all([
-      s.from('profiles').update({full_name:fullName.trim().slice(0,160),phone:phone.trim().slice(0,40),date_of_birth:dateOfBirth}).eq('id',profile.id),
-      s.from('fenix_blood_donors').upsert({user_id:profile.id,blood_group:bloodGroup,upazila_id:upazilaId||null,area_text:areaText.trim().slice(0,200)||null,availability,last_donation_date:lastDonationDate||null,preferred_contact,is_public:true,note:donorNote.trim().slice(0,500)||null,gender,emergency_available:emergencyAvailable,updated_at:new Date().toISOString()},{onConflict:'user_id'}),
-    ])
+    const {error:pe}=await s.from('profiles').update({full_name:fullName.trim().slice(0,160),phone:phone.trim().slice(0,40),date_of_birth:dateOfBirth}).eq('id',profile.id)
+    if(pe){setSavingDonor(false);setNotice(bn?'Main Profile update হয়নি।':'Main Profile could not be updated.');return}
+    const {error:de}=await s.from('fenix_blood_donors').upsert({user_id:profile.id,blood_group:bloodGroup,upazila_id:upazilaId||null,area_text:areaText.trim().slice(0,200)||null,availability,last_donation_date:lastDonationDate||null,preferred_contact,is_public:true,note:donorNote.trim().slice(0,500)||null,gender,emergency_available:emergencyAvailable,updated_at:new Date().toISOString()},{onConflict:'user_id'})
     setSavingDonor(false)
-    if(pe||de){setNotice(bn?'Donor profile save হয়নি।':'Donor profile could not be saved.');return}
+    if(de){setNotice(bn?'Donor profile save হয়নি।':'Donor profile could not be saved.');return}
     setNotice(bn?'✅ Donor profile automatic verified হয়েছে।':'✅ Donor profile automatically verified.')
     await load()
   }
@@ -198,7 +196,7 @@ export default function CareBloodPage() {
     </section>
 
     <section className="mt-5 fenix-surface-strong rounded-[2rem] p-5 sm:p-7"><div className="flex flex-wrap items-end justify-between gap-3"><div><p className="fenix-kicker">{bn?'Donor list':'Donor list'}</p><h2 className="mt-2 text-2xl font-black">{bn?'Available donors':'Available donors'}</h2></div><select value={filter} onChange={e=>setFilter(e.target.value as BloodGroup|'')} className="h-10 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-xs font-bold"><option value="">{bn?'সব group':'All groups'}</option>{GROUPS.map(g=><option key={g} value={g}>{g}</option>)}</select></div>
-      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">{filtered.map(d=><article key={d.user_id} className="rounded-2xl border border-[var(--fx-border)] p-4"><div className="flex items-center gap-3">{d.avatar_url?<img src={d.avatar_url} alt="" className="h-12 w-12 rounded-2xl object-cover"/>:<div className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--fx-primary-soft)] text-lg">🩸</div>}<div className="min-w-0"><h3 className="truncate text-sm font-black">{d.full_name||'FeniX Donor'}</h3><p className="text-[11px] text-[var(--fx-muted)]">@{d.username||'donor'} · {d.blood_group}</p></div>{d.emergency_available?<span className="ml-auto">🚨</span>:null}</div><div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-bold"><span className="rounded-full bg-[var(--fx-primary-soft)] px-2.5 py-1 text-[var(--fx-primary-strong)]">🩸 {bn?'Verified Donor':'Verified Donor'}</span>{(d.upazila_bn||d.upazila_en)&&<span className="rounded-full border border-[var(--fx-border)] px-2.5 py-1">{bn?(d.upazila_bn||d.upazila_en):(d.upazila_en||d.upazila_bn)}</span>}</div>{d.area_text&&<p className="mt-2 flex items-center gap-1.5 text-xs text-[var(--fx-muted)]"><MapPin size={14}/>{d.area_text}</p>}<div className="mt-3 flex flex-wrap gap-2"><MessageButton userId={d.user_id} name={d.full_name||'FeniX Donor'} label={bn?'Message':'Message'} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-[var(--fx-primary-strong)] px-3 text-[10px] font-bold text-white"/>{d.public_phone&&<><a href={'tel:'+encodeURIComponent(d.public_phone)} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--fx-border)] px-3 text-[10px] font-bold"><Phone size={13}/>Call</a><a href={'sms:'+encodeURIComponent(d.public_phone)} className="inline-flex min-h-9 items-center rounded-lg border border-[var(--fx-border)] px-3 text-[10px] font-bold">SMS</a></>}{d.public_whatsapp&&<a href={d.public_whatsapp.startsWith('http')?d.public_whatsapp:'https://wa.me/'+d.public_whatsapp.replace(/\D/g,'')} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--fx-border)] px-3 text-[10px] font-bold"><WhatsappLogo size={13}/>WhatsApp</a>}</div></article>)}{!filtered.length&&<div className="rounded-2xl border border-dashed border-[var(--fx-border)] p-8 text-center text-sm text-[var(--fx-muted)]">{bn?'কোনো available donor পাওয়া যায়নি।':'No available donor found.'}</div>}</div>
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">{filtered.map(d=><article key={d.user_id} className="rounded-2xl border border-[var(--fx-border)] p-4"><div className="flex items-center gap-3">{d.avatar_url?<img src={d.avatar_url} alt="" className="h-12 w-12 rounded-2xl object-cover"/>:<div className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--fx-primary-soft)] text-lg">🩸</div>}<div className="min-w-0"><h3 className="truncate text-sm font-black">{d.full_name||'FeniX Donor'}</h3><p className="text-[11px] text-[var(--fx-muted)]">@{d.username||'donor'} · {d.blood_group}</p></div>{d.emergency_available?<span className="ml-auto">🚨</span>:null}</div><div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-bold"><span className="rounded-full bg-[var(--fx-primary-soft)] px-2.5 py-1 text-[var(--fx-primary-strong)]">🩸 {bn?'Verified Donor':'Verified Donor'}</span>{(d.upazila_bn||d.upazila_en)&&<span className="rounded-full border border-[var(--fx-border)] px-2.5 py-1">{bn?(d.upazila_bn||d.upazila_en):(d.upazila_en||d.upazila_bn)}</span>}</div>{d.area_text&&<p className="mt-2 flex items-center gap-1.5 text-xs text-[var(--fx-muted)]"><MapPin size={14}/>{d.area_text}</p>}<div className="mt-3 flex flex-wrap gap-2"><MessageButton userId={d.user_id} name={d.full_name||'FeniX Donor'} label={bn?'Message':'Message'} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-[var(--fx-primary-strong)] px-3 text-[10px] font-bold text-white"/>{d.public_whatsapp&&<a href={d.public_whatsapp.startsWith('http')?d.public_whatsapp:'https://wa.me/'+d.public_whatsapp.replace(/\D/g,'')} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[var(--fx-border)] px-3 text-[10px] font-bold"><WhatsappLogo size={13}/>WhatsApp</a>}</div></article>)}{!filtered.length&&<div className="rounded-2xl border border-dashed border-[var(--fx-border)] p-8 text-center text-sm text-[var(--fx-muted)]">{bn?'কোনো available donor পাওয়া যায়নি।':'No available donor found.'}</div>}</div>
     </section>
 
     <section className="mt-5 grid gap-5 lg:grid-cols-2">
