@@ -75,7 +75,6 @@ export default function CareBloodPage() {
   const { locale } = useFenixLocale()
   const bn = locale === 'bn'
   const [profile,setProfile]=useState<Profile|null>(null)
-  const [donor,setDonor]=useState<Donor|null>(null)
   const [donors,setDonors]=useState<PublicDonor[]>([])
   const [requests,setRequests]=useState<BloodRequest[]>([])
   const [locations,setLocations]=useState<Array<{id:string;name_bn:string;name_en:string|null}>>([])
@@ -128,8 +127,8 @@ export default function CareBloodPage() {
       setRequestUpazila(pp.upazila_id??'');setRequestArea(pp.area_text??'')
     }
     if(d.data){
-      const x=d.data as Donor;setDonor(x);setBloodGroup(x.blood_group);setGender(x.gender??'');setUpazilaId(x.upazila_id??pp?.upazila_id??'');setAreaText(x.area_text??pp?.area_text??'');setAvailability(x.availability);setLastDonationDate(x.last_donation_date??'');setPreferredContact(x.preferred_contact);setEmergencyAvailable(x.emergency_available);setDonorNote(x.note??'')
-    } else setDonor(null)
+      const x=d.data as Donor;setBloodGroup(x.blood_group);setGender(x.gender??'');setUpazilaId(x.upazila_id??pp?.upazila_id??'');setAreaText(x.area_text??pp?.area_text??'');setAvailability(x.availability);setLastDonationDate(x.last_donation_date??'');setPreferredContact(x.preferred_contact);setEmergencyAvailable(x.emergency_available);setDonorNote(x.note??'')
+    }
     setDonors((ds.data??[]) as PublicDonor[]);setRequests((rs.data??[]) as BloodRequest[]);setLocations((ls.data??[]) as typeof locations);setLoading(false)
   }
 
@@ -146,7 +145,7 @@ export default function CareBloodPage() {
     const s=createClient()
     const {error:pe}=await s.from('profiles').update({full_name:fullName.trim().slice(0,160),phone:phone.trim().slice(0,40),date_of_birth:dateOfBirth}).eq('id',profile.id)
     if(pe){setSavingDonor(false);setNotice(bn?'Main Profile update হয়নি।':'Main Profile could not be updated.');return}
-    const {error:de}=await s.from('fenix_blood_donors').upsert({user_id:profile.id,blood_group:bloodGroup,upazila_id:upazilaId||null,area_text:areaText.trim().slice(0,200)||null,availability,last_donation_date:lastDonationDate||null,preferred_contact,is_public:true,note:donorNote.trim().slice(0,500)||null,gender,emergency_available:emergencyAvailable,updated_at:new Date().toISOString()},{onConflict:'user_id'})
+    const {error:de}=await s.from('fenix_blood_donors').upsert({user_id:profile.id,blood_group:bloodGroup,upazila_id:upazilaId||null,area_text:areaText.trim().slice(0,200)||null,availability,last_donation_date:lastDonationDate||null,preferred_contact:preferredContact,is_public:true,note:donorNote.trim().slice(0,500)||null,gender,emergency_available:emergencyAvailable,updated_at:new Date().toISOString()},{onConflict:'user_id'})
     setSavingDonor(false)
     if(de){setNotice(bn?'Donor profile save হয়নি।':'Donor profile could not be saved.');return}
     setNotice(bn?'✅ Donor profile automatic verified হয়েছে।':'✅ Donor profile automatically verified.')
