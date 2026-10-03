@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, BookmarkSimple, Trash, UserCircle } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
@@ -23,7 +23,7 @@ export default function SavedPage() {
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true)
     const s = createClient()
     const { data: auth } = await s.auth.getSession()
@@ -69,7 +69,9 @@ export default function SavedPage() {
     setLoading(false)
   }
 
-  useEffect(() => { void load() }, [bn])
+  }, [bn])
+
+  useEffect(() => { void load() }, [load])
 
   async function remove(id: string) {
     const s = createClient()
