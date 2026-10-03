@@ -8,6 +8,7 @@ import { createClient } from '@/utils/supabase/client'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 import { optimizeImageFile, PROFILE_IMAGE_HARD_LIMIT_BYTES, PROFILE_IMAGE_TARGET_BYTES, removePublicImage, uploadOptimizedPublicImage } from '@/lib/media/image-upload'
 import ImageCropEditor from '@/components/profile/ImageCropEditor'
+import ProfileBadges from '@/components/profile/ProfileBadges'
 import FeniLocationPicker from '@/components/profile/FeniLocationPicker'
 import { ROUTES } from '@/lib/core/routes'
 
@@ -32,6 +33,7 @@ export default function ProfileEditorPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [originalUsername, setOriginalUsername] = useState('')
   const [fullName, setFullName] = useState('')
+  const [profileRole, setProfileRole] = useState<string | null>(null)
   const [dateOfBirth, setDateOfBirth] = useState('')
   const [username, setUsername] = useState('')
   const [bio, setBio] = useState('')
@@ -94,7 +96,7 @@ export default function ProfileEditorPage() {
       const { data: auth } = await s.auth.getUser()
       if (!auth.user) { window.location.replace(ROUTES.auth.login + '?next=' + encodeURIComponent(ROUTES.core.profile)); return }
       const [{ data: profile }, { data: settings }] = await Promise.all([
-        s.from('profiles').select('id,full_name,date_of_birth,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url,district_id,upazila_id,locality_id,area_text,road_text,house_details,holding_no,location_public_level,exact_location_visibility').eq('id', auth.user.id).maybeSingle(),
+        s.from('profiles').select('id,full_name,date_of_birth,role,username,bio,avatar_url,cover_url,location_text,website_url,whatsapp_url,facebook_url,instagram_url,district_id,upazila_id,locality_id,area_text,road_text,house_details,holding_no,location_public_level,exact_location_visibility').eq('id', auth.user.id).maybeSingle(),
         s.from('profile_settings').select('locale,profile_visibility,message_permissions,feed_visibility').eq('user_id', auth.user.id).maybeSingle(),
       ])
       if (!active) return
@@ -103,6 +105,7 @@ export default function ProfileEditorPage() {
       setUserId(auth.user.id)
       setEmail(auth.user.email ?? '')
       setFullName(profile?.full_name ?? auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? '')
+      setProfileRole(profile?.role ?? null)
       const providerDob = typeof auth.user.user_metadata?.date_of_birth === 'string' ? auth.user.user_metadata.date_of_birth : typeof auth.user.user_metadata?.birthdate === 'string' ? auth.user.user_metadata.birthdate : typeof auth.user.user_metadata?.birthday === 'string' ? auth.user.user_metadata.birthday : ''
       setDateOfBirth(profile?.date_of_birth ?? providerDob)
       const loadedUsername = profile?.username ?? makeUsername(auth.user.email ?? 'user')
@@ -340,7 +343,7 @@ export default function ProfileEditorPage() {
                 </div>
                 <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--fx-primary-soft)] px-3 py-1.5 text-[10px] font-bold text-[var(--fx-primary-strong)]"><ShieldCheck size={14}/> {locale==='bn'?'প্রোফাইল নিয়ন্ত্রণ সক্রিয়':'Profile controls active'}</span>
               </div>
-              <div className="mt-4"><h1 className="text-3xl font-black tracking-[-.045em] sm:text-4xl">{fullName || (locale==='bn' ? 'আপনার FeniX profile' : 'Your FeniX profile')}</h1><p className="mt-1 text-sm text-[var(--fx-muted)]">@{username || 'username'} · {email}</p>{bio && <p className="mt-4 max-w-2xl whitespace-pre-wrap text-sm leading-7 text-[var(--fx-muted)]">{bio}</p>}<div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">{locationText && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><MapPin size={14}/>{locationText}</span>}{websiteUrl && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><Globe size={14}/>Website</span>}</div></div>
+              <div className="mt-4"><h1 className="text-3xl font-black tracking-[-.045em] sm:text-4xl">{fullName || (locale==='bn' ? 'আপনার FeniX profile' : 'Your FeniX profile')}</h1><ProfileBadges userId={userId ?? ''} role={profileRole} locale={locale}/><p className="mt-1 text-sm text-[var(--fx-muted)]">@{username || 'username'} · {email}</p>{bio && <p className="mt-4 max-w-2xl whitespace-pre-wrap text-sm leading-7 text-[var(--fx-muted)]">{bio}</p>}<div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--fx-muted)]">{locationText && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><MapPin size={14}/>{locationText}</span>}{websiteUrl && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[.03] px-3 py-1.5 dark:bg-white/[.04]"><Globe size={14}/>Website</span>}</div></div>
             </div>
             {imageBusy && <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[var(--fx-border)]"><div className="h-full rounded-full bg-[var(--fx-primary-strong)] transition-all" style={{width:imageProgress+'%'}}/></div>}
           </div>
