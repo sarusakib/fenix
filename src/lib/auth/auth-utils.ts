@@ -43,6 +43,30 @@ type SendPasswordResetInput = {
 
 const MIN_PASSWORD_LENGTH = 12
 
+export function getPasswordPolicyError(password: string): string | null {
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return 'Password must be at least 12 characters.'
+  }
+
+  if (!/[a-z]/.test(password)) {
+    return 'Password must include a lowercase letter.'
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    return 'Password must include an uppercase letter.'
+  }
+
+  if (!/\d/.test(password)) {
+    return 'Password must include a number.'
+  }
+
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return 'Password must include a special character.'
+  }
+
+  return null
+}
+
 export function validateAuthInput({
   mode,
   email,
@@ -62,24 +86,9 @@ export function validateAuthInput({
       return 'Name is required.'
     }
 
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      return 'Signup password must be at least 12 characters.'
-    }
-
-    if (!/[a-z]/.test(password)) {
-      return 'Signup password must include a lowercase letter.'
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      return 'Signup password must include an uppercase letter.'
-    }
-
-    if (!/\d/.test(password)) {
-      return 'Signup password must include a number.'
-    }
-
-    if (!/[^A-Za-z0-9]/.test(password)) {
-      return 'Signup password must include a special character.'
+    const passwordError = getPasswordPolicyError(password)
+    if (passwordError) {
+      return 'Signup ' + passwordError.charAt(0).toLowerCase() + passwordError.slice(1)
     }
   }
 
