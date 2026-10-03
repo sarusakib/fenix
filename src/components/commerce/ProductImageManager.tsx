@@ -172,6 +172,7 @@ export default function ProductImageManager({
               type="button"
               disabled={busy}
               onClick={()=>void remove(image)}
+              aria-label={image.alt_text_en||image.alt_text_bn ? 'Delete ' + (image.alt_text_en||image.alt_text_bn) : 'Delete product image'}
               className="rounded-lg p-2 text-red-600 disabled:opacity-40"
             >
               <Trash size={16}/>
