@@ -60,9 +60,30 @@ where d.is_public=true
   and p.is_public=true
   and private.is_fenix_user_active(p.id);
 
-alter view public.fenix_public_blood_donors set (security_invoker=false);
+alter view public.fenix_public_blood_donors set (security_invoker=true);
+
+grant select (id, username, full_name, avatar_url) on public.profiles to anon;
+
+drop policy if exists profiles_public_identity_select_anon on public.profiles;
+create policy profiles_public_identity_select_anon
+on public.profiles
+for select
+to anon
+using (is_public = true);
 
 revoke select on public.fenix_blood_donors from anon;
+grant select (
+  user_id,
+  blood_group,
+  upazila_id,
+  area_text,
+  availability,
+  last_donation_date,
+  preferred_contact,
+  is_public,
+  gender,
+  emergency_available
+) on public.fenix_blood_donors to anon;
 
 revoke all on public.fenix_public_blood_donors from public,authenticated;
 grant select on public.fenix_public_blood_donors to anon,authenticated;
