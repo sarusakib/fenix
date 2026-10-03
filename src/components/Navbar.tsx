@@ -52,7 +52,7 @@ export default function Navbar() {
     }
     window.addEventListener('fenix:notifications-changed', refresh)
     return () => { active = false; window.removeEventListener('fenix:notifications-changed', refresh) }
-  }, [user?.id])
+  }, [user])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') closeMenus() }
