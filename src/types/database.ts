@@ -5585,6 +5585,7 @@ export type Database = {
           country_code: string
           cover_url: string | null
           created_at: string
+          date_of_birth: string | null
           district_id: string | null
           exact_location_visibility: string
           facebook_url: string | null
@@ -5614,6 +5615,7 @@ export type Database = {
           country_code?: string
           cover_url?: string | null
           created_at?: string
+          date_of_birth?: string | null
           district_id?: string | null
           exact_location_visibility?: string
           facebook_url?: string | null
@@ -5643,6 +5645,7 @@ export type Database = {
           country_code?: string
           cover_url?: string | null
           created_at?: string
+          date_of_birth?: string | null
           district_id?: string | null
           exact_location_visibility?: string
           facebook_url?: string | null
