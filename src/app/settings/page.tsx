@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/client'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useHomeTheme, type HomeTheme } from '@/components/theme/HomeThemeProvider'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
+import { getPasswordPolicyError, isPasswordCompromised } from '@/lib/auth/auth-utils'
 
 type Privacy = 'public' | 'private'
 type MessagePermission = 'everyone' | 'authenticated' | 'nobody'
@@ -118,8 +119,9 @@ export default function SettingsPage() {
   }
 
   async function changePassword() {
-    if (newPassword.length < 8) {
-      setNotice(bn ? 'Password কমপক্ষে 8 অক্ষরের হতে হবে।' : 'Password must be at least 8 characters.')
+    const passwordPolicyError = getPasswordPolicyError(newPassword)
+    if (passwordPolicyError) {
+      setNotice(bn ? 'Password-এ কমপক্ষে 12 অক্ষর, একটি বড় হাতের অক্ষর, একটি ছোট হাতের অক্ষর, একটি সংখ্যা ও একটি special character থাকতে হবে।' : passwordPolicyError)
       return
     }
     if (!currentPassword) {
@@ -141,6 +143,19 @@ export default function SettingsPage() {
     if (!email) {
       setSecurityBusy(false)
       setNotice(bn ? 'এই account-এ email password সেট করা নেই।' : 'This account does not have an email password sign-in.')
+      return
+    }
+
+    try {
+      const compromised = await isPasswordCompromised(newPassword)
+      if (compromised) {
+        setSecurityBusy(false)
+        setNotice(bn ? 'এই password আগে data breach-এ পাওয়া গেছে। অন্য একটি নতুন password ব্যবহার করুন।' : 'This password has appeared in a data breach. Choose a different password.')
+        return
+      }
+    } catch {
+      setSecurityBusy(false)
+      setNotice(bn ? 'Password security check এখন পাওয়া যাচ্ছে না। আবার চেষ্টা করুন।' : 'The password security check is temporarily unavailable. Please try again.')
       return
     }
 
@@ -285,7 +300,7 @@ export default function SettingsPage() {
           <SettingsSection icon={<Lock size={20}/>} title={bn ? 'Security & login' : 'Security & login'} text={bn ? 'Password এবং session access নিয়ন্ত্রণ করুন।' : 'Control password and session access.'}>
             <div className="rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-bg)]/40 p-4">
               <p className="text-sm font-bold">{bn ? 'Password পরিবর্তন' : 'Change password'}</p>
-              <p className="mt-1 text-xs leading-5 text-[var(--fx-muted)]">{bn ? 'কমপক্ষে 8 অক্ষরের নতুন password দিন। Supabase সাম্প্রতিক authentication চাইতে পারে।' : 'Choose a new password of at least 8 characters. Supabase may require recent authentication.'}</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--fx-muted)]">{bn ? 'কমপক্ষে 12 অক্ষরের শক্তিশালী password দিন। Supabase সাম্প্রতিক authentication চাইতে পারে।' : 'Choose a strong password of at least 12 characters. Supabase may require recent authentication.'}</p>
               <div className="mt-3 grid gap-2 sm:grid-cols-3">
                 <input type="password" value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} autoComplete="current-password" placeholder={bn?'বর্তমান password':'Current password'} className="h-11 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-sm outline-none"/>
                 <input type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} autoComplete="new-password" placeholder={bn?'নতুন password':'New password'} className="h-11 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3 text-sm outline-none"/>
