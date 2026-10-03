@@ -112,8 +112,8 @@ export default function ImageCropEditor({ file, kind, locale, onCancel, onConfir
     setError('')
     try {
       const source = await loadBitmap(file)
-      const sourceWidth = 'width' in source ? source.width : source.naturalWidth
-      const sourceHeight = 'height' in source ? source.height : source.naturalHeight
+      const sourceWidth = source instanceof ImageBitmap ? source.width : source.naturalWidth
+      const sourceHeight = source instanceof ImageBitmap ? source.height : source.naturalHeight
       const sourceScale = layout.scale
       const left = (layout.frameWidth - layout.width) / 2 + offset.x
       const top = (layout.frameHeight - layout.height) / 2 + offset.y
