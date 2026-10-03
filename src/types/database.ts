@@ -1808,6 +1808,7 @@ export type Database = {
           availability?: string
           emergency_available?: boolean
           blood_group: string
+          gender?: string | null
           created_at?: string
           is_public?: boolean
           last_donation_date?: string | null
