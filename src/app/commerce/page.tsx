@@ -46,7 +46,7 @@ export default async function CommercePage({ searchParams }: CommercePageProps) 
 
   let query = supabase
     .from('commerce_public_products')
-    .select('*')
+    .select('id,vendor_id,category_id,name_bn,name_en,slug,price,compare_at_price,currency,allow_guest_purchase,vendor_display_name,vendor_display_name_bn,vendor_display_name_en,vendor_is_verified,image_id,image_bucket,image_path')
     .order('created_at', { ascending: false })
     .limit(48)
 
