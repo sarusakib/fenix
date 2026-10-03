@@ -46,7 +46,7 @@ export default function OpportunityRadarPage() {
     <main className="min-h-dvh bg-[#f7faf9] text-[#0b1736] dark:bg-[#030506] dark:text-white">
       <Navbar />
       <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-black/10 bg-white/80 px-4 text-sm font-bold dark:border-white/10 dark:bg-white/[.04]"><ArrowLeft size={17} /> Home</Link>
+        <Link href="/feed" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-black/10 bg-white/80 px-4 text-sm font-bold dark:border-white/10 dark:bg-white/[.04]"><ArrowLeft size={17} /> Feed </Link>
         <div className="mt-7 flex items-start gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#008080]/[.08] text-[#008080]"><ChartLineUp size={25} /></div>
           <div><p className="text-xs font-bold uppercase tracking-[.16em] text-[#008080]">Opportunity Radar</p><h1 className="mt-1 text-3xl font-black sm:text-5xl">See observable local signals</h1><p className="mt-3 max-w-3xl text-sm leading-7 opacity-60">This surface summarizes currently visible FeniX data. It is a discovery aid—not a prediction, investment recommendation or guarantee.</p></div>

@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   ShieldCheck,
   Storefront,
+  UserCircle,
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import {
@@ -35,6 +36,8 @@ type ProductResult = {
   shop_slug: string | null
 }
 
+type ProfileResult = { id: string; username: string | null; full_name: string | null; bio: string | null; avatar_url: string | null }
+
 type PlaceResult = {
   id: string
   level: string
@@ -56,6 +59,7 @@ export default function FenixSearchPage() {
   const [businesses, setBusinesses] = useState<DirectoryBusiness[]>([])
   const [products, setProducts] = useState<ProductResult[]>([])
   const [places, setPlaces] = useState<PlaceResult[]>([])
+  const [profiles, setProfiles] = useState<ProfileResult[]>([])
   const [loading, setLoading] = useState(Boolean(initialQuery))
   const [searched, setSearched] = useState(Boolean(initialQuery))
   const [error, setError] = useState('')
@@ -67,6 +71,7 @@ export default function FenixSearchPage() {
       setBusinesses([])
       setProducts([])
       setPlaces([])
+      setProfiles([])
       setSearched(false)
       return
     }
@@ -77,7 +82,8 @@ export default function FenixSearchPage() {
 
     const supabase = createClient()
 
-    const [businessResult, productResult, placeResult] = await Promise.all([
+    const profileSearch = supabase.from('fenix_public_profiles').select('id,username,full_name,bio,avatar_url').or('username.ilike.%'+value.replace(/[%_\\]/g,(character)=>'\\'+character)+'%,full_name.ilike.%'+value.replace(/[%_\\]/g,(character)=>'\\'+character)+'%').order('full_name').limit(12)
+    const [businessResult, productResult, placeResult, profileResult] = await Promise.all([
       searchDirectoryBusinesses({ query: value, limit: 12 }),
       supabase
         .from('commerce_public_products')
@@ -95,11 +101,13 @@ export default function FenixSearchPage() {
         query_text: value,
         match_count: 8,
       }),
+      profileSearch,
     ])
 
     setBusinesses(businessResult.data ?? [])
     setProducts((productResult.data ?? []) as ProductResult[])
     setPlaces((placeResult.data ?? []) as PlaceResult[])
+    setProfiles((profileResult.data ?? []) as ProfileResult[])
 
     if (businessResult.error && productResult.error && placeResult.error) {
       setError('Search is temporarily unavailable. Please try again.')
@@ -124,7 +132,7 @@ export default function FenixSearchPage() {
     void runSearch(value)
   }
 
-  const total = businesses.length + products.length + places.length
+  const total = businesses.length + products.length + places.length + profiles.length
 
   return (
     <main className="min-h-dvh bg-[var(--fx-bg)] text-[var(--fx-text)]">
@@ -132,10 +140,10 @@ export default function FenixSearchPage() {
 
       <section className="mx-auto max-w-7xl px-4 pb-28 pt-8 sm:px-6 lg:px-8">
         <Link
-          href="/"
+          href="/feed"
           className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-4 text-sm font-bold"
         >
-          <ArrowLeft size={17} /> Home
+          <ArrowLeft size={17} /> Feed
         </Link>
 
         <div className="mt-7 max-w-4xl">
@@ -146,7 +154,7 @@ export default function FenixSearchPage() {
             Find what you need.
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--fx-muted)] sm:text-base">
-            Business, product and local place discovery in one search. Bangla, English, Banglish and common local names can be used.
+            People, business, product and local place discovery in one search. Bangla, English, Banglish and common local names can be used.
           </p>
         </div>
 
@@ -157,7 +165,7 @@ export default function FenixSearchPage() {
               autoFocus
               value={query}
               onChange={(event) => setQuery(event.target.value.slice(0, 120))}
-              placeholder="Business, product, place…"
+              placeholder="People, business, product, place…"
               maxLength={120}
               className="min-w-0 flex-1 bg-transparent px-1 py-3 text-sm outline-none placeholder:text-[var(--fx-muted)]"
               aria-label="Search FeniX"
@@ -280,6 +288,21 @@ export default function FenixSearchPage() {
               )) : <EmptyState text="No product matched this search." />}
             </ResultSection>
 
+<ResultSection
+              icon={<UserCircle size={20} />}
+              title="People"
+              count={profiles.length}
+            >
+              {profiles.length ? profiles.map(profile => (
+                <Link key={profile.id} href={profile.username ? '/profile/'+encodeURIComponent(profile.username) : '/profile'} className="block rounded-2xl border border-[var(--fx-border)] bg-[var(--fx-surface)] p-4 transition hover:-translate-y-0.5">
+                  <div className="flex items-start gap-3">
+                    {profile.avatar_url ? <img src={profile.avatar_url} alt="" loading="lazy" decoding="async" width={42} height={42} className="h-[42px] w-[42px] shrink-0 rounded-full object-cover"/> : <div className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-full bg-[var(--fx-primary-soft)] text-[var(--fx-primary-strong)]"><UserCircle size={26}/></div>}
+                    <div className="min-w-0"><h2 className="truncate text-sm font-black">{profile.full_name || profile.username || 'FeniX user'}</h2><p className="mt-1 truncate text-xs text-[var(--fx-muted)]">{profile.username ? '@'+profile.username : 'FeniX user'}</p>{profile.bio && <p className="mt-2 line-clamp-2 text-xs leading-5 text-[var(--fx-muted)]">{profile.bio}</p>}</div>
+                  </div>
+                </Link>
+              )) : <EmptyState text="No person matched this search." />}
+            </ResultSection>
+
             <ResultSection
               icon={<MapPin size={20} />}
               title="Places"
@@ -310,6 +333,7 @@ export default function FenixSearchPage() {
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <SearchTip icon={<Storefront size={22} />} title="Businesses" body="Find local businesses, suppliers and services." />
             <SearchTip icon={<ShoppingBag size={22} />} title="Products" body="Find published products from approved sellers." />
+            <SearchTip icon={<UserCircle size={22} />} title="People" body="Find public FeniX profiles and follow them." />
             <SearchTip icon={<MapPin size={22} />} title="Places" body="Search Feni locations using common local names." />
           </div>
         )}

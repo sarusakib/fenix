@@ -59,7 +59,7 @@ export default function JobsPage(){
 
   return <main className="min-h-dvh"><Navbar/>
     <section className="mx-auto max-w-7xl px-4 pb-24 pt-8 sm:px-6 lg:px-8">
-      <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-4 text-sm font-bold"><ArrowLeft size={17}/> Home</Link>
+      <Link href="/feed" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-4 text-sm font-bold"><ArrowLeft size={17}/> Feed </Link>
       <div className="mt-7 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div><p className="text-xs font-black uppercase tracking-[.16em] text-[var(--fx-primary-strong)]">Work & opportunity</p><h1 className="mt-2 text-3xl font-black tracking-[-.045em] sm:text-5xl">Verified jobs & local work</h1><p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--fx-muted)]">Employer-submitted postings are reviewed before publication. Applications stay inside FeniX and remain visible only to the relevant applicant and employer.</p></div>
         {signedIn&&<Link href="/jobs/post" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--fx-primary-strong)] px-4 text-sm font-bold text-white"><Plus size={17}/> Post a job</Link>}

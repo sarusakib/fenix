@@ -1,25 +1,42 @@
 /**
  * FeniX — Central Route Registry.
- * Keep navigation paths in one place so feature routes remain consistent.
+ *
+ * Canonical user-facing routes live here. Feature links should use this
+ * registry instead of inventing parallel paths.
+ *
+ * Legacy routes are kept only for backwards compatibility and should
+ * redirect to their canonical destinations when a route is obsolete.
  */
 export const ROUTES = {
-  home: '/',
+  home: '/feed',
+  feed: '/feed',
+  search: '/search',
   services: '/services',
+  settings: '/settings',
   help: '/help',
   emergency: '/emergency',
   admin: '/admin',
   policy: '/policy',
+
   auth: {
     login: '/login',
     callback: '/auth/callback',
     resetPassword: '/auth/reset-password',
   },
+
   core: {
+    feed: '/feed',
+    search: '/search',
+    network: '/services',
     guide: '/guide',
     directory: '/directory',
     start: '/start',
     invest: '/invest',
+    profile: '/profile',
+    messages: '/messages',
+    notifications: '/notifications',
   },
+
   directory: {
     root: '/directory',
     business: (slugOrId: string) => '/directory/' + encodeURIComponent(slugOrId),
@@ -31,6 +48,7 @@ export const ROUTES = {
     verify: '/directory/verify',
     qr: (slugOrId: string) => '/directory/' + encodeURIComponent(slugOrId) + '/qr',
   },
+
   start: {
     root: '/start',
     idea: '/start/idea',
@@ -44,6 +62,7 @@ export const ROUTES = {
     launch: '/start/launch',
     dashboard: '/start/dashboard',
   },
+
   investment: {
     root: '/invest',
     create: '/invest/create',
@@ -51,8 +70,10 @@ export const ROUTES = {
     dashboard: '/invest/dashboard',
     manage: '/invest/manage',
     calculator: '/invest/calculator',
+    dueDiligence: '/invest/due-diligence',
     opportunity: (id: string) => '/invest/' + encodeURIComponent(id),
   },
+
   commerce: {
     root: '/commerce',
     shop: '/shop',
@@ -73,6 +94,7 @@ export const ROUTES = {
     shopBySlug: (slug: string) => '/shop/' + encodeURIComponent(slug),
     productBySlug: (slug: string) => '/product/' + encodeURIComponent(slug),
   },
+
   ecosystem: {
     radar: '/radar',
     deals: '/deals',
@@ -80,11 +102,26 @@ export const ROUTES = {
     requests: '/requests',
     messages: '/messages',
     notifications: '/notifications',
+    settings: '/settings',
+    blocked: '/settings/blocked',
+    saved: '/saved',
+    news: '/news',
   },
+
   dashboard: {
     root: '/dashboard',
     business: '/dashboard/business',
-    settings: '/dashboard/settings',
+    /**
+     * Kept as a registry alias for old dashboard links. The canonical
+     * settings route is /settings.
+     */
+    settings: '/settings',
+  },
+
+  legacy: {
+    home: '/',
+    dashboardSettings: '/dashboard/settings',
+    feni: '/feni',
   },
 } as const
 
@@ -98,7 +135,9 @@ export type DashboardRoute = keyof RouteRegistry['dashboard']
 
 export function buildSearchRoute(query: string): string {
   const normalizedQuery = query.trim()
-  return normalizedQuery ? ROUTES.core.guide + '?q=' + encodeURIComponent(normalizedQuery) : ROUTES.core.guide
+  return normalizedQuery
+    ? ROUTES.search + '?q=' + encodeURIComponent(normalizedQuery)
+    : ROUTES.search
 }
 
 export function buildAuthCallbackUrl(origin: string): string {

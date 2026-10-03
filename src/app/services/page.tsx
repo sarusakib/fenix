@@ -14,8 +14,8 @@ export default function ServicesPage() {
       <Navbar />
       <section className="mx-auto w-full max-w-7xl px-4 pb-28 pt-8 sm:px-6 lg:px-8">
         <div className="fenix-surface-strong rounded-[2.2rem] p-5 sm:p-8 lg:p-10">
-          <Link href="/" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold">
-            <ArrowLeft size={16} /> Home
+          <Link href="/feed" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] bg-[var(--fx-surface)] px-3.5 text-xs font-bold">
+            <ArrowLeft size={16} /> Feed
           </Link>
           <div className="mt-7 grid gap-7 lg:grid-cols-[1fr_.46fr] lg:items-end">
             <div>

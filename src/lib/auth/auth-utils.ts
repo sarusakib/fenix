@@ -1,4 +1,5 @@
 import type { createClient } from '@/utils/supabase/client'
+import { ROUTES } from '@/lib/core/routes'
 
 type FenixSupabaseClient = ReturnType<typeof createClient>
 
@@ -175,9 +176,9 @@ export async function signInWithOAuth({
   supabase,
   provider,
   origin,
-  next = '/',
+  next = ROUTES.feed,
 }: SignInWithOAuthInput) {
-  const callback = new URL('/auth/callback', origin)
+  const callback = new URL(ROUTES.auth.callback, origin)
   callback.searchParams.set('next', next)
 
   return supabase.auth.signInWithOAuth({
@@ -194,6 +195,6 @@ export async function sendPasswordReset({
   origin,
 }: SendPasswordResetInput) {
   return supabase.auth.resetPasswordForEmail(email.trim(), {
-    redirectTo: `${origin}/auth/reset-password`,
+    redirectTo: new URL(ROUTES.auth.resetPassword, origin).toString(),
   })
 }

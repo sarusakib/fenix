@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import FenixBrand from '@/components/FenixBrand'
 
 export default function Loading() {
@@ -6,7 +7,7 @@ export default function Loading() {
       <div className="w-full max-w-sm rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface)] p-7 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--fx-primary-soft)]">
-            <img src="/icon.svg" alt="" className="h-9 w-9" />
+            <Image src="/icon.svg" alt="" width={36} height={36} priority className="h-9 w-9" />
           </div>
           <div className="min-w-0 flex-1">
             <FenixBrand compact />

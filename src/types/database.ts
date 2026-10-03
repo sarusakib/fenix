@@ -70,7 +70,21 @@ export type Database = {
             foreignKeyName: "business_claim_requests_claimant_id_fkey"
             columns: ["claimant_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_claimant_id_fkey"
+            columns: ["claimant_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_claimant_id_fkey"
+            columns: ["claimant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -91,7 +105,21 @@ export type Database = {
             foreignKeyName: "business_claim_requests_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claim_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -362,7 +390,21 @@ export type Database = {
             foreignKeyName: "business_reports_reporter_id_fkey"
             columns: ["reporter_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -383,7 +425,21 @@ export type Database = {
             foreignKeyName: "business_reports_reviewer_id_fkey"
             columns: ["reviewer_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reports_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -450,7 +506,21 @@ export type Database = {
             foreignKeyName: "business_reviews_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -478,7 +548,21 @@ export type Database = {
             foreignKeyName: "business_reviews_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -1119,7 +1203,21 @@ export type Database = {
             foreignKeyName: "business_verification_requests_requester_id_fkey"
             columns: ["requester_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -1140,7 +1238,21 @@ export type Database = {
             foreignKeyName: "business_verification_requests_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -1201,7 +1313,21 @@ export type Database = {
             foreignKeyName: "businesses_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -1346,7 +1472,21 @@ export type Database = {
             foreignKeyName: "commerce_return_requests_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_return_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commerce_return_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -1368,6 +1508,540 @@ export type Database = {
             columns: ["order_item_id"]
             isOneToOne: false
             referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_ambulance_providers: {
+        Row: {
+          ac_available: boolean
+          ambulance_type: string
+          available_24_7: boolean
+          base_area: string | null
+          created_at: string
+          display_name: string
+          id: string
+          is_verified: boolean
+          owner_id: string | null
+          oxygen_available: boolean
+          phone: string | null
+          service_area: string | null
+          status: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          ac_available?: boolean
+          ambulance_type?: string
+          available_24_7?: boolean
+          base_area?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          is_verified?: boolean
+          owner_id?: string | null
+          oxygen_available?: boolean
+          phone?: string | null
+          service_area?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          ac_available?: boolean
+          ambulance_type?: string
+          available_24_7?: boolean
+          base_area?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_verified?: boolean
+          owner_id?: string | null
+          oxygen_available?: boolean
+          phone?: string | null
+          service_area?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_providers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_ambulance_requests: {
+        Row: {
+          ambulance_type: string
+          condition_category: string
+          created_at: string
+          destination_hospital: string | null
+          id: string
+          note: string | null
+          oxygen_needed: boolean
+          pickup_area: string
+          pickup_upazila_id: string | null
+          provider_id: string | null
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ambulance_type?: string
+          condition_category?: string
+          created_at?: string
+          destination_hospital?: string | null
+          id?: string
+          note?: string | null
+          oxygen_needed?: boolean
+          pickup_area: string
+          pickup_upazila_id?: string | null
+          provider_id?: string | null
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ambulance_type?: string
+          condition_category?: string
+          created_at?: string
+          destination_hospital?: string | null
+          id?: string
+          note?: string | null
+          oxygen_needed?: boolean
+          pickup_area?: string
+          pickup_upazila_id?: string | null
+          provider_id?: string | null
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_ambulance_requests_pickup_upazila_id_fkey"
+            columns: ["pickup_upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_ambulance_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_ambulance_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_ambulance_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_answers: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          question_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          question_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          question_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_question_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_blood_donors: {
+        Row: {
+          area_text: string | null
+          availability: string
+          blood_group: string
+          created_at: string
+          is_public: boolean
+          last_donation_date: string | null
+          note: string | null
+          preferred_contact: string
+          upazila_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area_text?: string | null
+          availability?: string
+          blood_group: string
+          created_at?: string
+          is_public?: boolean
+          last_donation_date?: string | null
+          note?: string | null
+          preferred_contact?: string
+          upazila_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area_text?: string | null
+          availability?: string
+          blood_group?: string
+          created_at?: string
+          is_public?: boolean
+          last_donation_date?: string | null
+          note?: string | null
+          preferred_contact?: string
+          upazila_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_blood_donors_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_donors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_blood_requests: {
+        Row: {
+          area_text: string | null
+          blood_group: string
+          contact_method: string
+          created_at: string
+          hospital_area: string | null
+          hospital_name: string
+          id: string
+          needed_at: string | null
+          note: string | null
+          requester_id: string
+          status: string
+          units: number
+          upazila_id: string | null
+          updated_at: string
+          urgency: string
+        }
+        Insert: {
+          area_text?: string | null
+          blood_group: string
+          contact_method?: string
+          created_at?: string
+          hospital_area?: string | null
+          hospital_name: string
+          id?: string
+          needed_at?: string | null
+          note?: string | null
+          requester_id: string
+          status?: string
+          units: number
+          upazila_id?: string | null
+          updated_at?: string
+          urgency?: string
+        }
+        Update: {
+          area_text?: string | null
+          blood_group?: string
+          contact_method?: string
+          created_at?: string
+          hospital_area?: string | null
+          hospital_name?: string
+          id?: string
+          needed_at?: string | null
+          note?: string | null
+          requester_id?: string
+          status?: string
+          units?: number
+          upazila_id?: string | null
+          updated_at?: string
+          urgency?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_requests_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_blood_responses: {
+        Row: {
+          created_at: string
+          donor_id: string
+          id: string
+          message: string | null
+          request_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          donor_id: string
+          id?: string
+          message?: string | null
+          request_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          donor_id?: string
+          id?: string
+          message?: string | null
+          request_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_blood_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_blood_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_blood_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -1678,6 +2352,75 @@ export type Database = {
           },
         ]
       }
+      fenix_brain_pulse_intents_public: {
+        Row: {
+          intent_key: string
+          searches_30d: number
+          searches_7d: number
+        }
+        Insert: {
+          intent_key: string
+          searches_30d?: number
+          searches_7d?: number
+        }
+        Update: {
+          intent_key?: string
+          searches_30d?: number
+          searches_7d?: number
+        }
+        Relationships: []
+      }
+      fenix_brain_pulse_terms_public: {
+        Row: {
+          searches_30d: number
+          searches_7d: number
+          term: string
+          unique_queries_7d: number
+        }
+        Insert: {
+          searches_30d?: number
+          searches_7d?: number
+          term: string
+          unique_queries_7d?: number
+        }
+        Update: {
+          searches_30d?: number
+          searches_7d?: number
+          term?: string
+          unique_queries_7d?: number
+        }
+        Relationships: []
+      }
+      fenix_brain_query_events: {
+        Row: {
+          created_at: string
+          id: string
+          intent_key: string
+          language_code: string
+          query_hash: string
+          result_count: number
+          term: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intent_key?: string
+          language_code?: string
+          query_hash: string
+          result_count?: number
+          term: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intent_key?: string
+          language_code?: string
+          query_hash?: string
+          result_count?: number
+          term?: string
+        }
+        Relationships: []
+      }
       fenix_brain_query_terms: {
         Row: {
           created_at: string
@@ -1945,6 +2688,132 @@ export type Database = {
           },
         ]
       }
+      fenix_content_bookmarks: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_content_comments: {
+        Row: {
+          author_id: string
+          body: string
+          content_id: string
+          content_type: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          content_id: string
+          content_type: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fenix_content_reports: {
         Row: {
           admin_note: string | null
@@ -1997,7 +2866,21 @@ export type Database = {
             foreignKeyName: "fenix_content_reports_reporter_id_fkey"
             columns: ["reporter_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -2018,12 +2901,86 @@ export type Database = {
             foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
             columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_content_votes: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          user_id: string
+          value?: number
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_content_votes_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -2097,7 +3054,21 @@ export type Database = {
             foreignKeyName: "fenix_direct_messages_recipient_id_fkey"
             columns: ["recipient_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -2125,7 +3096,21 @@ export type Database = {
             foreignKeyName: "fenix_direct_messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -2158,12 +3143,280 @@ export type Database = {
             foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
             columns: ["blocked_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
             columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_dm_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_feature_flags: {
+        Row: {
+          description: string | null
+          enabled: boolean
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          description?: string | null
+          enabled?: boolean
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fenix_job_applications: {
+        Row: {
+          applicant_id: string
+          cover_note: string | null
+          created_at: string
+          employer_note: string | null
+          id: string
+          job_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          cover_note?: string | null
+          created_at?: string
+          employer_note?: string | null
+          id?: string
+          job_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          cover_note?: string | null
+          created_at?: string
+          employer_note?: string | null
+          id?: string
+          job_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_jobs: {
+        Row: {
+          application_deadline: string | null
+          business_id: string | null
+          created_at: string
+          currency: string
+          description: string
+          district: string
+          employment_type: string
+          external_apply_url: string | null
+          id: string
+          location_text: string | null
+          owner_id: string
+          published_at: string | null
+          salary_max: number | null
+          salary_min: number | null
+          status: string
+          title: string
+          upazila: string | null
+          updated_at: string
+          verification_note: string | null
+          verification_status: string
+          workplace_type: string
+        }
+        Insert: {
+          application_deadline?: string | null
+          business_id?: string | null
+          created_at?: string
+          currency?: string
+          description: string
+          district?: string
+          employment_type?: string
+          external_apply_url?: string | null
+          id?: string
+          location_text?: string | null
+          owner_id: string
+          published_at?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
+          title: string
+          upazila?: string | null
+          updated_at?: string
+          verification_note?: string | null
+          verification_status?: string
+          workplace_type?: string
+        }
+        Update: {
+          application_deadline?: string | null
+          business_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string
+          district?: string
+          employment_type?: string
+          external_apply_url?: string | null
+          id?: string
+          location_text?: string | null
+          owner_id?: string
+          published_at?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
+          title?: string
+          upazila?: string | null
+          updated_at?: string
+          verification_note?: string | null
+          verification_status?: string
+          workplace_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_jobs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_jobs_owner_id_fkey"
+            columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -2192,6 +3445,34 @@ export type Database = {
             columns: ["message_id"]
             isOneToOne: false
             referencedRelation: "fenix_direct_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_message_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -2234,166 +3515,38 @@ export type Database = {
             foreignKeyName: "fenix_message_reactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
           },
-        ]
-      }
-      fenix_jobs: {
-        Row: {
-          application_deadline: string | null
-          business_id: string | null
-          created_at: string
-          currency: string
-          description: string
-          district: string
-          employment_type: string
-          external_apply_url: string | null
-          id: string
-          location_text: string | null
-          owner_id: string
-          published_at: string | null
-          salary_max: number | null
-          salary_min: number | null
-          status: string
-          title: string
-          updated_at: string
-          upazila: string | null
-          verification_note: string | null
-          verification_status: string
-          workplace_type: string
-        }
-        Insert: {
-          application_deadline?: string | null
-          business_id?: string | null
-          created_at?: string
-          currency?: string
-          description: string
-          district?: string
-          employment_type?: string
-          external_apply_url?: string | null
-          id?: string
-          location_text?: string | null
-          owner_id: string
-          published_at?: string | null
-          salary_max?: number | null
-          salary_min?: number | null
-          status?: string
-          title: string
-          updated_at?: string
-          upazila?: string | null
-          verification_note?: string | null
-          verification_status?: string
-          workplace_type?: string
-        }
-        Update: {
-          application_deadline?: string | null
-          business_id?: string | null
-          created_at?: string
-          currency?: string
-          description?: string
-          district?: string
-          employment_type?: string
-          external_apply_url?: string | null
-          id?: string
-          location_text?: string | null
-          owner_id?: string
-          published_at?: string | null
-          salary_max?: number | null
-          salary_min?: number | null
-          status?: string
-          title?: string
-          updated_at?: string
-          upazila?: string | null
-          verification_note?: string | null
-          verification_status?: string
-          workplace_type?: string
-        }
-        Relationships: [
           {
-            foreignKeyName: "fenix_jobs_business_id_fkey"
-            columns: ["business_id"]
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: "fenix_public_profile_stats"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fenix_jobs_owner_id_fkey"
-            columns: ["owner_id"]
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_message_reactions_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
-      }
-      fenix_job_applications: {
-        Row: {
-          applicant_id: string
-          cover_note: string | null
-          created_at: string
-          employer_note: string | null
-          id: string
-          job_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          applicant_id: string
-          cover_note?: string | null
-          created_at?: string
-          employer_note?: string | null
-          id?: string
-          job_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          applicant_id?: string
-          cover_note?: string | null
-          created_at?: string
-          employer_note?: string | null
-          id?: string
-          job_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fenix_job_applications_applicant_id_fkey"
-            columns: ["applicant_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fenix_job_applications_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "fenix_jobs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      fenix_feature_flags: {
-        Row: {
-          description: string | null
-          enabled: boolean
-          key: string
-          updated_at: string
-        }
-        Insert: {
-          description?: string | null
-          enabled?: boolean
-          key: string
-          updated_at?: string
-        }
-        Update: {
-          description?: string | null
-          enabled?: boolean
-          key?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       fenix_notifications: {
         Row: {
@@ -2438,6 +3591,13 @@ export type Database = {
             foreignKeyName: "fenix_notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
             referencedColumns: ["id"]
           },
@@ -2445,7 +3605,115 @@ export type Database = {
             foreignKeyName: "fenix_notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_post_media: {
+        Row: {
+          author_id: string
+          byte_size: number
+          created_at: string
+          height: number | null
+          id: string
+          mime_type: string
+          optimization_version: string
+          post_id: string
+          sort_order: number
+          source_byte_size: number | null
+          source_digest: string | null
+          storage_bucket: string
+          storage_path: string
+          width: number | null
+        }
+        Insert: {
+          author_id: string
+          byte_size: number
+          created_at?: string
+          height?: number | null
+          id?: string
+          mime_type: string
+          optimization_version?: string
+          post_id: string
+          sort_order?: number
+          source_byte_size?: number | null
+          source_digest?: string | null
+          storage_bucket?: string
+          storage_path: string
+          width?: number | null
+        }
+        Update: {
+          author_id?: string
+          byte_size?: number
+          created_at?: string
+          height?: number | null
+          id?: string
+          mime_type?: string
+          optimization_version?: string
+          post_id?: string
+          sort_order?: number
+          source_byte_size?: number | null
+          source_digest?: string | null
+          storage_bucket?: string
+          storage_path?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_post_media_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
             referencedColumns: ["id"]
           },
         ]
@@ -2490,7 +3758,21 @@ export type Database = {
             foreignKeyName: "fenix_posts_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -2502,71 +3784,261 @@ export type Database = {
           },
         ]
       }
-      fenix_post_media: {
+      fenix_profile_follows: {
         Row: {
-          author_id: string
-          byte_size: number
           created_at: string
-          height: number | null
-          id: string
-          mime_type: string
-          post_id: string
-          sort_order: number
-          storage_bucket: string
-          storage_path: string
-          width: number | null
-          source_byte_size: number | null
-          source_digest: string | null
-          optimization_version: string
+          follower_id: string
+          following_id: string
         }
         Insert: {
-          author_id: string
-          byte_size: number
           created_at?: string
-          height?: number | null
-          id?: string
-          mime_type: string
-          post_id: string
-          sort_order?: number
-          storage_bucket?: string
-          storage_path: string
-          width?: number | null
-          source_byte_size?: number | null
-          source_digest?: string | null
-          optimization_version?: string
+          follower_id: string
+          following_id: string
         }
         Update: {
-          author_id?: string
-          byte_size?: number
           created_at?: string
-          height?: number | null
-          id?: string
-          mime_type?: string
-          post_id?: string
-          sort_order?: number
-          storage_bucket?: string
-          storage_path?: string
-          width?: number | null
-          source_byte_size?: number | null
-          source_digest?: string | null
-          optimization_version?: string
+          follower_id?: string
+          following_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fenix_post_media_author_id_fkey"
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_profile_follows_following_id_fkey"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_questions: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          title: string
+          topic_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          title: string
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          title?: string
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fenix_post_media_post_id_fkey"
-            columns: ["post_id"]
+            foreignKeyName: "fenix_questions_topic_id_fkey"
+            columns: ["topic_id"]
             isOneToOne: false
-            referencedRelation: "fenix_posts"
+            referencedRelation: "fenix_topics"
             referencedColumns: ["id"]
           },
         ]
+      }
+      fenix_topic_follows: {
+        Row: {
+          created_at: string
+          topic_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          topic_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          topic_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_topic_follows_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_topics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_topic_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_topics: {
+        Row: {
+          created_at: string
+          description_bn: string | null
+          description_en: string | null
+          id: string
+          name_bn: string
+          name_en: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          name_bn: string
+          name_en: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          name_bn?: string
+          name_en?: string
+          slug?: string
+        }
+        Relationships: []
       }
       fenix_user_moderation: {
         Row: {
@@ -2605,7 +4077,21 @@ export type Database = {
             foreignKeyName: "fenix_user_moderation_changed_by_fkey"
             columns: ["changed_by"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -2626,7 +4112,21 @@ export type Database = {
             foreignKeyName: "fenix_user_moderation_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_user_moderation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -2835,6 +4335,82 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "investment_documents_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_due_diligence_checks: {
+        Row: {
+          check_key: string
+          created_at: string
+          id: string
+          investor_id: string
+          note: string | null
+          opportunity_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          check_key: string
+          created_at?: string
+          id?: string
+          investor_id: string
+          note?: string | null
+          opportunity_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          check_key?: string
+          created_at?: string
+          id?: string
+          investor_id?: string
+          note?: string | null
+          opportunity_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_due_diligence_checks_opportunity_id_fkey"
             columns: ["opportunity_id"]
             isOneToOne: false
             referencedRelation: "investment_opportunities"
@@ -3201,6 +4777,123 @@ export type Database = {
           },
         ]
       }
+      news_posts: {
+        Row: {
+          author_id: string | null
+          automation_status: string
+          breaking: boolean
+          category: string
+          content_bn: string
+          content_en: string
+          created_at: string
+          discovered_at: string
+          excerpt_bn: string | null
+          excerpt_en: string | null
+          featured: boolean
+          id: string
+          image_url: string | null
+          published_at: string | null
+          slug: string
+          source_item_key: string | null
+          source_name: string | null
+          source_published_at: string | null
+          source_url: string | null
+          status: string
+          title_bn: string
+          title_en: string
+          updated_at: string
+          verification_status: string
+        }
+        Insert: {
+          author_id?: string | null
+          automation_status?: string
+          breaking?: boolean
+          category: string
+          content_bn: string
+          content_en: string
+          created_at?: string
+          discovered_at?: string
+          excerpt_bn?: string | null
+          excerpt_en?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          slug: string
+          source_item_key?: string | null
+          source_name?: string | null
+          source_published_at?: string | null
+          source_url?: string | null
+          status?: string
+          title_bn: string
+          title_en: string
+          updated_at?: string
+          verification_status?: string
+        }
+        Update: {
+          author_id?: string | null
+          automation_status?: string
+          breaking?: boolean
+          category?: string
+          content_bn?: string
+          content_en?: string
+          created_at?: string
+          discovered_at?: string
+          excerpt_bn?: string | null
+          excerpt_en?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          slug?: string
+          source_item_key?: string | null
+          source_name?: string | null
+          source_published_at?: string | null
+          source_url?: string | null
+          status?: string
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+          verification_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
@@ -3360,7 +5053,21 @@ export type Database = {
             foreignKeyName: "orders_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -3429,52 +5136,52 @@ export type Database = {
         Row: {
           alt_text_bn: string | null
           alt_text_en: string | null
+          byte_size: number | null
           created_at: string
+          height: number | null
           id: string
           is_primary: boolean
+          optimization_version: string
           product_id: string
           sort_order: number
-          storage_bucket: string
-          storage_path: string
-          byte_size: number | null
-          height: number | null
           source_byte_size: number | null
           source_digest: string | null
-          optimization_version: string
+          storage_bucket: string
+          storage_path: string
           width: number | null
         }
         Insert: {
           alt_text_bn?: string | null
           alt_text_en?: string | null
+          byte_size?: number | null
           created_at?: string
+          height?: number | null
           id?: string
           is_primary?: boolean
+          optimization_version?: string
           product_id: string
           sort_order?: number
-          storage_bucket?: string
-          storage_path: string
-          byte_size?: number | null
-          height?: number | null
           source_byte_size?: number | null
           source_digest?: string | null
-          optimization_version?: string
+          storage_bucket?: string
+          storage_path: string
           width?: number | null
         }
         Update: {
           alt_text_bn?: string | null
           alt_text_en?: string | null
+          byte_size?: number | null
           created_at?: string
+          height?: number | null
           id?: string
           is_primary?: boolean
+          optimization_version?: string
           product_id?: string
           sort_order?: number
-          storage_bucket?: string
-          storage_path?: string
-          byte_size?: number | null
-          height?: number | null
           source_byte_size?: number | null
           source_digest?: string | null
-          optimization_version?: string
+          storage_bucket?: string
+          storage_path?: string
           width?: number | null
         }
         Relationships: [
@@ -3549,7 +5256,21 @@ export type Database = {
             foreignKeyName: "product_reviews_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -3670,11 +5391,118 @@ export type Database = {
           },
         ]
       }
+      profile_contacts: {
+        Row: {
+          created_at: string
+          facebook_public: boolean
+          facebook_url: string | null
+          instagram_public: boolean
+          instagram_url: string | null
+          linkedin_public: boolean
+          linkedin_url: string | null
+          phone_public: boolean
+          public_facebook_url: string | null
+          public_instagram_url: string | null
+          public_linkedin_url: string | null
+          public_whatsapp: string | null
+          public_youtube_url: string | null
+          updated_at: string
+          user_id: string
+          whatsapp: string | null
+          whatsapp_public: boolean
+          youtube_public: boolean
+          youtube_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          facebook_public?: boolean
+          facebook_url?: string | null
+          instagram_public?: boolean
+          instagram_url?: string | null
+          linkedin_public?: boolean
+          linkedin_url?: string | null
+          phone_public?: boolean
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_whatsapp?: string | null
+          public_youtube_url?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp?: string | null
+          whatsapp_public?: boolean
+          youtube_public?: boolean
+          youtube_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          facebook_public?: boolean
+          facebook_url?: string | null
+          instagram_public?: boolean
+          instagram_url?: string | null
+          linkedin_public?: boolean
+          linkedin_url?: string | null
+          phone_public?: boolean
+          public_facebook_url?: string | null
+          public_instagram_url?: string | null
+          public_linkedin_url?: string | null
+          public_whatsapp?: string | null
+          public_youtube_url?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string | null
+          whatsapp_public?: boolean
+          youtube_public?: boolean
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_settings: {
         Row: {
           feed_visibility: string
+          interests: string[]
           locale: string
           message_permissions: string
+          notification_preferences: Json
+          onboarding_completed: boolean
+          onboarding_dismissed: boolean
+          onboarding_step: string
           profile_visibility: string
           reduced_motion: boolean
           theme: string
@@ -3683,8 +5511,13 @@ export type Database = {
         }
         Insert: {
           feed_visibility?: string
+          interests?: string[]
           locale?: string
           message_permissions?: string
+          notification_preferences?: Json
+          onboarding_completed?: boolean
+          onboarding_dismissed?: boolean
+          onboarding_step?: string
           profile_visibility?: string
           reduced_motion?: boolean
           theme?: string
@@ -3693,8 +5526,13 @@ export type Database = {
         }
         Update: {
           feed_visibility?: string
+          interests?: string[]
           locale?: string
           message_permissions?: string
+          notification_preferences?: Json
+          onboarding_completed?: boolean
+          onboarding_dismissed?: boolean
+          onboarding_step?: string
           profile_visibility?: string
           reduced_motion?: boolean
           theme?: string
@@ -3713,7 +5551,21 @@ export type Database = {
             foreignKeyName: "profile_settings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -3727,48 +5579,115 @@ export type Database = {
       }
       profiles: {
         Row: {
+          area_text: string | null
           avatar_url: string | null
           bio: string | null
+          country_code: string
           cover_url: string | null
           created_at: string
+          district_id: string | null
+          exact_location_visibility: string
+          facebook_url: string | null
+          feed_public: boolean
           full_name: string | null
+          holding_no: string | null
+          house_details: string | null
           id: string
+          instagram_url: string | null
+          is_public: boolean
+          locality_id: string | null
+          location_public_level: string
           location_text: string | null
           phone: string | null
+          road_text: string | null
           role: string | null
+          upazila_id: string | null
           updated_at: string
           username: string | null
           website_url: string | null
+          whatsapp_url: string | null
         }
         Insert: {
+          area_text?: string | null
           avatar_url?: string | null
           bio?: string | null
+          country_code?: string
           cover_url?: string | null
           created_at?: string
+          district_id?: string | null
+          exact_location_visibility?: string
+          facebook_url?: string | null
+          feed_public?: boolean
           full_name?: string | null
+          holding_no?: string | null
+          house_details?: string | null
           id: string
+          instagram_url?: string | null
+          is_public?: boolean
+          locality_id?: string | null
+          location_public_level?: string
           location_text?: string | null
           phone?: string | null
+          road_text?: string | null
           role?: string | null
+          upazila_id?: string | null
           updated_at?: string
           username?: string | null
           website_url?: string | null
+          whatsapp_url?: string | null
         }
         Update: {
+          area_text?: string | null
           avatar_url?: string | null
           bio?: string | null
+          country_code?: string
           cover_url?: string | null
           created_at?: string
+          district_id?: string | null
+          exact_location_visibility?: string
+          facebook_url?: string | null
+          feed_public?: boolean
           full_name?: string | null
+          holding_no?: string | null
+          house_details?: string | null
           id?: string
+          instagram_url?: string | null
+          is_public?: boolean
+          locality_id?: string | null
+          location_public_level?: string
           location_text?: string | null
           phone?: string | null
+          road_text?: string | null
           role?: string | null
+          upazila_id?: string | null
           updated_at?: string
           username?: string | null
           website_url?: string | null
+          whatsapp_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_locality_id_fkey"
+            columns: ["locality_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_brain_locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vendor_profiles: {
         Row: {
@@ -3838,7 +5757,21 @@ export type Database = {
             foreignKeyName: "vendor_profiles_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "fenix_public_profiles_v2"
             referencedColumns: ["id"]
           },
           {
@@ -3849,54 +5782,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      news_posts: {
-        Row: { id: string; slug: string; title_bn: string; title_en: string; excerpt_bn: string | null; excerpt_en: string | null; content_bn: string; content_en: string; category: string; status: string; featured: boolean; breaking: boolean; source_name: string | null; source_url: string | null; source_item_key: string | null; source_published_at: string | null; discovered_at: string; automation_status: string; verification_status: string; image_url: string | null; author_id: string | null; published_at: string | null; created_at: string; updated_at: string }
-        Insert: { id?: string; slug: string; title_bn: string; title_en: string; excerpt_bn?: string | null; excerpt_en?: string | null; content_bn: string; content_en: string; category: string; status?: string; featured?: boolean; breaking?: boolean; source_name?: string | null; source_url?: string | null; source_item_key?: string | null; source_published_at?: string | null; discovered_at?: string; automation_status?: string; verification_status?: string; image_url?: string | null; author_id?: string | null; published_at?: string | null; created_at?: string; updated_at?: string }
-        Update: { id?: string; slug?: string; title_bn?: string; title_en?: string; excerpt_bn?: string | null; excerpt_en?: string | null; content_bn?: string; content_en?: string; category?: string; status?: string; featured?: boolean; breaking?: boolean; source_name?: string | null; source_url?: string | null; source_item_key?: string | null; source_published_at?: string | null; discovered_at?: string; automation_status?: string; verification_status?: string; image_url?: string | null; author_id?: string | null; published_at?: string | null; created_at?: string; updated_at?: string }
-        Relationships: []
-      }
-      fenix_topics: {
-        Row: { id: string; slug: string; name_bn: string; name_en: string; description_bn: string | null; description_en: string | null; created_at: string }
-        Insert: { id?: string; slug: string; name_bn: string; name_en: string; description_bn?: string | null; description_en?: string | null; created_at?: string }
-        Update: { id?: string; slug?: string; name_bn?: string; name_en?: string; description_bn?: string | null; description_en?: string | null; created_at?: string }
-        Relationships: []
-      }
-      fenix_questions: {
-        Row: { id: string; author_id: string; topic_id: string | null; title: string; body: string; created_at: string; updated_at: string; deleted_at: string | null }
-        Insert: { id?: string; author_id: string; topic_id?: string | null; title: string; body: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
-        Update: { id?: string; author_id?: string; topic_id?: string | null; title?: string; body?: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
-        Relationships: []
-      }
-      fenix_answers: {
-        Row: { id: string; question_id: string; author_id: string; body: string; created_at: string; updated_at: string; deleted_at: string | null }
-        Insert: { id?: string; question_id: string; author_id: string; body: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
-        Update: { id?: string; question_id?: string; author_id?: string; body?: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
-        Relationships: []
-      }
-      fenix_content_votes: {
-        Row: { user_id: string; content_type: string; content_id: string; value: number; created_at: string }
-        Insert: { user_id: string; content_type: string; content_id: string; value?: number; created_at?: string }
-        Update: { user_id?: string; content_type?: string; content_id?: string; value?: number; created_at?: string }
-        Relationships: []
-      }
-      fenix_topic_follows: {
-        Row: { user_id: string; topic_id: string; created_at: string }
-        Insert: { user_id?: string; topic_id?: string; created_at?: string }
-        Update: { user_id?: string; topic_id?: string; created_at?: string }
-        Relationships: []
-      }
-      fenix_content_bookmarks: {
-        Row: { user_id: string; content_type: string; content_id: string; created_at: string }
-        Insert: { user_id?: string; content_type?: string; content_id?: string; created_at?: string }
-        Update: { user_id?: string; content_type?: string; content_id?: string; created_at?: string }
-        Relationships: []
-      }
-      fenix_content_comments: {
-        Row: { id: string; author_id: string; content_type: string; content_id: string; body: string; created_at: string; updated_at: string; deleted_at: string | null }
-        Insert: { id?: string; author_id: string; content_type: string; content_id: string; body: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
-        Update: { id?: string; author_id?: string; content_type?: string; content_id?: string; body?: string; created_at?: string; updated_at?: string; deleted_at?: string | null }
-        Relationships: []
       }
     }
     Views: {
@@ -3945,12 +5830,160 @@ export type Database = {
           },
         ]
       }
-      fenix_public_question_feed: {
-        Row: { id: string | null; title: string | null; body: string | null; created_at: string | null; updated_at: string | null; author_id: string | null; topic_id: string | null; author_name: string | null; author_username: string | null; author_avatar_url: string | null; topic_slug: string | null; topic_name_bn: string | null; topic_name_en: string | null; answer_count: number | null; score: number | null }
+      fenix_brain_pulse_intents: {
+        Row: {
+          intent_key: string | null
+          searches_30d: number | null
+          searches_7d: number | null
+        }
+        Relationships: []
+      }
+      fenix_brain_pulse_terms: {
+        Row: {
+          searches_30d: number | null
+          searches_7d: number | null
+          term: string | null
+          unique_queries_7d: number | null
+        }
+        Relationships: []
+      }
+      fenix_public_ambulance_providers: {
+        Row: {
+          ac_available: boolean | null
+          ambulance_type: string | null
+          available_24_7: boolean | null
+          base_area: string | null
+          display_name: string | null
+          id: string | null
+          is_verified: boolean | null
+          oxygen_available: boolean | null
+          phone: string | null
+          service_area: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          ac_available?: boolean | null
+          ambulance_type?: string | null
+          available_24_7?: boolean | null
+          base_area?: string | null
+          display_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          oxygen_available?: boolean | null
+          phone?: string | null
+          service_area?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          ac_available?: boolean | null
+          ambulance_type?: string | null
+          available_24_7?: boolean | null
+          base_area?: string | null
+          display_name?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          oxygen_available?: boolean | null
+          phone?: string | null
+          service_area?: string | null
+          whatsapp?: string | null
+        }
         Relationships: []
       }
       fenix_public_answer_feed: {
-        Row: { id: string | null; question_id: string | null; body: string | null; created_at: string | null; updated_at: string | null; author_id: string | null; author_name: string | null; author_username: string | null; author_avatar_url: string | null; score: number | null }
+        Row: {
+          author_avatar_url: string | null
+          author_id: string | null
+          author_name: string | null
+          author_username: string | null
+          body: string | null
+          created_at: string | null
+          id: string | null
+          question_id: string | null
+          score: number | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_question_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fenix_public_blood_donors: {
+        Row: {
+          area_text: string | null
+          availability: string | null
+          avatar_url: string | null
+          blood_group: string | null
+          full_name: string | null
+          last_donation_date: string | null
+          preferred_contact: string | null
+          upazila_bn: string | null
+          upazila_en: string | null
+          username: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_blood_requests: {
+        Row: {
+          area_text: string | null
+          blood_group: string | null
+          created_at: string | null
+          hospital_area: string | null
+          hospital_name: string | null
+          id: string | null
+          needed_at: string | null
+          status: string | null
+          units: number | null
+          upazila_bn: string | null
+          upazila_en: string | null
+          urgency: string | null
+        }
         Relationships: []
       }
       fenix_public_feed: {
@@ -3966,19 +5999,111 @@ export type Database = {
         }
         Relationships: []
       }
+      fenix_public_profile_stats: {
+        Row: {
+          followers: number | null
+          following: number | null
+          id: string | null
+          posts: number | null
+        }
+        Relationships: []
+      }
       fenix_public_profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
           cover_url: string | null
           created_at: string | null
+          facebook_url: string | null
           full_name: string | null
           id: string | null
+          instagram_url: string | null
           location_text: string | null
           username: string | null
           website_url: string | null
+          whatsapp_url: string | null
         }
         Relationships: []
+      }
+      fenix_public_profiles_v2: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          cover_url: string | null
+          created_at: string | null
+          facebook_url: string | null
+          full_name: string | null
+          id: string | null
+          instagram_url: string | null
+          location_text: string | null
+          username: string | null
+          website_url: string | null
+          whatsapp_url: string | null
+        }
+        Relationships: []
+      }
+      fenix_public_question_feed: {
+        Row: {
+          answer_count: number | null
+          author_avatar_url: string | null
+          author_id: string | null
+          author_name: string | null
+          author_username: string | null
+          body: string | null
+          created_at: string | null
+          id: string | null
+          score: number | null
+          title: string | null
+          topic_id: string | null
+          topic_name_bn: string | null
+          topic_name_en: string | null
+          topic_slug: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_feed"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profile_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_public_profiles_v2"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fenix_questions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "fenix_topics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -4100,7 +6225,10 @@ export type Database = {
         Returns: boolean
       }
       is_fenix_admin: { Args: never; Returns: boolean }
-      is_fenix_user_active: { Args: { p_user_id?: string }; Returns: boolean }
+      is_fenix_username_available: {
+        Args: { p_exclude_user_id?: string; p_username: string }
+        Returns: boolean
+      }
       keyword_feni_brain_chunks: {
         Args: { match_count?: number; query_text: string }
         Returns: {
@@ -4199,6 +6327,16 @@ export type Database = {
       owner_update_investment_interest: {
         Args: { p_interest_id: string; p_owner_note?: string; p_status: string }
         Returns: boolean
+      }
+      record_feni_brain_events: {
+        Args: {
+          p_intent_key: string
+          p_language_code: string
+          p_query_hash: string
+          p_result_count?: number
+          p_terms: string[]
+        }
+        Returns: number
       }
       save_business_embedding: {
         Args: { p_business_id: string; p_embedding: string }
@@ -4456,20 +6594,16 @@ export type CompositeTypes<
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
-
 /** FeniX application compatibility aliases. Keep these alongside generated Supabase types. */
 export type Business = Database["public"]["Tables"]["businesses"]["Row"]
 export type BusinessInsert = Database["public"]["Tables"]["businesses"]["Insert"]
 export type BusinessUpdate = Database["public"]["Tables"]["businesses"]["Update"]
-
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
 export type ProfileInsert = Database["public"]["Tables"]["profiles"]["Insert"]
 export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
-
 export type VendorProfile = Database["public"]["Tables"]["vendor_profiles"]["Row"]
 export type VendorProfileInsert = Database["public"]["Tables"]["vendor_profiles"]["Insert"]
 export type VendorProfileUpdate = Database["public"]["Tables"]["vendor_profiles"]["Update"]
-
 export type InvestmentDocument = Database["public"]["Tables"]["investment_documents"]["Row"]
 export type InvestmentInterest = Database["public"]["Tables"]["investment_interests"]["Row"]
 export type InvestmentOpportunity = Database["public"]["Tables"]["investment_opportunities"]["Row"]
@@ -4478,6 +6612,12 @@ export type InvestmentReport = Database["public"]["Tables"]["investment_reports"
 export type InvestmentDeal = Database["public"]["Tables"]["investment_deals"]["Row"]
 export type InvestmentUpdate = Database["public"]["Tables"]["investment_updates"]["Row"]
 export type InvestmentMessage = Database["public"]["Tables"]["investment_messages"]["Row"]
+export type ProfileSettings = Database["public"]["Tables"]["profile_settings"]["Row"]
+export type ProfileContact = Database["public"]["Tables"]["profile_contacts"]["Row"]
+export type ProfileFollow = Database["public"]["Tables"]["fenix_profile_follows"]["Row"]
+export type FenixNotification = Database["public"]["Tables"]["fenix_notifications"]["Row"]
+export type ContentVote = Database["public"]["Tables"]["fenix_content_votes"]["Row"]
+export type ContentComment = Database["public"]["Tables"]["fenix_content_comments"]["Row"]
 
 export const Constants = {
   public: {

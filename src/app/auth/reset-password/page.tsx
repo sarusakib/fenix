@@ -3,6 +3,7 @@
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
+import { ROUTES } from '@/lib/core/routes'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -19,8 +20,8 @@ export default function ResetPasswordPage() {
     setError('')
     setMessage('')
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
+    if (password.length < 12) {
+      setError('Password must be at least 12 characters.')
       return
     }
 
@@ -52,7 +53,7 @@ export default function ResetPasswordPage() {
     )
 
     setTimeout(() => {
-      router.replace('/login')
+      router.replace(ROUTES.auth.login)
     }, 1200)
   }
 
@@ -94,7 +95,7 @@ export default function ResetPasswordPage() {
                 setPassword(event.target.value)
               }
               required
-              minLength={6}
+              minLength={12}
               className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
               placeholder="Enter new password"
             />

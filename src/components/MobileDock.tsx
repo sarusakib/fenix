@@ -4,18 +4,19 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Brain, House, List, MagnifyingGlass, UserCircle } from '@phosphor-icons/react'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
+import { ROUTES } from '@/lib/core/routes'
 
 export default function MobileDock() {
   const pathname = usePathname()
   const { locale } = useFenixLocale()
-  if (pathname === '/login' || pathname?.startsWith('/auth/')) return null
+  if (pathname === ROUTES.auth.login || pathname?.startsWith('/auth/')) return null
   const bn = locale === 'bn'
   const items = [
-    { href: '/feed', label: bn ? 'ফিড' : 'Feed', icon: House },
-    { href: '/search', label: bn ? 'সার্চ' : 'Search', icon: MagnifyingGlass },
-    { href: '/services', label: bn ? 'নেটওয়ার্ক' : 'Network', icon: List },
-    { href: '/guide', label: bn ? 'ব্রেইন' : 'Brain', icon: Brain },
-    { href: '/profile', label: bn ? 'প্রোফাইল' : 'Profile', icon: UserCircle },
+    { href: ROUTES.feed, label: bn ? 'ফিড' : 'Feed', icon: House },
+    { href: ROUTES.search, label: bn ? 'সার্চ' : 'Search', icon: MagnifyingGlass },
+    { href: ROUTES.services, label: bn ? 'নেটওয়ার্ক' : 'Network', icon: List },
+    { href: ROUTES.core.guide, label: bn ? 'ব্রেইন' : 'Brain', icon: Brain },
+    { href: ROUTES.core.profile, label: bn ? 'প্রোফাইল' : 'Profile', icon: UserCircle },
   ]
   return (
     <nav aria-label="Mobile primary navigation" className="fixed inset-x-2 bottom-2 z-[70] md:hidden">
