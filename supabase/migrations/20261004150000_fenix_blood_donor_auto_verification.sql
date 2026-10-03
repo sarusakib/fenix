@@ -47,39 +47,33 @@ execute function private.enforce_fenix_blood_donor_verification();
 
 create or replace view public.fenix_public_blood_donors as
 select
-  p.username,
-  p.full_name,
-  p.avatar_url,
-  d.blood_group,
-  d.area_text,
-  l.name_bn as upazila_bn,
-  l.name_en as upazila_en,
-  d.availability,
-  d.last_donation_date,
-  d.preferred_contact,
-  d.user_id,
-  d.gender,
-  d.emergency_available,
+  p.username,p.full_name,p.avatar_url,d.blood_group,d.area_text,
+  l.name_bn as upazila_bn,l.name_en as upazila_en,d.availability,d.last_donation_date,d.preferred_contact,
+  d.user_id,d.gender,d.emergency_available,
   null::text as public_phone,
-  case
-    when coalesce(pc.whatsapp_public,false)
-      then coalesce(nullif(pc.public_whatsapp,''), p.whatsapp_url)
-    else null
-  end as public_whatsapp
+  case when coalesce(pc.whatsapp_public,false) then coalesce(nullif(pc.public_whatsapp,''),p.whatsapp_url) else null end as public_whatsapp
 from public.fenix_blood_donors d
-join public.profiles p on p.id = d.user_id
-left join public.fenix_brain_locations l on l.id = d.upazila_id
-left join public.profile_settings ps on ps.user_id = d.user_id
-left join public.profile_contacts pc on pc.user_id = d.user_id
-left join public.fenix_user_moderation m on m.user_id = d.user_id
-where d.is_public = true
-  and d.availability = 'available'
-  and coalesce(ps.profile_visibility,'public') = 'public'
-  and coalesce(m.status,'active') = 'active';
+join public.profiles p on p.id=d.user_id
+left join public.fenix_brain_locations l on l.id=d.upazila_id
+left join public.profile_contacts pc on pc.user_id=d.user_id
+where d.is_public=true
+  and d.availability='available';
 
 alter view public.fenix_public_blood_donors set (security_invoker=true);
 
-revoke all on public.fenix_public_blood_donors from public, authenticated;
-grant select on public.fenix_public_blood_donors to anon, authenticated;
+drop policy if exists fenix_blood_donors_public_select on public.fenix_blood_donors;
+create policy fenix_blood_donors_public_select
+on public.fenix_blood_donors
+for select to anon,authenticated
+using (is_public=true and availability='available' and private.is_fenix_user_active(user_id));
+
+revoke select on public.fenix_blood_donors from anon;
+grant select (
+  user_id,blood_group,upazila_id,area_text,availability,last_donation_date,
+  preferred_contact,is_public,gender,emergency_available
+) on public.fenix_blood_donors to anon;
+
+revoke all on public.fenix_public_blood_donors from public,authenticated;
+grant select on public.fenix_public_blood_donors to anon,authenticated;
 
 commit;
