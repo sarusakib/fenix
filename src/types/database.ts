@@ -5970,6 +5970,7 @@ export type Database = {
           blood_group: string | null
           full_name: string | null
           gender: string | null
+          emergency_available: boolean | null
           last_donation_date: string | null
           preferred_contact: string | null
           public_phone: string | null
