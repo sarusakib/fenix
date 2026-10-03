@@ -67,8 +67,6 @@ export default function SavedPage() {
       setItems(((posts ?? []) as SavedPost[]).sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999)))
     }
     setLoading(false)
-  }
-
   }, [bn])
 
   useEffect(() => { void load() }, [load])
