@@ -1,6 +1,6 @@
 'use server'
 
-import { HfInference } from '@huggingface/inference'
+import { runFeniBrainChat } from '../../lib/feniBrainAI'
 import { searchFeniBrain } from './searchFeniBrain'
 import { fetchLiveFeniSources, shouldUseLiveWeb } from '../../lib/feniBrainLiveWeb'
 import { buildFeniBrainPlan, buildFeniXPolicyPrompt } from '../../lib/fenixNetwork'
@@ -8,7 +8,7 @@ import { canonicalBrainIntent, buildZeroResultHints } from '../../lib/feniBrainE
 import { classifyFeniBrainQuestion, detectLanguage, detectFeniBrainIntent, detectRequestedFactSubject, extractBudgetBDT, extractEntities } from '../../lib/feniBrainQuery'
 
 const MODEL = process.env.FENI_BRAIN_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct'
-const PROVIDER = 'together'
+const PROVIDER = process.env.FENI_BRAIN_PROVIDER || 'together'
 const MAX_QUERY_LENGTH = 120
 const MAX_CONTEXT_LENGTH = 12000
 const MAX_ANSWER_TOKENS = 650
@@ -226,9 +226,8 @@ export async function answerFeniBrain(query) {
   }
 
   try {
-    const hf = new HfInference(token)
     const context = buildContext(retrieval.results || [], liveSources)
-    const responsePromise = hf.chatCompletion({
+    const messages = [
       model: MODEL,
       provider: PROVIDER,
       messages: [
@@ -247,12 +246,22 @@ export async function answerFeniBrain(query) {
       ],
       max_tokens: MAX_ANSWER_TOKENS,
       temperature: 0.2,
-    })
+    ]
+
+    const responsePromise = runFeniBrainChat({
+      token,
+      model: MODEL,
+      messages,
+      max_tokens: MAX_ANSWER_TOKENS,
+      temperature: 0.2,
+    }).then(({ response, provider }) => ({ response, provider }))
 
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error('Feni Brain AI timeout.')), AI_TIMEOUT_MS)
     })
-    const response = await Promise.race([responsePromise, timeoutPromise])
+    const responseResult = await Promise.race([responsePromise, timeoutPromise])
+    const response = responseResult?.response || responseResult
+    const providerUsed = responseResult?.provider || PROVIDER
 
     const answer = response?.choices?.[0]?.message?.content?.trim()
     if (!answer) throw new Error('Empty Feni Brain response.')
@@ -261,7 +270,7 @@ export async function answerFeniBrain(query) {
       success: true, ...brainMeta(cleanQuery, retrieval, plan), answer, intent: retrieval.intent, locations: retrieval.locations,
       childLocations: retrieval.childLocations, sources: retrieval.sources,
       grounded: Boolean((retrieval.results?.length || 0) > 0 || (retrieval.childLocations?.length || 0) > 0 || liveSources.length > 0),
-      aiGenerated: true, requestedFactSubject, model: MODEL, liveWebChecked, liveSources: publicLiveSources(liveSources),
+      aiGenerated: true, requestedFactSubject, model: MODEL, provider: providerUsed, liveWebChecked, liveSources: publicLiveSources(liveSources),
       confidence: Number(retrieval.retrievalConfidence ?? 0), results: retrieval.results,
       guidance: plan.actions, guidanceTitle: plan.guidanceTitle, guidanceText: plan.guidanceText,
       safetyNote: plan.safetyNote, knowledgeMode: plan.knowledgeMode,
