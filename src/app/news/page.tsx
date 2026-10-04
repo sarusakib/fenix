@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import type { Metadata } from 'next'\nimport Link from 'next/link'
 import { ArrowRight, Clock, Newspaper, ShieldCheck, TrendUp } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
