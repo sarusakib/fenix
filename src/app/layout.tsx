@@ -40,9 +40,9 @@ export const metadata: Metadata = {
     title: 'FeniX | Feni Business Ecosystem',
     description: 'Build. Connect. Grow. — Feni Business Ecosystem.',
   },
-  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
-    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
-    : undefined,
+  verification: {
+    google: 'BaRTByfTej4hOcJ27MhPUU7GoV2C8ItusBoFhFtbAXY',
+  },
   manifest: '/manifest.json',
   icons: {
     icon: '/fenix-logo.svg',
