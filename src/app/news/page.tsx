@@ -1,10 +1,23 @@
-import type { Metadata } from 'next'\nimport Link from 'next/link'
+import type { Metadata } from 'next'
+import Link from 'next/link'
 import { ArrowRight, Clock, Newspaper, ShieldCheck, TrendUp } from '@phosphor-icons/react/dist/ssr'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'FeniX News | Feni Local News, Business & Public Updates',
+  description: 'FeniX News — public Feni local news, business updates, jobs, events, public notices and official FeniX updates.',
+  alternates: { canonical: '/news' },
+  openGraph: {
+    type: 'website',
+    title: 'FeniX News | Feni Local News, Business & Public Updates',
+    description: 'Public FeniX newsroom for Feni local news, business, jobs, events, public notices and official updates.',
+    url: '/news',
+  },
+}
 
 const categories = [
   ['all','All'], ['local','Local'], ['business','Business'], ['jobs','Jobs'],
