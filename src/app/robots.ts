@@ -6,7 +6,7 @@ export default function robots():MetadataRoute.Robots{
  return {
   rules:[
    {userAgent:'*',allow:['/','/feni','/guide','/directory','/invest','/commerce','/services','/policy','/help','/emergency','/care/blood','/feed','/news'],disallow:['/admin/','/dashboard/','/messages/','/auth/','/api/']},
-   {userAgent:'OAI-SearchBot',allow:['/','/feni','/guide','/directory','/invest','/commerce','/services','/policy','/help','/feed']},
+   {userAgent:'OAI-SearchBot',allow:['/','/feni','/guide','/directory','/invest','/commerce','/services','/policy','/help','/care/blood','/feed','/news'],disallow:['/admin/','/dashboard/','/messages/','/auth/','/api/']},
   ],
   sitemap:`${base}/sitemap.xml`,
  }
