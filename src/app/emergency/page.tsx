@@ -15,11 +15,11 @@ const ACTIONS = [
     icon: FirstAidKit,
   },
   {
-    title: 'Find a blood donor',
-    titleBn: 'রক্তদাতা খুঁজুন',
-    body: 'Search published local information for blood-donor discovery. Do not treat an unverified profile as a confirmed donor.',
-    bodyBn: 'প্রকাশিত স্থানীয় তথ্য থেকে রক্তদাতা খুঁজুন। যাচাইহীন প্রোফাইলকে নিশ্চিত রক্তদাতা হিসেবে ধরে নেবেন না।',
-    href: '/search?q=blood%20donor',
+    title: 'Find or become a blood donor',
+    titleBn: 'রক্তদাতা খুঁজুন বা রক্তদাতা হন',
+    body: 'Find available donors, request blood, or register yourself as a donor from one place.',
+    bodyBn: 'উপলব্ধ রক্তদাতা খুঁজুন, রক্তের অনুরোধ দিন, অথবা একই জায়গা থেকে নিজেকে রক্তদাতা হিসেবে নিবন্ধন করুন।',
+    href: '/care/blood',
     icon: Drop,
   },
   {
