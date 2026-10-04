@@ -5,7 +5,7 @@ const base=process.env.NEXT_PUBLIC_SITE_URL || 'https://fenix-saru-sakib.vercel.
 export default function robots():MetadataRoute.Robots{
  return {
   rules:[
-   {userAgent:'*',allow:['/','/feni','/guide','/directory','/invest','/commerce','/services','/policy','/help','/emergency','/feed'],disallow:['/admin/','/dashboard/','/messages/','/auth/','/api/']},
+   {userAgent:'*',allow:['/','/feni','/guide','/directory','/invest','/commerce','/services','/policy','/help','/emergency','/care/blood','/feed','/news'],disallow:['/admin/','/dashboard/','/messages/','/auth/','/api/']},
    {userAgent:'OAI-SearchBot',allow:['/','/feni','/guide','/directory','/invest','/commerce','/services','/policy','/help','/feed']},
   ],
   sitemap:`${base}/sitemap.xml`,

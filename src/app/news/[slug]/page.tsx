@@ -1,6 +1,8 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, Clock, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
 import { notFound } from 'next/navigation'
+import { headers } from 'next/headers'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase/server'
 import MarkNewsSeen from '@/components/news/MarkNewsSeen'
@@ -9,11 +11,18 @@ export const dynamic = 'force-dynamic'
 
 const labels: Record<string,string> = { local:'Local', business:'Business', jobs:'Jobs', events:'Events', public_notice:'Public Notice', fenix:'FeniX Update' }
 
-export async function generateMetadata({params}:{params:Promise<{slug:string}>}) {
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}): Promise<Metadata> {
   const {slug}=await params
   const s=await createClient()
-  const {data}=await (s as any).from('news_posts').select('title_en,title_bn,excerpt_en,excerpt_bn').eq('slug',slug).eq('status','published').maybeSingle()
-  return data ? {title:data.title_en+' | FeniX News',description:data.excerpt_en||data.excerpt_bn||'FeniX News'} : {title:'FeniX News'}
+  const {data}=await (s as any).from('news_posts').select('title_en,title_bn,excerpt_en,excerpt_bn,image_url,published_at').eq('slug',slug).eq('status','published').maybeSingle()
+  if (!data) return { title:'FeniX News', robots:{index:false,follow:true} }
+  const description=data.excerpt_en||data.excerpt_bn||'FeniX News'
+  return {
+    title:data.title_en+' | FeniX News',
+    description,
+    alternates:{canonical:'/news/'+encodeURIComponent(slug)},
+    openGraph:{type:'article',title:data.title_en+' | FeniX News',description,url:'/news/'+encodeURIComponent(slug),...(data.image_url?{images:[{url:data.image_url}]}:{}),...(data.published_at?{publishedTime:data.published_at}: {})},
+  }
 }
 
 export default async function NewsArticle({params}:{params:Promise<{slug:string}>}) {
@@ -21,7 +30,23 @@ export default async function NewsArticle({params}:{params:Promise<{slug:string}
   const s=await createClient()
   const {data,error}=await (s as any).from('news_posts').select('*').eq('slug',slug).eq('status','published').maybeSingle()
   if(error || !data) notFound()
+  const nonce = (await headers()).get('x-fenix-nonce') ?? undefined
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://fenix-saru-sakib.vercel.app'
+  const articleUrl = `${base}/news/${encodeURIComponent(data.slug)}`
+  const structuredData = {
+    '@context':'https://schema.org',
+    '@type':'NewsArticle',
+    headline:data.title_en,
+    description:data.excerpt_en||data.excerpt_bn||undefined,
+    datePublished:data.published_at||undefined,
+    dateModified:data.updated_at||data.published_at||undefined,
+    url:articleUrl,
+    mainEntityOfPage:{'@type':'WebPage','@id':articleUrl},
+    publisher:{'@type':'Organization',name:'FeniX',url:base},
+    ...(data.image_url?{image:[data.image_url]}:{})
+  }
   return <main className="fenix-shell min-h-dvh"><Navbar/><MarkNewsSeen id={data.id}/><article className="mx-auto max-w-4xl px-4 pb-28 pt-7 sm:px-6">
+    <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(structuredData)}}/>
     <Link href="/news" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--fx-border)] px-3.5 text-xs font-bold"><ArrowLeft size={15}/> FeniX News</Link>
     <div className="mt-7"><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-[var(--fx-primary-soft)] px-3 py-1.5 text-[9px] font-black uppercase tracking-[.13em] text-[var(--fx-primary-strong)]">{labels[data.category]}</span>{data.breaking&&<span className="rounded-full bg-red-600 px-3 py-1.5 text-[9px] font-black uppercase tracking-[.13em] text-white">Breaking</span>}</div>
       <h1 className="mt-5 text-4xl font-black leading-tight tracking-[-.055em] sm:text-6xl">{data.title_en}</h1>
