@@ -184,6 +184,7 @@ async function publishDiscoveredNews(
 
   const recentTitles=(recent.data||[]).map((row:any)=>cleanNewsText([row.title_bn,row.title_en].filter(Boolean).join(" ")));
   const rows:any[]=[];
+  const skipped:string[]=[];
   let inserted=0;
   const maxPerRun=4;
 
@@ -266,10 +267,12 @@ async function publishDiscoveredNews(
         recentTitles.push(combinedTitle);
       }
     } catch(e) {
+      const reason=e instanceof Error?e.message:"unknown";
+      skipped.push(reason.slice(0,180));
       console.error("FeniX automated news item skipped:",{
         source_id:source.source_id,
         url:item.url,
-        error:e instanceof Error?e.message:"unknown",
+        error:reason,
       });
     }
   }
@@ -277,6 +280,9 @@ async function publishDiscoveredNews(
   return {
     discovered:items.length,
     inserted,
+    skipped:skipped.length,
+    reasons:skipped.slice(0,4),
+    aiConfigured:Boolean(Deno.env.get("HUGGINGFACE_API_KEY")),
     publicationStatus:inserted?"published":"none",
   };
 }
@@ -450,10 +456,11 @@ Deno.serve(async(req)=>{
             source_url:finalSourceUrl,
             extracted_content:items.slice(0,20).map((item)=>item.title).join("\n"),
             change_summary:previousItemHash
-              ? `News source changed; discovered ${newsResult.discovered} local items and inserted ${newsResult.inserted} news records.`
-              : `Initial news discovery; found ${newsResult.discovered} local items.`,
+              ? `News source changed; discovered ${newsResult.discovered} local items, inserted ${newsResult.inserted}, skipped ${newsResult.skipped ?? 0}.${newsResult.reasons?.length ? " "+newsResult.reasons.join(" | ") : ""}`
+              : `Initial news discovery; found ${newsResult.discovered} local items, inserted ${newsResult.inserted}, skipped ${newsResult.skipped ?? 0}.${newsResult.reasons?.length ? " "+newsResult.reasons.join(" | ") : ""}`,
             status:source.auto_publish ? "auto_published" : "pending",
             reviewed_at:source.auto_publish ? now : null,
+            metadata:{news_result:newsResult},
           });
 
           await db.from("fenix_brain_update_runs").update({
