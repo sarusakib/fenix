@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { buildPublishedContent, extractPublishedAt, fetchArticleText, summarizeNews, titleSimilarity, clean as cleanNewsText } from "../_shared/news-auto.ts";
+import { buildPublishedContent, extractPublishedAt, fetchArticleText, summarizeNews, titleSimilarity, clean as cleanNewsText } from "./news-auto.ts";
 
 const MAX_EMBEDDING_BACKFILL = 12;
 
