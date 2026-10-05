@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { buildPublishedContent, extractPublishedAt, fetchArticleText, summarizeNews, titleSimilarity, clean as cleanNewsText } from "../_shared/news-auto.ts";
 
 const MAX_EMBEDDING_BACKFILL = 12;
 
@@ -170,57 +171,113 @@ async function publishDiscoveredNews(
   now:string,
 ) {
   if(!items.length) return {discovered:0,inserted:0,publicationStatus:"none"};
-
-  const rows=[];
-  for(const item of items) {
-    const key=await sha256(item.url);
-    const official=Boolean(source.auto_publish && source.trust_tier===1 && source.parser_key==="notice_html");
-    const status=official?"published":"review";
-    const titleBn=item.title;
-    const titleEn=official?("Official notice: "+item.title):item.title;
-    const sourceName=String(source.publisher||source.title||"FeniX News Source");
-    const sourceSentence=official
-      ? `এই তথ্যটি ${sourceName} প্রকাশিত একটি অফিসিয়াল নোটিশ/আপডেট থেকে FeniX News Feed-এ স্বয়ংক্রিয়ভাবে যুক্ত হয়েছে। মূল উৎস যাচাই করতে Source খুলুন।`
-      : `FeniX এই আপডেটটি ${sourceName} প্রকাশিত ফেনী-সংক্রান্ত কনটেন্ট থেকে শনাক্ত করেছে। এটি public করার আগে FeniX Admin review queue-তে থাকবে। মূল প্রতিবেদন Source-এ দেখুন।`;
-    const sourceSentenceEn=official
-      ? `This item was automatically added from an official notice or update published by ${sourceName}. Open the source for the original notice.`
-      : `FeniX detected this Feni-related update from ${sourceName}. It remains in the FeniX review queue before public publication. Open the source for the original report.`;
-
-    rows.push({
-      slug:"auto-"+key.slice(0,20),
-      title_bn:titleBn,
-      title_en:titleEn,
-      excerpt_bn:sourceSentence,
-      excerpt_en:sourceSentenceEn,
-      content_bn:sourceSentence+"\n\n"+titleBn,
-      content_en:sourceSentenceEn+"\n\n"+titleEn,
-      category:categoryForNews(item.title,source.parser_key),
-      status,
-      featured:false,
-      breaking:false,
-      source_name:sourceName,
-      source_url:item.url,
-      source_item_key:key,
-      source_published_at:item.publishedAt,
-      discovered_at:now,
-      automation_status:official?"auto_official":"review_queue",
-      verification_status:official?"official_source":"reported",
-      published_at:official?(item.publishedAt||now):null,
-    });
+  if(!source.auto_publish || Number(source.trust_tier || 99) > 2) {
+    return {discovered:items.length,inserted:0,publicationStatus:"review"};
   }
 
-  const result=await db
+  const recent=await db
     .from("news_posts")
-    .upsert(rows,{onConflict:"source_item_key",ignoreDuplicates:true})
-    .select("id,status,automation_status");
+    .select("title_bn,title_en,source_item_key")
+    .eq("status","published")
+    .order("published_at",{ascending:false})
+    .limit(200);
 
-  if(result.error) throw new Error("News insert failed: "+result.error.message);
+  const recentTitles=(recent.data||[]).map((row:any)=>cleanNewsText([row.title_bn,row.title_en].filter(Boolean).join(" ")));
+  const rows:any[]=[];
+  let inserted=0;
+  const maxPerRun=4;
 
-  const inserted=Array.isArray(result.data)?result.data.length:0;
+  for(const item of items) {
+    if(rows.length>=maxPerRun) break;
+
+    try {
+      const fetched=await fetchAllowlistedSource(item.url,{
+        "User-Agent":"FeniX-News-AutoPublisher/1.0",
+      });
+      if(!fetched.response.ok) throw new Error("Article HTTP "+fetched.response.status);
+      const raw=await fetched.response.text();
+      if(raw.length>500000) throw new Error("Article exceeds safe read limit");
+
+      const articleText=await fetchArticleText(async()=>raw,item.url);
+      if(articleText.length<500) throw new Error("Article content too short");
+
+      const sourcePublishedAt=extractPublishedAt(raw)||item.publishedAt||null;
+      if(sourcePublishedAt) {
+        const ageMs=Date.now()-Date.parse(sourcePublishedAt);
+        if(Number.isFinite(ageMs) && ageMs>72*3600000) continue;
+      }
+
+      const brief=await summarizeNews({
+        token:Deno.env.get("HUGGINGFACE_API_KEY")||"",
+        sourceName:String(source.publisher||source.title||"FeniX News Source"),
+        sourceUrl:item.url,
+        title:item.title,
+        publishedAt:sourcePublishedAt,
+        articleText,
+      });
+
+      const combinedTitle=cleanNewsText([brief.title_bn,brief.title_en].join(" "));
+      const duplicate=recentTitles.some((existing:string)=>titleSimilarity(combinedTitle,existing)>=0.76);
+      if(duplicate) continue;
+
+      const fingerprint=await sha256(combinedTitle.toLocaleLowerCase("bn-BD").replace(/\s+/g," ").trim());
+      const automationStatus=Number(source.trust_tier||99)===1?"auto_official":"auto_curated";
+      const sourceName=String(source.publisher||source.title||"FeniX News Source");
+      const automationNote=Number(source.trust_tier||99)===1
+        ? `FeniX-এর automated official-source brief। মূল তথ্য ${sourceName}-এর প্রকাশিত উৎস থেকে সংক্ষেপ করা হয়েছে; প্রয়োজনে Source খুলে মূল নোটিশ দেখুন।`
+        : `FeniX-এর automated curated brief। ${sourceName}-এর প্রকাশিত প্রতিবেদনের তথ্য সংক্ষেপ ও পুনর্গঠন করা হয়েছে; পূর্ণ তথ্যের জন্য Source দেখুন।`;
+
+      const content=buildPublishedContent(brief,sourceName,item.url,automationNote);
+
+      const row={
+        slug:"auto-"+fingerprint.slice(0,20),
+        title_bn:cleanNewsText(brief.title_bn).slice(0,240),
+        title_en:cleanNewsText(brief.title_en).slice(0,240),
+        excerpt_bn:cleanNewsText(brief.excerpt_bn).slice(0,900),
+        excerpt_en:cleanNewsText(brief.excerpt_en).slice(0,900),
+        content_bn:content.content_bn,
+        content_en:content.content_en,
+        category:brief.category,
+        status:"published",
+        featured:false,
+        breaking:false,
+        source_name:sourceName,
+        source_url:item.url,
+        source_item_key:await sha256(item.url),
+        source_published_at:sourcePublishedAt,
+        discovered_at:now,
+        automation_status:automationStatus,
+        verification_status:Number(source.trust_tier||99)===1?"official_source":"reported",
+        image_url:null,
+        author_id:null,
+        published_at:now,
+        story_fingerprint:fingerprint,
+        ads_eligible:false,
+      };
+
+      const ins=await db.from("news_posts").insert(row).select("id").maybeSingle();
+      if(ins.error) {
+        if(ins.error.code==="23505") continue;
+        throw new Error("News insert failed: "+ins.error.message);
+      }
+      if(ins.data?.id){
+        inserted++;
+        rows.push(row);
+        recentTitles.push(combinedTitle);
+      }
+    } catch(e) {
+      console.error("FeniX automated news item skipped:",{
+        source_id:source.source_id,
+        url:item.url,
+        error:e instanceof Error?e.message:"unknown",
+      });
+    }
+  }
+
   return {
     discovered:items.length,
     inserted,
-    publicationStatus:rows.some((row)=>row.status==="published")?"published":"review",
+    publicationStatus:inserted?"published":"none",
   };
 }
 
