@@ -75,7 +75,14 @@ export function extractPublishedAt(html:string) {
   return null;
 }
 
-export async function summarizeNews(params:{
+export async function summarizeNews({
+  token,
+  sourceName,
+  sourceUrl,
+  title,
+  publishedAt,
+  articleText,
+}:{
   token:string;
   sourceName:string;
   sourceUrl:string;
