@@ -1,6 +1,12 @@
 begin;
 
 alter table public.news_posts
+  drop constraint if exists news_posts_automation_status_check;
+alter table public.news_posts
+  add constraint news_posts_automation_status_check
+  check (automation_status in ('manual','auto_official','auto_curated','review_queue'));
+
+alter table public.news_posts
   add column if not exists story_fingerprint text,
   add column if not exists ads_eligible boolean not null default true;
 
