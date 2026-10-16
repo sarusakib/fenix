@@ -11,7 +11,7 @@ FeniX supports Gemini as the preferred chat/summarization provider, with Hugging
 3. Enable it for the Production environment and Preview if preview testing is needed.
 4. Redeploy the branch/deployment after the variable is saved. Do not expose the value in client-side code or logs.
 
-The default chat model is `gemini-2.5-flash`. You can override it with `FENI_BRAIN_GEMINI_MODEL`. When a Gemini key is configured, Feni Brain uses it before the Hugging Face chat provider, which prevents an exhausted Hugging Face chat balance from breaking normal AI answers.
+The default chat and News summary model is `gemini-3.8-flash` (current stable Flash model). You can override it with `FENI_BRAIN_GEMINI_MODEL`. When a Gemini key is configured, Feni Brain uses it before the Hugging Face chat provider, which prevents an exhausted Hugging Face chat balance from breaking normal AI answers.
 
 ### 2. Add the key for scheduled News summaries
 
