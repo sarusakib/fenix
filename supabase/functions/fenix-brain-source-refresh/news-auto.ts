@@ -127,7 +127,7 @@ export async function summarizeNews({
         body: JSON.stringify({
           system_instruction: { parts: [{ text: "Return valid JSON only. No markdown. No extra commentary." }] },
           contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 900 },
+          generationConfig: { maxOutputTokens: 900 },
         }),
         signal: controller.signal,
       });
