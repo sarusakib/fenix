@@ -1,5 +1,5 @@
 const MODEL_DEFAULT = "Qwen/Qwen2.5-7B-Instruct";
-const GEMINI_MODEL_DEFAULT = "gemini-2.5-flash";
+const GEMINI_MODEL_DEFAULT = "gemini-3.8-flash";
 
 function clean(value:string) {
   return String(value || "").replace(/\s+/g, " ").trim();
