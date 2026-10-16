@@ -1,4 +1,5 @@
 const MODEL_DEFAULT = "Qwen/Qwen2.5-7B-Instruct";
+const GEMINI_MODEL_DEFAULT = "gemini-2.5-flash";
 
 function clean(value:string) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -108,26 +109,67 @@ export async function summarizeNews({
     JSON.stringify({sourceName,sourceUrl,publishedAt,title,articleText:articleText.slice(0,8500)}),
   ].join("\n");
 
-  const response=await fetch("https://router.huggingface.co/v1/chat/completions",{
-    method:"POST",
-    headers:{
-      Authorization:"Bearer "+token,
-      "Content-Type":"application/json",
-    },
-    body:JSON.stringify({
-      model:Deno.env.get("FENI_NEWS_AI_MODEL") || MODEL_DEFAULT,
-      messages:[
-        {role:"system",content:"Return JSON only. No markdown. No extra commentary."},
-        {role:"user",content:prompt},
-      ],
-      temperature:0.1,
-      max_tokens:900,
-    }),
-  });
+  let text = "";
+  const geminiApiKey = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("GOOGLE_GEMINI_API_KEY");
 
-  if(!response.ok) throw new Error("News AI provider returned "+response.status);
-  const data=await response.json();
-  const text=String(data?.choices?.[0]?.message?.content || "");
+  if (geminiApiKey) {
+    const model = Deno.env.get("FENI_NEWS_GEMINI_MODEL") || GEMINI_MODEL_DEFAULT;
+    const controller = new AbortController();
+    const timeoutHandle = setTimeout(() => controller.abort(), 15000);
+    let response: Response;
+    try {
+      response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": geminiApiKey,
+        },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: "Return valid JSON only. No markdown. No extra commentary." }] },
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 900 },
+        }),
+        signal: controller.signal,
+      });
+    } catch (error) {
+      if (error?.name === "AbortError") throw new Error("News Gemini request timed out");
+      throw error;
+    } finally {
+      clearTimeout(timeoutHandle);
+    }
+
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      const message = String(data?.error?.message || "News Gemini provider failed").slice(0, 180);
+      throw new Error("News Gemini provider returned " + response.status + ": " + message);
+    }
+    text = String((data?.candidates?.[0]?.content?.parts || [])
+      .map((part: any) => typeof part?.text === "string" ? part.text : "")
+      .join("") || "");
+  } else {
+    if (!token) throw new Error("No news AI key is configured; set GEMINI_API_KEY or HUGGINGFACE_API_KEY.");
+
+    const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: Deno.env.get("FENI_NEWS_AI_MODEL") || MODEL_DEFAULT,
+        messages: [
+          { role: "system", content: "Return JSON only. No markdown. No extra commentary." },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.1,
+        max_tokens: 900,
+      }),
+    });
+
+    if (!response.ok) throw new Error("News AI provider returned " + response.status);
+    const data = await response.json();
+    text = String(data?.choices?.[0]?.message?.content || "");
+  }
   const parsed=parseJson(text);
   if(!parsed) throw new Error("News AI returned invalid JSON");
 
