@@ -132,7 +132,7 @@ export async function summarizeNews({
         signal: controller.signal,
       });
     } catch (error) {
-      if (error?.name === "AbortError") throw new Error("News Gemini request timed out");
+      if (error instanceof Error && error.name === "AbortError") throw new Error("News Gemini request timed out");
       throw error;
     } finally {
       clearTimeout(timeoutHandle);
