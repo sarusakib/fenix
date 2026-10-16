@@ -33,7 +33,6 @@ async function generateGeminiAnswer(apiKey, model, systemPrompt, userPrompt) {
           contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
           generationConfig: {
             maxOutputTokens: MAX_ANSWER_TOKENS,
-            temperature: 0.2,
           },
         }),
         signal: controller.signal,
