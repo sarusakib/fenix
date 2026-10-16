@@ -263,7 +263,7 @@ export async function answerFeniBrain(query) {
 
   const token = process.env.HUGGINGFACE_API_KEY
   const geminiToken = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY
-  const geminiModel = process.env.FENI_BRAIN_GEMINI_MODEL || 'gemini-2.5-flash'
+  const geminiModel = process.env.FENI_BRAIN_GEMINI_MODEL || 'gemini-3.8-flash'
   if (!token && !geminiToken) {
     return {
       success: true, ...brainMeta(cleanQuery, retrieval, plan), answer: safeFallbackAnswer(cleanQuery, retrieval), intent: retrieval.intent,
