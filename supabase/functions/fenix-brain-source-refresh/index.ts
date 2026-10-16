@@ -282,7 +282,7 @@ async function publishDiscoveredNews(
     inserted,
     skipped:skipped.length,
     reasons:skipped.slice(0,4),
-    aiConfigured:Boolean(Deno.env.get("HUGGINGFACE_API_KEY")),
+    aiConfigured:Boolean(Deno.env.get("GEMINI_API_KEY") || Deno.env.get("GOOGLE_GEMINI_API_KEY") || Deno.env.get("HUGGINGFACE_API_KEY")),
     publicationStatus:inserted?"published":"none",
   };
 }
