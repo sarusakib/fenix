@@ -49,7 +49,7 @@ function isAllowedSourceUrl(
     if (
       parserKey === "health_registry_html" &&
       host === "hris.mohfw.gov.bd" &&
-      url.pathname.replace(/\\/+$/, "") === "/public/facility-registry/reports/organization-list"
+      url.pathname.replace(/\/+$/, "") === "/public/facility-registry/reports/organization-list"
     ) return true;
 
     // Smart Feni's public HTML pages must never be scraped. An administrator must
@@ -441,7 +441,7 @@ Deno.serve(async(req)=>{
 
     try {
       const headers:Record<string,string>={
-        "User-Agent":"FeniX-Feni-Brain-Updater/1.2 (+https://fenix-saru-sakib.vercel.app)",
+        "User-Agent":"FeniX-Feni-Brain-Updater/1.2",
       };
       if(source.etag) headers["If-None-Match"]=source.etag;
       if(source.last_modified) headers["If-Modified-Since"]=source.last_modified;
@@ -495,7 +495,7 @@ Deno.serve(async(req)=>{
       if (isIngestionAdapter(source.parser_key)) {
         if (source.parser_key === "smartfeni_partner_json") {
           const contentType = response.headers.get("content-type") ?? "";
-          if (!/application\\/(?:[a-z0-9.+-]+\\+)?json\\b/i.test(contentType)) {
+          if (!/application\/(?:[a-z0-9.+-]+\+)?json\b/i.test(contentType)) {
             throw new Error("smartfeni_partner_feed_invalid_content_type: expected application/json");
           }
         }
