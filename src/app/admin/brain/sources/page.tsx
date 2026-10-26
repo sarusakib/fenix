@@ -309,7 +309,7 @@ export default function BrainSourcesAdminPage() {
     if (draft.parser_key === 'health_registry_html' &&
         (draft.source_type !== 'government_official' ||
          host !== 'hris.mohfw.gov.bd' ||
-         !/^\\/public\\/facility-registry\\/reports\\/organization-list\\/?$/i.test(path))) {
+         !(path === '/public/facility-registry/reports/organization-list' || path === '/public/facility-registry/reports/organization-list/'))) {
       setError('DGHS adapter-এর জন্য public organization-list report-এর নির্দিষ্ট URL ব্যবহার করতে হবে।')
       setSaving(false)
       return
