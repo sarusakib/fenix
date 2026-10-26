@@ -60,7 +60,7 @@ function isAllowedSourceUrl(
       // The adapter only accepts the public organization report and filters rows
       // whose published District field is exactly Feni.
       return host === "hris.mohfw.gov.bd" &&
-        url.pathname.replace(/\\/+$/, "") === "/public/facility-registry/reports/organization-list";
+        url.pathname.replace(/\/+$/, "") === "/public/facility-registry/reports/organization-list";
     }
     if (parserKey === "smartfeni_partner_json") {
       // Smart Feni public HTML must never be crawled. Require authorized JSON path
