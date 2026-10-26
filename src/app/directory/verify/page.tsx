@@ -42,6 +42,7 @@ type OwnedBusiness = {
 
 export default function DirectoryVerifyPage() {
   const [businessId, setBusinessId] = useState('')
+  const [businessIdReady, setBusinessIdReady] = useState(false)
   const [business, setBusiness] = useState<OwnedBusiness | null>(null)
   const [type, setType] = useState<VerificationType>('identity')
   const [note, setNote] = useState('')
@@ -55,126 +56,149 @@ export default function DirectoryVerifyPage() {
 
   useEffect(() => {
     setBusinessId((new URLSearchParams(window.location.search).get('business') || '').trim())
+    setBusinessIdReady(true)
   }, [])
 
   useEffect(() => {
+    if (!businessIdReady) return
     let active = true
 
     async function load() {
-      const supabase = createClient()
-      const { data: auth } = await supabase.auth.getUser()
+      setLoading(true)
+      setError('')
+      setBusiness(null)
+      setHistory([])
 
-      if (!active) return
+      try {
+        const supabase = createClient()
+        const { data: auth, error: authError } = await supabase.auth.getUser()
+        if (authError) throw authError
+        if (!active) return
 
-      setSignedIn(Boolean(auth.user))
-      setAuthChecked(true)
+        setSignedIn(Boolean(auth.user))
+        setAuthChecked(true)
 
-      if (!auth.user) {
-        setLoading(false)
-        return
+        if (!auth.user) return
+
+        if (!businessId) {
+          setError('This page needs a business ID. Open your business profile and choose Verification.')
+          return
+        }
+
+        const [businessResult, historyResult] = await Promise.all([
+          supabase
+            .from('businesses')
+            .select('id,name,title_bn,title_en,owner_id')
+            .eq('id', businessId)
+            .maybeSingle(),
+          supabase
+            .from('business_verification_requests')
+            .select('id,verification_type,status,evidence_note,review_note,created_at,reviewed_at')
+            .eq('business_id', businessId)
+            .eq('requester_id', auth.user.id)
+            .order('created_at', { ascending: false })
+            .limit(20),
+        ])
+
+        if (!active) return
+
+        if (
+          businessResult.error ||
+          !businessResult.data ||
+          businessResult.data.owner_id !== auth.user.id
+        ) {
+          setError('You can request verification only for a business you own.')
+          return
+        }
+
+        setBusiness(businessResult.data)
+        if (historyResult.error) {
+          setError('Verification history could not be loaded. You can still submit a new request.')
+        } else {
+          setHistory((historyResult.data ?? []) as VerificationHistory[])
+        }
+      } catch {
+        if (active) {
+          setSignedIn(false)
+          setError('Verification details could not be loaded because of a connection problem. Please reload and try again.')
+        }
+      } finally {
+        if (active) {
+          setAuthChecked(true)
+          setLoading(false)
+        }
       }
-
-      if (!businessId) {
-        setError('This page needs a business ID. Open your business profile and choose Verification.')
-        setLoading(false)
-        return
-      }
-
-      const [businessResult, historyResult] = await Promise.all([
-        supabase
-          .from('businesses')
-          .select('id,name,title_bn,title_en,owner_id')
-          .eq('id', businessId)
-          .maybeSingle(),
-        supabase
-          .from('business_verification_requests')
-          .select('id,verification_type,status,evidence_note,review_note,created_at,reviewed_at')
-          .eq('business_id', businessId)
-          .eq('requester_id', auth.user.id)
-          .order('created_at', { ascending: false })
-          .limit(20),
-      ])
-
-      if (!active) return
-
-      if (
-        businessResult.error ||
-        !businessResult.data ||
-        businessResult.data.owner_id !== auth.user.id
-      ) {
-        setError('You can request verification only for a business you own.')
-        setLoading(false)
-        return
-      }
-
-      setBusiness(businessResult.data)
-      setHistory((historyResult.data ?? []) as VerificationHistory[])
-      if (historyResult.error) setError('Verification history could not be loaded.')
-      setLoading(false)
     }
 
     void load()
     return () => {
       active = false
     }
-  }, [businessId])
+  }, [businessId, businessIdReady])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (busy) return
 
-    setBusy(true)
+    const cleanNote = note.trim().slice(0, 3000)
     setMessage('')
     setError('')
 
-    const supabase = createClient()
-    const { data: auth } = await supabase.auth.getUser()
-
-    if (!auth.user || !business) {
-      setBusy(false)
-      setError('Please sign in and select your business.')
-      return
-    }
-
-    const cleanNote = note.trim().slice(0, 3000)
     if (cleanNote.length < 10) {
-      setBusy(false)
-      setError('Please provide at least a short evidence note so the reviewer knows what to check.')
+      setError('Please provide at least 10 characters describing the evidence a reviewer should check.')
       return
     }
 
-    const { data, error: insertError } = await supabase
-      .from('business_verification_requests')
-      .insert({
-        business_id: business.id,
-        requester_id: auth.user.id,
-        verification_type: type,
-        evidence_note: cleanNote,
-        status: 'pending',
-      })
-      .select('id,verification_type,status,evidence_note,created_at')
-      .single()
+    setBusy(true)
 
-    if (insertError) {
-      setError(
-        insertError.code === '23505'
-          ? 'A request of this type is already under review.'
-          : 'Verification request could not be submitted.',
-      )
-    } else if (data) {
-      setMessage('Verification request submitted for authorized review.')
-      setHistory((items) => [
-        {
-          ...(data as VerificationHistory),
-          review_note: null,
-          reviewed_at: null,
-        },
-        ...items,
-      ])
-      setNote('')
+    try {
+      const supabase = createClient()
+      const { data: auth, error: authError } = await supabase.auth.getUser()
+      if (authError) throw authError
+
+      if (!auth.user || !business) {
+        setError('Please sign in and select your business.')
+        return
+      }
+
+      const { data, error: insertError } = await supabase
+        .from('business_verification_requests')
+        .insert({
+          business_id: business.id,
+          requester_id: auth.user.id,
+          verification_type: type,
+          evidence_note: cleanNote,
+          status: 'pending',
+        })
+        .select('id,verification_type,status,evidence_note,created_at')
+        .single()
+
+      if (insertError) {
+        setError(
+          insertError.code === '23505'
+            ? 'A request of this type is already under review.'
+            : 'Verification request could not be submitted.',
+        )
+        return
+      }
+
+      if (data) {
+        setMessage('Verification request submitted for authorized review.')
+        setHistory((items) => [
+          {
+            ...(data as VerificationHistory),
+            review_note: null,
+            reviewed_at: null,
+          },
+          ...items,
+        ])
+        setNote('')
+      }
+    } catch {
+      setError('Verification request could not be submitted because of a connection problem. Please try again.')
+    } finally {
+      setBusy(false)
     }
-
-    setBusy(false)
   }
 
   return (
