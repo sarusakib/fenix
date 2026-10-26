@@ -1,6 +1,11 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { buildPublishedContent, extractPublishedAt, fetchArticleText, summarizeNews, titleSimilarity, clean as cleanNewsText } from "./news-auto.ts";
+import {
+  isIngestionAdapter,
+  parseIngestionAdapter,
+  requiresPartnerAuthorization,
+} from "./source-adapters.ts";
 
 const MAX_EMBEDDING_BACKFILL = 12;
 
@@ -12,7 +17,10 @@ const ALLOWED_HOSTS = new Set([
   "zpfeni.gov.bd","www.zpfeni.gov.bd","feni.judiciary.gov.bd","pourashava.feni.gov.bd",
   // Public local platforms, maps and secondary directories. Discovered content
   // remains subject to review; host allowlisting does not enable auto-publishing.
-  "smartfeni.com","www.smartfeni.com","bizhubfeni.com","www.bizhubfeni.com",
+  // Smart Feni is intentionally excluded from generic crawling because its published
+  // Terms of Service prohibit scraping/bots. A separately authorized JSON partner
+  // feed is handled by a guarded, adapter-specific path below.
+  "bizhubfeni.com","www.bizhubfeni.com",
   "myfeni.com","www.myfeni.com",
   "biz4bd.com","www.biz4bd.com","fbcci.org","www.fbcci.org",
   "marketbangladesh.com","www.marketbangladesh.com",
@@ -23,10 +31,38 @@ const ALLOWED_HOSTS = new Set([
   "feninewsbd.com","www.feninewsbd.com",
 ]);
 
-function isAllowedSourceUrl(raw: string) {
+function isAllowedSourceUrl(
+  raw: string,
+  parserKey = "",
+  smartFeniAuthorized = false,
+) {
   try {
     const url = new URL(raw);
-    return url.protocol === "https:" && ALLOWED_HOSTS.has(url.hostname.toLowerCase());
+    if (url.protocol !== "https:" || url.username || url.password) return false;
+    const host = url.hostname.toLowerCase();
+
+    if (ALLOWED_HOSTS.has(host)) return true;
+
+    // The health registry adapter may fetch only the verified public organization
+    // report, never arbitrary pages on the health ministry host. Its parser then
+    // retains rows whose District field is exactly Feni.
+    if (
+      parserKey === "health_registry_html" &&
+      host === "hris.mohfw.gov.bd" &&
+      url.pathname.replace(/\\/+$/, "") === "/public/facility-registry/reports/organization-list"
+    ) return true;
+
+    // Smart Feni's public HTML pages must never be scraped. An administrator must
+    // explicitly confirm a source-owner-authorized API/feed, and only an API/JSON
+    // path is permitted. The response Content-Type is checked again before parsing.
+    if (
+      parserKey === "smartfeni_partner_json" &&
+      smartFeniAuthorized &&
+      (host === "smartfeni.com" || host === "www.smartfeni.com") &&
+      (url.pathname.toLowerCase().startsWith("/api/") || url.pathname.toLowerCase().endsWith(".json"))
+    ) return true;
+
+    return false;
   } catch {
     return false;
   }
@@ -144,11 +180,16 @@ function categoryForNews(title:string, parserKey:string) {
   return "local";
 }
 
-async function fetchAllowlistedSource(sourceUrl:string,headers:Record<string,string>) {
+async function fetchAllowlistedSource(
+  sourceUrl:string,
+  headers:Record<string,string>,
+  parserKey = "",
+  smartFeniAuthorized = false,
+) {
   let currentUrl=sourceUrl;
   for(let redirectCount=0;redirectCount<=3;redirectCount+=1) {
-    if(!isAllowedSourceUrl(currentUrl)) {
-      throw new Error("Blocked redirect to non-allowlisted host");
+    if(!isAllowedSourceUrl(currentUrl,parserKey,smartFeniAuthorized)) {
+      throw new Error("Blocked redirect to non-allowlisted host or adapter path");
     }
 
     const controller=new AbortController();
@@ -382,6 +423,7 @@ Deno.serve(async(req)=>{
 
   const report={
     checked:0,changed:0,unchanged:0,failed:0,published:0,embedded:0,
+    adapter_candidates_created:0,adapter_records_staged:0,
     embed_pending:0,embedding_backfill_embedded:0,embedding_backfill_failed:0,
     embedding_backfill_blocked:false,embedding_backfill_remaining:0,quarantined_sources:0,
   };
@@ -399,16 +441,32 @@ Deno.serve(async(req)=>{
 
     try {
       const headers:Record<string,string>={
-        "User-Agent":"FeniX-Feni-Brain-Updater/1.1",
+        "User-Agent":"FeniX-Feni-Brain-Updater/1.2 (+https://fenix-saru-sakib.vercel.app)",
       };
       if(source.etag) headers["If-None-Match"]=source.etag;
       if(source.last_modified) headers["If-Modified-Since"]=source.last_modified;
 
-      if(!isAllowedSourceUrl(source.url)) {
-        throw new Error("Source host is not allowlisted");
+      let smartFeniAuthorized = false;
+      if (requiresPartnerAuthorization(source.parser_key)) {
+        const registry = await db
+          .from("fenix_brain_sources")
+          .select("metadata,status")
+          .eq("id", source.source_id)
+          .single();
+        if (registry.error) throw new Error("Could not verify partner-feed authorization");
+        const metadata = registry.data?.metadata ?? {};
+        smartFeniAuthorized = metadata.partner_api_authorized === true && metadata.access_verified === true;
+        if (!smartFeniAuthorized) {
+          throw new Error("smartfeni_permission_required: only a source-owner-authorized JSON feed may be fetched");
+        }
       }
 
-      const fetched=await fetchAllowlistedSource(source.url,headers);
+      if(!isAllowedSourceUrl(source.url,source.parser_key,smartFeniAuthorized)) {
+        throw new Error("Source URL is not allowlisted for its selected adapter");
+      }
+
+      if (source.parser_key === "smartfeni_partner_json") headers["Accept"] = "application/json";
+      const fetched=await fetchAllowlistedSource(source.url,headers,source.parser_key,smartFeniAuthorized);
       const response=fetched.response;
       const finalSourceUrl=fetched.finalUrl;
       const now=new Date().toISOString();
@@ -432,6 +490,92 @@ Deno.serve(async(req)=>{
       const raw=await response.text();
       if(raw.length>source.max_bytes) {
         throw new Error("Source exceeds configured byte limit");
+      }
+
+      if (isIngestionAdapter(source.parser_key)) {
+        if (source.parser_key === "smartfeni_partner_json") {
+          const contentType = response.headers.get("content-type") ?? "";
+          if (!/application\\/(?:[a-z0-9.+-]+\\+)?json\\b/i.test(contentType)) {
+            throw new Error("smartfeni_partner_feed_invalid_content_type: expected application/json");
+          }
+        }
+
+        const snapshot = parseIngestionAdapter(source.parser_key, raw, finalSourceUrl);
+        // Store a bounded evidence snapshot, not a copy of the whole remote page.
+        // Every adapter result stays in the verification queue; this branch can
+        // never publish news or activate a canonical entity automatically.
+        const boundedSnapshot = {
+          ...snapshot,
+          items: snapshot.items.slice(0, 40),
+          headings: snapshot.headings.slice(0, 30),
+          discovery_links: snapshot.discovery_links.slice(0, 20),
+          excerpt: snapshot.excerpt.slice(0, 1800),
+          review_required: true as const,
+        };
+        const serializedSnapshot = JSON.stringify(boundedSnapshot);
+        const hash = await sha256(serializedSnapshot);
+        const refreshNow = await db
+          .from("fenix_brain_source_refresh")
+          .select("last_content_hash")
+          .eq("source_id", source.source_id)
+          .single();
+        const previousHash = refreshNow.data?.last_content_hash ?? null;
+
+        if (previousHash === hash) {
+          report.unchanged++;
+          await db.from("fenix_brain_update_runs").update({
+            completed_at:now,status:"unchanged",http_status:response.status,
+            content_hash:hash,bytes_read:raw.length,
+            metadata:{adapter:source.parser_key,record_count:snapshot.record_count},
+          }).eq("id",runId);
+        } else {
+          const summary = `Adapter ${source.parser_key} staged ${snapshot.record_count} record(s); manual review required; no auto-publish.`;
+          const candidate = await db.from("fenix_brain_update_candidates").insert({
+            source_id:source.source_id,
+            content_hash:hash,
+            previous_hash:previousHash,
+            title:snapshot.page_title || source.title,
+            source_url:finalSourceUrl,
+            extracted_content:serializedSnapshot,
+            change_summary:summary,
+            status:"pending",
+            metadata:{
+              adapter:source.parser_key,
+              adapter_version:1,
+              record_count:snapshot.record_count,
+              review_required:true,
+              auto_publish_ignored:true,
+              warnings:snapshot.warnings,
+            },
+          });
+          if (candidate.error && candidate.error.code !== "23505") {
+            throw new Error("Adapter candidate insert failed: "+candidate.error.message);
+          }
+
+          report.changed++;
+          report.adapter_records_staged += snapshot.record_count;
+          if (!candidate.error) report.adapter_candidates_created++;
+
+          await db.from("fenix_brain_update_runs").update({
+            completed_at:now,status:"changed",http_status:response.status,
+            content_hash:hash,bytes_read:raw.length,
+            metadata:{adapter:source.parser_key,record_count:snapshot.record_count,candidate_status:"pending"},
+          }).eq("id",runId);
+        }
+
+        await db.from("fenix_brain_source_refresh").update({
+          next_refresh_at:nextAt(source.refresh_interval_hours),
+          last_checked_at:now,
+          last_success_at:now,
+          last_http_status:response.status,
+          last_content_hash:hash,
+          etag:response.headers.get("etag"),
+          last_modified:response.headers.get("last-modified"),
+          last_error:null,
+          auto_publish:false,
+          updated_at:now,
+        }).eq("source_id",source.source_id);
+        continue;
       }
 
       if(source.parser_key==="notice_html" || source.parser_key==="news_html") {
