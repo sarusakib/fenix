@@ -264,7 +264,7 @@ export default function BrainSourcesAdminPage() {
     if (url) {
       try {
         parsedUrl = new URL(url)
-        if (parsedUrl.protocol !== 'https:' || parsedUrl.username || parsedUrl.password) throw new Error('https')
+        if (parsedUrl.protocol !== 'https:' || parsedUrl.username || parsedUrl.password || (parsedUrl.port && parsedUrl.port !== '443')) throw new Error('https')
       } catch {
         setError('Source URL অবশ্যই সঠিক HTTPS link হতে হবে এবং এতে username/password থাকতে পারবে না।')
         setSaving(false)
