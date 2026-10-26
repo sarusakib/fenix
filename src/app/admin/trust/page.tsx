@@ -23,6 +23,7 @@ export default function AdminTrustPage() {
   const [names, setNames] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState('')
   const [error, setError] = useState('')
+  const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({})
 
   useEffect(() => {
     let active = true
@@ -55,27 +56,56 @@ export default function AdminTrustPage() {
   }, [])
 
   async function act(kind: 'claim' | 'review' | 'report' | 'verification', id: string, status: string) {
+    if (busy) return
     setBusy(kind + id)
     setError('')
-    const s = createClient()
-    const { data: auth } = await s.auth.getUser()
-    if (!auth.user) { setError('Admin session expired.'); setBusy(''); return }
-    const now = new Date().toISOString()
-    const patch = kind === 'claim'
-      ? { status, reviewed_by: auth.user.id, reviewed_at: now }
-      : kind === 'review'
-        ? { status, reviewed_by: auth.user.id, reviewed_at: now }
-        : kind === 'report'
-          ? { status, reviewer_id: auth.user.id, resolved_at: ['resolved', 'dismissed'].includes(status) ? now : null }
-          : { status, reviewed_by: auth.user.id, reviewed_at: now }
-    const table = kind === 'verification' ? 'business_verification_requests' : tables[kind]
-    const { error: e } = await s.from(table).update(patch).eq('id', id)
-    if (e) { setError('Update failed.'); setBusy(''); return }
-    if (kind === 'claim') setClaims(v => v.map(x => x.id === id ? { ...x, ...patch } : x))
-    if (kind === 'review') setReviews(v => v.map(x => x.id === id ? { ...x, ...patch } : x))
-    if (kind === 'report') setReports(v => v.map(x => x.id === id ? { ...x, ...patch } : x))
-    if (kind === 'verification') setVerifications(v => v.map(x => x.id === id ? { ...x, ...patch } : x))
-    setBusy('')
+
+    try {
+      const s = createClient()
+      const { data: auth, error: authError } = await s.auth.getUser()
+      if (authError) throw authError
+      if (!auth.user) {
+        setError('Admin session expired. Please sign in again.')
+        return
+      }
+
+      const now = new Date().toISOString()
+      const reviewNote = (reviewNotes[id] ?? '').trim().slice(0, 2000) || null
+      const patch = kind === 'claim'
+        ? { status, reviewed_by: auth.user.id, reviewed_at: now, review_note: reviewNote }
+        : kind === 'review'
+          ? { status, reviewed_by: auth.user.id, reviewed_at: now, admin_note: reviewNote }
+          : kind === 'report'
+            ? {
+                status,
+                reviewer_id: auth.user.id,
+                resolution_note: reviewNote,
+                resolved_at: ['resolved', 'dismissed'].includes(status) ? now : null,
+              }
+            : { status, reviewed_by: auth.user.id, reviewed_at: now, review_note: reviewNote }
+
+      const table = kind === 'verification' ? 'business_verification_requests' : tables[kind]
+      const { error: updateError } = await s.from(table).update(patch).eq('id', id)
+
+      if (updateError) {
+        const message = updateError.message || ''
+        if (kind === 'claim' && status === 'approved' && /owned by another account|business is missing/i.test(message)) {
+          setError('Claim approval was blocked because the business is missing or already belongs to another account. Keep the claim pending and verify ownership before retrying.')
+        } else {
+          setError('Update failed. Check your connection and whether the request is still pending, then try again.')
+        }
+        return
+      }
+
+      if (kind === 'claim') setClaims(rows => rows.map(row => row.id === id ? { ...row, ...patch } : row))
+      if (kind === 'review') setReviews(rows => rows.map(row => row.id === id ? { ...row, ...patch } : row))
+      if (kind === 'report') setReports(rows => rows.map(row => row.id === id ? { ...row, ...patch } : row))
+      if (kind === 'verification') setVerifications(rows => rows.map(row => row.id === id ? { ...row, ...patch } : row))
+    } catch {
+      setError('The trust decision could not be saved because of a connection problem. Please try again.')
+    } finally {
+      setBusy('')
+    }
   }
 
   if (allowed === null) return <main className="min-h-dvh bg-[#f7faf9] dark:bg-[#030506]"><Navbar /><div className="mx-auto max-w-5xl px-4 py-16 text-sm opacity-60">Checking admin access…</div></main>
@@ -91,11 +121,40 @@ export default function AdminTrustPage() {
               <div><p className="font-bold">{names[row.business_id] || 'Business ' + row.business_id.slice(0, 8)}</p><p className="mt-1 text-xs opacity-45">{row.status} · {new Date(row.created_at).toLocaleString('en-GB')}</p></div>
               {row.status === 'pending' && <div className="flex gap-2">{kind === 'report' ? <><ActionButton onClick={() => void act(kind, row.id, 'resolved')} disabled={busy === kind + row.id} good>Resolve<Check size={15} /></ActionButton><ActionButton onClick={() => void act(kind, row.id, 'dismissed')} disabled={busy === kind + row.id}>Dismiss<X size={15} /></ActionButton></> : <><ActionButton onClick={() => void act(kind, row.id, kind === 'claim' || kind === 'verification' ? 'approved' : 'published')} disabled={busy === kind + row.id} good> {kind === 'claim' || kind === 'verification' ? 'Approve' : 'Publish'} <Check size={15} /></ActionButton><ActionButton onClick={() => void act(kind, row.id, 'rejected')} disabled={busy === kind + row.id}>Reject<X size={15} /></ActionButton></>}</div>}
             </div>
+            {kind === 'verification' && row.verification_type && (
+              <p className="mt-3 text-xs font-bold text-[#007171] dark:text-teal-200">
+                Verification type: {{ phone: 'Phone', location: 'Location', identity: 'Identity', business: 'Business' }[row.verification_type] || row.verification_type}
+              </p>
+            )}
+            {(kind === 'claim' && row.claimant_id || kind === 'verification' && row.requester_id) && (
+              <p className="mt-2 text-xs opacity-50">
+                Requester ID: {String(kind === 'claim' ? row.claimant_id : row.requester_id)}
+              </p>
+            )}
             {row.note && <p className="mt-3 whitespace-pre-wrap text-sm leading-6 opacity-65">{row.note}</p>}
+            {row.evidence_note && <p className="mt-3 whitespace-pre-wrap text-sm leading-6 opacity-65"><strong>Evidence:</strong> {row.evidence_note}</p>}
             {row.title && <p className="mt-3 text-sm font-bold">{row.title}{row.rating ? ' · ' + row.rating + '/5' : ''}</p>}
             {row.body && <p className="mt-2 whitespace-pre-wrap text-sm leading-6 opacity-65">{row.body}</p>}
             {row.reason && <p className="mt-3 text-xs font-bold opacity-50">Reason: {row.reason}</p>}
             {row.details && <p className="mt-2 whitespace-pre-wrap text-sm leading-6 opacity-65">{row.details}</p>}
+            {(row.review_note || row.admin_note || row.resolution_note) && (
+              <p className="mt-3 whitespace-pre-wrap rounded-xl bg-black/[.025] p-3 text-sm leading-6 opacity-65 dark:bg-white/[.04]">
+                <strong>Previous reviewer note:</strong> {row.review_note || row.admin_note || row.resolution_note}
+              </p>
+            )}
+            {row.status === 'pending' && (
+              <label className="mt-4 block">
+                <span className="text-xs font-bold opacity-65">Reviewer note (optional)</span>
+                <textarea
+                  value={reviewNotes[row.id] ?? ''}
+                  onChange={(event) => setReviewNotes(current => ({ ...current, [row.id]: event.target.value.slice(0, 2000) }))}
+                  maxLength={2000}
+                  rows={2}
+                  placeholder="Explain the decision or required correction. Max 2,000 characters."
+                  className="mt-2 w-full rounded-xl border border-black/10 bg-transparent p-3 text-sm leading-6 dark:border-white/10"
+                />
+              </label>
+            )}
           </article>
         )) : <p className="py-6 text-sm opacity-45">Queue is empty.</p>}
       </div>
