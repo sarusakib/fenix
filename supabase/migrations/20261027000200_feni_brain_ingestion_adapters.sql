@@ -226,11 +226,14 @@ begin
     raise exception 'health_registry_adapter_requires_public_organization_report' using errcode = '22023';
   end if;
 
-  if v_parser_key = 'smartfeni_partner_json' then
+  if v_parser_key = 'smartfeni_partner_json' and v_url is not null then
     if v_host not in ('smartfeni.com','www.smartfeni.com')
        or (v_path not ilike '/api/%' and v_path not ilike '%.json') then
       raise exception 'smartfeni_requires_authorized_json_feed_url' using errcode = '22023';
     end if;
+  end if;
+
+  if v_parser_key = 'smartfeni_partner_json' and p_status = 'active' then
     if coalesce(v_metadata->>'partner_api_authorized','false') <> 'true'
        or coalesce(v_metadata->>'access_verified','false') <> 'true' then
       raise exception 'smartfeni_permission_required' using errcode = '42501';
