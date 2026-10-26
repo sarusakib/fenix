@@ -34,52 +34,106 @@ type SearchArgs = {
 export async function searchDirectoryBusinesses(
   args: SearchArgs = {},
 ): Promise<{ data: DirectoryBusiness[]; error: Error | null }> {
-  const supabase = createClient()
-  const query = args.query?.trim().slice(0, 120) || undefined
-  const category = args.category?.trim().slice(0, 80) || undefined
-  const upazila = args.upazila?.trim().slice(0, 80) || undefined
+  try {
+    const supabase = createClient()
+    const query = args.query?.trim().slice(0, 120) || undefined
+    const category = args.category?.trim().slice(0, 80) || undefined
+    const upazila = args.upazila?.trim().slice(0, 80) || undefined
+    const requestedLimit = typeof args.limit === 'number' && Number.isFinite(args.limit)
+      ? Math.trunc(args.limit)
+      : 24
+    const requestedOffset = typeof args.offset === 'number' && Number.isFinite(args.offset)
+      ? Math.trunc(args.offset)
+      : 0
 
-  const { data, error } = await supabase.rpc('search_directory_businesses', {
-    p_query: query,
-    p_category: category,
-    p_upazila: upazila,
-    p_limit: Math.min(Math.max(args.limit ?? 24, 1), 50),
-    p_offset: Math.max(args.offset ?? 0, 0),
-  })
+    const { data, error } = await supabase.rpc('search_directory_businesses', {
+      p_query: query,
+      p_category: category,
+      p_upazila: upazila,
+      p_limit: Math.min(Math.max(requestedLimit, 1), 50),
+      p_offset: Math.max(requestedOffset, 0),
+    })
 
-  if (error) return { data: [], error }
-  return { data: (data ?? []) as DirectoryBusiness[], error: null }
+    if (error) return { data: [], error }
+    return { data: (data ?? []) as DirectoryBusiness[], error: null }
+  } catch (error) {
+    return {
+      data: [],
+      error: error instanceof Error ? error : new Error('Business search failed.'),
+    }
+  }
 }
 
 export async function getDirectoryCategories(): Promise<{
   data: DirectoryCategory[]
   error: Error | null
 }> {
-  const supabase = createClient()
-  const { data, error } = await supabase.rpc('list_directory_categories')
+  try {
+    const supabase = createClient()
+    const { data, error } = await supabase.rpc('list_directory_categories')
 
-  if (error) return { data: [], error }
-  return { data: (data ?? []) as DirectoryCategory[], error: null }
+    if (error) return { data: [], error }
+    return { data: (data ?? []) as DirectoryCategory[], error: null }
+  } catch (error) {
+    return {
+      data: [],
+      error: error instanceof Error ? error : new Error('Directory categories failed to load.'),
+    }
+  }
 }
 
 export async function getDirectoryUpazilas(): Promise<{
   data: DirectoryUpazila[]
   error: Error | null
 }> {
-  const supabase = createClient()
-  const { data, error } = await supabase.rpc('list_directory_upazilas')
+  try {
+    const supabase = createClient()
+    const { data, error } = await supabase.rpc('list_directory_upazilas')
 
-  if (error) return { data: [], error }
-  return { data: (data ?? []) as DirectoryUpazila[], error: null }
+    if (error) return { data: [], error }
+    return { data: (data ?? []) as DirectoryUpazila[], error: null }
+  } catch (error) {
+    return {
+      data: [],
+      error: error instanceof Error ? error : new Error('Directory upazilas failed to load.'),
+    }
+  }
+}
+
+function normalizePublicHttpUrl(value: string | null | undefined): string | null {
+  const raw = value?.trim()
+  if (!raw || raw.length > 1000 || /[\u0000-\u001f\u007f]/.test(raw)) return null
+
+  const candidate = /^https?:\/\//i.test(raw)
+    ? raw
+    : 'https://' + raw.replace(/^\/+/, '')
+
+  try {
+    const url = new URL(candidate)
+    if (
+      (url.protocol !== 'http:' && url.protocol !== 'https:') ||
+      !url.hostname ||
+      url.username ||
+      url.password
+    ) {
+      return null
+    }
+    return url.toString()
+  } catch {
+    return null
+  }
 }
 
 export async function getDirectoryBusiness(
   identifier: string,
 ): Promise<{ data: DirectoryDetail | null; error: Error | null }> {
-  const supabase = createClient()
-  const value = identifier.trim()
+  try {
+    const supabase = createClient()
+    const value = identifier.trim()
 
-  if (!value) return { data: null, error: new Error('Business is required.') }
+    if (!value || value.length > 200) {
+      return { data: null, error: new Error('A valid business identifier is required.') }
+    }
 
   let businessId = value
 
@@ -128,7 +182,7 @@ export async function getDirectoryBusiness(
         .from('investment_opportunities')
         .select('id, title_bn, title_en, category')
         .eq('business_id', businessId)
-        .eq('status', 'published')
+        .in('status', ['approved', 'fully_funded'])
         .eq('verification_status', 'verified')
         .order('updated_at', { ascending: false })
         .limit(6),
@@ -188,8 +242,8 @@ export async function getDirectoryBusiness(
       map_label: location?.map_label ?? null,
       phone: contact?.phone ?? null,
       whatsapp: contact?.whatsapp ?? null,
-      website_url: contact?.website_url ?? null,
-      facebook_url: contact?.facebook_url ?? null,
+      website_url: normalizePublicHttpUrl(contact?.website_url),
+      facebook_url: normalizePublicHttpUrl(contact?.facebook_url),
       product_count: productsResult.data?.length ?? 0,
       has_investment: (investmentResult.data?.length ?? 0) > 0,
       slug: profile?.slug ?? null,
@@ -198,6 +252,12 @@ export async function getDirectoryBusiness(
       business_type: profile?.business_type ?? null,
     } as DirectoryDetail,
     error: null,
+    }
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error('Business details could not be loaded.'),
+    }
   }
 }
 
