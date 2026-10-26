@@ -89,7 +89,10 @@ Deno.test("health adapter keeps only explicitly Feni facility rows", () => {
   assert(!JSON.stringify(snapshot).includes("0123456789"), "personal/public contact fields are not copied into review snapshots");
   assert(snapshot.review_required, "health facts require human verification");
 
-  const noFeniRows = html.replace(/<tr><td>101[\\s\\S]*?<\\/tr>/, "").replace("Feni Sadar Health Complex", "Another Facility");
+  const noFeniRows = html.replace(
+    '<tr><td>101</td><td>Feni Sadar Health Complex</td><td>ফেনী সদর স্বাস্থ্য কমপ্লেক্স</td><td>FENI-101</td><td>Hospital</td><td>Chattogram</td><td>Feni</td><td>Feni Sadar</td><td>0123456789</td></tr>',
+    "",
+  );
   expectThrows(
     () => parseIngestionAdapter("health_registry_html", noFeniRows, sourceUrl),
     "health_registry_feni_filter_required",
