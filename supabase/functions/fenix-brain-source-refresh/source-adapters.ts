@@ -13,6 +13,7 @@ export type AdapterItem = {
   district?: string;
   upazila?: string;
   code?: string;
+  facility_id?: string;
   type?: string;
   agency?: string;
   ownership?: string;
@@ -313,8 +314,8 @@ function parseHealthRegistry(html: string, sourceUrl: string): IngestionSnapshot
         name: name.slice(0, 180),
         district: "Feni",
         ...(banglaIndex >= 0 && cells[banglaIndex] ? { name_bn: cells[banglaIndex].slice(0, 180) } : {}),
-        ...(idIndex >= 0 && cells[idIndex] ? { code: cells[idIndex].slice(0, 80) } : {}),
-        ...(codeIndex >= 0 && cells[codeIndex] ? { type: (itemType(cells[typeIndex >= 0 ? typeIndex : -1]) || "").slice(0, 120) } : {}),
+        ...(idIndex >= 0 && cells[idIndex] ? { facility_id: cells[idIndex].slice(0, 80) } : {}),
+        ...(codeIndex >= 0 && cells[codeIndex] ? { code: cells[codeIndex].slice(0, 80) } : {}),
         ...(typeIndex >= 0 && cells[typeIndex] ? { type: cells[typeIndex].slice(0, 120) } : {}),
         ...(agencyIndex >= 0 && cells[agencyIndex] ? { agency: cells[agencyIndex].slice(0, 120) } : {}),
         ...(upazilaIndex >= 0 && cells[upazilaIndex] ? { upazila: cells[upazilaIndex].slice(0, 120) } : {}),
@@ -350,10 +351,6 @@ function parseHealthRegistry(html: string, sourceUrl: string): IngestionSnapshot
     warnings: ["Health-facility records are staged for verification; they are not statements of opening hours, current services, emergency availability, or clinical quality."],
     review_required: true,
   };
-}
-
-function itemType(value: string | undefined): string {
-  return value ?? "";
 }
 
 function parseSmartFeniPartnerJson(raw: string, sourceUrl: string): IngestionSnapshot {
