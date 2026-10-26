@@ -21,6 +21,7 @@ type BusinessSummary = {
 
 export default function DirectoryClaimPage() {
   const [businessId, setBusinessId] = useState('')
+  const [businessIdReady, setBusinessIdReady] = useState(false)
   const [business, setBusiness] = useState<BusinessSummary | null>(null)
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(true)
@@ -32,12 +33,16 @@ export default function DirectoryClaimPage() {
 
   useEffect(() => {
     setBusinessId((new URLSearchParams(window.location.search).get('business') || '').trim())
+    setBusinessIdReady(true)
   }, [])
 
   useEffect(() => {
+    if (!businessIdReady) return
     let active = true
 
     async function load() {
+      setError('')
+      setBusiness(null)
       try {
         const supabase = createClient()
         const { data: auth, error: authError } = await supabase.auth.getUser()
@@ -78,7 +83,7 @@ export default function DirectoryClaimPage() {
     return () => {
       active = false
     }
-  }, [businessId])
+  }, [businessId, businessIdReady])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
