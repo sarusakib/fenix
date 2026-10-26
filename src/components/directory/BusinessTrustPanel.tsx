@@ -29,15 +29,19 @@ export default function BusinessTrustPanel({ businessId, businessPath }: { busin
   useEffect(() => {
     let active = true
     async function loadReviews() {
-      const s = createClient()
-      const { data } = await s
-        .from('business_reviews')
-        .select('id,rating,title,body,status,created_at')
-        .eq('business_id', businessId)
-        .in('status', ['published'])
-        .order('created_at', { ascending: false })
-        .limit(20)
-      if (active) setReviews((data ?? []) as Review[])
+      try {
+        const s = createClient()
+        const { data, error: loadError } = await s
+          .from('business_reviews')
+          .select('id,rating,title,body,status,created_at')
+          .eq('business_id', businessId)
+          .eq('status', 'published')
+          .order('created_at', { ascending: false })
+          .limit(20)
+        if (active && !loadError) setReviews((data ?? []) as Review[])
+      } catch {
+        // Review content is optional; keep the business profile usable if reviews are unavailable.
+      }
     }
     void loadReviews()
     return () => { active = false }
