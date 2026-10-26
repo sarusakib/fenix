@@ -269,7 +269,7 @@ begin
     returning id into v_id;
   end if;
 
-  insert into public.fenix_brain_source_refresh (
+  insert into public.fenix_brain_source_refresh as current_refresh (
     source_id, enabled, refresh_interval_hours, next_refresh_at, parser_key, auto_publish
   ) values (
     v_id, v_refresh_enabled, v_interval, now(), v_parser_key, false
@@ -278,7 +278,7 @@ begin
   set enabled = excluded.enabled,
       refresh_interval_hours = excluded.refresh_interval_hours,
       next_refresh_at = case when excluded.enabled then now()
-                             else public.fenix_brain_source_refresh.next_refresh_at end,
+                             else current_refresh.next_refresh_at end,
       parser_key = excluded.parser_key,
       auto_publish = false,
       updated_at = now();
