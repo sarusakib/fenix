@@ -62,5 +62,8 @@ jobs:
           deno check --config supabase/functions/deno.json supabase/functions/fenix-brain-source-refresh/index.ts
           deno check --config supabase/functions/deno.json supabase/functions/fenix-brain-embed-backfill/index.ts
 
+      - name: Test Feni Brain ingestion adapters
+        run: deno test --config supabase/functions/deno.json supabase/functions/fenix-brain-source-refresh/source-adapters.test.ts
+
       - name: Production build
         run: npm run build
