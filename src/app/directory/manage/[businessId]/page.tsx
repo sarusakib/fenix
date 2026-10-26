@@ -649,8 +649,6 @@ export default function DirectoryBusinessEditorPage() {
     }
   }
 
-  const busyLabel = bn ? 'সংরক্ষণ হচ্ছে…' : 'Saving…'
-
   return (
     <main className="min-h-dvh bg-[var(--fx-bg)] text-[var(--fx-text)]">
       <Navbar />
