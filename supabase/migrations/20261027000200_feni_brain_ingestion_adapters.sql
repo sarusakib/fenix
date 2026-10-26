@@ -141,6 +141,7 @@ declare
   v_id uuid;
   v_url text := nullif(trim(p_url), '');
   v_host text;
+  v_port text;
   v_path text := '';
   v_refresh_enabled boolean := false;
   v_parser_key text := 'generic_html';
@@ -192,6 +193,10 @@ begin
       raise exception 'source_url_must_be_https_without_credentials' using errcode = '22023';
     end if;
     v_host := lower(substring(v_url from '^https://([^/:?#]+)'));
+    v_port := substring(v_url from '^https://[^/:?#]+:([0-9]+)');
+    if v_port is not null and v_port <> '443' then
+      raise exception 'source_url_nonstandard_https_port' using errcode = '22023';
+    end if;
     v_path := coalesce(substring(v_url from '^https://[^/]+([^?#]*)'), '/');
   end if;
 
