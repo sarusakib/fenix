@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Buildings, ShieldCheck, Storefront } from '@phosphor-icons/react'
+import { ArrowLeft, ArrowRight, Buildings, PencilSimple, ShieldCheck, Storefront } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
 import { useFenixLocale } from '@/components/i18n/FenixLocaleProvider'
 import { createClient } from '@/utils/supabase/client'
@@ -180,6 +180,9 @@ export default function DirectoryManagePage() {
                   <div className="mt-5 flex flex-wrap gap-2">
                     <Link href={'/directory/' + encodeURIComponent(item.profile?.slug || item.id)} className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#008080] px-4 text-sm font-bold text-white">
                       {bn ? 'প্রোফাইল দেখুন' : 'Open profile'} <ArrowRight size={16} />
+                    </Link>
+                    <Link href={'/directory/manage/' + encodeURIComponent(item.id)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-black/10 px-4 text-sm font-bold dark:border-white/10">
+                      <PencilSimple size={16} /> {bn ? 'প্রোফাইল সম্পাদনা' : 'Edit profile'}
                     </Link>
                     <Link href={'/directory/verify?business=' + encodeURIComponent(item.id)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#008080]/20 px-4 text-sm font-bold text-[#007171] dark:border-teal-300/15 dark:text-teal-200">
                       <ShieldCheck size={17} /> {bn ? 'যাচাইয়ের অনুরোধ' : 'Request review'}
