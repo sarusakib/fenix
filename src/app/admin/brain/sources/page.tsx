@@ -413,7 +413,7 @@ export default function BrainSourcesAdminPage() {
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
               <p className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">
-                <GlobeHemisphereWest size={15} /> Feni Brain · Roadmap 2C
+                <GlobeHemisphereWest size={15} /> Feni Brain · Roadmap 2C / 2D
               </p>
               <h1 className="mt-3 text-3xl font-black tracking-[-.05em] sm:text-5xl">Source registry</h1>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--fx-muted)]">
@@ -569,7 +569,9 @@ export default function BrainSourcesAdminPage() {
                         )}
                         <div className="mt-3 grid gap-x-4 gap-y-1 text-xs text-[var(--fx-muted)] sm:grid-cols-2">
                           <p>Refresh: <strong className="font-bold text-[var(--fx-text)]">{refresh?.enabled ? 'Enabled' : 'Disabled / not configured'}</strong>{refresh ? ' · ' + refresh.refresh_interval_hours + 'h' : ''}</p>
-                          <p>Parser: <strong className="font-bold text-[var(--fx-text)]">{refresh?.parser_key ?? 'native / none'}</strong></p>
+                          <p>Parser: <strong className="font-bold text-[var(--fx-text)]">{refresh?.parser_key ?? String(source.metadata?.parser_key ?? (source.source_type === 'internal' ? 'native / none' : 'not configured'))}</strong></p>
+                          <p>Access review: <strong className="font-bold text-[var(--fx-text)]">{source.metadata?.access_verified === true ? 'Verified by admin' : 'Not verified'}</strong></p>
+                          {source.metadata?.parser_key === 'smartfeni_partner_json' && <p>Partner authorization: <strong className="font-bold text-[var(--fx-text)]">{source.metadata?.partner_api_authorized === true ? 'Confirmed' : 'Not confirmed'}</strong></p>}
                           <p>Last checked: {safeDate(refresh?.last_checked_at)}</p>
                           <p>Last success: {safeDate(refresh?.last_success_at)}{refresh?.last_http_status ? ' · HTTP ' + refresh.last_http_status : ''}</p>
                           {refresh?.last_error && <p className="sm:col-span-2 text-red-700 dark:text-red-300">Last error: {refresh.last_error}</p>}
