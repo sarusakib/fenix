@@ -38,7 +38,7 @@ function isAllowedSourceUrl(
 ) {
   try {
     const url = new URL(raw);
-    if (url.protocol !== "https:" || url.username || url.password) return false;
+    if (url.protocol !== "https:" || url.username || url.password || (url.port && url.port !== "443")) return false;
     const host = url.hostname.toLowerCase();
 
     // Dedicated adapters are bound to a specific host/path and must not fall
