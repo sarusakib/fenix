@@ -220,6 +220,24 @@ begin
     raise exception 'invalid_source_parser' using errcode = '22023';
   end if;
 
+  if v_parser_key = 'feni_official_html' and p_source_type <> 'government_official' then
+    raise exception 'official_adapter_requires_government_source_type' using errcode = '22023';
+  end if;
+
+  if v_parser_key in ('bizhub_feni_html','secondary_directory_html')
+     and p_source_type not in ('public_web','verified_business') then
+    raise exception 'directory_adapter_requires_public_web_source_type' using errcode = '22023';
+  end if;
+
+  if v_parser_key = 'health_registry_html'
+     and p_source_type not in ('government_official','official_document') then
+    raise exception 'health_adapter_requires_government_source_type' using errcode = '22023';
+  end if;
+
+  if v_parser_key = 'smartfeni_partner_json' and p_source_type <> 'public_web' then
+    raise exception 'smartfeni_adapter_requires_public_web_source_type' using errcode = '22023';
+  end if;
+
   if v_url is not null and v_parser_key = 'feni_official_html'
      and v_host <> 'feni.gov.bd' and v_host not like '%.feni.gov.bd' then
     raise exception 'official_adapter_requires_feni_gov_bd_host' using errcode = '22023';
