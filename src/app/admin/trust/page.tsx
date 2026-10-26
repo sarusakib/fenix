@@ -8,6 +8,13 @@ import { createClient } from '@/utils/supabase/client'
 
 type Row = { id: string; business_id: string; status: string; created_at: string; [key: string]: any }
 
+const verificationTypeLabels: Record<string, string> = {
+  phone: 'Phone',
+  location: 'Location',
+  identity: 'Identity',
+  business: 'Business',
+}
+
 const tables = {
   claim: 'business_claim_requests',
   review: 'business_reviews',
@@ -123,7 +130,7 @@ export default function AdminTrustPage() {
             </div>
             {kind === 'verification' && row.verification_type && (
               <p className="mt-3 text-xs font-bold text-[#007171] dark:text-teal-200">
-                Verification type: {{ phone: 'Phone', location: 'Location', identity: 'Identity', business: 'Business' }[row.verification_type] || row.verification_type}
+                Verification type: {verificationTypeLabels[String(row.verification_type)] || String(row.verification_type)}
               </p>
             )}
             {(kind === 'claim' && row.claimant_id || kind === 'verification' && row.requester_id) && (
