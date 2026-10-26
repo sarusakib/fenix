@@ -220,6 +220,25 @@ begin
     raise exception 'invalid_source_parser' using errcode = '22023';
   end if;
 
+  if v_url is not null and v_parser_key = 'feni_official_html'
+     and v_host <> 'feni.gov.bd' and v_host not like '%.feni.gov.bd' then
+    raise exception 'official_adapter_requires_feni_gov_bd_host' using errcode = '22023';
+  end if;
+
+  if v_url is not null and v_parser_key = 'bizhub_feni_html'
+     and v_host not in ('bizhubfeni.com','www.bizhubfeni.com') then
+    raise exception 'bizhub_adapter_requires_bizhub_host' using errcode = '22023';
+  end if;
+
+  if v_url is not null and v_parser_key = 'secondary_directory_html'
+     and v_host not in (
+       'biz4bd.com','www.biz4bd.com','fbcci.org','www.fbcci.org',
+       'marketbangladesh.com','www.marketbangladesh.com',
+       'bdbusinessdirectory.com','www.bdbusinessdirectory.com'
+     ) then
+    raise exception 'secondary_directory_adapter_requires_known_directory_host' using errcode = '22023';
+  end if;
+
   if v_parser_key = 'health_registry_html'
      and (v_host <> 'hris.mohfw.gov.bd'
           or v_path !~* '^/public/facility-registry/reports/organization-list/?$') then
