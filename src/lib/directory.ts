@@ -2,7 +2,19 @@ import { createClient } from '@/utils/supabase/client'
 import type { Database } from '@/types/database'
 
 export type DirectoryBusiness =
-  Database['public']['Functions']['search_directory_businesses']['Returns'][number]
+  Database['public']['Functions']['search_directory_businesses']['Returns'][number] & {
+    slug?: string | null
+    logo_path?: string | null
+    cover_path?: string | null
+  }
+
+export type DirectoryHours = {
+  business_id: string
+  day_of_week: number
+  opens_at: string | null
+  closes_at: string | null
+  is_closed: boolean
+}
 
 export type DirectoryCategory =
   Database['public']['Functions']['list_directory_categories']['Returns'][number]
@@ -21,6 +33,9 @@ export type DirectoryDetail = Omit<
   about_bn: string | null
   about_en: string | null
   business_type: string | null
+  logo_path: string | null
+  cover_path: string | null
+  opening_hours: DirectoryHours[]
 }
 
 type SearchArgs = {
@@ -55,7 +70,34 @@ export async function searchDirectoryBusinesses(
     })
 
     if (error) return { data: [], error }
-    return { data: (data ?? []) as DirectoryBusiness[], error: null }
+
+    const rows = (data ?? []) as DirectoryBusiness[]
+    if (!rows.length) return { data: rows, error: null }
+
+    // Media paths and friendly slugs live in the one-to-one directory profile.
+    // Treat this as optional enrichment so search still works during schema rollout
+    // or when a profile has no media.
+    try {
+      const { data: profiles, error: profilesError } = await supabase
+        .from('business_directory_profiles')
+        .select('business_id,slug,logo_path,cover_path')
+        .in('business_id', rows.map((row) => row.id))
+
+      if (!profilesError && profiles) {
+        const byBusiness = new Map(profiles.map((profile) => [profile.business_id, profile]))
+        return {
+          data: rows.map((row) => ({
+            ...row,
+            ...(byBusiness.get(row.id) ?? {}),
+          })),
+          error: null,
+        }
+      }
+    } catch {
+      // Optional enrichment should not break primary directory search.
+    }
+
+    return { data: rows, error: null }
   } catch (error) {
     return {
       data: [],
@@ -203,6 +245,37 @@ export async function getDirectoryBusiness(
   if (productsResult.error) return { data: null, error: productsResult.error }
   if (investmentResult.error) return { data: null, error: investmentResult.error }
 
+  // Optional media and hours are queried separately so an older database schema
+  // can still serve a basic business profile while a migration is being staged.
+  let logoPath: string | null = null
+  let coverPath: string | null = null
+  let openingHours: DirectoryHours[] = []
+
+  if (profileResult.data?.business_id) {
+    try {
+      const { data: media } = await supabase
+        .from('business_directory_profiles')
+        .select('logo_path,cover_path')
+        .eq('business_id', businessId)
+        .maybeSingle()
+      logoPath = media?.logo_path ?? null
+      coverPath = media?.cover_path ?? null
+    } catch {
+      // The base public profile remains usable without optional media.
+    }
+
+    try {
+      const { data: hours, error: hoursError } = await supabase
+        .from('business_directory_hours')
+        .select('business_id,day_of_week,opens_at,closes_at,is_closed')
+        .eq('business_id', businessId)
+        .order('day_of_week', { ascending: true })
+      if (!hoursError) openingHours = (hours ?? []) as DirectoryHours[]
+    } catch {
+      // Older deployments may not have the hours migration yet.
+    }
+  }
+
   if (
     profileResult.data &&
     profileResult.data.listing_status !== 'published'
@@ -250,6 +323,9 @@ export async function getDirectoryBusiness(
       about_bn: profile?.about_bn ?? null,
       about_en: profile?.about_en ?? null,
       business_type: profile?.business_type ?? null,
+      logo_path: logoPath,
+      cover_path: coverPath,
+      opening_hours: openingHours,
     } as DirectoryDetail,
     error: null,
     }
@@ -258,6 +334,18 @@ export async function getDirectoryBusiness(
       data: null,
       error: error instanceof Error ? error : new Error('Business details could not be loaded.'),
     }
+  }
+}
+
+export function getDirectoryImageUrl(path: string | null | undefined): string | null {
+  const value = path?.trim()
+  if (!value) return null
+  try {
+    const supabase = createClient()
+    const { data } = supabase.storage.from('business-directory-media').getPublicUrl(value)
+    return data.publicUrl || null
+  } catch {
+    return null
   }
 }
 
