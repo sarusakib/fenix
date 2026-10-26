@@ -24,7 +24,7 @@ const modules = [
   { title: 'Commerce Operations', body: 'Seller, product, order and return operations.', href: '/commerce/admin', icon: ShoppingBag },
   { title: 'Investment Operations', body: 'Opportunities, investors, documents and interests.', href: '/admin/investment', icon: ChartLineUp },
   { title: 'Jobs Operations', body: 'Review employer postings and protect applicant workflows.', href: '/admin/jobs', icon: UsersThree },
-  { title: 'Brain & Knowledge', body: 'Open the public Feni Brain experience.', href: '/guide', icon: Brain },
+  { title: 'Brain Source Registry', body: 'Manage official, local platform, map, directory and news sources with review and refresh status.', href: '/admin/brain/sources', icon: Brain },
   { title: 'Public Experience', body: 'See Directory, Invest and Commerce as members do.', href: '/directory', icon: Storefront },
   { title: 'FeniX News', body: 'Create, review and publish the public FeniX newsroom.', href: '/admin/news', icon: Newspaper },
   { title: 'Platform Settings', body: 'Governance, member preferences and public policy links.', href: '/admin/settings', icon: GearSix },
