@@ -10,6 +10,7 @@ on:
   pull_request:
     branches:
       - main
+      - "feat/feni-brain-source-registry-20261027"
 
 permissions:
   contents: read
