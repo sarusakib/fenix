@@ -6,6 +6,16 @@ begin;
 
 alter table public.fenix_brain_sources enable row level security;
 
+-- Internal/native data-source metadata must not be visible to anonymous users.
+-- Admins retain a separate policy for the entire registry.
+drop policy if exists "Public can read active Feni Brain sources"
+  on public.fenix_brain_sources;
+create policy "Public can read active Feni Brain sources"
+  on public.fenix_brain_sources
+  for select
+  to anon, authenticated
+  using (status = 'active' and source_type <> 'internal');
+
 drop policy if exists "Admins can read all Feni Brain sources"
   on public.fenix_brain_sources;
 create policy "Admins can read all Feni Brain sources"
