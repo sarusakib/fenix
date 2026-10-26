@@ -41,28 +41,36 @@ function isAllowedSourceUrl(
     if (url.protocol !== "https:" || url.username || url.password) return false;
     const host = url.hostname.toLowerCase();
 
-    if (ALLOWED_HOSTS.has(host)) return true;
+    // Dedicated adapters are bound to a specific host/path and must not fall
+    // through to the generic hostname allowlist.
+    if (parserKey === "feni_official_html") {
+      return host === "feni.gov.bd" || host.endsWith(".feni.gov.bd");
+    }
+    if (parserKey === "bizhub_feni_html") {
+      return host === "bizhubfeni.com" || host === "www.bizhubfeni.com";
+    }
+    if (parserKey === "secondary_directory_html") {
+      return new Set([
+        "biz4bd.com","www.biz4bd.com","fbcci.org","www.fbcci.org",
+        "marketbangladesh.com","www.marketbangladesh.com",
+        "bdbusinessdirectory.com","www.bdbusinessdirectory.com",
+      ]).has(host);
+    }
+    if (parserKey === "health_registry_html") {
+      // The adapter only accepts the public organization report and filters rows
+      // whose published District field is exactly Feni.
+      return host === "hris.mohfw.gov.bd" &&
+        url.pathname.replace(/\\/+$/, "") === "/public/facility-registry/reports/organization-list";
+    }
+    if (parserKey === "smartfeni_partner_json") {
+      // Smart Feni public HTML must never be crawled. Require authorized JSON path
+      // plus the response Content-Type check before parsing.
+      return smartFeniAuthorized &&
+        (host === "smartfeni.com" || host === "www.smartfeni.com") &&
+        (url.pathname.toLowerCase().startsWith("/api/") || url.pathname.toLowerCase().endsWith(".json"));
+    }
 
-    // The health registry adapter may fetch only the verified public organization
-    // report, never arbitrary pages on the health ministry host. Its parser then
-    // retains rows whose District field is exactly Feni.
-    if (
-      parserKey === "health_registry_html" &&
-      host === "hris.mohfw.gov.bd" &&
-      url.pathname.replace(/\/+$/, "") === "/public/facility-registry/reports/organization-list"
-    ) return true;
-
-    // Smart Feni's public HTML pages must never be scraped. An administrator must
-    // explicitly confirm a source-owner-authorized API/feed, and only an API/JSON
-    // path is permitted. The response Content-Type is checked again before parsing.
-    if (
-      parserKey === "smartfeni_partner_json" &&
-      smartFeniAuthorized &&
-      (host === "smartfeni.com" || host === "www.smartfeni.com") &&
-      (url.pathname.toLowerCase().startsWith("/api/") || url.pathname.toLowerCase().endsWith(".json"))
-    ) return true;
-
-    return false;
+    return ALLOWED_HOSTS.has(host);
   } catch {
     return false;
   }
