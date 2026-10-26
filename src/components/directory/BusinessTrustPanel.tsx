@@ -45,63 +45,114 @@ export default function BusinessTrustPanel({ businessId, businessPath }: { busin
 
   async function submitReview(event: FormEvent) {
     event.preventDefault()
-    setBusy(true)
+    const reviewBody = body.trim()
+
     setNotice('')
     setError('')
-    const s = createClient()
-    const { data: auth } = await s.auth.getUser()
-    if (!auth.user) {
-      setError('Please sign in to write a review.')
-      setBusy(false)
+
+    if (reviewBody.length < 10) {
+      setError('Please describe your actual experience in at least 10 characters.')
       return
     }
-    const { error: e } = await s.from('business_reviews').insert({
-      business_id: businessId,
-      author_id: auth.user.id,
-      rating,
-      title: title.trim().slice(0, 160) || null,
-      body: body.trim().slice(0, 2500),
-      status: 'pending',
-    })
-    if (e) setError('Review could not be submitted. You may already have a review for this business.')
-    else {
+
+    if (busy) return
+    setBusy(true)
+
+    try {
+      const s = createClient()
+      const { data: auth, error: authError } = await s.auth.getUser()
+      if (authError) throw authError
+
+      if (!auth.user) {
+        setError('Please sign in to write a review.')
+        return
+      }
+
+      const { error: insertError } = await s.from('business_reviews').insert({
+        business_id: businessId,
+        author_id: auth.user.id,
+        rating,
+        title: title.trim().slice(0, 160) || null,
+        body: reviewBody.slice(0, 2500),
+        status: 'pending',
+      })
+
+      if (insertError) {
+        setError('Review could not be submitted. You may already have a review for this business.')
+        return
+      }
+
       setNotice('Review submitted for moderation.')
       setTitle('')
       setBody('')
       setRating(5)
       setShowReview(false)
-      const { data } = await createClient().from('business_reviews').select('id,rating,title,body,status,created_at').eq('business_id', businessId).in('status', ['published']).order('created_at', { ascending: false }).limit(20)
-      setReviews((data ?? []) as Review[])
+
+      try {
+        const { data } = await s
+          .from('business_reviews')
+          .select('id,rating,title,body,status,created_at')
+          .eq('business_id', businessId)
+          .eq('status', 'published')
+          .order('created_at', { ascending: false })
+          .limit(20)
+        setReviews((data ?? []) as Review[])
+      } catch {
+        // A failed refresh must not turn a successful submission into a failure message.
+      }
+    } catch {
+      setError('Review could not be submitted because of a connection problem. Please try again.')
+    } finally {
+      setBusy(false)
     }
-    setBusy(false)
   }
 
   async function submitReport(event: FormEvent) {
     event.preventDefault()
-    setBusy(true)
+    const reportDetails = report.trim()
+
     setNotice('')
     setError('')
-    const s = createClient()
-    const { data: auth } = await s.auth.getUser()
-    if (!auth.user) {
-      setError('Please sign in to report this business.')
-      setBusy(false)
+
+    if (reportDetails.length < 10) {
+      setError('Please describe the listing issue in at least 10 characters.')
       return
     }
-    const { error: e } = await s.from('business_reports').insert({
-      business_id: businessId,
-      reporter_id: auth.user.id,
-      reason: 'business_listing',
-      details: report.trim().slice(0, 3000),
-      status: 'pending',
-    })
-    if (e) setError('Report could not be submitted right now.')
-    else {
+
+    if (busy) return
+    setBusy(true)
+
+    try {
+      const s = createClient()
+      const { data: auth, error: authError } = await s.auth.getUser()
+      if (authError) throw authError
+
+      if (!auth.user) {
+        setError('Please sign in to report this business.')
+        return
+      }
+
+      const { error: insertError } = await s.from('business_reports').insert({
+        business_id: businessId,
+        reporter_id: auth.user.id,
+        reason: 'business_listing',
+        details: reportDetails.slice(0, 3000),
+        status: 'pending',
+      })
+
+      if (insertError) {
+        setError('Report could not be submitted right now.')
+        return
+      }
+
       setNotice('Report submitted to the FeniX trust queue.')
       setReport('')
       setShowReport(false)
+    } catch {
+      setError('Report could not be submitted because of a connection problem. Please try again.')
+    } finally {
+      setBusy(false)
     }
-    setBusy(false)
   }
 
   return (
@@ -112,8 +163,9 @@ export default function BusinessTrustPanel({ businessId, businessPath }: { busin
           <h2 className="mt-2 text-2xl font-black">Reviews and transparency</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-white/45">Reviews are moderated. A trust label describes what FeniX checked; it is not a quality guarantee or government approval.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link href={businessPath + '/qr'} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 px-3 text-xs font-bold dark:border-white/10"><QrCode size={16}/> QR identity</Link>
+          <Link href={'/directory/claim?business=' + encodeURIComponent(businessId)} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#008080]/20 bg-[#008080]/[.05] px-3 text-xs font-bold text-[#007171] dark:text-teal-200"><UserCircle size={16}/> Claim business</Link>
           <button type="button" onClick={() => setShowReport(v => !v)} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-red-500/15 px-3 text-xs font-bold text-red-700 dark:text-red-300"><Flag size={16}/> Report</button>
         </div>
       </div>
@@ -143,7 +195,7 @@ export default function BusinessTrustPanel({ businessId, businessPath }: { busin
             {Array.from({ length: 5 }).map((_, i) => <button key={i} type="button" onClick={() => setRating(i + 1)} aria-label={'Rate ' + (i + 1)} className="rounded-lg p-1 text-amber-500"><Star size={22} weight={i < rating ? 'fill' : 'regular'} /></button>)}
           </div>
           <input value={title} onChange={e => setTitle(e.target.value)} maxLength={160} placeholder="Review title (optional)" className="mt-4 h-11 w-full rounded-xl border border-black/10 bg-transparent px-3 text-sm dark:border-white/10" />
-          <textarea required value={body} onChange={e => setBody(e.target.value)} maxLength={2500} rows={5} placeholder="Share what you actually experienced." className="mt-3 w-full rounded-xl border border-black/10 bg-transparent p-3 text-sm leading-6 dark:border-white/10" />
+          <textarea required value={body} onChange={e => setBody(e.target.value)} minLength={10} maxLength={2500} rows={5} placeholder="Share what you actually experienced (at least 10 characters)." className="mt-3 w-full rounded-xl border border-black/10 bg-transparent p-3 text-sm leading-6 dark:border-white/10" />
           <button disabled={busy} className="mt-3 min-h-11 rounded-xl bg-[#008080] px-4 text-sm font-bold text-white disabled:opacity-50">{busy ? 'Submitting...' : 'Submit for review'}</button>
         </form>
       )}
@@ -151,7 +203,7 @@ export default function BusinessTrustPanel({ businessId, businessPath }: { busin
       {showReport && (
         <form onSubmit={submitReport} className="mt-5 rounded-2xl border border-red-500/15 bg-red-500/[.04] p-5">
           <label className="block text-xs font-bold uppercase tracking-[.12em] opacity-50">What should FeniX review?</label>
-          <textarea required value={report} onChange={e => setReport(e.target.value)} maxLength={3000} rows={5} placeholder="Describe misleading information, impersonation, unsafe behavior or another listing issue." className="mt-3 w-full rounded-xl border border-red-500/15 bg-transparent p-3 text-sm leading-6" />
+          <textarea required value={report} onChange={e => setReport(e.target.value)} minLength={10} maxLength={3000} rows={5} placeholder="Describe misleading information, impersonation, unsafe behavior or another listing issue (at least 10 characters)." className="mt-3 w-full rounded-xl border border-red-500/15 bg-transparent p-3 text-sm leading-6" />
           <button disabled={busy} className="mt-3 min-h-11 rounded-xl bg-red-600 px-4 text-sm font-bold text-white disabled:opacity-50">{busy ? 'Submitting...' : 'Submit report'}</button>
         </form>
       )}
