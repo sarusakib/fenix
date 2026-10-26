@@ -53,6 +53,9 @@ type Draft = {
   language_code: string
   trust_tier: number
   status: string
+  parser_key: string
+  access_verified: boolean
+  partner_api_authorized: boolean
 }
 
 const EMPTY_DRAFT: Draft = {
@@ -64,6 +67,9 @@ const EMPTY_DRAFT: Draft = {
   language_code: 'bn',
   trust_tier: 3,
   status: 'needs_review',
+  parser_key: 'generic_html',
+  access_verified: false,
+  partner_api_authorized: false,
 }
 
 const SOURCE_TYPES = [
@@ -80,6 +86,17 @@ const STATUS_OPTIONS = [
   ['needs_review', 'পর্যালোচনা প্রয়োজন / Needs review'],
   ['active', 'সক্রিয় / Active'],
   ['archived', 'আর্কাইভ / Archived'],
+] as const
+
+const PARSER_OPTIONS = [
+  ['generic_html', 'Generic HTML snapshot'],
+  ['feni_official_html', 'Feni official portal'],
+  ['bizhub_feni_html', 'BizHub Feni directory'],
+  ['health_registry_html', 'DGHS health facility registry'],
+  ['secondary_directory_html', 'Selected secondary directory'],
+  ['smartfeni_partner_json', 'Smart Feni authorized JSON partner feed'],
+  ['notice_html', 'Government notices'],
+  ['news_html', 'Local news index'],
 ] as const
 
 function safeDate(value: string | null | undefined) {
@@ -99,6 +116,14 @@ function friendlyError(message: string) {
   if (message.includes('invalid_language_code')) return 'Language নির্বাচন সঠিক নয়।'
   if (message.includes('invalid_trust_tier')) return 'Trust tier 1 থেকে 4-এর মধ্যে হতে হবে।'
   if (message.includes('publisher_or_title_length_invalid')) return 'Publisher ও title-এর দৈর্ঘ্য যাচাই করুন।'
+  if (message.includes('invalid_source_parser')) return 'এই source-এর জন্য parser নির্বাচন সঠিক নয়।'
+  if (message.includes('source_access_review_required')) return 'Source-এর terms ও অনুমোদিত access method যাচাই করে Access verified নির্বাচন করুন।'
+  if (message.includes('official_adapter_requires_feni_gov_bd_host')) return 'Feni official adapter শুধু feni.gov.bd বা তার সরকারি subdomain-এ ব্যবহার করুন।'
+  if (message.includes('bizhub_adapter_requires_bizhub_host')) return 'BizHub adapter-এর URL অবশ্যই bizhubfeni.com-এর হতে হবে।'
+  if (message.includes('secondary_directory_adapter_requires_known_directory_host')) return 'Secondary directory adapter-এর জন্য অনুমোদিত directory host নির্বাচন করুন।'
+  if (message.includes('health_registry_adapter_requires_public_organization_report')) return 'DGHS adapter-এর জন্য public organization-list report URL ব্যবহার করুন।'
+  if (message.includes('smartfeni_requires_authorized_json_feed_url')) return 'Smart Feni-তে public homepage নয়—অনুমোদিত API বা JSON feed URL দিতে হবে।'
+  if (message.includes('smartfeni_permission_required')) return 'Smart Feni-এর source-owner authorization ও access verification ছাড়া feed চালু করা যাবে না।'
   return message || 'কাজটি সম্পন্ন করা যায়নি।'
 }
 
@@ -210,6 +235,9 @@ export default function BrainSourcesAdminPage() {
       language_code: source.language_code,
       trust_tier: source.trust_tier,
       status: source.status,
+      parser_key: refreshStates[source.id]?.parser_key ?? String(source.metadata?.parser_key ?? 'generic_html'),
+      access_verified: source.metadata?.access_verified === true,
+      partner_api_authorized: source.metadata?.partner_api_authorized === true,
     })
     setFormOpen(true)
     setError('')
@@ -232,16 +260,87 @@ export default function BrainSourcesAdminPage() {
       return
     }
 
+    let parsedUrl: URL | null = null
     if (url) {
       try {
-        if (new URL(url).protocol !== 'https:') throw new Error('https')
+        parsedUrl = new URL(url)
+        if (parsedUrl.protocol !== 'https:' || parsedUrl.username || parsedUrl.password || (parsedUrl.port && parsedUrl.port !== '443')) throw new Error('https')
       } catch {
-        setError('Source URL অবশ্যই সঠিক HTTPS link হতে হবে।')
+        setError('Source URL অবশ্যই সঠিক HTTPS link হতে হবে এবং এতে username/password থাকতে পারবে না।')
         setSaving(false)
         return
       }
     } else if (draft.status === 'active' && draft.source_type !== 'internal') {
       setError('Active external source-এর HTTPS URL দিতে হবে। URL না থাকলে “Needs review” রাখুন।')
+      setSaving(false)
+      return
+    }
+
+    const host = parsedUrl?.hostname.toLowerCase() ?? ''
+    const path = parsedUrl?.pathname ?? ''
+    const secondaryHosts = new Set([
+      'biz4bd.com', 'www.biz4bd.com', 'fbcci.org', 'www.fbcci.org',
+      'marketbangladesh.com', 'www.marketbangladesh.com',
+      'bdbusinessdirectory.com', 'www.bdbusinessdirectory.com',
+    ])
+
+    if (draft.source_type === 'internal' && (url || draft.parser_key !== 'generic_html')) {
+      setError('FeniX-owned source-এর জন্য native database ব্যবহার করুন; external URL বা web adapter নয়।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'feni_official_html' &&
+        (draft.source_type !== 'government_official' || !(host === 'feni.gov.bd' || host.endsWith('.feni.gov.bd'))) ) {
+      setError('Feni official adapter শুধু government_official source এবং feni.gov.bd subdomain-এর জন্য।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'bizhub_feni_html' &&
+        (draft.source_type !== 'public_web' || !['bizhubfeni.com', 'www.bizhubfeni.com'].includes(host))) {
+      setError('BizHub adapter-এর জন্য source type Public web এবং BizHub Feni URL লাগবে।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'secondary_directory_html' && !secondaryHosts.has(host)) {
+      setError('Secondary directory adapter-এর URL অবশ্যই নির্বাচিত directory host-এর হতে হবে।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'health_registry_html' &&
+        (draft.source_type !== 'government_official' ||
+         host !== 'hris.mohfw.gov.bd' ||
+         !(path === '/public/facility-registry/reports/organization-list' || path === '/public/facility-registry/reports/organization-list/'))) {
+      setError('DGHS adapter-এর জন্য public organization-list report-এর নির্দিষ্ট URL ব্যবহার করতে হবে।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'smartfeni_partner_json') {
+      const validFeedPath = path.toLowerCase().startsWith('/api/') || path.toLowerCase().endsWith('.json')
+      if (url && (!['smartfeni.com', 'www.smartfeni.com'].includes(host) || !validFeedPath)) {
+        setError('Smart Feni-তে public homepage নয়—অনুমোদিত API বা JSON feed URL দিতে হবে।')
+        setSaving(false)
+        return
+      }
+      if (draft.status === 'active' && (!url || !draft.access_verified || !draft.partner_api_authorized)) {
+        setError('Smart Feni feed চালু করতে নির্দিষ্ট HTTPS JSON feed, access verification এবং source-owner authorization—তিনটিই প্রয়োজন।')
+        setSaving(false)
+        return
+      }
+      if (draft.source_type !== 'public_web') {
+        setError('Smart Feni partner feed-এর source type Public web হতে হবে।')
+        setSaving(false)
+        return
+      }
+    }
+    if (draft.parser_key === 'health_registry_html' && draft.status === 'active' && !draft.access_verified) {
+      setError('Health registry চালু করার আগে report URL ও Feni filter যাচাই করুন।')
+      setSaving(false)
+      return
+    }
+    if (draft.status === 'active' &&
+        ['public_web', 'community', 'social', 'verified_business'].includes(draft.source_type) &&
+        !draft.access_verified) {
+      setError('External source active করার আগে terms/licensing ও অনুমোদিত access method যাচাই করে Access verified নির্বাচন করুন।')
       setSaving(false)
       return
     }
@@ -256,7 +355,13 @@ export default function BrainSourcesAdminPage() {
       p_language_code: draft.language_code,
       p_trust_tier: Number(draft.trust_tier),
       p_status: draft.status,
-      p_metadata: null,
+      p_metadata: {
+        parser_key: draft.parser_key,
+        adapter_version: 1,
+        access_verified: draft.access_verified,
+        partner_api_authorized: draft.partner_api_authorized,
+        auto_publish: false,
+      },
     })
 
     if (saveError) {
@@ -308,7 +413,7 @@ export default function BrainSourcesAdminPage() {
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
               <p className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-[var(--fx-primary-strong)]">
-                <GlobeHemisphereWest size={15} /> Feni Brain · Roadmap 2C
+                <GlobeHemisphereWest size={15} /> Feni Brain · Roadmap 2C / 2D
               </p>
               <h1 className="mt-3 text-3xl font-black tracking-[-.05em] sm:text-5xl">Source registry</h1>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--fx-muted)]">
@@ -385,9 +490,28 @@ export default function BrainSourcesAdminPage() {
                   <option value={4}>4 · Unverified / discovery lead</option>
                 </select>
               </label>
+              <label className="text-xs font-bold">Ingestion adapter
+                <select value={draft.parser_key} onChange={(event) => setDraft((v) => ({ ...v, parser_key: event.target.value }))} className="mt-2 min-h-11 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 text-sm">
+                  {PARSER_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </label>
+              <div className="rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] p-3 sm:col-span-2">
+                <label className="flex cursor-pointer items-start gap-3 text-sm font-semibold">
+                  <input type="checkbox" checked={draft.access_verified} onChange={(event) => setDraft((v) => ({ ...v, access_verified: event.target.checked }))} className="mt-1 h-4 w-4 accent-[#008080]" />
+                  <span>Access verified <span className="block text-xs font-normal leading-5 text-[var(--fx-muted)]">এই source-এর public URL, terms/licensing এবং অনুমোদিত access method আমি যাচাই করেছি। এটি সক্রিয় করার সম্মতি ছাড়া শুধু verification flag হিসেবে সংরক্ষিত হয়।</span></span>
+                </label>
+                {draft.parser_key === 'smartfeni_partner_json' && (
+                  <label className="mt-4 flex cursor-pointer items-start gap-3 border-t border-[var(--fx-border)] pt-4 text-sm font-semibold">
+                    <input type="checkbox" checked={draft.partner_api_authorized} onChange={(event) => setDraft((v) => ({ ...v, partner_api_authorized: event.target.checked }))} className="mt-1 h-4 w-4 accent-[#008080]" />
+                    <span>Smart Feni source-owner authorization confirmed <span className="block text-xs font-normal leading-5 text-[var(--fx-muted)]">শুধু Smart Feni-এর অনুমোদিত API/JSON feed-এর জন্য চিহ্নিত করুন। Public HTML page crawl করা হবে না।</span></span>
+                  </label>
+                )}
+              </div>
             </div>
 
-            <p className="mt-4 text-xs leading-6 text-[var(--fx-muted)]">নতুন source-এর জন্য “Needs review” ডিফল্ট। “Active” করলে allowlisted HTTPS host থেকে scheduled fetch চালু হয়—তাই source-এর terms/licensing, access permission ও উপযুক্ত parser/adapter আগে যাচাই করুন। Social বা map source-এর জন্য authorized API/adapter না থাকলে active করবেন না। কোনো source-ই এই ফর্ম থেকে auto-publish চালু করতে পারবে না।</p>
+            <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/[.06] p-3 text-xs leading-6 text-[var(--fx-muted)]">
+              নতুন source-এর জন্য “Needs review” ডিফল্ট। Adapter-specific host/path যাচাই করা হয়; ভুল source type, অঅনুমোদিত endpoint বা verification ছাড়া third-party source active করা যাবে না। স্বাস্থ্য রেজিস্ট্রির adapter শুধু যে row-তে District = Feni তা রাখে এবং Feni row না পেলে ingestion ব্যর্থ করে। সব adapter output review queue-তে যায়—স্বয়ংক্রিয়ভাবে publish বা canonical business তৈরি হয় না।
+            </div>
             <div className="mt-5 flex flex-wrap gap-2">
               <button type="submit" disabled={saving} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#008080] px-4 text-sm font-bold text-white disabled:opacity-60">
                 {saving ? <ArrowClockwise size={16} className="animate-spin" /> : <CheckCircle size={16} />}
@@ -445,7 +569,9 @@ export default function BrainSourcesAdminPage() {
                         )}
                         <div className="mt-3 grid gap-x-4 gap-y-1 text-xs text-[var(--fx-muted)] sm:grid-cols-2">
                           <p>Refresh: <strong className="font-bold text-[var(--fx-text)]">{refresh?.enabled ? 'Enabled' : 'Disabled / not configured'}</strong>{refresh ? ' · ' + refresh.refresh_interval_hours + 'h' : ''}</p>
-                          <p>Parser: <strong className="font-bold text-[var(--fx-text)]">{refresh?.parser_key ?? 'native / none'}</strong></p>
+                          <p>Parser: <strong className="font-bold text-[var(--fx-text)]">{refresh?.parser_key ?? String(source.metadata?.parser_key ?? (source.source_type === 'internal' ? 'native / none' : 'not configured'))}</strong></p>
+                          <p>Access review: <strong className="font-bold text-[var(--fx-text)]">{source.metadata?.access_verified === true ? 'Verified by admin' : 'Not verified'}</strong></p>
+                          {source.metadata?.parser_key === 'smartfeni_partner_json' && <p>Partner authorization: <strong className="font-bold text-[var(--fx-text)]">{source.metadata?.partner_api_authorized === true ? 'Confirmed' : 'Not confirmed'}</strong></p>}
                           <p>Last checked: {safeDate(refresh?.last_checked_at)}</p>
                           <p>Last success: {safeDate(refresh?.last_success_at)}{refresh?.last_http_status ? ' · HTTP ' + refresh.last_http_status : ''}</p>
                           {refresh?.last_error && <p className="sm:col-span-2 text-red-700 dark:text-red-300">Last error: {refresh.last_error}</p>}
