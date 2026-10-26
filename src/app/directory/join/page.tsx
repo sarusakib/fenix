@@ -78,35 +78,40 @@ export default function DirectoryJoinPage() {
 
     setBusy(true)
 
-    const supabase = createClient()
-    const { data: auth } = await supabase.auth.getUser()
+    try {
+      const supabase = createClient()
+      const { data: auth, error: authError } = await supabase.auth.getUser()
+      if (authError) throw authError
 
-    if (!auth.user) {
+      if (!auth.user) {
+        setSignedIn(false)
+        setError('Please sign in before creating a business.')
+        return
+      }
+
+      const { data, error: insertError } = await supabase
+        .from('businesses')
+        .insert({
+          owner_id: auth.user.id,
+          name: safeName,
+          title_en: safeName,
+          category,
+          description: safeDescription || null,
+        })
+        .select('id')
+        .single()
+
+      if (insertError || !data) {
+        setError('Business could not be added right now. Please try again.')
+        return
+      }
+
+      router.push('/directory/manage?created=1')
+    } catch {
+      setError('Business could not be added because of a connection problem. Please try again.')
+    } finally {
       setBusy(false)
-      setSignedIn(false)
-      setError('Please sign in before creating a business.')
-      return
     }
-
-    const { data, error: insertError } = await supabase
-      .from('businesses')
-      .insert({
-        owner_id: auth.user.id,
-        name: safeName,
-        title_en: safeName,
-        category,
-        description: safeDescription || null,
-      })
-      .select('id')
-      .single()
-
-    if (insertError || !data) {
-      setError('Business could not be added right now. Please try again.')
-      setBusy(false)
-      return
-    }
-
-    router.push('/directory/manage?created=1')
   }
 
   return (
