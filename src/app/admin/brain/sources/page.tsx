@@ -335,7 +335,7 @@ export default function BrainSourcesAdminPage() {
           </div>
           <div className="mt-5 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/[.06] p-3 text-xs leading-6 text-[var(--fx-muted)]">
             <ShieldCheck size={17} className="mt-0.5 shrink-0 text-amber-600" />
-            <p>নতুন source স্বয়ংক্রিয়ভাবে publish হয় না। External refresh কেবল allowlisted HTTPS host-এ চলে; social URL আগে manually verify করতে হবে। FeniX-owned source native database থেকে আসে, HTML fetch থেকে নয়।</p>
+            <p>নতুন source স্বয়ংক্রিয়ভাবে publish হয় না। তৃতীয় পক্ষের source “Active” করার আগে public URL, terms/licensing ও অনুমোদিত access method যাচাই করতে হবে। Social ও map source-এর জন্য সঠিক official API/adapter না থাকলে “Needs review” রাখুন। FeniX-owned source native database থেকে আসে, HTML fetch থেকে নয়।</p>
           </div>
         </header>
 
@@ -387,7 +387,7 @@ export default function BrainSourcesAdminPage() {
               </label>
             </div>
 
-            <p className="mt-4 text-xs leading-6 text-[var(--fx-muted)]">“Active” করলে source refresh worker URL-এর host পরীক্ষা করবে। নতুন social/community URL-এর জন্য “Needs review” ব্যবহার করুন; অনুমোদিত access method ও সঠিক public page নিশ্চিত না হওয়া পর্যন্ত সেটি active করবেন না।</p>
+            <p className="mt-4 text-xs leading-6 text-[var(--fx-muted)]">নতুন source-এর জন্য “Needs review” ডিফল্ট। “Active” করলে allowlisted HTTPS host থেকে scheduled fetch চালু হয়—তাই source-এর terms/licensing, access permission ও উপযুক্ত parser/adapter আগে যাচাই করুন। Social বা map source-এর জন্য authorized API/adapter না থাকলে active করবেন না। কোনো source-ই এই ফর্ম থেকে auto-publish চালু করতে পারবে না।</p>
             <div className="mt-5 flex flex-wrap gap-2">
               <button type="submit" disabled={saving} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#008080] px-4 text-sm font-bold text-white disabled:opacity-60">
                 {saving ? <ArrowClockwise size={16} className="animate-spin" /> : <CheckCircle size={16} />}
