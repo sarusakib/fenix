@@ -490,9 +490,28 @@ export default function BrainSourcesAdminPage() {
                   <option value={4}>4 · Unverified / discovery lead</option>
                 </select>
               </label>
+              <label className="text-xs font-bold">Ingestion adapter
+                <select value={draft.parser_key} onChange={(event) => setDraft((v) => ({ ...v, parser_key: event.target.value }))} className="mt-2 min-h-11 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] px-3 text-sm">
+                  {PARSER_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </label>
+              <div className="rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] p-3 sm:col-span-2">
+                <label className="flex cursor-pointer items-start gap-3 text-sm font-semibold">
+                  <input type="checkbox" checked={draft.access_verified} onChange={(event) => setDraft((v) => ({ ...v, access_verified: event.target.checked }))} className="mt-1 h-4 w-4 accent-[#008080]" />
+                  <span>Access verified <span className="block text-xs font-normal leading-5 text-[var(--fx-muted)]">এই source-এর public URL, terms/licensing এবং অনুমোদিত access method আমি যাচাই করেছি। এটি সক্রিয় করার সম্মতি ছাড়া শুধু verification flag হিসেবে সংরক্ষিত হয়।</span></span>
+                </label>
+                {draft.parser_key === 'smartfeni_partner_json' && (
+                  <label className="mt-4 flex cursor-pointer items-start gap-3 border-t border-[var(--fx-border)] pt-4 text-sm font-semibold">
+                    <input type="checkbox" checked={draft.partner_api_authorized} onChange={(event) => setDraft((v) => ({ ...v, partner_api_authorized: event.target.checked }))} className="mt-1 h-4 w-4 accent-[#008080]" />
+                    <span>Smart Feni source-owner authorization confirmed <span className="block text-xs font-normal leading-5 text-[var(--fx-muted)]">শুধু Smart Feni-এর অনুমোদিত API/JSON feed-এর জন্য চিহ্নিত করুন। Public HTML page crawl করা হবে না।</span></span>
+                  </label>
+                )}
+              </div>
             </div>
 
-            <p className="mt-4 text-xs leading-6 text-[var(--fx-muted)]">নতুন source-এর জন্য “Needs review” ডিফল্ট। “Active” করলে allowlisted HTTPS host থেকে scheduled fetch চালু হয়—তাই source-এর terms/licensing, access permission ও উপযুক্ত parser/adapter আগে যাচাই করুন। Social বা map source-এর জন্য authorized API/adapter না থাকলে active করবেন না। কোনো source-ই এই ফর্ম থেকে auto-publish চালু করতে পারবে না।</p>
+            <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/[.06] p-3 text-xs leading-6 text-[var(--fx-muted)]">
+              নতুন source-এর জন্য “Needs review” ডিফল্ট। Adapter-specific host/path যাচাই করা হয়; ভুল source type, অঅনুমোদিত endpoint বা verification ছাড়া third-party source active করা যাবে না। স্বাস্থ্য রেজিস্ট্রির adapter শুধু যে row-তে District = Feni তা রাখে এবং Feni row না পেলে ingestion ব্যর্থ করে। সব adapter output review queue-তে যায়—স্বয়ংক্রিয়ভাবে publish বা canonical business তৈরি হয় না।
+            </div>
             <div className="mt-5 flex flex-wrap gap-2">
               <button type="submit" disabled={saving} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#008080] px-4 text-sm font-bold text-white disabled:opacity-60">
                 {saving ? <ArrowClockwise size={16} className="animate-spin" /> : <CheckCircle size={16} />}
