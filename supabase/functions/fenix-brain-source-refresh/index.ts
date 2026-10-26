@@ -5,10 +5,20 @@ import { buildPublishedContent, extractPublishedAt, fetchArticleText, summarizeN
 const MAX_EMBEDDING_BACKFILL = 12;
 
 const ALLOWED_HOSTS = new Set([
+  // Government and local-authority sources.
   "bangladesh.gov.bd","feni.gov.bd","bbs.feni.gov.bd","sadar.feni.gov.bd",
   "chhagalnaiya.feni.gov.bd","daganbhuiyan.feni.gov.bd","fulgazi.feni.gov.bd",
   "parshuram.feni.gov.bd","sonagazi.feni.gov.bd","lged.sadar.feni.gov.bd",
-  "zpfeni.gov.bd","feni.judiciary.gov.bd",
+  "zpfeni.gov.bd","www.zpfeni.gov.bd","feni.judiciary.gov.bd","pourashava.feni.gov.bd",
+  "hris.mohfw.gov.bd",
+  // Public local platforms, maps and secondary directories. Discovered content
+  // remains subject to review; host allowlisting does not enable auto-publishing.
+  "smartfeni.com","www.smartfeni.com","bizhubfeni.com","www.bizhubfeni.com",
+  "myfeni.com","www.myfeni.com","openstreetmap.org","www.openstreetmap.org",
+  "biz4bd.com","www.biz4bd.com","fbcci.org","www.fbcci.org",
+  "marketbangladesh.com","www.marketbangladesh.com",
+  "bdbusinessdirectory.com","www.bdbusinessdirectory.com",
+  // News publishers supported by the local-news parser.
   "www.ntvbd.com","publisher.ntvbd.com","www.prothomalo.com",
   "www.ajkerpatrika.com","fenirshomoy.com","www.fenirshomoy.com",
   "feninewsbd.com","www.feninewsbd.com",
