@@ -45,10 +45,19 @@ export default function DirectoryJoinPage() {
     let active = true
 
     async function checkAuth() {
-      const { data } = await createClient().auth.getUser()
-      if (!active) return
-      setSignedIn(Boolean(data.user))
-      setAuthChecked(true)
+      try {
+        const { data, error: authError } = await createClient().auth.getUser()
+        if (authError) throw authError
+        if (!active) return
+        setSignedIn(Boolean(data.user))
+      } catch {
+        if (active) {
+          setSignedIn(false)
+          setError('Could not confirm your sign-in status. Please reload and try again.')
+        }
+      } finally {
+        if (active) setAuthChecked(true)
+      }
     }
 
     void checkAuth()
