@@ -6,10 +6,13 @@ import { useParams } from 'next/navigation'
 import {
   ArrowLeft,
   ArrowUpRight,
+  Clock,
+  ImageSquare,
   MapPin,
   Plus,
   ShieldCheck,
   Trash,
+  UploadSimple,
   Storefront,
 } from '@phosphor-icons/react'
 import Navbar from '@/components/Navbar'
@@ -23,6 +26,41 @@ import {
   FenixTextarea,
 } from '@/components/forms/FenixForm'
 import { createClient } from '@/utils/supabase/client'
+import {
+  HARD_IMAGE_UPLOAD_BYTES,
+  optimizeImageFile,
+  removePublicImage,
+  uploadOptimizedPublicImage,
+} from '@/lib/media/image-upload'
+import { getDirectoryImageUrl } from '@/lib/directory'
+
+const DIRECTORY_MEDIA_BUCKET = 'business-directory-media'
+
+type BusinessHoursFormRow = {
+  day_of_week: number
+  opens_at: string
+  closes_at: string
+  is_closed: boolean
+}
+
+const WEEKDAYS = [
+  { day: 0, en: 'Sunday', bn: 'রবিবার' },
+  { day: 1, en: 'Monday', bn: 'সোমবার' },
+  { day: 2, en: 'Tuesday', bn: 'মঙ্গলবার' },
+  { day: 3, en: 'Wednesday', bn: 'বুধবার' },
+  { day: 4, en: 'Thursday', bn: 'বৃহস্পতিবার' },
+  { day: 5, en: 'Friday', bn: 'শুক্রবার' },
+  { day: 6, en: 'Saturday', bn: 'শনিবার' },
+] as const
+
+function defaultHours(): BusinessHoursFormRow[] {
+  return WEEKDAYS.map((day) => ({
+    day_of_week: day.day,
+    opens_at: '',
+    closes_at: '',
+    is_closed: false,
+  }))
+}
 
 const CATEGORIES = [
   'Retail',
@@ -65,6 +103,8 @@ type ProfileRow = {
   about_bn: string | null
   about_en: string | null
   business_type: string | null
+  logo_path?: string | null
+  cover_path?: string | null
   verification_level: string
   listing_status: string
   owner_claimed: boolean
@@ -167,6 +207,13 @@ export default function DirectoryBusinessEditorPage() {
   const [aliasDraft, setAliasDraft] = useState('')
   const [aliasLanguage, setAliasLanguage] = useState<'bn' | 'en' | 'banglish' | 'local'>('bn')
   const [aliasBusyId, setAliasBusyId] = useState<string | null>(null)
+  const [logoPath, setLogoPath] = useState('')
+  const [coverPath, setCoverPath] = useState('')
+  const [mediaBusy, setMediaBusy] = useState<'logo' | 'cover' | null>(null)
+  const [mediaFeedback, setMediaFeedback] = useState<Feedback | null>(null)
+  const [hours, setHours] = useState<BusinessHoursFormRow[]>(defaultHours)
+  const [hoursSaving, setHoursSaving] = useState(false)
+  const [hoursFeedback, setHoursFeedback] = useState<Feedback | null>(null)
 
   const [name, setName] = useState('')
   const [titleBn, setTitleBn] = useState('')
@@ -273,7 +320,51 @@ export default function DirectoryBusinessEditorPage() {
         const loadedContact = contactResult.data as ContactRow | null
 
         setBusiness(businessData as BusinessRow)
-        setProfile(loadedProfile)
+        let savedLogoPath = loadedProfile?.logo_path ?? null
+        let savedCoverPath = loadedProfile?.cover_path ?? null
+        if (loadedProfile) {
+          try {
+            const { data: mediaData, error: mediaError } = await supabase
+              .from('business_directory_profiles')
+              .select('logo_path,cover_path')
+              .eq('business_id', businessId)
+              .maybeSingle()
+            if (!mediaError) {
+              savedLogoPath = mediaData?.logo_path ?? null
+              savedCoverPath = mediaData?.cover_path ?? null
+            }
+          } catch {
+            // Optional media must not block core business editing.
+          }
+        }
+
+        let loadedHours = defaultHours()
+        try {
+          const { data: hourData, error: hourError } = await supabase
+            .from('business_directory_hours')
+            .select('day_of_week,opens_at,closes_at,is_closed')
+            .eq('business_id', businessId)
+            .order('day_of_week', { ascending: true })
+          if (!hourError && hourData) {
+            const byDay = new Map(hourData.map((row) => [row.day_of_week, row]))
+            loadedHours = WEEKDAYS.map((day) => {
+              const row = byDay.get(day.day)
+              return {
+                day_of_week: day.day,
+                opens_at: row?.opens_at?.slice(0, 5) ?? '',
+                closes_at: row?.closes_at?.slice(0, 5) ?? '',
+                is_closed: row?.is_closed ?? false,
+              }
+            })
+          }
+        } catch {
+          // The hours table may not be deployed yet.
+        }
+
+        setProfile(loadedProfile ? { ...loadedProfile, logo_path: savedLogoPath, cover_path: savedCoverPath } : null)
+        setLogoPath(savedLogoPath ?? '')
+        setCoverPath(savedCoverPath ?? '')
+        setHours(loadedHours)
         setLocationExists(Boolean(loadedLocation))
         setContactsExist(Boolean(loadedContact))
 
@@ -581,6 +672,161 @@ export default function DirectoryBusinessEditorPage() {
     }
   }
 
+  async function uploadBusinessImage(kind: 'logo' | 'cover', file: File) {
+    if (!business || !ownerId || mediaBusy) return
+    setMediaBusy(kind)
+    setMediaFeedback(null)
+    const previousPath = kind === 'logo' ? logoPath : coverPath
+    let uploadedPath: string | null = null
+
+    try {
+      if (!file.type.startsWith('image/') || file.size > 20 * 1024 * 1024) {
+        throw new Error('Choose an image smaller than 20 MB.')
+      }
+      const supabase = createClient()
+      const optimized = await optimizeImageFile(file, {
+        maxDimension: kind === 'logo' ? 1000 : 1800,
+        targetBytes: kind === 'logo' ? 220 * 1024 : 320 * 1024,
+        hardLimitBytes: HARD_IMAGE_UPLOAD_BYTES,
+      })
+      const extension = optimized.mimeType === 'image/webp' ? 'webp' : 'jpg'
+      const path = ownerId + '/' + business.id + '/' + kind + '-' + crypto.randomUUID() + '.' + extension
+      const uploaded = await uploadOptimizedPublicImage(
+        supabase, DIRECTORY_MEDIA_BUCKET, path, optimized, HARD_IMAGE_UPLOAD_BYTES,
+      )
+      uploadedPath = uploaded.path
+      const mediaFields = kind === 'logo'
+        ? { logo_path: uploaded.path }
+        : { cover_path: uploaded.path }
+
+      let savedProfile: ProfileRow | null = null
+      if (profile) {
+        const { data, error: saveError } = await supabase
+          .from('business_directory_profiles')
+          .update(mediaFields)
+          .eq('business_id', business.id)
+          .select('business_id,slug,tagline_bn,tagline_en,about_bn,about_en,business_type,logo_path,cover_path,verification_level,listing_status,owner_claimed,phone_verified,location_verified')
+          .maybeSingle()
+        if (saveError) throw saveError
+        if (!data) throw new Error('Business profile update was not confirmed.')
+        savedProfile = data as ProfileRow
+      } else {
+        const { data, error: saveError } = await supabase
+          .from('business_directory_profiles')
+          .insert({ business_id: business.id, ...mediaFields })
+          .select('business_id,slug,tagline_bn,tagline_en,about_bn,about_en,business_type,logo_path,cover_path,verification_level,listing_status,owner_claimed,phone_verified,location_verified')
+          .single()
+        if (saveError) throw saveError
+        savedProfile = data as ProfileRow
+      }
+
+      if (!savedProfile) throw new Error('Business profile save was not confirmed.')
+      setProfile(savedProfile)
+      if (kind === 'logo') setLogoPath(uploaded.path)
+      else setCoverPath(uploaded.path)
+      uploadedPath = null
+
+      if (previousPath && previousPath !== uploaded.path) {
+        try { await removePublicImage(supabase, DIRECTORY_MEDIA_BUCKET, previousPath) } catch {
+          // New reference is committed; cleanup failure should not roll back it.
+        }
+      }
+      setMediaFeedback({
+        kind: 'success',
+        text: bn ? (kind === 'logo' ? 'ব্যবসার লোগো সংরক্ষণ হয়েছে।' : 'কভার ছবি সংরক্ষণ হয়েছে।') : (kind === 'logo' ? 'Business logo saved.' : 'Cover image saved.'),
+      })
+    } catch {
+      if (uploadedPath) {
+        try { await removePublicImage(createClient(), DIRECTORY_MEDIA_BUCKET, uploadedPath) } catch {
+          // Best-effort cleanup after a failed database write.
+        }
+      }
+      setMediaFeedback({
+        kind: 'error',
+        text: bn ? 'ছবি আপলোড বা সংরক্ষণ করা যায়নি। JPEG/PNG/WebP দিয়ে আবার চেষ্টা করুন।' : 'The image could not be uploaded or saved. Try a JPEG, PNG or WebP image.',
+      })
+    } finally {
+      setMediaBusy(null)
+    }
+  }
+
+  async function removeBusinessImage(kind: 'logo' | 'cover') {
+    if (!business || !profile || mediaBusy) return
+    const oldPath = kind === 'logo' ? logoPath : coverPath
+    if (!oldPath) return
+    setMediaBusy(kind)
+    setMediaFeedback(null)
+
+    try {
+      const supabase = createClient()
+      const fields = kind === 'logo' ? { logo_path: null } : { cover_path: null }
+      const { data, error: updateError } = await supabase
+        .from('business_directory_profiles')
+        .update(fields)
+        .eq('business_id', business.id)
+        .select('business_id,slug,tagline_bn,tagline_en,about_bn,about_en,business_type,logo_path,cover_path,verification_level,listing_status,owner_claimed,phone_verified,location_verified')
+        .maybeSingle()
+      if (updateError) throw updateError
+      if (!data) throw new Error('Image removal was not confirmed.')
+
+      setProfile(data as ProfileRow)
+      if (kind === 'logo') setLogoPath('')
+      else setCoverPath('')
+      try { await removePublicImage(supabase, DIRECTORY_MEDIA_BUCKET, oldPath) } catch {
+        // The profile no longer points at the old object.
+      }
+      setMediaFeedback({ kind: 'success', text: bn ? 'ছবি সরানো হয়েছে।' : 'Image removed.' })
+    } catch {
+      setMediaFeedback({ kind: 'error', text: bn ? 'ছবি সরানো যায়নি। আবার চেষ্টা করুন।' : 'Image could not be removed. Please try again.' })
+    } finally {
+      setMediaBusy(null)
+    }
+  }
+
+  async function saveHours() {
+    if (!business || !ownerId || hoursSaving) return
+    setHoursFeedback(null)
+    if (hours.some((row) => !row.is_closed && Boolean(row.opens_at) !== Boolean(row.closes_at))) {
+      setHoursFeedback({
+        kind: 'error',
+        text: bn ? 'প্রতিদিনের খোলার ও বন্ধের সময় দুটিই দিন, অথবা দুটিই ফাঁকা রাখুন।' : 'For each day, set both opening and closing times or leave both empty.',
+      })
+      return
+    }
+
+    setHoursSaving(true)
+    try {
+      const supabase = createClient()
+      if (!profile) {
+        const { data, error: profileError } = await supabase
+          .from('business_directory_profiles')
+          .insert({ business_id: business.id })
+          .select('business_id,slug,tagline_bn,tagline_en,about_bn,about_en,business_type,logo_path,cover_path,verification_level,listing_status,owner_claimed,phone_verified,location_verified')
+          .single()
+        if (profileError) throw profileError
+        setProfile(data as ProfileRow)
+      }
+
+      const rows = hours.map((row) => ({
+        business_id: business.id,
+        day_of_week: row.day_of_week,
+        opens_at: row.is_closed ? null : row.opens_at || null,
+        closes_at: row.is_closed ? null : row.closes_at || null,
+        is_closed: row.is_closed,
+      }))
+      const { error: saveError } = await supabase
+        .from('business_directory_hours')
+        .upsert(rows, { onConflict: 'business_id,day_of_week' })
+      if (saveError) throw saveError
+
+      setHoursFeedback({ kind: 'success', text: bn ? 'সাপ্তাহিক সময়সূচি সংরক্ষণ হয়েছে।' : 'Weekly opening hours saved.' })
+    } catch {
+      setHoursFeedback({ kind: 'error', text: bn ? 'সময়সূচি সংরক্ষণ করা যায়নি। ডাটাবেস migration সক্রিয় আছে কি না পরীক্ষা করুন।' : 'Hours could not be saved. Confirm the database migration is active and try again.' })
+    } finally {
+      setHoursSaving(false)
+    }
+  }
+
   async function addAlias(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!business || !ownerId || saving || aliasBusyId) return
@@ -780,7 +1026,36 @@ export default function DirectoryBusinessEditorPage() {
             </section>
 
             <section className="mt-6 rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-6 sm:p-8">
-              <h2 className="text-xl font-black">{bn ? '৩. অবস্থান ও মানচিত্র' : '3. Location and map'}</h2>
+              <h2 className="text-xl font-black">{bn ? '৩. ব্যবসার ছবি' : '3. Business images'}</h2>
+              <p className="mt-1 text-sm leading-6 text-[var(--fx-muted)]">{bn ? 'লোগো ও কভার ছবি প্রকাশ্য ব্যবসার পরিচিতি উন্নত করে। আপলোডের আগে ছবি অপ্টিমাইজ হয়; প্রতিটি ছবির সর্বোচ্চ আকার ৪০০ KB।' : 'A logo and cover image make the public business profile easier to recognize. Images are optimized before upload; maximum stored size is 400 KB each.'}</p>
+              <div className="mt-5 grid gap-5 md:grid-cols-2">
+                <div className="rounded-2xl border border-[var(--fx-border)] p-4">
+                  <div className="flex items-center gap-2"><ImageSquare size={18}/><h3 className="font-bold">{bn ? 'ব্যবসার লোগো' : 'Business logo'}</h3></div>
+                  {logoPath ? <img src={getDirectoryImageUrl(logoPath) || ''} alt={bn ? 'ব্যবসার লোগো' : 'Business logo'} width={320} height={220} className="mt-4 h-40 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] object-contain" /> : <div className="mt-4 grid h-40 place-items-center rounded-xl bg-[var(--fx-bg)] text-[var(--fx-muted)]"><Storefront size={36}/></div>}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl bg-[#008080] px-3 text-xs font-bold text-white">
+                      <UploadSimple size={15}/>{mediaBusy === 'logo' ? (bn ? 'আপলোড হচ্ছে…' : 'Uploading…') : (bn ? 'লোগো আপলোড' : 'Upload logo')}
+                      <input type="file" accept="image/jpeg,image/png,image/webp" disabled={Boolean(mediaBusy)} className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadBusinessImage('logo', file); event.currentTarget.value = '' }} />
+                    </label>
+                    {logoPath && <button type="button" disabled={Boolean(mediaBusy)} onClick={() => void removeBusinessImage('logo')} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-red-500/20 px-3 text-xs font-bold text-red-700 disabled:opacity-50 dark:text-red-200"><Trash size={14}/>{bn ? 'লোগো সরান' : 'Remove logo'}</button>}
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-[var(--fx-border)] p-4">
+                  <div className="flex items-center gap-2"><ImageSquare size={18}/><h3 className="font-bold">{bn ? 'কভার ছবি' : 'Cover image'}</h3></div>
+                  {coverPath ? <img src={getDirectoryImageUrl(coverPath) || ''} alt={bn ? 'ব্যবসার কভার ছবি' : 'Business cover image'} width={640} height={220} className="mt-4 h-40 w-full rounded-xl border border-[var(--fx-border)] bg-[var(--fx-bg)] object-cover" /> : <div className="mt-4 grid h-40 place-items-center rounded-xl bg-[var(--fx-bg)] text-[var(--fx-muted)]"><ImageSquare size={36}/></div>}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl bg-[#008080] px-3 text-xs font-bold text-white">
+                      <UploadSimple size={15}/>{mediaBusy === 'cover' ? (bn ? 'আপলোড হচ্ছে…' : 'Uploading…') : (bn ? 'কভার আপলোড' : 'Upload cover')}
+                      <input type="file" accept="image/jpeg,image/png,image/webp" disabled={Boolean(mediaBusy)} className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadBusinessImage('cover', file); event.currentTarget.value = '' }} />
+                    </label>
+                    {coverPath && <button type="button" disabled={Boolean(mediaBusy)} onClick={() => void removeBusinessImage('cover')} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-red-500/20 px-3 text-xs font-bold text-red-700 disabled:opacity-50 dark:text-red-200"><Trash size={14}/>{bn ? 'কভার সরান' : 'Remove cover'}</button>}
+                  </div>
+                </div>
+              </div>
+              {mediaFeedback && <div className="mt-4"><FenixFormMessage tone={mediaFeedback.kind}>{mediaFeedback.text}</FenixFormMessage></div>}
+            </section>
+            <section className="mt-6 rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-6 sm:p-8">
+              <h2 className="text-xl font-black">{bn ? '৪. অবস্থান ও মানচিত্র' : '4. Location and map'}</h2>
               <p className="mt-1 text-sm text-[var(--fx-muted)]">{bn ? 'প্রকাশযোগ্য অবস্থান দিন। ঠিকানা থেকে স্থানাঙ্ক অনুমান করা হয় না।' : 'Provide a publishable location. Coordinates are never guessed from an address.'}</p>
               <form onSubmit={saveLocation} className="mt-6 space-y-5">
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -829,7 +1104,37 @@ export default function DirectoryBusinessEditorPage() {
             </section>
 
             <section className="mt-6 rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-6 sm:p-8">
-              <h2 className="text-xl font-black">{bn ? '৪. যোগাযোগের তথ্য' : '4. Public contact details'}</h2>
+              <div className="flex items-center gap-2"><Clock size={20}/><h2 className="text-xl font-black">{bn ? 'সাপ্তাহিক খোলার সময়' : 'Weekly opening hours'}</h2></div>
+              <p className="mt-1 text-sm leading-6 text-[var(--fx-muted)]">{bn ? 'সময় জানা না থাকলে খোলার ও বন্ধের সময় ফাঁকা রাখুন। বন্ধ থাকলে “বন্ধ” চিহ্ন দিন। রাত পেরিয়ে খোলা থাকলেও সময় দেওয়া যাবে।' : 'Leave both times blank if the schedule is unknown. Mark a day closed when appropriate. Overnight hours are supported.'}</p>
+              <div className="mt-5 space-y-3">
+                {WEEKDAYS.map((day) => {
+                  const row = hours.find((item) => item.day_of_week === day.day) ?? { day_of_week: day.day, opens_at: '', closes_at: '', is_closed: false }
+                  return (
+                    <div key={day.day} className="grid gap-3 rounded-xl border border-[var(--fx-border)] p-3 sm:grid-cols-[140px_1fr_1fr_auto] sm:items-center">
+                      <strong className="text-sm">{bn ? day.bn : day.en}</strong>
+                      <label className="text-xs text-[var(--fx-muted)]">{bn ? 'খোলার সময়' : 'Opens'}
+                        <input aria-label={(bn ? day.bn : day.en) + ' opening time'} type="time" disabled={row.is_closed || hoursSaving} value={row.opens_at} onChange={(event) => setHours((current) => current.map((item) => item.day_of_week === day.day ? { ...item, opens_at: event.target.value } : item))} className="mt-1 block min-h-10 w-full rounded-lg border border-[var(--fx-border)] bg-transparent px-2 text-sm disabled:opacity-45"/>
+                      </label>
+                      <label className="text-xs text-[var(--fx-muted)]">{bn ? 'বন্ধের সময়' : 'Closes'}
+                        <input aria-label={(bn ? day.bn : day.en) + ' closing time'} type="time" disabled={row.is_closed || hoursSaving} value={row.closes_at} onChange={(event) => setHours((current) => current.map((item) => item.day_of_week === day.day ? { ...item, closes_at: event.target.value } : item))} className="mt-1 block min-h-10 w-full rounded-lg border border-[var(--fx-border)] bg-transparent px-2 text-sm disabled:opacity-45"/>
+                      </label>
+                      <label className="inline-flex items-center gap-2 text-xs font-semibold">
+                        <input type="checkbox" checked={row.is_closed} disabled={hoursSaving} onChange={(event) => setHours((current) => current.map((item) => item.day_of_week === day.day ? { ...item, is_closed: event.target.checked, opens_at: event.target.checked ? '' : item.opens_at, closes_at: event.target.checked ? '' : item.closes_at } : item))} className="h-4 w-4 accent-[#008080]"/>
+                        {bn ? 'বন্ধ' : 'Closed'}
+                      </label>
+                    </div>
+                  )
+                })}
+              </div>
+              {hoursFeedback && <div className="mt-4"><FenixFormMessage tone={hoursFeedback.kind}>{hoursFeedback.text}</FenixFormMessage></div>}
+              <div className="mt-5">
+                <button type="button" disabled={hoursSaving} onClick={() => void saveHours()} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#008080] px-4 text-sm font-bold text-white disabled:opacity-50">
+                  {hoursSaving ? (bn ? 'সংরক্ষণ হচ্ছে…' : 'Saving…') : (bn ? 'সময়সূচি সংরক্ষণ করুন' : 'Save opening hours')}
+                </button>
+              </div>
+            </section>
+            <section className="mt-6 rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-6 sm:p-8">
+              <h2 className="text-xl font-black">{bn ? '৫. যোগাযোগের তথ্য' : '5. Public contact details'}</h2>
               <p className="mt-1 text-sm text-[var(--fx-muted)]">{bn ? 'প্রতিটি ফোন/লিংক পাবলিক করার আগে সেটিংস যাচাই করুন।' : 'Review visibility before publishing phone numbers and links.'}</p>
               <form onSubmit={saveContacts} className="mt-6 space-y-5">
                 <FenixField label={bn ? 'ফোন নম্বর' : 'Phone number'} htmlFor="business-phone">
@@ -867,7 +1172,7 @@ export default function DirectoryBusinessEditorPage() {
             </section>
 
             <section className="mt-6 rounded-[2rem] border border-[var(--fx-border)] bg-[var(--fx-surface-strong)] p-6 sm:p-8">
-              <h2 className="text-xl font-black">{bn ? '৫. সার্চের বিকল্প নাম' : '5. Alternate search names'}</h2>
+              <h2 className="text-xl font-black">{bn ? '৬. সার্চের বিকল্প নাম' : '6. Alternate search names'}</h2>
               <p className="mt-1 text-sm text-[var(--fx-muted)]">{bn ? 'বাংলা, ইংরেজি ও Banglish বানান যোগ করুন যাতে মানুষ সহজে খুঁজে পায়।' : 'Add Bangla, English and Banglish spellings to help people find this business.'}</p>
               <form onSubmit={addAlias} className="mt-5 grid gap-3 sm:grid-cols-[1fr_180px_auto] sm:items-end">
                 <FenixField label={bn ? 'বিকল্প নাম' : 'Alternate name'} htmlFor="business-alias" required>
