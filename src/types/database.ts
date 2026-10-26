@@ -6217,6 +6217,20 @@ export type Database = {
         }
         Returns: string
       }
+      fenix_brain_admin_upsert_source: {
+        Args: {
+          p_id: string | null
+          p_language_code: string
+          p_metadata?: Json | null
+          p_publisher: string
+          p_source_type: string
+          p_status: string
+          p_title: string
+          p_trust_tier: number
+          p_url: string | null
+        }
+        Returns: string
+      }
       fenix_brain_internal_refresh_secret: { Args: never; Returns: string }
       generate_commerce_order_number: { Args: never; Returns: string }
       get_public_vendor_shop: {
