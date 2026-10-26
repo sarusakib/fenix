@@ -109,7 +109,181 @@ insert into public.fenix_brain_source_refresh (
 select
   s.id,
   true,
-  greatest(1, least(coalesce((s.metadata->>'refresh_interval_hours')::integer, 24), 720)),
+  greatest(1, least(case
+    when coalesce(s.metadata->>'refresh_interval_hours', '') ~ '^[0-9]{1,3}
+  now(),
+  case
+    when s.metadata->>'parser_key' in ('generic_html','notice_html','news_html')
+      then s.metadata->>'parser_key'
+    when s.source_type = 'government_official' then 'notice_html'
+    else 'generic_html'
+  end,
+  false
+from public.fenix_brain_sources s
+where s.status = 'active'
+  and s.source_type <> 'internal'
+  and s.url like 'https://%'
+on conflict (source_id) do nothing;
+
+-- The only browser-write path for the source registry. New/changed sources never
+-- auto-publish; status changes only enable refresh for hosts explicitly allowlisted
+-- by the refresh Edge Function. Social URLs may be staged as needs_review.
+create or replace function public.fenix_brain_admin_upsert_source(
+  p_id uuid,
+  p_source_type text,
+  p_publisher text,
+  p_title text,
+  p_url text,
+  p_language_code text,
+  p_trust_tier smallint,
+  p_status text,
+  p_metadata jsonb default null
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_id uuid;
+  v_url text := nullif(trim(p_url), '');
+  v_host text;
+  v_refresh_enabled boolean := false;
+  v_parser_key text := 'generic_html';
+  v_interval integer := 24;
+begin
+  if not coalesce((select public.is_fenix_admin()), false) then
+    raise exception 'admin_required' using errcode = '42501';
+  end if;
+
+  if p_source_type is null or p_source_type not in (
+    'government_official','official_document','verified_business',
+    'public_web','community','social','internal'
+  ) then
+    raise exception 'invalid_source_type' using errcode = '22023';
+  end if;
+
+  if coalesce(length(trim(p_publisher)), 0) not between 2 and 200
+     or coalesce(length(trim(p_title)), 0) not between 2 and 300 then
+    raise exception 'publisher_or_title_length_invalid' using errcode = '22023';
+  end if;
+
+  if p_status is null or p_status not in ('active','needs_review','archived') then
+    raise exception 'invalid_source_status' using errcode = '22023';
+  end if;
+
+  if p_language_code is null or p_language_code not in ('bn','en','mixed','unknown') then
+    raise exception 'invalid_language_code' using errcode = '22023';
+  end if;
+
+  if p_trust_tier is null or p_trust_tier not between 1 and 4 then
+    raise exception 'invalid_trust_tier' using errcode = '22023';
+  end if;
+
+  if v_url is not null then
+    if v_url !~* '^https://[^/@[:space:]?#]+(:[0-9]+)?(/|[?#]|$)'
+       or v_url ~* '^https://[^/]*@' then
+      raise exception 'source_url_must_be_https_without_credentials' using errcode = '22023';
+    end if;
+    v_host := lower(substring(v_url from '^https://([^/:?#]+)'));
+  end if;
+
+  if p_source_type = 'internal' and v_url is not null then
+    raise exception 'internal_source_must_use_native_data' using errcode = '22023';
+  end if;
+
+  if v_url is not null and exists (
+    select 1 from public.fenix_brain_sources x
+    where x.url = v_url and (p_id is null or x.id <> p_id)
+  ) then
+    raise exception 'source_url_already_registered' using errcode = '23505';
+  end if;
+
+  if p_status = 'active' and p_source_type <> 'internal' then
+    if v_url is null or v_host not in (
+      'bangladesh.gov.bd','feni.gov.bd','bbs.feni.gov.bd','sadar.feni.gov.bd',
+      'chhagalnaiya.feni.gov.bd','daganbhuiyan.feni.gov.bd','fulgazi.feni.gov.bd',
+      'parshuram.feni.gov.bd','sonagazi.feni.gov.bd','lged.sadar.feni.gov.bd',
+      'zpfeni.gov.bd','www.zpfeni.gov.bd','feni.judiciary.gov.bd','pourashava.feni.gov.bd',
+      'www.ntvbd.com','publisher.ntvbd.com','www.prothomalo.com','www.ajkerpatrika.com',
+      'fenirshomoy.com','www.fenirshomoy.com','feninewsbd.com','www.feninewsbd.com',
+      'hris.mohfw.gov.bd','smartfeni.com','www.smartfeni.com',
+      'bizhubfeni.com','www.bizhubfeni.com','myfeni.com','www.myfeni.com',
+      'openstreetmap.org','www.openstreetmap.org','biz4bd.com','www.biz4bd.com',
+      'fbcci.org','www.fbcci.org','marketbangladesh.com','www.marketbangladesh.com',
+      'bdbusinessdirectory.com','www.bdbusinessdirectory.com'
+    ) then
+      raise exception 'active_source_host_not_allowlisted' using errcode = '22023';
+    end if;
+    v_refresh_enabled := true;
+  end if;
+
+  if v_host in ('fenirshomoy.com','www.fenirshomoy.com','feninewsbd.com','www.feninewsbd.com') then
+    v_parser_key := 'news_html';
+    v_interval := 24;
+  elsif p_source_type = 'government_official' then
+    v_parser_key := 'notice_html';
+    v_interval := 24;
+  else
+    v_parser_key := 'generic_html';
+    v_interval := 168;
+  end if;
+
+  if p_id is null then
+    insert into public.fenix_brain_sources (
+      source_type, publisher, title, url, language_code, trust_tier, status, metadata,
+      created_at, updated_at
+    ) values (
+      p_source_type, trim(p_publisher), trim(p_title), v_url, p_language_code,
+      p_trust_tier, p_status, coalesce(p_metadata, '{}'::jsonb), now(), now()
+    )
+    returning id into v_id;
+  else
+    update public.fenix_brain_sources
+    set source_type = p_source_type,
+        publisher = trim(p_publisher),
+        title = trim(p_title),
+        url = v_url,
+        language_code = p_language_code,
+        trust_tier = p_trust_tier,
+        status = p_status,
+        metadata = coalesce(p_metadata, metadata),
+        updated_at = now()
+    where id = p_id
+    returning id into v_id;
+
+    if v_id is null then
+      raise exception 'source_not_found' using errcode = 'P0002';
+    end if;
+  end if;
+
+  insert into public.fenix_brain_source_refresh (
+    source_id, enabled, refresh_interval_hours, next_refresh_at, parser_key, auto_publish
+  ) values (
+    v_id, v_refresh_enabled, v_interval, now(), v_parser_key, false
+  )
+  on conflict (source_id) do update
+  set enabled = excluded.enabled,
+      parser_key = excluded.parser_key,
+      auto_publish = false,
+      updated_at = now();
+
+  return v_id;
+end;
+$$;
+
+revoke all on function public.fenix_brain_admin_upsert_source(
+  uuid,text,text,text,text,text,smallint,text,jsonb
+) from public, anon, authenticated;
+grant execute on function public.fenix_brain_admin_upsert_source(
+  uuid,text,text,text,text,text,smallint,text,jsonb
+) to authenticated;
+
+commit;
+
+      then (s.metadata->>'refresh_interval_hours')::integer
+    else 24
+  end, 720)),
   now(),
   case
     when s.metadata->>'parser_key' in ('generic_html','notice_html','news_html')
