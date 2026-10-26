@@ -143,8 +143,8 @@ create or replace function public.fenix_brain_admin_upsert_source(
 returns uuid
 language plpgsql
 security definer
-set search_path = public
-as $$
+set search_path = ''
+as $
 declare
   v_id uuid;
   v_url text := nullif(trim(p_url), '');
