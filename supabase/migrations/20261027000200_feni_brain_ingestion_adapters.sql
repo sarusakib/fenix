@@ -284,8 +284,101 @@ begin
 
     if v_host = 'hris.mohfw.gov.bd' then
       if v_parser_key <> 'health_registry_html'
-         or v_path !~* '^/public/facility-registry/reports/organization-list/?$' then
+         or v_path !~* '^/public/facility-registry/reports/organization-list/?
+      if v_parser_key <> 'smartfeni_partner_json'
+         or coalesce(v_metadata->>'partner_api_authorized','false') <> 'true'
+         or coalesce(v_metadata->>'access_verified','false') <> 'true'
+         or (v_path not ilike '/api/%' and v_path not ilike '%.json') then
+        raise exception 'smartfeni_permission_required' using errcode = '42501';
+      end if;
+    elsif v_host not in (
+      'bangladesh.gov.bd','feni.gov.bd','bbs.feni.gov.bd','sadar.feni.gov.bd',
+      'chhagalnaiya.feni.gov.bd','daganbhuiyan.feni.gov.bd','fulgazi.feni.gov.bd',
+      'parshuram.feni.gov.bd','sonagazi.feni.gov.bd','lged.sadar.feni.gov.bd',
+      'zpfeni.gov.bd','www.zpfeni.gov.bd','feni.judiciary.gov.bd','pourashava.feni.gov.bd',
+      'www.ntvbd.com','publisher.ntvbd.com','www.prothomalo.com','www.ajkerpatrika.com',
+      'fenirshomoy.com','www.fenirshomoy.com','feninewsbd.com','www.feninewsbd.com',
+      'bizhubfeni.com','www.bizhubfeni.com','myfeni.com','www.myfeni.com',
+      'biz4bd.com','www.biz4bd.com','fbcci.org','www.fbcci.org',
+      'marketbangladesh.com','www.marketbangladesh.com',
+      'bdbusinessdirectory.com','www.bdbusinessdirectory.com'
+    ) then
+      raise exception 'active_source_host_not_allowlisted' using errcode = '22023';
+    end if;
+
+    if p_source_type in ('public_web','community','social','verified_business')
+       and coalesce(v_metadata->>'access_verified','false') <> 'true' then
+      raise exception 'source_access_review_required' using errcode = '22023';
+    end if;
+
+    v_refresh_enabled := true;
+  end if;
+
+  if v_parser_key = 'smartfeni_partner_json' then
+    v_interval := 168;
+  elsif v_parser_key in ('news_html','notice_html') then
+    v_interval := 24;
+  elsif v_metadata->>'refresh_interval_hours' ~ '^[0-9]{1,3}$' then
+    v_interval := greatest(1, least((v_metadata->>'refresh_interval_hours')::integer, 720));
+  else
+    v_interval := 168;
+  end if;
+
+  if p_id is null then
+    insert into public.fenix_brain_sources (
+      source_type, publisher, title, url, language_code, trust_tier, status, metadata,
+      created_at, updated_at
+    ) values (
+      p_source_type, trim(p_publisher), trim(p_title), v_url, p_language_code,
+      p_trust_tier, p_status, v_metadata, now(), now()
+    )
+    returning id into v_id;
+  else
+    update public.fenix_brain_sources
+    set source_type = p_source_type,
+        publisher = trim(p_publisher),
+        title = trim(p_title),
+        url = v_url,
+        language_code = p_language_code,
+        trust_tier = p_trust_tier,
+        status = p_status,
+        metadata = v_metadata,
+        updated_at = now()
+    where id = p_id
+    returning id into v_id;
+  end if;
+
+  insert into public.fenix_brain_source_refresh as current_refresh (
+    source_id, enabled, refresh_interval_hours, next_refresh_at, parser_key, auto_publish
+  ) values (
+    v_id, v_refresh_enabled, v_interval, now(), v_parser_key, false
+  )
+  on conflict (source_id) do update
+  set enabled = excluded.enabled,
+      refresh_interval_hours = excluded.refresh_interval_hours,
+      next_refresh_at = case when excluded.enabled then now()
+                             else current_refresh.next_refresh_at end,
+      parser_key = excluded.parser_key,
+      auto_publish = false,
+      updated_at = now();
+
+  return v_id;
+end;
+$$;
+
+revoke all on function public.fenix_brain_admin_upsert_source(
+  uuid,text,text,text,text,text,smallint,text,jsonb
+) from public, anon, authenticated;
+grant execute on function public.fenix_brain_admin_upsert_source(
+  uuid,text,text,text,text,text,smallint,text,jsonb
+) to authenticated;
+
+commit;
+ then
         raise exception 'health_registry_adapter_requires_public_organization_report' using errcode = '22023';
+      end if;
+      if coalesce(v_metadata->>'access_verified','false') <> 'true' then
+        raise exception 'source_access_review_required' using errcode = '22023';
       end if;
     elsif v_host in ('smartfeni.com','www.smartfeni.com') then
       if v_parser_key <> 'smartfeni_partner_json'
