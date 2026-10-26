@@ -208,11 +208,10 @@ begin
       'chhagalnaiya.feni.gov.bd','daganbhuiyan.feni.gov.bd','fulgazi.feni.gov.bd',
       'parshuram.feni.gov.bd','sonagazi.feni.gov.bd','lged.sadar.feni.gov.bd',
       'zpfeni.gov.bd','www.zpfeni.gov.bd','feni.judiciary.gov.bd','pourashava.feni.gov.bd',
-      'hris.mohfw.gov.bd',
       'www.ntvbd.com','publisher.ntvbd.com','www.prothomalo.com','www.ajkerpatrika.com',
       'fenirshomoy.com','www.fenirshomoy.com','feninewsbd.com','www.feninewsbd.com',
       'smartfeni.com','www.smartfeni.com','bizhubfeni.com','www.bizhubfeni.com',
-      'myfeni.com','www.myfeni.com','openstreetmap.org','www.openstreetmap.org',
+      'myfeni.com','www.myfeni.com',
       'biz4bd.com','www.biz4bd.com','fbcci.org','www.fbcci.org',
       'marketbangladesh.com','www.marketbangladesh.com',
       'bdbusinessdirectory.com','www.bdbusinessdirectory.com'
