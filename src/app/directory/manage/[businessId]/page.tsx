@@ -1,12 +1,11 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import {
   ArrowLeft,
   ArrowUpRight,
-  CheckCircle,
   MapPin,
   Plus,
   ShieldCheck,
@@ -147,10 +146,6 @@ function verificationLabel(level: string | null | undefined, bn: boolean) {
   return row ? (bn ? row.bn : row.en) : (bn ? TRUST_LABELS.unverified.bn : TRUST_LABELS.unverified.en)
 }
 
-function InputHelp({ children }: { children: React.ReactNode }) {
-  return <p className="mt-1.5 text-[11px] leading-5 text-[var(--fx-muted)]">{children}</p>
-}
-
 export default function DirectoryBusinessEditorPage() {
   const params = useParams<{ businessId: string }>()
   const businessId = String(params.businessId ?? '').trim()
@@ -160,6 +155,8 @@ export default function DirectoryBusinessEditorPage() {
   const [ownerId, setOwnerId] = useState<string | null>(null)
   const [business, setBusiness] = useState<BusinessRow | null>(null)
   const [profile, setProfile] = useState<ProfileRow | null>(null)
+  const [locationExists, setLocationExists] = useState(false)
+  const [contactsExist, setContactsExist] = useState(false)
   const [loading, setLoading] = useState(true)
   const [signedIn, setSignedIn] = useState(false)
   const [notFound, setNotFound] = useState(false)
@@ -277,6 +274,8 @@ export default function DirectoryBusinessEditorPage() {
 
         setBusiness(businessData as BusinessRow)
         setProfile(loadedProfile)
+        setLocationExists(Boolean(loadedLocation))
+        setContactsExist(Boolean(loadedContact))
 
         setName(businessData.name ?? '')
         setTitleBn(businessData.title_bn ?? '')
@@ -313,11 +312,7 @@ export default function DirectoryBusinessEditorPage() {
         setOwnerId(auth.user.id)
       } catch {
         if (active) {
-          setLoadError(
-            bn
-              ? 'ব্যবসার তথ্য লোড করা যায়নি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।'
-              : 'Business details could not be loaded. Check your connection and try again.',
-          )
+          setLoadError('Business details could not be loaded. Check your connection and try again.')
         }
       } finally {
         if (active) setLoading(false)
@@ -328,7 +323,7 @@ export default function DirectoryBusinessEditorPage() {
     return () => {
       active = false
     }
-  }, [businessId, bn])
+  }, [businessId])
 
   async function saveBasic(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -404,25 +399,33 @@ export default function DirectoryBusinessEditorPage() {
 
     try {
       const supabase = createClient()
-      const { data, error: saveError } = await supabase
-        .from('business_directory_profiles')
-        .upsert({
-          business_id: business.id,
-          slug: nextSlug || null,
-          business_type: cleanText(businessType, 80) || null,
-          tagline_bn: cleanText(taglineBn, 240) || null,
-          tagline_en: cleanText(taglineEn, 240) || null,
-          about_bn: cleanText(aboutBn, 4000) || null,
-          about_en: cleanText(aboutEn, 4000) || null,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'business_id' })
+      const publicFields = {
+        slug: nextSlug || null,
+        business_type: cleanText(businessType, 80) || null,
+        tagline_bn: cleanText(taglineBn, 240) || null,
+        tagline_en: cleanText(taglineEn, 240) || null,
+        about_bn: cleanText(aboutBn, 4000) || null,
+        about_en: cleanText(aboutEn, 4000) || null,
+      }
+
+      const query = profile
+        ? supabase
+            .from('business_directory_profiles')
+            .update(publicFields)
+            .eq('business_id', business.id)
+        : supabase
+            .from('business_directory_profiles')
+            .insert({ business_id: business.id, ...publicFields })
+
+      const { data, error: saveError } = await query
         .select('business_id,slug,tagline_bn,tagline_en,about_bn,about_en,business_type,verification_level,listing_status,owner_claimed,phone_verified,location_verified')
-        .single()
+        .maybeSingle()
 
       if (saveError) {
         if (saveError.code === '23505') throw new Error('DUPLICATE_SLUG')
         throw saveError
       }
+      if (!data) throw new Error('Directory profile update was not confirmed.')
 
       setProfile(data as ProfileRow)
       setSlug(data.slug ?? '')
@@ -463,25 +466,31 @@ export default function DirectoryBusinessEditorPage() {
 
     try {
       const supabase = createClient()
-      const { error: saveError } = await supabase
-        .from('business_directory_locations')
-        .upsert({
-          business_id: business.id,
-          district: cleanText(district, 120) || 'Feni',
-          upazila: cleanText(upazila, 120) || null,
-          area: cleanText(area, 160) || null,
-          market: cleanText(market, 160) || null,
-          address: cleanText(address, 500) || null,
-          postal_code: cleanText(postalCode, 24) || null,
-          latitude: lat,
-          longitude: lon,
-          map_label: cleanText(mapLabel, 240) || null,
-          location_source: 'owner_provided',
-          is_public: locationPublic,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'business_id' })
+      const publicLocation = {
+        district: cleanText(district, 120) || 'Feni',
+        upazila: cleanText(upazila, 120) || null,
+        area: cleanText(area, 160) || null,
+        market: cleanText(market, 160) || null,
+        address: cleanText(address, 500) || null,
+        postal_code: cleanText(postalCode, 24) || null,
+        latitude: lat,
+        longitude: lon,
+        map_label: cleanText(mapLabel, 240) || null,
+        is_public: locationPublic,
+      }
+      const query = locationExists
+        ? supabase
+            .from('business_directory_locations')
+            .update(publicLocation)
+            .eq('business_id', business.id)
+        : supabase
+            .from('business_directory_locations')
+            .insert({ business_id: business.id, ...publicLocation })
+      const { data, error: saveError } = await query.select('business_id').maybeSingle()
 
       if (saveError) throw saveError
+      if (!data) throw new Error('Location update was not confirmed.')
+      setLocationExists(true)
       setSectionFeedback('location', 'success', bn ? 'অবস্থান ও মানচিত্রের তথ্য সংরক্ষণ হয়েছে।' : 'Location details saved.')
     } catch {
       setSectionFeedback('location', 'error', bn ? 'অবস্থানের তথ্য সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।' : 'Location details could not be saved. Please try again.')
@@ -513,21 +522,28 @@ export default function DirectoryBusinessEditorPage() {
 
     try {
       const supabase = createClient()
-      const { error: saveError } = await supabase
-        .from('business_directory_contacts')
-        .upsert({
-          business_id: business.id,
-          phone: phonePublic ? cleanText(phone, 60) || null : null,
-          whatsapp: whatsappPublic ? cleanText(whatsapp, 60) || null : null,
-          website_url: websitePublic ? normalizedWebsite : null,
-          facebook_url: websitePublic ? normalizedFacebook : null,
-          is_phone_public: phonePublic,
-          is_whatsapp_public: whatsappPublic,
-          is_website_public: websitePublic,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'business_id' })
+      const publicContacts = {
+        phone: phonePublic ? cleanText(phone, 60) || null : null,
+        whatsapp: whatsappPublic ? cleanText(whatsapp, 60) || null : null,
+        website_url: websitePublic ? normalizedWebsite : null,
+        facebook_url: websitePublic ? normalizedFacebook : null,
+        is_phone_public: phonePublic,
+        is_whatsapp_public: whatsappPublic,
+        is_website_public: websitePublic,
+      }
+      const query = contactsExist
+        ? supabase
+            .from('business_directory_contacts')
+            .update(publicContacts)
+            .eq('business_id', business.id)
+        : supabase
+            .from('business_directory_contacts')
+            .insert({ business_id: business.id, ...publicContacts })
+      const { data, error: saveError } = await query.select('business_id').maybeSingle()
 
       if (saveError) throw saveError
+      if (!data) throw new Error('Contact update was not confirmed.')
+      setContactsExist(true)
       if (!phonePublic) setPhone('')
       if (!whatsappPublic) setWhatsapp('')
       if (!websitePublic) {
