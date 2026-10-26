@@ -22,6 +22,7 @@ import {
   getBusinessPath,
   getBusinessSecondaryName,
   getDirectoryCategories,
+  getDirectoryImageUrl,
   getDirectoryUpazilas,
   getDirectionsUrl,
   searchDirectoryBusinesses,
@@ -74,13 +75,18 @@ function BusinessCard({ business, bn }: { business: DirectoryBusiness; bn: boole
   const name = getBusinessDisplayName(business)
   const secondary = getBusinessSecondaryName(business)
   const directionsUrl = getDirectionsUrl(business)
+  const logoUrl = getDirectoryImageUrl(business.logo_path)
 
   return (
     <article className="group flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_12px_40px_rgba(15,23,42,.06)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:shadow-[0_18px_55px_rgba(15,23,42,.10)] dark:border-white/[0.08] dark:bg-white/[0.045] dark:shadow-none">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-teal-600/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
-            <Storefront size={24} weight="duotone" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-teal-600/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
+            {logoUrl ? (
+              <img src={logoUrl} alt="" width={96} height={96} loading="lazy" className="h-full w-full object-contain" />
+            ) : (
+              <Storefront size={24} weight="duotone" />
+            )}
           </div>
           <div className="min-w-0">
             <h2 className="truncate text-base font-black text-[#0b1736] dark:text-white">
