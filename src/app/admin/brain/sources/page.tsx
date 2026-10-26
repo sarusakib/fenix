@@ -53,6 +53,9 @@ type Draft = {
   language_code: string
   trust_tier: number
   status: string
+  parser_key: string
+  access_verified: boolean
+  partner_api_authorized: boolean
 }
 
 const EMPTY_DRAFT: Draft = {
@@ -64,6 +67,9 @@ const EMPTY_DRAFT: Draft = {
   language_code: 'bn',
   trust_tier: 3,
   status: 'needs_review',
+  parser_key: 'generic_html',
+  access_verified: false,
+  partner_api_authorized: false,
 }
 
 const SOURCE_TYPES = [
@@ -80,6 +86,17 @@ const STATUS_OPTIONS = [
   ['needs_review', 'পর্যালোচনা প্রয়োজন / Needs review'],
   ['active', 'সক্রিয় / Active'],
   ['archived', 'আর্কাইভ / Archived'],
+] as const
+
+const PARSER_OPTIONS = [
+  ['generic_html', 'Generic HTML snapshot'],
+  ['feni_official_html', 'Feni official portal'],
+  ['bizhub_feni_html', 'BizHub Feni directory'],
+  ['health_registry_html', 'DGHS health facility registry'],
+  ['secondary_directory_html', 'Selected secondary directory'],
+  ['smartfeni_partner_json', 'Smart Feni authorized JSON partner feed'],
+  ['notice_html', 'Government notices'],
+  ['news_html', 'Local news index'],
 ] as const
 
 function safeDate(value: string | null | undefined) {
@@ -99,6 +116,14 @@ function friendlyError(message: string) {
   if (message.includes('invalid_language_code')) return 'Language নির্বাচন সঠিক নয়।'
   if (message.includes('invalid_trust_tier')) return 'Trust tier 1 থেকে 4-এর মধ্যে হতে হবে।'
   if (message.includes('publisher_or_title_length_invalid')) return 'Publisher ও title-এর দৈর্ঘ্য যাচাই করুন।'
+  if (message.includes('invalid_source_parser')) return 'এই source-এর জন্য parser নির্বাচন সঠিক নয়।'
+  if (message.includes('source_access_review_required')) return 'Source-এর terms ও অনুমোদিত access method যাচাই করে Access verified নির্বাচন করুন।'
+  if (message.includes('official_adapter_requires_feni_gov_bd_host')) return 'Feni official adapter শুধু feni.gov.bd বা তার সরকারি subdomain-এ ব্যবহার করুন।'
+  if (message.includes('bizhub_adapter_requires_bizhub_host')) return 'BizHub adapter-এর URL অবশ্যই bizhubfeni.com-এর হতে হবে।'
+  if (message.includes('secondary_directory_adapter_requires_known_directory_host')) return 'Secondary directory adapter-এর জন্য অনুমোদিত directory host নির্বাচন করুন।'
+  if (message.includes('health_registry_adapter_requires_public_organization_report')) return 'DGHS adapter-এর জন্য public organization-list report URL ব্যবহার করুন।'
+  if (message.includes('smartfeni_requires_authorized_json_feed_url')) return 'Smart Feni-তে public homepage নয়—অনুমোদিত API বা JSON feed URL দিতে হবে।'
+  if (message.includes('smartfeni_permission_required')) return 'Smart Feni-এর source-owner authorization ও access verification ছাড়া feed চালু করা যাবে না।'
   return message || 'কাজটি সম্পন্ন করা যায়নি।'
 }
 
@@ -210,6 +235,9 @@ export default function BrainSourcesAdminPage() {
       language_code: source.language_code,
       trust_tier: source.trust_tier,
       status: source.status,
+      parser_key: refreshStates[source.id]?.parser_key ?? String(source.metadata?.parser_key ?? 'generic_html'),
+      access_verified: source.metadata?.access_verified === true,
+      partner_api_authorized: source.metadata?.partner_api_authorized === true,
     })
     setFormOpen(true)
     setError('')
@@ -232,16 +260,87 @@ export default function BrainSourcesAdminPage() {
       return
     }
 
+    let parsedUrl: URL | null = null
     if (url) {
       try {
-        if (new URL(url).protocol !== 'https:') throw new Error('https')
+        parsedUrl = new URL(url)
+        if (parsedUrl.protocol !== 'https:' || parsedUrl.username || parsedUrl.password) throw new Error('https')
       } catch {
-        setError('Source URL অবশ্যই সঠিক HTTPS link হতে হবে।')
+        setError('Source URL অবশ্যই সঠিক HTTPS link হতে হবে এবং এতে username/password থাকতে পারবে না।')
         setSaving(false)
         return
       }
     } else if (draft.status === 'active' && draft.source_type !== 'internal') {
       setError('Active external source-এর HTTPS URL দিতে হবে। URL না থাকলে “Needs review” রাখুন।')
+      setSaving(false)
+      return
+    }
+
+    const host = parsedUrl?.hostname.toLowerCase() ?? ''
+    const path = parsedUrl?.pathname ?? ''
+    const secondaryHosts = new Set([
+      'biz4bd.com', 'www.biz4bd.com', 'fbcci.org', 'www.fbcci.org',
+      'marketbangladesh.com', 'www.marketbangladesh.com',
+      'bdbusinessdirectory.com', 'www.bdbusinessdirectory.com',
+    ])
+
+    if (draft.source_type === 'internal' && (url || draft.parser_key !== 'generic_html')) {
+      setError('FeniX-owned source-এর জন্য native database ব্যবহার করুন; external URL বা web adapter নয়।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'feni_official_html' &&
+        (draft.source_type !== 'government_official' || !(host === 'feni.gov.bd' || host.endsWith('.feni.gov.bd'))) ) {
+      setError('Feni official adapter শুধু government_official source এবং feni.gov.bd subdomain-এর জন্য।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'bizhub_feni_html' &&
+        (draft.source_type !== 'public_web' || !['bizhubfeni.com', 'www.bizhubfeni.com'].includes(host))) {
+      setError('BizHub adapter-এর জন্য source type Public web এবং BizHub Feni URL লাগবে।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'secondary_directory_html' && !secondaryHosts.has(host)) {
+      setError('Secondary directory adapter-এর URL অবশ্যই নির্বাচিত directory host-এর হতে হবে।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'health_registry_html' &&
+        (draft.source_type !== 'government_official' ||
+         host !== 'hris.mohfw.gov.bd' ||
+         !/^\\/public\\/facility-registry\\/reports\\/organization-list\\/?$/i.test(path))) {
+      setError('DGHS adapter-এর জন্য public organization-list report-এর নির্দিষ্ট URL ব্যবহার করতে হবে।')
+      setSaving(false)
+      return
+    }
+    if (draft.parser_key === 'smartfeni_partner_json') {
+      const validFeedPath = path.toLowerCase().startsWith('/api/') || path.toLowerCase().endsWith('.json')
+      if (url && (!['smartfeni.com', 'www.smartfeni.com'].includes(host) || !validFeedPath)) {
+        setError('Smart Feni-তে public homepage নয়—অনুমোদিত API বা JSON feed URL দিতে হবে।')
+        setSaving(false)
+        return
+      }
+      if (draft.status === 'active' && (!url || !draft.access_verified || !draft.partner_api_authorized)) {
+        setError('Smart Feni feed চালু করতে নির্দিষ্ট HTTPS JSON feed, access verification এবং source-owner authorization—তিনটিই প্রয়োজন।')
+        setSaving(false)
+        return
+      }
+      if (draft.source_type !== 'public_web') {
+        setError('Smart Feni partner feed-এর source type Public web হতে হবে।')
+        setSaving(false)
+        return
+      }
+    }
+    if (draft.parser_key === 'health_registry_html' && draft.status === 'active' && !draft.access_verified) {
+      setError('Health registry চালু করার আগে report URL ও Feni filter যাচাই করুন।')
+      setSaving(false)
+      return
+    }
+    if (draft.status === 'active' &&
+        ['public_web', 'community', 'social', 'verified_business'].includes(draft.source_type) &&
+        !draft.access_verified) {
+      setError('External source active করার আগে terms/licensing ও অনুমোদিত access method যাচাই করে Access verified নির্বাচন করুন।')
       setSaving(false)
       return
     }
@@ -256,7 +355,13 @@ export default function BrainSourcesAdminPage() {
       p_language_code: draft.language_code,
       p_trust_tier: Number(draft.trust_tier),
       p_status: draft.status,
-      p_metadata: null,
+      p_metadata: {
+        parser_key: draft.parser_key,
+        adapter_version: 1,
+        access_verified: draft.access_verified,
+        partner_api_authorized: draft.partner_api_authorized,
+        auto_publish: false,
+      },
     })
 
     if (saveError) {
