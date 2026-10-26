@@ -349,13 +349,17 @@ export default function DirectoryBrowser() {
       if (filtersKeyRef.current !== requestedFilters) return
       if (result.error) throw result.error
 
+      const existing = new Set(businesses.map((item) => item.id))
+      const additional = result.data.filter((item) => !existing.has(item.id))
+
       setBusinesses((current) => {
         if (filtersKeyRef.current !== requestedFilters) return current
-        const existing = new Set(current.map((item) => item.id))
-        const additional = result.data.filter((item) => !existing.has(item.id))
-        return [...current, ...additional]
+        const currentIds = new Set(current.map((item) => item.id))
+        const newItems = result.data.filter((item) => !currentIds.has(item.id))
+        return [...current, ...newItems]
       })
-      setHasMore(result.data.length === PAGE_SIZE)
+      // Stop if the RPC keeps returning the same records, preventing a no-progress loop.
+      setHasMore(result.data.length === PAGE_SIZE && additional.length > 0)
     } catch {
       if (filtersKeyRef.current === requestedFilters) {
         setMoreError(
