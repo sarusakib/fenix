@@ -8,6 +8,7 @@ export type IngestionAdapterKey =
 export type AdapterItem = {
   name: string;
   source_url?: string;
+  public_url?: string;
   category?: string;
   location?: string;
   district?: string;
@@ -397,7 +398,9 @@ function parseSmartFeniPartnerJson(raw: string, sourceUrl: string): IngestionSna
     if (!/business|shop|store|service provider|organization|clinic|hospital|pharmacy|restaurant/i.test(entityType + " " + category)) continue;
 
     const district = String(row.district ?? row.district_name ?? row.districtName ?? "").trim();
-    if (district && !/^(?:feni|ফেনী)$/i.test(district)) continue;
+    // Never infer that an unlabelled record belongs to Feni. Require an explicit
+    // Feni district field even when the provider says it is a local feed.
+    if (!district || !/^(?:feni|ফেনী)$/i.test(district)) continue;
     const publicUrlRaw = String(row.public_url ?? row.publicUrl ?? row.website ?? row.profile_url ?? row.profileUrl ?? "").trim();
     let publicUrl: string | undefined;
     try {
@@ -415,14 +418,15 @@ function parseSmartFeniPartnerJson(raw: string, sourceUrl: string): IngestionSna
     items.push({
       name: name.slice(0, 180),
       ...(category ? { category: category.slice(0, 120) } : {}),
-      ...(district ? { district: "Feni" } : { district: "Feni" }),
+      district: "Feni",
       ...(String(row.upazila ?? row.upazila_name ?? row.upazilaName ?? "").trim()
         ? { upazila: String(row.upazila ?? row.upazila_name ?? row.upazilaName).trim().slice(0, 120) }
         : {}),
       ...(String(row.area ?? row.location ?? row.address_area ?? "").trim()
         ? { location: String(row.area ?? row.location ?? row.address_area).trim().slice(0, 180) }
         : {}),
-      ...(publicUrl ? { source_url: publicUrl } : {}),
+      source_url: sourceUrl,
+      ...(publicUrl ? { public_url: publicUrl } : {}),
       ...(entityType ? { type: entityType.slice(0, 120) } : {}),
     });
     if (items.length >= MAX_ITEMS) break;
