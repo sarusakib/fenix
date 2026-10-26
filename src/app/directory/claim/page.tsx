@@ -21,6 +21,7 @@ type BusinessSummary = {
 
 export default function DirectoryClaimPage() {
   const [businessId, setBusinessId] = useState('')
+  const [businessIdReady, setBusinessIdReady] = useState(false)
   const [business, setBusiness] = useState<BusinessSummary | null>(null)
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(true)
@@ -32,45 +33,57 @@ export default function DirectoryClaimPage() {
 
   useEffect(() => {
     setBusinessId((new URLSearchParams(window.location.search).get('business') || '').trim())
+    setBusinessIdReady(true)
   }, [])
 
   useEffect(() => {
+    if (!businessIdReady) return
     let active = true
 
     async function load() {
-      const supabase = createClient()
-      const { data: auth } = await supabase.auth.getUser()
+      setError('')
+      setBusiness(null)
+      try {
+        const supabase = createClient()
+        const { data: auth, error: authError } = await supabase.auth.getUser()
+        if (authError) throw authError
 
-      if (!active) return
+        if (!active) return
 
-      setSignedIn(Boolean(auth.user))
-      setAuthChecked(true)
+        setSignedIn(Boolean(auth.user))
+        setAuthChecked(true)
 
-      if (!businessId) {
-        setError('This page needs a business ID. Open a business profile first and choose Claim.')
-        setLoading(false)
-        return
+        if (!businessId) {
+          setError('This page needs a business ID. Open a business profile first and choose Claim.')
+          return
+        }
+
+        const { data, error: businessError } = await supabase
+          .from('businesses')
+          .select('id,name,title_bn,title_en')
+          .eq('id', businessId)
+          .maybeSingle()
+
+        if (!active) return
+
+        if (businessError || !data) setError('Business could not be found.')
+        else setBusiness(data)
+      } catch {
+        if (active) {
+          setError('Business details could not be checked right now. Please try again.')
+        }
+      } finally {
+        if (active) {
+          setAuthChecked(true)
+          setLoading(false)
+        }
       }
-
-      const { data, error: businessError } = await supabase
-        .from('businesses')
-        .select('id,name,title_bn,title_en')
-        .eq('id', businessId)
-        .maybeSingle()
-
-      if (!active) return
-
-      if (businessError || !data) setError('Business could not be found.')
-      else setBusiness(data)
-
-      setLoading(false)
     }
-
     void load()
     return () => {
       active = false
     }
-  }, [businessId])
+  }, [businessId, businessIdReady])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -80,43 +93,47 @@ export default function DirectoryClaimPage() {
     setError('')
     setMessage('')
 
-    const supabase = createClient()
-    const { data: auth } = await supabase.auth.getUser()
+    try {
+      const supabase = createClient()
+      const { data: auth, error: authError } = await supabase.auth.getUser()
+      if (authError) throw authError
 
-    if (!auth.user) {
-      setBusy(false)
-      setSignedIn(false)
-      setError('Please sign in before submitting a claim.')
-      return
-    }
+      if (!auth.user) {
+        setSignedIn(false)
+        setError('Please sign in before submitting a claim.')
+        return
+      }
 
-    if (!businessId || !business) {
-      setBusy(false)
-      setError('Choose a valid business first.')
-      return
-    }
+      if (!businessId || !business) {
+        setError('Choose a valid business first.')
+        return
+      }
 
-    const { error: insertError } = await supabase
-      .from('business_claim_requests')
-      .insert({
-        business_id: businessId,
-        claimant_id: auth.user.id,
-        note: note.trim().slice(0, 2000),
-        status: 'pending',
-      })
+      const { error: insertError } = await supabase
+        .from('business_claim_requests')
+        .insert({
+          business_id: businessId,
+          claimant_id: auth.user.id,
+          note: note.trim().slice(0, 2000),
+          status: 'pending',
+        })
 
-    if (insertError) {
-      setError(
-        insertError.code === '23505'
-          ? 'A pending claim already exists for this business.'
-          : 'Claim request could not be submitted right now.',
-      )
-    } else {
+      if (insertError) {
+        setError(
+          insertError.code === '23505'
+            ? 'A pending claim already exists for this business.'
+            : 'Claim request could not be submitted right now.',
+        )
+        return
+      }
+
       setMessage('Claim submitted. An authorized FeniX reviewer must approve it before ownership is shown as reviewed.')
       setNote('')
+    } catch {
+      setError('Claim request could not be submitted because of a connection problem. Please try again.')
+    } finally {
+      setBusy(false)
     }
-
-    setBusy(false)
   }
 
   return (

@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   ArrowUpRight,
   Buildings,
+  Clock,
   Compass,
   Globe,
   MapPin,
@@ -22,6 +23,7 @@ import {
   getBusinessDisplayName,
   getBusinessSecondaryName,
   getDirectoryBusiness,
+  getDirectoryImageUrl,
   getDirectionsUrl,
   type DirectoryDetail,
 } from '@/lib/directory'
@@ -59,14 +61,29 @@ function money(value: number, currency: string) {
   }).format(value)
 }
 
+function formatBusinessTime(value: string | null) {
+  if (!value) return ''
+  const [hourText, minuteText] = value.slice(0, 5).split(':')
+  const hour = Number(hourText)
+  const minute = Number(minuteText)
+  if (!Number.isInteger(hour) || hour < 0 || hour > 23 || !Number.isInteger(minute) || minute < 0 || minute > 59) {
+    return value.slice(0, 5)
+  }
+  const suffix = hour >= 12 ? 'PM' : 'AM'
+  const displayHour = hour % 12 || 12
+  return displayHour + ':' + String(minute).padStart(2, '0') + ' ' + suffix
+}
+
 export default function DirectoryBusinessPage() {
   const params = useParams<{ slug: string }>()
-  const identifier = decodeURIComponent(String(params.slug ?? ''))
+  const identifier = String(params.slug ?? '').trim()
   const [business, setBusiness] = useState<DirectoryDetail | null>(null)
   const [products, setProducts] = useState<ProductPreview[]>([])
   const [investments, setInvestments] = useState<InvestmentPreview[]>([])
   const [loading, setLoading] = useState(true)
   const [missing, setMissing] = useState(false)
+  const [loadFailed, setLoadFailed] = useState(false)
+  const [retryVersion, setRetryVersion] = useState(0)
 
   useEffect(() => {
     let active = true
@@ -74,48 +91,64 @@ export default function DirectoryBusinessPage() {
 
     async function load() {
       setLoading(true)
-      const result = await getDirectoryBusiness(identifier)
-      if (!active) return
+      setLoadFailed(false)
+      setMissing(false)
 
-      if (result.error || !result.data) {
-        setBusiness(null)
-        setMissing(true)
-        setLoading(false)
-        return
+      try {
+        const result = await getDirectoryBusiness(identifier)
+        if (!active) return
+
+        if (result.error) {
+          setBusiness(null)
+          setLoadFailed(true)
+          return
+        }
+
+        if (!result.data) {
+          setBusiness(null)
+          setMissing(true)
+          return
+        }
+
+        setBusiness(result.data)
+
+        const [productsResult, investmentsResult] = await Promise.all([
+          supabase
+            .from('products')
+            .select('id, name_bn, name_en, price, currency, slug')
+            .eq('business_id', result.data.id)
+            .eq('status', 'published')
+            .eq('is_active', true)
+            .order('updated_at', { ascending: false })
+            .limit(8),
+          supabase
+            .from('investment_opportunities')
+            .select('id, title_bn, title_en, category')
+            .eq('business_id', result.data.id)
+            .in('status', ['approved', 'fully_funded'])
+            .eq('verification_status', 'verified')
+            .order('updated_at', { ascending: false })
+            .limit(6),
+        ])
+
+        if (!active) return
+        setProducts((productsResult.data ?? []) as ProductPreview[])
+        setInvestments((investmentsResult.data ?? []) as InvestmentPreview[])
+      } catch {
+        if (active) {
+          setBusiness(null)
+          setLoadFailed(true)
+        }
+      } finally {
+        if (active) setLoading(false)
       }
-
-      setBusiness(result.data)
-
-      const [productsResult, investmentsResult] = await Promise.all([
-        supabase
-          .from('products')
-          .select('id, name_bn, name_en, price, currency, slug')
-          .eq('business_id', result.data.id)
-          .eq('status', 'published')
-          .eq('is_active', true)
-          .order('updated_at', { ascending: false })
-          .limit(8),
-        supabase
-          .from('investment_opportunities')
-          .select('id, title_bn, title_en, category')
-          .eq('business_id', result.data.id)
-          .eq('status', 'published')
-          .eq('verification_status', 'verified')
-          .order('updated_at', { ascending: false })
-          .limit(6),
-      ])
-
-      if (!active) return
-      setProducts((productsResult.data ?? []) as ProductPreview[])
-      setInvestments((investmentsResult.data ?? []) as InvestmentPreview[])
-      setLoading(false)
     }
 
     void load()
     return () => {
       active = false
     }
-  }, [identifier])
+  }, [identifier, retryVersion])
 
   if (loading) {
     return (
@@ -128,7 +161,7 @@ export default function DirectoryBusinessPage() {
     )
   }
 
-  if (missing || !business) {
+  if (loadFailed || missing || !business) {
     return (
       <main className="min-h-dvh bg-[#f8fafc] px-4 py-10 text-[#0b1736] dark:bg-[#030506] dark:text-white">
         <div className="mx-auto max-w-3xl">
@@ -138,11 +171,24 @@ export default function DirectoryBusinessPage() {
           </Link>
           <div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-8 text-center dark:border-white/[0.08] dark:bg-white/[0.04]">
             <Storefront size={32} className="mx-auto text-slate-400 dark:text-white/35" />
-            <h1 className="mt-4 text-2xl font-black">Business not found</h1>
+            <h1 className="mt-4 text-2xl font-black">
+              {loadFailed ? 'Directory temporarily unavailable' : 'Business not found'}
+            </h1>
             <p className="mt-2 text-sm text-slate-500 dark:text-white/45">
-              This business may be unpublished, removed or the link may be incorrect.
+              {loadFailed
+                ? 'The business details could not be loaded right now. Please try again.'
+                : 'This business may be unpublished, removed or the link may be incorrect.'}
             </p>
-            <Link href="/directory" className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-[#008080] px-4 text-sm font-bold text-white">
+            {loadFailed && (
+              <button
+                type="button"
+                onClick={() => setRetryVersion((value) => value + 1)}
+                className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-[#008080] px-4 text-sm font-bold text-white"
+              >
+                Try again
+              </button>
+            )}
+            <Link href="/directory" className="mt-6 inline-flex min-h-11 items-center rounded-xl border border-slate-200 px-4 text-sm font-bold dark:border-white/[0.08]">
               Find another business
             </Link>
           </div>
@@ -154,6 +200,19 @@ export default function DirectoryBusinessPage() {
   const name = getBusinessDisplayName(business)
   const secondary = getBusinessSecondaryName(business)
   const directionsUrl = getDirectionsUrl(business)
+  const logoUrl = getDirectoryImageUrl(business.logo_path)
+  const coverUrl = getDirectoryImageUrl(business.cover_path)
+  const weeklyHours = business.opening_hours ?? []
+  const hasPublishedHours = weeklyHours.some((row) => row.is_closed || row.opens_at || row.closes_at)
+  const weekdayLabels = [
+    { day: 0, en: 'Sunday', bn: 'রবিবার' },
+    { day: 1, en: 'Monday', bn: 'সোমবার' },
+    { day: 2, en: 'Tuesday', bn: 'মঙ্গলবার' },
+    { day: 3, en: 'Wednesday', bn: 'বুধবার' },
+    { day: 4, en: 'Thursday', bn: 'বৃহস্পতিবার' },
+    { day: 5, en: 'Friday', bn: 'শুক্রবার' },
+    { day: 6, en: 'Saturday', bn: 'শনিবার' },
+  ]
   const location = [business.market, business.area, business.upazila, business.district]
     .map((value) => value?.trim())
     .filter(Boolean)
@@ -171,16 +230,21 @@ export default function DirectoryBusinessPage() {
         </Link>
 
         <section className="mt-6 overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white shadow-[0_20px_70px_rgba(15,23,42,.07)] dark:border-white/[0.08] dark:bg-white/[0.045] dark:shadow-none">
+          {coverUrl && <img src={coverUrl} alt="" width={1600} height={560} loading="lazy" className="h-48 w-full object-cover sm:h-64 lg:h-72" />}
           <div className="border-b border-slate-100 p-6 sm:p-8 dark:border-white/[0.06]">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="flex min-w-0 gap-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-teal-600/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
-                  <Buildings size={30} weight="duotone" />
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-teal-600/10 text-teal-700 dark:bg-teal-300/10 dark:text-teal-200">
+                  {logoUrl ? (
+                    <img src={logoUrl} alt="" width={160} height={160} className="h-full w-full object-contain" />
+                  ) : (
+                    <Buildings size={30} weight="duotone" />
+                  )}
                 </div>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="rounded-full bg-teal-600/10 px-2.5 py-1 text-[10px] font-bold text-teal-800 dark:bg-teal-300/10 dark:text-teal-100">
-                      {verificationLabels[business.verification_level] ?? 'Basic listing'}
+                      {verificationLabels[business.verification_level] ?? verificationLabels.unverified}
                     </span>
                     {business.phone_verified && (
                       <span className="rounded-full bg-sky-500/10 px-2.5 py-1 text-[10px] font-bold text-sky-800 dark:bg-sky-300/10 dark:text-sky-100">
@@ -254,6 +318,34 @@ export default function DirectoryBusinessPage() {
                   {business.tagline_bn || business.tagline_en}
                 </p>
               ) : null}
+
+              {hasPublishedHours && (
+                <section className="mt-8">
+                  <div className="flex items-center gap-2">
+                    <Clock size={19} className="text-teal-700 dark:text-teal-200" />
+                    <h2 className="text-lg font-black">Opening hours / খোলার সময়</h2>
+                  </div>
+                  <div className="mt-4 max-w-xl divide-y divide-slate-100 rounded-2xl border border-slate-200 dark:divide-white/[0.06] dark:border-white/[0.08]">
+                    {weekdayLabels.map((day) => {
+                      const hours = weeklyHours.find((row) => row.day_of_week === day.day)
+                      const label = day.en + ' / ' + day.bn
+                      const status = !hours || (!hours.is_closed && !hours.opens_at && !hours.closes_at)
+                        ? 'Hours not provided'
+                        : hours.is_closed
+                          ? 'Closed / বন্ধ'
+                          : hours.opens_at && hours.closes_at
+                            ? formatBusinessTime(hours.opens_at) + ' – ' + formatBusinessTime(hours.closes_at)
+                            : 'Hours not provided'
+                      return (
+                        <div key={day.day} className="flex items-center justify-between gap-4 px-4 py-3 text-sm">
+                          <span className="font-semibold">{label}</span>
+                          <span className={'text-right ' + (hours?.is_closed ? 'font-bold text-red-700 dark:text-red-300' : 'text-slate-600 dark:text-white/55')}>{status}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </section>
+              )}
 
               {products.length > 0 && (
                 <section className="mt-8">

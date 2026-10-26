@@ -275,10 +275,12 @@ export type Database = {
           about_en: string | null
           business_id: string
           business_type: string | null
+          cover_path: string | null
           created_at: string
           last_verified_at: string | null
           listing_status: string
           location_verified: boolean
+          logo_path: string | null
           owner_claimed: boolean
           phone_verified: boolean
           slug: string | null
@@ -292,10 +294,12 @@ export type Database = {
           about_en?: string | null
           business_id: string
           business_type?: string | null
+          cover_path?: string | null
           created_at?: string
           last_verified_at?: string | null
           listing_status?: string
           location_verified?: boolean
+          logo_path?: string | null
           owner_claimed?: boolean
           phone_verified?: boolean
           slug?: string | null
@@ -309,10 +313,12 @@ export type Database = {
           about_en?: string | null
           business_id?: string
           business_type?: string | null
+          cover_path?: string | null
           created_at?: string
           last_verified_at?: string | null
           listing_status?: string
           location_verified?: boolean
+          logo_path?: string | null
           owner_claimed?: boolean
           phone_verified?: boolean
           slug?: string | null
@@ -326,6 +332,44 @@ export type Database = {
             foreignKeyName: "business_directory_profiles_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_directory_hours: {
+        Row: {
+          business_id: string
+          closes_at: string | null
+          created_at: string
+          day_of_week: number
+          is_closed: boolean
+          opens_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          closes_at?: string | null
+          created_at?: string
+          day_of_week: number
+          is_closed?: boolean
+          opens_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          closes_at?: string | null
+          created_at?: string
+          day_of_week?: number
+          is_closed?: boolean
+          opens_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_directory_hours_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
