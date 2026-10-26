@@ -6,8 +6,58 @@ begin;
 
 -- A listing owner may edit public copy and the slug, but must not be able to
 -- self-assign verification badges, publication state, or approved ownership.
+-- Keep the owner row-level path available for own unpublished profiles while
+-- limiting writes through column-level privileges below. No owner DELETE policy
+-- is created, so an owner cannot delete the directory profile or reviewer state.
 drop policy if exists "Owners can manage directory profiles" on public.business_directory_profiles;
 drop policy if exists "Directory profiles owner delete" on public.business_directory_profiles;
+drop policy if exists "Directory profiles owner select" on public.business_directory_profiles;
+drop policy if exists "Directory profiles owner insert" on public.business_directory_profiles;
+drop policy if exists "Directory profiles owner update" on public.business_directory_profiles;
+
+create policy "Directory profiles owner select"
+on public.business_directory_profiles
+for select to authenticated
+using (
+  exists (
+    select 1
+    from public.businesses b
+    where b.id = business_directory_profiles.business_id
+      and b.owner_id = (select auth.uid())
+  )
+);
+
+create policy "Directory profiles owner insert"
+on public.business_directory_profiles
+for insert to authenticated
+with check (
+  exists (
+    select 1
+    from public.businesses b
+    where b.id = business_directory_profiles.business_id
+      and b.owner_id = (select auth.uid())
+  )
+);
+
+create policy "Directory profiles owner update"
+on public.business_directory_profiles
+for update to authenticated
+using (
+  exists (
+    select 1
+    from public.businesses b
+    where b.id = business_directory_profiles.business_id
+      and b.owner_id = (select auth.uid())
+  )
+)
+with check (
+  exists (
+    select 1
+    from public.businesses b
+    where b.id = business_directory_profiles.business_id
+      and b.owner_id = (select auth.uid())
+  )
+);
 
 revoke insert, update, delete on table public.business_directory_profiles from authenticated;
 revoke insert (
